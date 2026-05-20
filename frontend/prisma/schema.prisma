@@ -1,0 +1,73 @@
+// Prisma schema file for Kassler Smart Lock Showcase Website
+// Suitable for PostgreSQL or MySQL
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  slug      String    @unique
+  name      String
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id                  String             @id
+  name                String
+  code                String             @unique
+  categorySlug        String
+  category            Category           @relation(fields: [categorySlug], references: [slug])
+  priceRange          String
+  shortDescription    String
+  description         String             @db.Text
+  features            String[] // Mapped as JSON or simple string array in PG
+  dimensions          String
+  material            String
+  battery             String
+  openingMethods      String[]
+  lockingMechanism    String
+  images              String[]
+  colors              String[]
+  technologies        String[]
+  warranty            Int // In months
+  installationManual  String[]
+  faqs                ProductFaq[]
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+}
+
+model ProductFaq {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  question  String
+  answer    String   @db.Text
+  createdAt DateTime @default(now())
+}
+
+model LeadContact {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  email     String?
+  product   String?
+  message   String   @db.Text
+  status    String   @default("NEW") // NEW, CONTACTED, SOLVED
+  createdAt DateTime @default(now())
+}
+
+model ChatbotQA {
+  id        String   @id @default(uuid())
+  keyword   String   @unique
+  question  String
+  answer    String   @db.Text
+  createdAt DateTime @default(now())
+}
