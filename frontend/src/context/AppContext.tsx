@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { Product } from "@/data/products";
 
 interface FilterState {
@@ -50,55 +50,41 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [chatbotProductContext, setChatbotProductContext] = useState<Product | null>(null);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
 
   // Load wishlist, recentlyViewed, and theme from LocalStorage on mount
   useEffect(() => {
     try {
-      const savedWishlist = localStorage.getItem("kassler_wishlist");
-      if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+      const savedWishlist = localStorage.getItem("tahouse_wishlist");
+      const savedRecent = localStorage.getItem("tahouse_recent");
 
-      const savedRecent = localStorage.getItem("kassler_recent");
+      if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
       if (savedRecent) setRecentlyViewed(JSON.parse(savedRecent));
 
-      const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
-      if (savedTheme) {
-        setTheme(savedTheme);
-        if (savedTheme === "dark") {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-      } else {
-        document.documentElement.classList.add("dark");
-      }
+      // Permanently force light theme and clear any dark mode configurations
+      setTheme("light");
+      localStorage.setItem("theme", "light");
+      document.documentElement.classList.remove("dark");
     } catch (e) {
       console.error("Error accessing localStorage:", e);
     }
   }, []);
 
-  const toggleTheme = () => {
-    setTheme((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      localStorage.setItem("theme", next);
-      if (next === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-      return next;
-    });
-  };
+  const toggleTheme = useCallback(() => {
+    // Theme is permanently light to preserve unified brand aesthetics
+    localStorage.setItem("theme", "light");
+    document.documentElement.classList.remove("dark");
+  }, []);
 
-  const toggleWishlist = (id: string) => {
+  const toggleWishlist = useCallback((id: string) => {
     setWishlist((prev) => {
       const updated = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
-      localStorage.setItem("kassler_wishlist", JSON.stringify(updated));
+      localStorage.setItem("tahouse_wishlist", JSON.stringify(updated));
       return updated;
     });
-  };
+  }, []);
 
-  const addToCompare = (product: Product): boolean => {
+  const addToCompare = useCallback((product: Product): boolean => {
     if (compareList.some((p) => p.id === product.id)) {
       return false; // Already in compare list
     }
@@ -107,42 +93,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
     setCompareList((prev) => [...prev, product]);
     return true;
-  };
+  }, [compareList]);
 
-  const removeFromCompare = (id: string) => {
+  const removeFromCompare = useCallback((id: string) => {
     setCompareList((prev) => prev.filter((p) => p.id !== id));
-  };
+  }, []);
 
-  const clearCompare = () => {
+  const clearCompare = useCallback(() => {
     setCompareList([]);
-  };
+  }, []);
 
-  const addToRecentlyViewed = (id: string) => {
+  const addToRecentlyViewed = useCallback((id: string) => {
     setRecentlyViewed((prev) => {
       const filtered = prev.filter((item) => item !== id);
       const updated = [id, ...filtered].slice(0, 5); // Cap at 5 products
-      localStorage.setItem("kassler_recent", JSON.stringify(updated));
+      localStorage.setItem("tahouse_recent", JSON.stringify(updated));
       return updated;
     });
-  };
+  }, []);
 
-  const updateFilters = (updates: Partial<FilterState>) => {
+  const updateFilters = useCallback((updates: Partial<FilterState>) => {
     setFilters((prev) => ({ ...prev, ...updates }));
-  };
+  }, []);
 
-  const toggleTechnologyFilter = (tech: string) => {
+  const toggleTechnologyFilter = useCallback((tech: string) => {
     setFilters((prev) => {
       const technologies = prev.technologies.includes(tech)
         ? prev.technologies.filter((t) => t !== tech)
         : [...prev.technologies, tech];
       return { ...prev, technologies };
     });
-  };
+  }, []);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setFilters(defaultFilters);
     setSearchQuery("");
-  };
+  }, []);
 
   return (
     <AppContext.Provider

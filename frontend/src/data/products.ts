@@ -4,10 +4,14 @@ export interface Product {
   code: string;
   category: string;
   categoryName: string;
+  imageUrl: string;
+  price: number;
   priceRange: string;
   description: string;
   shortDescription: string;
+  images: string[];
   features: string[];
+  specs: Record<string, string>;
   specifications: {
     dimensions: string;
     material: string;
@@ -15,329 +19,454 @@ export interface Product {
     openingMethods: string[];
     lockingMechanism: string;
   };
-  images: string[];
-  colors: string[];
   technologies: string[];
   warranty: number; // in months
+  warrantyText: string;
+  colors: string[];
   installationManual: string[];
   faq: { question: string; answer: string }[];
 }
 
 export const CATEGORIES = [
-  { slug: "khoa-dai-sanh", name: "Khóa đại sảnh" },
-  { slug: "khoa-cua-go", name: "Khóa cửa gỗ" },
-  { slug: "khoa-cua-nhom", name: "Khóa cửa nhôm" },
-  { slug: "khoa-cua-kinh", name: "Khóa cửa kính" },
-  { slug: "khoa-cua-cong", name: "Khóa cửa cổng" },
-  { slug: "khoa-khach-san", name: "Khóa khách sạn" },
-  { slug: "ket-sat-thong-minh", name: "Két sắt thông minh" },
+  { id: "all", slug: "all", name: "Tất cả sản phẩm" },
+  { id: "Kitchen", slug: "Kitchen", name: "Thiết bị nhà bếp" },
+  { id: "Lock", slug: "Lock", name: "Khóa thông minh" },
+  { id: "Water", slug: "Water", name: "Thiết bị lọc nước" },
+  { id: "Cabinet", slug: "Cabinet", name: "Phụ kiện tủ bếp" },
+  { id: "Smart", slug: "Smart", name: "Thiết bị thông minh" }
 ];
 
 export const PRODUCTS: Product[] = [
   {
-    id: "kassler-kl-990-gold",
-    name: "Khóa Vân Tay Đại Sảnh Tân Cổ Điển KL-990 Luxury",
-    code: "KL-990 Gold",
-    category: "khoa-dai-sanh",
-    categoryName: "Khóa đại sảnh",
-    priceRange: "28.500.000 - 32.000.000 VNĐ",
-    shortDescription: "Dòng khóa vân tay đại sảnh phân khúc siêu sang cổ điển, đúc từ đồng nguyên chất dát vàng 24K, tích hợp công nghệ Face ID 3D siêu nhạy.",
-    description: "Khóa cửa thông minh Kassler KL-990 là biểu tượng của sự quyền lực, sang trọng đỉnh cao dành cho các biệt thự, lâu đài phong cách tân cổ điển. Được chế tác thủ công tinh xảo bằng chất liệu đồng nguyên chất và dát vàng 24K sang trọng, kết hợp cùng các công nghệ bảo mật sinh trắc học hiện đại nhất thế giới như nhận diện khuôn mặt Face ID 3D, vân tay bán dẫn FPC Thụy Điển, mang đến sự an toàn tuyệt đối và nâng tầm thẩm mỹ cho ngôi gia của bạn.",
-    features: [
-      "Nhận diện khuôn mặt Face ID 3D siêu tốc dưới 0.5s",
-      "Vân tay bán dẫn FPC Thụy Điển chống làm giả",
-      "Thân khóa 5 chốt bằng inox 304 đúc nguyên khối chống cạy phá",
-      "Tích hợp chuông cửa và màn hình hiển thị HD sắc nét bên trong",
-      "Quản lý lịch sử mở cửa thông minh qua ứng dụng di động",
-    ],
-    specifications: {
-      dimensions: "Dài 820mm x Rộng 85mm x Dày 38mm",
-      material: "Đồng nguyên chất đúc đặc, mạ vàng 24K cao cấp",
-      battery: "Pin Lithium sạc dung lượng cao 4200mAh (dùng 6 - 8 tháng)",
-      openingMethods: ["Khuôn mặt (FaceID)", "Vân tay", "Mật mã ảo", "Thẻ từ mã hóa", "Chìa cơ chống sao chép", "App Wifi"],
-      lockingMechanism: "Thân khóa tự động hoàn toàn bằng Inox 304, tiêu chuẩn an toàn cấp độ C",
-    },
+    id: "ta-9800",
+    name: "Khóa Thông Minh FaceID 3D TA-9800",
+    code: "TA-9800 PREMIUM",
+    category: "Lock",
+    categoryName: "Khóa thông minh",
+    imageUrl: "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000",
+    price: 18500000,
+    priceRange: "18.500.000 VNĐ",
+    description: "Khóa thông minh phân khúc Luxury tích hợp camera chuông hình, nhận diện khuôn mặt FaceID 3D siêu tốc và kết nối App Wifi điều khiển từ xa.",
+    shortDescription: "Khóa thông minh phân khúc Luxury tích hợp camera chuông hình, nhận diện khuôn mặt FaceID 3D.",
     images: [
-      "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80",
-      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000",
+      "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?q=80&w=1000",
+      "https://images.unsplash.com/photo-1481277542470-605612bd2d61?q=80&w=1000"
     ],
-    colors: ["Vàng 24K", "Đồng cổ hoàng gia"],
-    technologies: ["Face ID 3D", "FPC Biometric Thụy Điển", "Wifi Tuya App", "Mã số ảo 32 chữ số", "Cảnh báo cạy phá"],
+    features: [
+      "Face ID 3D nhận diện sinh trắc học chống sao chép giả mạo",
+      "Màn hình màu LCD sắc nét mặt trong hiển thị toàn cảnh ngoài cửa",
+      "Gửi thông báo có hình ảnh người bấm chuông về app điện thoại",
+      "Vân tay bán dẫn FPC siêu nhạy từ Thụy Điển kích hoạt < 0.3 giây"
+    ],
+    specs: {
+      "Chất liệu": "Hợp kim kẽm hàng không CNC nguyên khối, mặt kính cường lực chịu lực",
+      "Chế độ mở khóa": "Face ID, Vân tay, Mật mã, Điện thoại, Thẻ từ, Chìa cơ khẩn cấp",
+      "Nguồn cấp năng lượng": "Pin sạc Lithium 5000mAh bền bỉ lên đến 12 tháng",
+      "Độ dày cửa tương thích": "Cửa gỗ, cửa chống cháy có độ dày từ 38mm - 120mm"
+    },
+    specifications: {
+      dimensions: "Dài 420mm x Rộng 78mm x Dày 26mm",
+      material: "Hợp kim kẽm hàng không CNC nguyên khối, mặt kính cường lực",
+      battery: "Pin sạc Lithium 5000mAh bền bỉ lên đến 12 tháng",
+      openingMethods: ["Face ID", "Vân tay", "Mật mã ảo", "Thẻ từ", "Chìa cơ", "App Wifi"],
+      lockingMechanism: "Thân khóa tự động hoàn toàn bằng Inox 304, tiêu chuẩn cấp độ C"
+    },
+    technologies: ["AI Face Recognition", "FPC Swedish Sensor", "Tuya Mobile IoT", "Anti-Peep PIN Code"],
     warranty: 36,
+    warrantyText: "36 Tháng (1 đổi 1 trong 12 tháng)",
+    colors: ["Space Gray (Xám Không Gian)", "Champagne Gold (Vàng Thượng Hạng)"],
     installationManual: [
-      "Đo kích thước đố cửa gỗ (yêu cầu độ dày cửa >= 40mm, độ rộng đố cửa >= 120mm).",
-      "Định vị và khoan lỗ khóa theo dưỡng lắp đặt đi kèm trong hộp sản phẩm.",
-      "Lắp đặt ruột khóa (thân khóa) vào khe cửa đã đục và siết chặt ốc cố định.",
-      "Đi dây kết nối giữa mặt trước và mặt sau qua lỗ khoan trục trung tâm.",
-      "Lắp đặt mặt trước, mặt sau của khóa vào đố cửa rồi cố định chắc chắn.",
-      "Lắp pin Lithium vào khay chứa ở mặt sau, kiểm tra hoạt động đóng mở cơ học.",
-      "Cài đặt mã số chủ đầu tiên và tải App để kích hoạt liên kết Wifi."
+      "Khảo sát đố cửa (độ dày cửa gỗ >= 38mm, đố cửa rộng >= 100mm).",
+      "Sử dụng dưỡng khoan đục lỗ đố cửa chuẩn xác theo sơ đồ kích thước.",
+      "Lắp đặt hộp ruột khóa tự động Inox 304 vào đố cửa.",
+      "Luồn dây cáp kết nối từ mặt trước ra mặt sau qua lỗ khoan cốt trung tâm.",
+      "Cố định chắc chắn hai mặt ốp trong/ngoài của khóa bằng vít chuyên dụng.",
+      "Lắp pin Lithium vào khay chứa, cài đặt cấu hình mã số Admin và liên kết App Tuya."
     ],
     faq: [
       {
-        question: "Dung lượng pin của khóa KL-990 dùng được bao lâu và sạc thế nào?",
-        answer: "Khóa KL-990 sử dụng pin sạc Lithium 4200mAh cao cấp. Với tần suất đóng mở bình thường (khoảng 10-15 lần/ngày), pin có thể dùng liên tục từ 6 đến 8 tháng. Khi pin yếu (dưới 10%), khóa sẽ phát âm thanh cảnh báo và gửi thông báo về ứng dụng điện thoại. Bạn chỉ cần cắm sạc qua cổng Type-C tích hợp phía dưới khóa hoặc tháo pin ra sạc khoảng 3-4 tiếng là đầy."
+        question: "Dung lượng pin sạc Lithium dùng được bao lâu và sạc như thế nào?",
+        answer: "Khóa sử dụng pin Lithium sạc dung lượng lớn 5000mAh. Với tần suất mở cửa trung bình, pin có thể hoạt động bền bỉ từ 8 đến 12 tháng. Khi pin yếu (dưới 10%), khóa sẽ phát âm thanh cảnh báo. Bạn chỉ cần tháo pin cắm sạc qua cổng Type-C khoảng 4 tiếng hoặc cắm sạc dự phòng trực tiếp vào ngõ sạc khẩn cấp ở phía dưới khóa."
       },
       {
-        question: "Công nghệ Face ID 3D có hoạt động tốt vào ban đêm hay không?",
-        answer: "Có, khóa được trang bị camera hồng ngoại kép ban đêm chuyên dụng. Hệ thống quét khuôn mặt 3D phân tích các đường nét đa chiều của khuôn mặt nên nhận diện chính xác tuyệt đối ngay cả trong môi trường tối hoàn toàn, đồng thời ngăn chặn triệt để hành vi sử dụng ảnh chụp hoặc video để mở khóa."
+        question: "Công nghệ Face ID 3D có nhận diện được trong bóng tối không?",
+        answer: "Có, khóa sử dụng camera hồng ngoại quét đa chiều (IR Face ID) tự động phát hiện và nhận diện khuôn mặt chính xác tuyệt đối ngay cả trong môi trường tối hoàn toàn, ngăn chặn triệt để các hành vi dùng hình ảnh hoặc video giả mạo."
       }
     ]
   },
   {
-    id: "kassler-kl-888-black",
-    name: "Khóa Cửa Gỗ Sang Trọng Kassler KL-888 Modern",
-    code: "KL-888 Black",
-    category: "khoa-cua-go",
-    categoryName: "Khóa cửa gỗ",
-    priceRange: "12.500.000 - 14.800.000 VNĐ",
-    shortDescription: "Thiết kế hiện đại vuông vức cao cấp, mặt kính cường lực chống trầy xước, tích hợp vân tay ngay trên tay cầm.",
-    description: "Kassler KL-888 là mẫu khóa thông minh sinh ra để dành riêng cho các dòng cửa gỗ căn hộ chung cư cao cấp hoặc biệt thự hiện đại. Sở hữu ngôn ngữ thiết kế tối giản sang trọng với mặt kính cường lực Gorilla Glass thế hệ 5 bóng bẩy chống bám vân tay, khung viền hợp kim kẽm siêu cứng cáp, KL-888 đem lại cảm giác cầm nắm chắc chắn và trải nghiệm thông minh đỉnh cao.",
-    features: [
-      "Vân tay sinh trắc học đặt ngay trên tay nắm mở cửa cực tiện lợi",
-      "Kính cường lực Gorilla mài cong 2.5D chống va đập, trầy xước",
-      "Quản lý người dùng, phân quyền truy cập thông qua ứng dụng thông minh",
-      "Tính năng xáo trộn mã số ảo ngăn nhìn trộm tuyệt đối",
-      "Chế độ thông phòng (Auto-Lock tạm thời tắt) cho các buổi tiệc tùng"
+    id: "ta-bosch-pxx",
+    name: "Bếp Từ Đa Điểm Bosch PXX975DC1E",
+    code: "BOSCH PXX975DC1E",
+    category: "Kitchen",
+    categoryName: "Thiết bị nhà bếp",
+    imageUrl: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=1000",
+    price: 32500000,
+    priceRange: "32.500.000 VNĐ",
+    description: "Bếp từ đa điểm cao cấp nhập khẩu nguyên khối từ Đức. Trang bị mặt bếp Schott Ceran chịu nhiệt, bảng điều khiển DirectSelect Premium và chức năng cảm biến chiên xào thông minh.",
+    shortDescription: "Bếp từ đa điểm cao cấp nhập khẩu nguyên khối từ Đức, Schott Ceran chịu nhiệt.",
+    images: [
+      "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=1000",
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1000"
     ],
+    features: [
+      "Vùng nấu FlexInduction tự động kết hợp xoong nồi cỡ lớn đa điểm",
+      "Điều khiển DirectSelect Premium với 17 mức nhiệt tinh chỉnh tiện lợi",
+      "Cảm biến nhiệt FryingSensor ngăn cháy xém thức ăn khi chiên xào",
+      "Tự động nhận diện chu vi đáy nồi thông minh ngắt nhiệt an toàn"
+    ],
+    specs: {
+      "Kích thước sản phẩm": "51 x 916 x 527 mm",
+      "Tổng công suất nấu": "11.100 W mạnh mẽ vượt trội",
+      "Xuất xứ": "Made in Germany (Đức)",
+      "Vật liệu kính": "Schott Ceran chịu nhiệt đến 750 độ C"
+    },
+    specifications: {
+      dimensions: "Dài 916mm x Rộng 527mm x Dày 51mm",
+      material: "Kính gốm thủy tinh Schott Ceran cao cấp của Đức",
+      battery: "Điện áp xoay chiều 220V - 240V / 50-60Hz",
+      openingMethods: ["Cảm ứng trượt DirectSelect Premium", "Khóa an toàn trẻ em"],
+      lockingMechanism: "Tự động tắt bếp an toàn khi tràn nước hoặc quá nhiệt"
+    },
+    technologies: ["FlexInduction Zone", "FryingSensor Plus", "PowerBoost System", "DirectSelect Dual UI"],
+    warranty: 24,
+    warrantyText: "24 Tháng chính hãng",
+    colors: ["Vát cạnh trước, viền thép không gỉ đen bóng"],
+    installationManual: [
+      "Khảo sát bàn đá bếp (yêu cầu kích thước khoét đá chuẩn xác 880mm x 490mm).",
+      "Dán gioăng cao su bọc quanh mép kính mặt dưới để chống thấm nước xuống tủ.",
+      "Đặt bếp từ từ trên xuống khoét đá nhẹ nhàng khớp khít.",
+      "Đấu nối dây điện nguồn qua aptomat chuyên dụng (khuyến nghị tối thiểu 30A-40A do công suất lớn).",
+      "Bật aptomat kiểm tra bảng điều khiển hiển thị và đun thử nước để nghiệm thu."
+    ],
+    faq: [
+      {
+        question: "Vùng nấu đa điểm FlexInduction hoạt động thế nào?",
+        answer: "FlexInduction cho phép bạn kết hợp hai vùng nấu nhỏ thành một vùng nấu phẳng cỡ lớn thống nhất. Bếp sẽ tự động nhận diện hình dạng và chu vi của xoong nồi (kể cả khay nướng hình chữ nhật) để chỉ truyền nhiệt trực tiếp dưới đáy nồi, giúp tiết kiệm tối đa năng lượng."
+      }
+    ]
+  },
+  {
+    id: "ta-konox-granite",
+    name: "Chậu Rửa Bát Đá Granite Konox",
+    code: "KONOX SINK LUXURY",
+    category: "Kitchen",
+    categoryName: "Thiết bị nhà bếp",
+    imageUrl: "https://images.unsplash.com/photo-1610557892470-76d318047648?q=80&w=1000",
+    price: 11950000,
+    priceRange: "11.950.000 VNĐ",
+    description: "Chậu rửa bát đá thạch anh cao cấp nhập khẩu chính hãng từ Ý. Chất liệu Keratek kháng khuẩn 99.9%, bền bỉ chống bám bẩn trầy xước.",
+    shortDescription: "Chậu rửa bát đá thạch anh cao cấp nhập khẩu chính hãng từ Ý, kháng khuẩn 99.9%.",
+    images: [
+      "https://images.unsplash.com/photo-1610557892470-76d318047648?q=80&w=1000",
+      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1000"
+    ],
+    features: [
+      "Chất liệu Keratek Plus độc quyền chịu nhiệt lên đến 340 độ C",
+      "Bề mặt mịn màng mướt nước không bám dầu mỡ hay cặn canxi",
+      "Chiều sâu chậu 220mm hạn chế tối đa việc bắn nước ra xung quanh",
+      "Đi kèm thớt sồi sang trọng và rổ ráo nước thông minh cao cấp"
+    ],
+    specs: {
+      "Kích thước chậu": "R 860 x S 500 x C 220 mm",
+      "Vật liệu độc quyền": "80% Bột đá thạch anh tự nhiên + Keo acrylic cao cấp",
+      "Kiểu lắp đặt": "Lắp nổi biên mỏng hoặc lắp âm bàn đá tinh tế",
+      "Phụ kiện tặng kèm": "Thớt gỗ sồi cao cấp Italy, Siphon ngăn mùi kháng khuẩn"
+    },
+    specifications: {
+      dimensions: "Dài 860mm x Rộng 500mm x Sâu 220mm",
+      material: "Đá Granite thạch anh tự nhiên (Ý) Keratek Plus",
+      battery: "Không dùng điện (Chậu rửa cơ học)",
+      openingMethods: ["Đầu xả nhấn định vị", "Lọc rác 3 lớp bằng Inox"],
+      lockingMechanism: "Siphon ngăn mùi kháng khuẩn thông minh tự lưu thông nước thoát"
+    },
+    technologies: ["Keratek Plus Nano Tech", "BioShield Antibacterial", "Drainage Flow Optimizer"],
+    warranty: 60,
+    warrantyText: "60 Tháng (5 Năm hoàn hảo)",
+    colors: ["Chalcis Carbon (Đen Kim Sa)", "Alba Off-White (Trắng Sữa Gạo)"],
+    installationManual: [
+      "Đo đạc và xác định vị trí khoét hố bàn đá bếp (kích thước cắt đá tùy thuộc lắp âm hay lắp nổi).",
+      "Khoét đá và mài trơn mép vết cắt.",
+      "Lắp đặt hệ thống ống xả tràn và siphon vào chậu trước khi đặt chậu lên đá.",
+      "Thoa keo silicone chuyên dụng chịu nước xung quanh viền chậu rửa.",
+      "Đặt chậu vào bàn đá bếp, cố định chặt các đai kẹp sắt ở mặt dưới.",
+      "Kết nối siphon với đường nước thải gia đình, mở nước kiểm tra rò rỉ."
+    ],
+    faq: [
+      {
+        question: "Chất liệu Keratek Plus có dễ bị ố hay nứt vỡ không?",
+        answer: "Không, Keratek Plus là công nghệ độc quyền của Ý kết hợp 80% thạch anh tự nhiên và nhựa Acrylic đặc biệt, giúp bề mặt chậu rửa cực kỳ mịn màng, chống bám màu dầu mỡ, cà phê. Chậu có khả năng chịu nhiệt cao lên đến 340 độ C và chống nứt vỡ do sốc nhiệt cực kỳ an toàn."
+      }
+    ]
+  },
+  {
+    id: "ta-smith-purifier",
+    name: "Máy Lọc Nước R.O Cao Cấp A.O. Smith",
+    code: "A.O. SMITH RO-M2",
+    category: "Water",
+    categoryName: "Thiết bị lọc nước",
+    imageUrl: "https://images.unsplash.com/photo-1585338107529-13afc5f02586?q=80&w=1000",
+    price: 14200000,
+    priceRange: "14.200.000 VNĐ",
+    description: "Công nghệ màng lọc RO-Side Stream độc quyền nâng cao tỷ lệ nước tinh khiết thu hồi, thiết kế không bình chứa đặt gọn âm tủ tối giản tinh tế.",
+    shortDescription: "Công nghệ màng lọc RO-Side Stream độc quyền thu hồi nước cao cấp A.O. Smith.",
+    images: [
+      "https://images.unsplash.com/photo-1585338107529-13afc5f02586?q=80&w=1000",
+      "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?q=80&w=1000"
+    ],
+    features: [
+      "Màng lọc RO Side Stream kéo dài tuổi thọ sử dụng lên đến 3 năm",
+      "Vòi rửa thông minh hiển thị trực tiếp chất lượng nước TDS và tuổi thọ lõi",
+      "Hệ thống cảnh báo rò rỉ nước Leak Detector an toàn tuyệt đối",
+      "Màn hình điều khiển vi xử lý kiểm tra tự động dòng chảy liên tục"
+    ],
+    specs: {
+      "Công suất lọc": "94 Lít/giờ liên tục tràn trề",
+      "Hiệu suất thu hồi nước": "1:1 siêu tiết kiệm tài nguyên nước",
+      "Xuất xứ thương hiệu": "A.O. Smith (Mỹ) danh tiếng hơn 140 năm",
+      "Công nghệ màng": "RO - Side Stream thế hệ mới tăng tuổi thọ 1.5 lần"
+    },
+    specifications: {
+      dimensions: "Dài 400mm x Rộng 185mm x Cao 430mm",
+      material: "Vỏ nhựa ABS thực phẩm cao cấp, hệ thống vòi Inox chuẩn NSF",
+      battery: "Nguồn điện một chiều DC 24V (qua Adapter 220V)",
+      openingMethods: ["Vòi điện tử cảm ứng hiển thị chất lượng TDS", "Lõi lọc thay nhanh EasyLink"],
+      lockingMechanism: "Van điện từ tự động ngắt nước bảo vệ bơm áp lực"
+    },
+    technologies: ["RO-Side Stream USA", "RFID Smart Core ID", "Leak Detection Sensor"],
+    warranty: 12,
+    warrantyText: "12 Tháng chính hãng Mỹ",
+    colors: ["Trắng Nhôm Cao Cấp", "Bản Titan Sần Cao Cấp"],
+    installationManual: [
+      "Chọn vị trí lắp đặt khô ráo dưới gầm tủ bếp hoặc tủ độc lập.",
+      "Kết nối đường cấp nước lạnh qua bộ khóa chia chữ T có sẵn.",
+      "Lắp đặt vòi nước điện tử thông minh lên bàn chậu rửa.",
+      "Lắp đặt các lõi lọc vào máy theo đúng ký hiệu mã màu.",
+      "Kết nối đường xả nước thải của máy vào ống thoát chậu rửa.",
+      "Cắm điện nguồn, xả bỏ 3 bình lọc đầu tiên để làm sạch đường ống trước khi uống trực tiếp."
+    ],
+    faq: [
+      {
+        question: "Nước lọc ra từ máy A.O. Smith có cần đun sôi lại trước khi uống không?",
+        answer: "Không cần đun sôi. Nước qua màng lọc RO-Side Stream độc quyền của A.O. Smith đạt tiêu chuẩn NSF quốc tế và Bộ Y Tế Việt Nam về nước uống trực tiếp tại vòi. Hệ thống loại bỏ 99.9% kim loại nặng, vi khuẩn, virus và các tạp chất hữu cơ độc hại."
+      }
+    ]
+  },
+  {
+    id: "ta-hafele-spice",
+    name: "Giá Kho Gia Vị Âm Tủ Hafele",
+    code: "HAFELE SPICE 400",
+    category: "Cabinet",
+    categoryName: "Phụ kiện tủ bếp",
+    imageUrl: "https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?q=80&w=1000",
+    price: 5400000,
+    priceRange: "5.400.000 VNĐ",
+    description: "Hệ thống khay inox chống rỉ 304 tích hợp ray giảm chấn thông minh, chuyển động nhẹ nhàng ngay cả khi phân bổ tải trọng lớn.",
+    shortDescription: "Khay inox chống rỉ 304 tích hợp ray giảm chấn thông minh Hafele.",
+    images: [
+      "https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?q=80&w=1000",
+      "https://images.unsplash.com/photo-1595514535311-665aa0757753?q=80&w=1000"
+    ],
+    features: [
+      "Gia công từ thép không rỉ SUS 304 chuẩn bền bỉ chống oxi hóa bếp ăn",
+      "Hệ ray âm giảm chấn Hafele bền bỉ trên 50,000 lần kéo mở liên tục",
+      "Thiết kế 2 tầng khoa học lưu trữ chai lọ gia vị dao thớt đa năng",
+      "Dễ dàng tháo rời vệ sinh nhanh gọn bằng nước sạch"
+    ],
+    specs: {
+      "Chiều rộng lọt lòng tủ": "Tối thiểu 365 mm",
+      "Độ dày nan Inox": "Nan dẹt dày 5mm chắc chắn chịu lực",
+      "Tải trọng tối đa": "Chịu lực tĩnh lên tới 35 kg",
+      "Chất liệu hoàn thiện": "Inox 304 điện hóa bóng gương gương sáng"
+    },
+    specifications: {
+      dimensions: "Dài 475mm x Rộng 360mm x Cao 450mm",
+      material: "Inox 304 điện hóa chống han rỉ rỉ sét ăn mòn",
+      battery: "Không dùng điện (Chuyển động cơ học kéo mở)",
+      openingMethods: ["Tay gạt gắn cánh tủ", "Trượt dọc nhẹ nhàng"],
+      lockingMechanism: "Ray giảm chấn tự khít nhẹ nhàng khi đóng tủ"
+    },
+    technologies: ["Hafele SoftClose Rails", "SUS304 Electroplating", "Flexible Space-Divider"],
+    warranty: 24,
+    warrantyText: "24 Tháng toàn quốc chính hãng Hafele",
+    colors: ["Bạc Inox Gương", "Xám Matte Grey Luxury"],
+    installationManual: [
+      "Kiểm tra kích thước lòng khoang tủ bếp (yêu cầu chiều rộng thông thủy tối thiểu 365mm).",
+      "Lắp đặt hệ thống ray âm giảm chấn xuống sàn đáy tủ.",
+      "Gắn khung gia vị Inox lên hệ thống ray trượt.",
+      "Căn chỉnh mặt cánh tủ gỗ bắt vít cố định vào mặt trước khung trượt.",
+      "Đóng mở thử nghiệm để điều chỉnh độ lệch khe cánh tủ gỗ cho khít đều đẹp mắt."
+    ],
+    faq: [
+      {
+        question: "Inox 304 có bị rỉ sét do mắm muối trong bếp không?",
+        answer: "Không. Chất liệu Inox 304 (SUS304) cao cấp chứa hàm lượng Crom và Niken cao, có khả năng chống oxy hóa tuyệt đối trước hơi muối mắm và gia vị trong gian bếp. Bạn chỉ cần lau chùi định kỳ bằng khăn ẩm sạch là khay luôn bóng sáng như mới."
+      }
+    ]
+  },
+  {
+    id: "ta-malloca-oven",
+    name: "Lò Nướng Đối Lưu Malloca Premium",
+    code: "MALLOCA OVEN MOV-72ED",
+    category: "Kitchen",
+    categoryName: "Thiết bị nhà bếp",
+    imageUrl: "https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?q=80&w=1000",
+    price: 16900000,
+    priceRange: "16.900.000 VNĐ",
+    description: "Thiết kế âm tủ thời thượng, kính đen viền thép không gỉ nguyên khối. Hệ thống quạt đối lưu 3D nướng chín đều hoàn hảo.",
+    shortDescription: "Lò nướng đối lưu thiết kế âm tủ thời thượng kính đen viền thép không gỉ Malloca.",
+    images: [
+      "https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?q=80&w=1000",
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1000"
+    ],
+    features: [
+      "Dung tích cực lớn 72 lít nướng vừa nguyên cả con gà tây lớn",
+      "9 công thức chương trình gia nhiệt đa dạng thiết lập riêng dễ dàng",
+      "Bề mặt kính cách nhiệt SafeTouch 3 lớp cách nhiệt ngoài mượt mà",
+      "Chức năng tự làm sạch bằng thủy phân Hydroclean cực kỳ nhàn nhã"
+    ],
+    specs: {
+      "Dung tích": "72 Lít gia đình",
+      "Dải nhiệt độ cài đặt": "50 độ C - 250 độ C",
+      "Công suất nướng": "3.100 W hiệu suất đối lưu",
+      "Tiêu chuẩn tiết kiệm điện": "Hạng A+ chuẩn châu Âu"
+    },
+    specifications: {
+      dimensions: "Dài 595mm x Cao 595mm x Sâu 566mm",
+      material: "Mặt kính đen chịu lực chịu nhiệt 3 lớp, viền inox không gỉ",
+      battery: "Điện áp gia đình 220V - 50Hz / Công suất 3100W",
+      openingMethods: ["Cảm ứng chạm SmartControl", "Tay nắm kéo mở trợ lực"],
+      lockingMechanism: "Khóa bàn phím an toàn và tự ngắt quá nhiệt"
+    },
+    technologies: ["Hydroclean Self-Clean", "3D Convection Fan", "SafeTouch Cool Door", "SmartControl Touchscreen"],
+    warranty: 36,
+    warrantyText: "36 Tháng Malloca Việt Nam",
+    colors: ["Kính cường lực đen tuyền cao cấp mạ gương"],
+    installationManual: [
+      "Thiết kế khoang tủ tủ gỗ âm (yêu cầu kích thước khoét tủ Rộng 560mm x Cao 590mm x Sâu tối thiểu 570mm).",
+      "Đảm bảo mặt sau của tủ có khe thông gió đối lưu khí nóng.",
+      "Đặt lò nướng vào khoang gỗ, cố định chắc chắn hai bên hông lò bằng vít gỗ chuyên dụng đi kèm.",
+      "Kết nối nguồn điện vào cầu đấu có tiếp địa an toàn chống rò điện.",
+      "Chạy lò không tải ở 200 độ C trong 30 phút đầu tiên để khử mùi sơn dầu lắp ráp."
+    ],
+    faq: [
+      {
+        question: "Công nghệ tự làm sạch Hydroclean hoạt động như thế nào?",
+        answer: "Hydroclean sử dụng hơi nước để làm mềm dầu mỡ cứng đầu bám trên thành lò. Bạn chỉ cần đổ một ít nước vào đáy lò nướng, chọn chế độ Hydroclean. Lò sẽ gia nhiệt tạo hơi nước áp suất cao trong 24 phút. Sau khi kết thúc, bạn chỉ cần dùng khăn sạch lau nhẹ là các vết dầu mỡ trôi sạch hoàn toàn."
+      }
+    ]
+  },
+  {
+    id: "ta-lock-wood",
+    name: "Khóa Cửa Gỗ Vân Tay TA-8500",
+    code: "TA-8500 SLIM",
+    category: "Lock",
+    categoryName: "Khóa thông minh",
+    imageUrl: "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?q=80&w=1000",
+    price: 9200000,
+    priceRange: "9.200.000 VNĐ",
+    description: "Khóa cửa gỗ dáng Slim thon gọn sang trọng tinh tế, tay kéo đẩy xoay chuyển mượt mà, chuyên dụng cho căn hộ cao cấp và văn phòng.",
+    shortDescription: "Khóa cửa gỗ dáng Slim thon gọn tay kéo đẩy xoay chuyển mượt mà TA-8500.",
+    images: [
+      "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?q=80&w=1000",
+      "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000"
+    ],
+    features: [
+      "Tay nắm dạng Push-Pull tiện dụng tự động chốt khóa siêu an toàn",
+      "Đầu đọc vân tay tích hợp trực tiếp trên tay cầm tự nhiên",
+      "Cơ chế chống rung lắc giảm tiếng ồn khi gạt chốt trong đêm",
+      "Tích hợp chuông báo động nhiệt độ cao phòng ngừa hỏa hoạn"
+    ],
+    specs: {
+      "Vật liệu hoàn thiện": "Hợp kim nhôm và Kính cường lực vát cong 2.5D",
+      "Chức năng khẩn cấp": "Ngõ sạc cổng USB-C cấp nguồn bên ngoài",
+      "Lưu trữ dữ liệu": "100 Vân tay, 100 Thẻ từ, 50 Mật mã gia đình",
+      "Độ dày cửa chuẩn": "Thích hợp cửa gỗ dày 40mm - 90mm"
+    },
     specifications: {
       dimensions: "Dài 380mm x Rộng 72mm x Dày 24mm",
-      material: "Hợp kim kẽm siêu bền, Mặt kính cường lực Gorilla Glass",
-      battery: "4 viên pin AA Alkaline 1.5V (dùng khoảng 10-12 tháng)",
-      openingMethods: ["Vân tay", "Mật mã", "Thẻ từ", "Chìa khóa cơ", "App Bluetooth/Wifi"],
-      lockingMechanism: "Thân khóa tự động Inox 304 4 chốt an toàn chống cắt phá"
+      material: "Hợp kim nhôm siêu nhẹ siêu cứng và mặt kính cường lực 2.5D",
+      battery: "4 viên pin AA Alkaline 1.5V (sử dụng 10 - 12 tháng)",
+      openingMethods: ["Vân tay sinh trắc học", "Mã số ảo", "Thẻ từ", "Chìa khóa cơ chống đoản", "App Wifi Tuya"],
+      lockingMechanism: "Thân khóa tự động Inox 304 chốt vát nghiêng chống cạy rung lắc"
     },
-    images: [
-      "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80",
-      "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80",
-    ],
-    colors: ["Đen huyền bí", "Xám Titan bóng"],
-    technologies: ["Mật mã ảo", "Cảm biến vân tay FPC", "App điều khiển từ xa", "Cảnh báo cháy nổ khi nhiệt độ phòng > 70 độ C"],
+    technologies: ["Push-Pull Ergo", "FPC Fingerprint Hub", "Heat Alarm Sensor"],
     warranty: 24,
+    warrantyText: "24 Tháng",
+    colors: ["Bronze Brown (Vàng Cafe Đồng)", "Deep Jet Black (Đen Bóng Đêm)"],
     installationManual: [
-      "Kiểm tra độ dày cửa gỗ (yêu cầu dày >= 38mm, rộng >= 95mm).",
-      "Đánh dấu và khoan đục lỗ theo bản vẽ kích thước chuẩn của KL-888.",
-      "Lắp đặt hộp khóa chốt bên trong thân cửa.",
-      "Ốp mặt trước có đệm cao su giảm chấn vào cửa, kéo dây nối điện qua khe cửa.",
-      "Kết nối dây cáp vào bo mạch mặt sau, cố định mặt sau bằng ốc vít chuyên dụng.",
-      "Lắp đặt 4 viên pin AA chất lượng cao, test chức năng gạt tay cầm kiểm tra chốt khóa.",
-      "Đăng ký vân tay Admin theo hướng dẫn giọng nói Tiếng Anh/Tiếng Việt."
+      "Đo đạc đố cửa gỗ chung cư/văn phòng (Độ dày >= 38mm, đố cửa >= 95mm).",
+      "Khoan lỗ lắp đặt bằng cách ốp dưỡng định vị của TA-8500 lên mép cửa.",
+      "Lắp đặt ruột chốt khóa Inox và siết vít giữ chặt hông cửa.",
+      "Gắn trục truyền chuyển động gạt và luồn cáp điện nối bo mạch.",
+      "Lắp ốp mặt trước và mặt sau, căn chỉnh cho cân xứng rồi siết ốc cố định.",
+      "Lắp pin AA kiểm tra đóng mở thử, thiết lập mật mã Admin ban đầu."
     ],
     faq: [
       {
-        question: "Khóa hết pin đột ngột khi đang ở bên ngoài thì mở thế nào?",
-        answer: "Trong trường hợp khóa hết sạch pin mà bạn chưa kịp thay, bạn có hai cách để mở cửa: (1) Sử dụng chìa khóa cơ dự phòng được cất giấu ở khe cắm dưới đáy khóa. (2) Sử dụng pin dự phòng (Sạc dự phòng điện thoại) cắm vào cổng cấp nguồn khẩn cấp USB/Type-C ở mặt trước để khóa lên điện tạm thời, sau đó mở cửa bằng vân tay hoặc mật mã."
+        question: "Khi khóa bị hết pin đột ngột mà đang ở ngoài thì làm cách nào?",
+        answer: "Nếu khóa hết pin khi bạn đang đứng ngoài, bạn có hai giải pháp nhanh chóng: (1) Sử dụng chìa khóa cơ chống đoản dự phòng cắm vào ổ khóa khẩn cấp ở đáy khóa để mở thủ công. (2) Sử dụng cục sạc dự phòng điện thoại cắm qua ngõ USB-C dưới đáy khóa để cấp điện tạm thời, sau đó nhập vân tay hoặc mật mã mở cửa bình thường."
       }
     ]
   },
   {
-    id: "kassler-kl-660-slim",
-    name: "Khóa Cửa Nhôm Chống Nước KL-660 Slim Plus",
-    code: "KL-660 Slim",
-    category: "khoa-cua-nhom",
-    categoryName: "Khóa cửa nhôm",
-    priceRange: "6.200.000 - 7.500.000 VNĐ",
-    shortDescription: "Giải pháp hoàn hảo cho cửa nhôm Xingfa, cửa nhựa lõi thép đố hẹp, chống nước tuyệt đối tiêu chuẩn IP66.",
-    description: "Kassler KL-660 Slim Plus sở hữu thiết kế thanh mảnh cực kỳ tinh tế, tối ưu hóa cho các hệ cửa đố nhỏ như nhôm kính Xingfa, cửa nhựa lõi thép, cửa sắt hộp. Đặc biệt, sản phẩm đạt tiêu chuẩn kháng nước quốc tế IP66 giúp hoạt động ổn định bền bỉ dưới mọi thời tiết mưa gió khắc nghiệt bên ngoài.",
-    features: [
-      "Thiết kế siêu mỏng siêu nhỏ gọn chuyên dụng cho hệ nhôm Xingfa đố hẹp",
-      "Kháng nước tuyệt đối IP66 phù hợp lắp đặt ngoài hiên nhà có mái che",
-      "Cảm biến vân tay siêu nhạy chống nước, nhận diện cả khi ngón tay ướt",
-      "Tay nắm dạng gạt xoay đa hướng thông minh, dễ dàng đảo chiều tay gạt trái/phải"
-    ],
-    specifications: {
-      dimensions: "Dài 320mm x Rộng 38mm x Dày 22mm",
-      material: "Hợp kim kẽm siêu cứng kết hợp Inox 304",
-      battery: "4 viên pin AAA Alkaline 1.5V (dùng 8-10 tháng)",
-      openingMethods: ["Vân tay", "Mã số", "Thẻ từ", "Chìa cơ", "App Wifi (Tuya Smart)"],
-      lockingMechanism: "Thân khóa móc chuyên dụng cho cửa mở trượt lùa hoặc chốt thẳng cho cửa mở quay"
-    },
+    id: "ta-philips-sh",
+    name: "Hệ Thống Smart Home Hub TA-Core",
+    code: "TA-CORE IoT",
+    category: "Smart",
+    categoryName: "Thiết bị thông minh",
+    imageUrl: "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000",
+    price: 6800000,
+    priceRange: "6.800.000 VNĐ",
+    description: "Bộ điều khiển trung tâm IoT quản lý toàn bộ thiết bị nhà bếp, khóa thông minh và hệ ánh sáng rèm cửa thông minh toàn diện.",
+    shortDescription: "Bộ điều khiển trung tâm IoT quản lý toàn bộ thiết bị nhà bếp khóa thông minh TA-Core.",
     images: [
-      "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000",
+      "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?q=80&w=1000"
     ],
-    colors: ["Bạc ánh kim", "Đen sần tĩnh điện"],
-    technologies: ["Chống nước IP66", "Vân tay bán dẫn 360 độ", "Quản lý mã số dùng 1 lần (OTP) qua điện thoại"],
+    features: [
+      "Kết nối ổn định đồng thời hàng trăm thiết bị qua giao thức Zigbee 3.0",
+      "Kích hoạt ngữ cảnh mở cửa tự động bật máy hút mùi và sáng đèn bếp",
+      "Điều khiển giọng nói siêu mượt mà qua Google Assistant và Alexa Siri",
+      "Thiết kế lắp âm tường sang trọng phay nhôm phủ anot mịn cao cấp"
+    ],
+    specs: {
+      "Giao thức hỗ trợ": "Zigbee 3.0, Wifi 2.4Ghz, Bluetooth Mesh5.0",
+      "Màn hình cảm ứng": "IPS HD 4.0 inch mượt mà sắc sảo",
+      "Nguồn hoạt động": "Nguồn trực tiếp 220V an tâm",
+      "Kích thước đế âm": "Mặt vuông chuẩn thông dụng 86x86 mm"
+    },
+    specifications: {
+      dimensions: "Dài 86mm x Rộng 86mm x Dày 35mm (Mặt viền nhôm nổi 10mm)",
+      material: "Khung hợp kim nhôm phay CNC phủ anodized, mặt kính IPS cường lực",
+      battery: "Cấp nguồn trực tiếp xoay chiều 220V (Dây Nóng + Dây Nguội)",
+      openingMethods: ["Cảm ứng chạm đa điểm", "Ra lệnh bằng giọng nói", "Điều khiển qua Smartphone"],
+      lockingMechanism: "Hệ thống mã hóa dữ liệu cục bộ an toàn cao, tự động khôi phục ngữ cảnh khi mất mạng"
+    },
+    technologies: ["Zigbee 3.0 Standard", "Local Automation Scene", "Anodized Aluminum Finish"],
     warranty: 24,
+    warrantyText: "24 Tháng",
+    colors: ["Matte Gold (Vàng Nhám)", "Matte Carbon Black (Đen Sợi Carbon)"],
     installationManual: [
-      "Khảo sát đố nhôm (yêu cầu rộng >= 55mm, sâu >= 50mm).",
-      "Đục lỗ định vị cẩn thận tránh làm biến dạng thanh nhôm Xingfa.",
-      "Đặt ruột khóa phù hợp (móc lùa cho cửa lùa hoặc chốt thẳng cho cửa mở quay).",
-      "Luồn dây cáp điều khiển qua trục nhôm.",
-      "Ốp khít gioăng cao su chống nước của mặt trước và sau vào nhôm và siết chặt.",
-      "Lắp pin AAA và cài đặt cấu hình thông số Admin trên khóa."
+      "Chờ sẵn đế âm vuông chuẩn 86x86mm tại vị trí lắp đặt (yêu cầu kéo sẵn dây nguội N).",
+      "Nối dây nguồn điện 220V (L, N) vào cầu đấu phía sau màn hình trung tâm.",
+      "Gắn cố định thân đế màn hình vào vít đế âm tường.",
+      "Ốp khít viền phay nhôm mặt kính trước vào đế gá.",
+      "Bật aptomat điện, mở màn hình kết nối Wifi gia đình, tải app SmartLife/Tuya để quét và liên kết các thiết bị vệ tinh Zigbee."
     ],
     faq: [
       {
-        question: "Cửa lắp đặt ngoài trời bị mưa xối trực tiếp có dùng được KL-660 không?",
-        answer: "Kassler KL-660 Slim có tiêu chuẩn chống nước IP66, chống mưa bụi rất tốt. Tuy nhiên để khóa có tuổi thọ lâu dài nhất dưới thời tiết Việt Nam nắng mưa trực tiếp gay gắt, chúng tôi khuyên bạn nên trang bị thêm hộp che mưa chuyên dụng để bảo vệ thân khóa khỏi bị thấm nước ngập lâu ngày."
-      }
-    ]
-  },
-  {
-    id: "kassler-kl-550-glass",
-    name: "Khóa Cửa Kính Cường Lực Không Khoan Lỗ KL-550",
-    code: "KL-550 Glass",
-    category: "khoa-cua-kinh",
-    categoryName: "Khóa cửa kính",
-    priceRange: "5.500.000 - 6.800.000 VNĐ",
-    shortDescription: "Lắp đặt trực tiếp cho cửa kính thủy lực văn phòng, shop thời trang, không cần khoan đục kính.",
-    description: "Khóa cửa kính thông minh Kassler KL-550 là giải pháp khóa vân tay tối ưu nhất cho văn phòng công ty và các cửa hàng thương mại sử dụng cửa kính cường lực. Điểm vượt trội của KL-550 là khả năng lắp đặt dạng kẹp siêu chắc chắn mà không cần khoan bất kỳ lỗ nào trên mặt kính cường lực có sẵn, giữ nguyên vẻ sang trọng nguyên bản của hệ thống cửa.",
-    features: [
-      "Lắp đặt kẹp cơ học thông minh, không cần khoan kính, không ảnh hưởng cấu trúc cửa",
-      "Tích hợp tính năng chấm công nhân viên và xuất lịch sử ra vào qua cổng USB",
-      "Hỗ trợ chế độ mở khóa liên tục (chế độ văn phòng họp) cực kỳ tiện lợi",
-      "Chuông cửa điện tử âm lượng lớn tích hợp ngay trên bàn phím số"
-    ],
-    specifications: {
-      dimensions: "Dài 190mm x Rộng 78mm x Dày 35mm",
-      material: "Nhựa ABS chống cháy phối hợp hợp kim nhôm đúc",
-      battery: "4 viên pin AA Alkaline 1.5V",
-      openingMethods: ["Vân tay (lưu 150 vân tay)", "Mật mã", "Thẻ từ (lưu 300 thẻ)", "Điều khiển từ xa (Remote - mua thêm)", "App điện thoại"],
-      lockingMechanism: "Khóa chốt kép xoay tròn siêu cứng cáp kẹp chặt đố kính đối diện"
-    },
-    images: [
-      "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80",
-    ],
-    colors: ["Đen gương Piano", "Bạc Chrome"],
-    technologies: ["Màn hình OLED hiển thị menu", "Chấm công xuất Excel qua USB", "Chống sốc điện tĩnh điện cao"],
-    warranty: 24,
-    installationManual: [
-      "Làm sạch bề mặt kính tại vị trí lắp đặt ở mép cửa kính.",
-      "Bóc lớp keo đệm cao su và kẹp chặt mặt trước/mặt sau khóa vào cánh kính.",
-      "Siết đều ốc lục giác kẹp ở mặt sau để cố định khóa vào mép kính (không siết quá tay làm vỡ kính).",
-      "Dán/kẹp hộp đón chốt khóa sang cánh kính đối diện hoặc đục lỗ đón chốt xuống nền sàn/khung cửa nếu là cửa kính 1 cánh.",
-      "Lắp pin AA, kiểm tra khoảng cách kẹp chốt an toàn đạt từ 3-5mm."
-    ],
-    faq: [
-      {
-        question: "Tính năng chấm công xuất file Excel trên KL-550 hoạt động thế nào?",
-        answer: "Khóa có bộ nhớ lưu trữ lịch sử mở cửa của từng nhân viên. Bạn chỉ cần cắm USB vào cổng kết nối dưới đáy khóa, truy cập Menu quản trị chọn 'Xuất lịch sử', khóa sẽ tự động ghi tệp tin Excel chứa danh sách chi tiết ngày/giờ mở cửa của từng ID nhân viên vào USB để bạn cắm sang máy tính xem."
-      }
-    ]
-  },
-  {
-    id: "kassler-kl-400-gate",
-    name: "Khóa Cửa Cổng Sắt Ngoài Trời Chống Nước KL-400",
-    code: "KL-400 Gate",
-    category: "khoa-cua-cong",
-    categoryName: "Khóa cửa cổng",
-    priceRange: "7.000.000 - 8.200.000 VNĐ",
-    shortDescription: "Thiết kế đúc Inox 304 nguyên khối chống cắt phá, bảo mật vân tay 2 mặt trong và ngoài.",
-    description: "Khóa cửa cổng Kassler KL-400 là giải pháp an ninh tối thượng cho cổng sắt biệt thự, nhà phố, nhà trọ. Được chế tác từ chất liệu Inox 304 đúc đặc siêu dày chống rỉ sét, chống cắt cưa và đột nhập phá hoại phá khóa. Đặc biệt khóa hỗ trợ tùy chọn vân tay 2 mặt (trong và ngoài) ngăn chặn kẻ gian thò tay qua khe cửa cổng để mở chốt từ phía trong.",
-    features: [
-      "Chất liệu thép Inox 304 đúc dày siêu bền, chống chịu rỉ sét ăn mòn biển",
-      "Vân tay 2 mặt khóa độc lập bảo mật tối đa cho cửa cổng nhiều nan khe hở",
-      "Hộp bảo vệ chống nước toàn diện tiêu chuẩn IP67 hoạt động dưới mưa xối trực tiếp",
-      "Tích hợp kết nối cổng chuông màn hình, hệ thống kiểm soát ra vào tòa nhà"
-    ],
-    specifications: {
-      dimensions: "Dài 170mm x Rộng 100mm x Dày 60mm",
-      material: "Thép Inox 304 đúc nguyên khối siêu cứng",
-      battery: "4 viên pin AA Alkaline hoặc đấu nguồn điện 12V trực tiếp",
-      openingMethods: ["Vân tay (2 mặt)", "Mã số", "Thẻ từ", "Chìa khóa cơ tròn chống đoản", "App Wifi điều khiển từ xa"],
-      lockingMechanism: "Khóa chốt móc tự khóa hoặc chốt ngang Inox đặc phi 16 cực khỏe"
-    },
-    images: [
-      "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80",
-    ],
-    colors: ["Inox xước bạc mờ"],
-    technologies: ["Kháng nước IP67", "Cảm biến vân tay kép sinh trắc học", "Cảnh báo chống đập cạy hú còi tại chỗ"],
-    warranty: 24,
-    installationManual: [
-      "Gia cố thêm miếng sắt đệm hàn vào cửa cổng sắt nếu độ dày hộp nan sắt không đủ rộng để bắt ốc trực tiếp.",
-      "Khoan lỗ luồn trục cốt khóa và dây điện kết nối 2 mặt của khóa cửa cổng.",
-      "Gắn gioăng cao su bọc kín các góc cạnh, áp hai mặt khóa siết ốc đối xứng.",
-      "Hàn hoặc bắt vít bát giữ chốt đón khóa vào khung cột cổng sắt đối diện.",
-      "Lắp đặt hộp che mưa kim loại bổ sung đi kèm để bảo đảm tuổi thọ sản phẩm lâu nhất."
-    ],
-    faq: [
-      {
-        question: "Lắp đặt cho nhà trọ có đông người thuê ra vào có bền không?",
-        answer: "Khóa cổng KL-400 rất phù hợp cho nhà trọ nhờ bộ nhớ lưu trữ lớn (lên tới 100 vân tay, 100 thẻ từ) và vỏ ngoài Inox 304 chịu lực va đập phá cực tốt. Bạn có thể dễ dàng thêm/bớt vân tay của từng người thuê thông qua mật mã chủ hoặc quản lý hoàn toàn trên ứng dụng điện thoại rất tiện lợi."
-      }
-    ]
-  },
-  {
-    id: "kassler-kl-300-hotel",
-    name: "Khóa Thẻ Từ Khách Sạn Kassler KL-300 Smart Card",
-    code: "KL-300 Hotel",
-    category: "khoa-khach-san",
-    categoryName: "Khóa khách sạn",
-    priceRange: "3.200.000 - 4.500.000 VNĐ (Theo dự án)",
-    shortDescription: "Quản lý phân quyền thẻ từ thông minh theo giờ, liên kết phần mềm quản lý phòng khách sạn chuyên dụng.",
-    description: "Kassler KL-300 là dòng khóa thẻ từ chuyên dụng phục vụ cho các dự án khách sạn, homestay, resort nghỉ dưỡng cao cấp. Tích hợp công nghệ thẻ từ RFID mã hóa cao tần chống sao chép và đồng bộ mượt mà với phần mềm quản lý máy tính chuyên nghiệp, cho phép phát hành thẻ phòng giới hạn thời gian lưu trú, phân quyền quản lý cho nhân viên dọn phòng.",
-    features: [
-      "Hệ thống khóa thẻ từ RFID tần số cao chống sao chép hay làm giả thẻ tuyệt đối",
-      "Đồng bộ phần mềm quản lý phòng khách sạn, tạo thẻ giới hạn thời gian Check-in/Check-out",
-      "Tiết kiệm điện tối đa, tuổi thọ pin kéo dài lên đến 18 tháng",
-      "Có chìa khóa cơ dự phòng khẩn cấp che kín thẩm mỹ dưới tay cầm"
-    ],
-    specifications: {
-      dimensions: "Dài 300mm x Rộng 70mm x Dày 20mm",
-      material: "Hợp kim kẽm chống ăn mòn sơn phủ bề mặt tĩnh điện cao cấp",
-      battery: "4 viên pin AA Alkaline 1.5V (dùng 1.5 năm)",
-      openingMethods: ["Thẻ từ cảm ứng RFID mã hóa", "Chìa cơ dự phòng"],
-      lockingMechanism: "Ruột khóa khách sạn tiêu chuẩn ANSI 5 chốt siêu an toàn, chống cạy"
-    },
-    images: [
-      "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80",
-    ],
-    colors: ["Bạc thanh lịch", "Vàng Gold tinh tế"],
-    technologies: ["Thẻ RFID Mifare 13.56MHz", "Quản lý phần mềm quản trị tập trung offline/online", "Cảnh báo cửa chưa đóng khít"],
-    warranty: 24,
-    installationManual: [
-      "Sử dụng dưỡng khoan đục đố cửa gỗ tự nhiên/gỗ công nghiệp của phòng khách sạn.",
-      "Lắp hộp khóa ruột tiêu chuẩn ANSI vào cửa, luồn dây tín hiệu lên đầu khóa.",
-      "Cố định mặt trước có chip đọc thẻ và mặt sau chứa khay pin siết chặt bằng trục ren sắt.",
-      "Kết nối phần mềm quản lý khách sạn trên máy tính với đầu đọc ghi thẻ qua cổng USB.",
-      "Quét thẻ cấu hình phòng (Room Card) để khóa nhận biết số phòng tương ứng."
-    ],
-    faq: [
-      {
-        question: "Phần mềm quản lý khách sạn đi kèm khóa có mất phí duy trì hàng năm không?",
-        answer: "Phần mềm quản lý hệ thống thẻ từ khách sạn Kassler được cung cấp miễn phí vĩnh viễn đi kèm theo dự án mua khóa. Phần mềm có giao diện tiếng Việt thân thiện, dễ sử dụng, giúp quản lý phân tầng thang máy, phát hành thẻ phòng, và báo cáo lịch sử chi tiết."
-      }
-    ]
-  },
-  {
-    id: "kassler-ks-100-safe",
-    name: "Két Sắt Thông Minh Vân Tay Cường Lực KS-100 Luxury",
-    code: "KS-100 Safe",
-    category: "ket-sat-thong-minh",
-    categoryName: "Két sắt thông minh",
-    priceRange: "18.500.000 - 22.000.000 VNĐ",
-    shortDescription: "Công nghệ nhận diện vân tay ẩn trên tay nắm xoay, thép cường lực đúc đặc dày 10 ly chống cháy phá.",
-    description: "Két sắt thông minh Kassler KS-100 mang đến giải pháp lưu trữ tài sản, giấy tờ quan trọng tuyệt mật ngay tại gia đình hay phòng giám đốc. Khác biệt với két sắt truyền thống cồng kềnh thô kệch, KS-100 khoác lên mình ngôn ngữ thiết kế sang trọng với mặt kính cường lực đen bóng siêu sang, tay nắm xoay tự động ẩn hiện, cùng thân vỏ đúc nguyên khối thép Carbon cường lực chống nạy, chống cháy nhiệt độ cao lên đến 1200 độ C.",
-    features: [
-      "Khóa mở bằng cảm biến vân tay sinh trắc học siêu nhạy tích hợp trên núm xoay tự động",
-      "Thân vỏ đúc bằng thép đặc dày 10mm siêu cứng, chống nạy khoan đục phá tối đa",
-      "Cảnh báo rung lắc, nhập sai mật khẩu quá 3 lần còi hú chói tai vang dội",
-      "Hệ thống chốt chìm Inox đặc đường kính 32mm xoay tròn chống cắt cưa chốt"
-    ],
-    specifications: {
-      dimensions: "Cao 600mm x Rộng 420mm x Sâu 380mm (Trọng lượng: 85kg)",
-      material: "Thép Carbon đúc đặc sơn tĩnh điện chống rỉ sét, Lót nhung nỉ alcantara cao cấp bên trong",
-      battery: "Sử dụng 4 viên pin AA Alkaline lắp mặt ngoài tiện lợi hoặc nguồn cấp cứu từ ngoài",
-      openingMethods: ["Vân tay bán dẫn", "Mật mã ảo cảm ứng", "Chìa khóa cơ chống sao chép khẩn cấp", "App Wifi nhận thông báo mở"],
-      lockingMechanism: "Hệ thống chốt Inox 32mm đúc đặc 4 hướng cắm sâu vào thành két"
-    },
-    images: [
-      "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80",
-    ],
-    colors: ["Đen nhám Classic", "Đồng cát ánh kim"],
-    technologies: ["Báo động rung lắc toàn thân", "Chống cháy tiêu chuẩn UL Class 350 (2 giờ ở 1200°C)", "Đèn LED chiếu sáng nội thất tự động bật"],
-    warranty: 36,
-    installationManual: [
-      "Chọn vị trí đặt két bằng phẳng trong phòng ngủ, tủ quần áo hoặc vị trí kín đáo.",
-      "Sử dụng vít nở sắt phi 12 bắt cố định két trực tiếp vào tường gạch hoặc nền bê tông thông qua 2 lỗ khoan chờ sẵn ở lưng/đáy két nhằm chống trộm khênh két.",
-      "Lắp pin AA đi kèm vào hộp pin phụ khẩn cấp mặt ngoài để kích hoạt màn hình cảm ứng.",
-      "Mở két bằng mã mặc định nhà sản xuất (123456), nhấn nút reset màu xanh phía sau cánh cửa để cài đặt mật mã mới và lấy dấu vân tay chủ."
-    ],
-    faq: [
-      {
-        question: "Bên trong két sắt có được chia ngăn thông minh không?",
-        answer: "Có, nội thất KS-100 được bọc da Alcantara cao cấp chống ẩm mốc trầy xước đồ trang sức vàng bạc. Két được chia làm 3 ngăn lớn linh hoạt có thể tháo rời vách ngăn gỗ, đặc biệt tích hợp 1 ngăn kéo khóa bảo mật riêng biệt ở giữa để giữ các tài liệu mật, hộ chiếu."
+        question: "Hệ thống có tự động hóa bật tắt các thiết bị bếp và khóa không?",
+        answer: "Có, thông qua màn hình TA-Core, bạn có thể thiết lập các kịch bản tự động hóa cực kỳ tiện lợi: Ví dụ kịch bản 'Trở về nhà': Khi khóa vân tay TA-9800 mở cửa, máy hút mùi bếp sẽ tự khởi động, rèm cửa mở ra và hệ thống đèn chiếu sáng khu vực bếp được bật sáng chào đón bạn."
       }
     ]
   }
 ];
+
+export const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND"
+  }).format(value);
+};

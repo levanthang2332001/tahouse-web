@@ -1,231 +1,202 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { Mail, Phone, MapPin, Clock, Facebook, Youtube, Send, CheckCircle2, Lock } from "lucide-react";
-import { useApp } from "@/context/AppContext";
-import { CATEGORIES } from "@/data/products";
+import { Mail, Phone, MapPin, Facebook, Youtube, Instagram, ArrowUp } from "lucide-react";
 
 export default function Footer() {
-  const { updateFilters, theme } = useApp();
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setSubscribed(true);
-      setEmail("");
-      setTimeout(() => setSubscribed(false), 5000); // resets after 5s
+  const handleScrollToTop = () => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
-  const handleCategoryClick = (slug: string) => {
-    updateFilters({ category: slug });
-    document.getElementById("products-listing")?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
-    <footer className="bg-[var(--background)] border-t border-gold/10 pt-16 pb-8 relative z-10">
-      
-      {/* Brand Partners Marquee Slider (Extra feature) */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-        <h4 className="text-center text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-8">Đối tác thương hiệu toàn cầu</h4>
-        <div className="overflow-hidden relative w-full py-4 border-y border-zinc-900/50">
-          <div className="flex gap-16 items-center whitespace-nowrap animate-scroll-marquee">
-            {/* Double the logos to support endless sliding marquee effect */}
-            {["KASSLER EUROPE", "FPC SWEDEN", "TUYA SMART", "YALE CO.", "MILRE KOREA", "SCHLAGE USA", "PHILIPS SMART", "KASSLER EUROPE", "FPC SWEDEN", "TUYA SMART", "YALE CO.", "MILRE KOREA", "SCHLAGE USA", "PHILIPS SMART"].map((partner, index) => (
-              <span 
-                key={index}
-                className="text-lg font-black tracking-widest text-zinc-600 hover:text-gold transition-colors font-mono cursor-default"
-              >
-                {partner}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+    <footer className="w-full bg-[#2a2c2d] text-gray-300 pt-20 pb-8 relative z-10 leading-relaxed font-sans transition-colors duration-300">
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
           
-          {/* Column 1: Company Profile */}
-          <div className="flex flex-col gap-6">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-lg border border-gold/30 bg-zinc-950 flex items-center justify-center">
-                <Lock className="w-4 h-4 text-gold" />
+          {/* Col 1: Brand Profile */}
+          <div className="lg:col-span-4 lg:pr-8 flex flex-col items-start">
+            <Link href="/" className="flex items-center gap-2 mb-6">
+              <div className="flex items-end leading-none bg-white p-2 rounded-sm select-none">
+                <span className="text-[#769b52] text-2xl tracking-tight font-medium">
+                  TA
+                </span>
+                <span className="text-gray-900 text-2xl tracking-tight font-medium ml-1">
+                  HOUSE
+                </span>
               </div>
-              <span className="text-lg font-black tracking-widest text-white font-sans">
-                KASSLER<span className="text-gold font-light text-xxs align-super">®</span>
-              </span>
             </Link>
-            <p className="text-sm text-zinc-400 leading-relaxed">
-              Thương hiệu khóa cửa thông minh cao cấp xuất xứ CHLB Đức. Đem đến giải pháp bảo mật tuyệt đối, thiết kế sang trọng đẳng cấp và ứng dụng các công nghệ AI sinh trắc học tiên phong hàng đầu thế giới.
+            <p className="text-xs font-light text-gray-400 leading-relaxed mb-6 max-w-sm text-left">
+              Chúng tôi cam kết mang đến sản phẩm chính hãng, chất lượng cao
+              cùng dịch vụ tận tâm để nâng tầm không gian sống của bạn.
             </p>
-            
-            {/* Social Medias */}
-            <div className="flex items-center gap-4">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-full bg-zinc-900 hover:bg-gold/15 text-zinc-400 hover:text-gold transition-all" title="Facebook">
-                <Facebook className="w-4 h-4" />
-              </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-full bg-zinc-900 hover:bg-gold/15 text-zinc-400 hover:text-gold transition-all" title="Youtube">
-                <Youtube className="w-4 h-4" />
-              </a>
-              <a href="#" className="p-2.5 rounded-full bg-zinc-900 hover:bg-gold/15 text-zinc-400 hover:text-gold transition-all font-bold text-xs leading-none" title="Zalo Official">
-                Zalo
-              </a>
-              <a href="#" className="p-2.5 rounded-full bg-zinc-900 hover:bg-gold/15 text-zinc-400 hover:text-gold transition-all font-bold text-xs leading-none" title="TikTok">
-                Tiktok
-              </a>
-            </div>
-          </div>
-
-          {/* Column 2: Categories & Quick Links */}
-          <div className="flex flex-col gap-6">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-white border-l-2 border-gold pl-3">Sản phẩm nổi bật</h3>
-            <ul className="flex flex-col gap-3">
-              {CATEGORIES.map((cat) => (
-                <li key={cat.slug}>
-                  <button
-                    onClick={() => handleCategoryClick(cat.slug)}
-                    className="text-sm text-zinc-400 hover:text-gold transition-colors text-left focus:outline-none"
-                  >
-                    {cat.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 3: Corporate Policies */}
-          <div className="flex flex-col gap-6">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-white border-l-2 border-gold pl-3">Chính sách & Hỗ trợ</h3>
-            <ul className="flex flex-col gap-3">
-              <li>
-                <Link href="#faq" className="text-sm text-zinc-400 hover:text-gold transition-colors">
-                  Chính sách bảo hành 36 tháng
-                </Link>
-              </li>
-              <li>
-                <Link href="#contact" className="text-sm text-zinc-400 hover:text-gold transition-colors">
-                  Chính sách vận chuyển & Lắp đặt
-                </Link>
-              </li>
-              <li>
-                <Link href="#contact" className="text-sm text-zinc-400 hover:text-gold transition-colors">
-                  Quy trình bảo trì định kỳ
-                </Link>
-              </li>
-              <li>
-                <Link href="#faq" className="text-sm text-zinc-400 hover:text-gold transition-colors">
-                  Hỏi đáp kỹ thuật FAQs
-                </Link>
-              </li>
-              <li>
-                <Link href="/admin" className="text-sm text-gold hover:underline font-medium">
-                  Cổng quản trị nội dung Admin
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 4: Newsletters / Subscribe */}
-          <div className="flex flex-col gap-6">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-white border-l-2 border-gold pl-3">Đăng ký Nhận Tin</h3>
-            <p className="text-sm text-zinc-400 leading-relaxed">
-              Nhận thông tin cập nhật về các mẫu khóa cao cấp mới nhất và các chương trình ưu đãi độc quyền.
-            </p>
-            
-            <form onSubmit={handleSubscribe} className="relative">
-              <input
-                type="email"
-                placeholder="Địa chỉ Email của bạn"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full pl-4 pr-12 py-3 bg-zinc-900 border border-gold/15 focus:border-gold rounded-lg text-sm text-white focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="absolute right-1 top-1 p-2 bg-gradient-to-r from-gold-dark to-gold text-[#050505] rounded-md hover:brightness-115 transition-all"
+            <div className="flex gap-3">
+              <a 
+                href="https://facebook.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-gray-400 hover:bg-[#769b52] hover:border-[#769b52] hover:text-white transition-all"
+                title="Facebook"
               >
-                <Send className="w-4 h-4" />
-              </button>
-            </form>
-
-            {subscribed && (
-              <div className="flex items-center gap-2 text-xs text-gold animate-fadeIn">
-                <CheckCircle2 className="w-4 h-4" />
-                Đăng ký thành công! Cảm ơn bạn đã quan tâm.
-              </div>
-            )}
+                <Facebook className="w-3.5 h-3.5" />
+              </a>
+              <a 
+                href="https://instagram.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-gray-400 hover:bg-[#769b52] hover:border-[#769b52] hover:text-white transition-all"
+                title="Instagram"
+              >
+                <Instagram className="w-3.5 h-3.5" />
+              </a>
+              <a 
+                href="https://youtube.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-gray-400 hover:bg-[#769b52] hover:border-[#769b52] hover:text-white transition-all"
+                title="Youtube"
+              >
+                <Youtube className="w-3.5 h-3.5" />
+              </a>
+              <a 
+                href="https://tiktok.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center text-gray-400 hover:bg-[#769b52] hover:border-[#769b52] hover:text-white transition-all"
+                title="TikTok"
+              >
+                {/* Tiktok inline SVG/Icon */}
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.74-3.94-1.78-.22-.22-.41-.47-.58-.73v7.05c-.01 2.3-.92 4.67-2.68 6.13-1.91 1.61-4.7 2.11-7.05 1.53-2.58-.63-4.82-2.73-5.39-5.38-.68-3.11.83-6.57 3.75-7.7 1-.39 2.08-.53 3.14-.46v4.03c-.87-.1-1.78.07-2.51.6-.9.65-1.34 1.88-1.07 2.97.29 1.17 1.42 2.07 2.62 2.01 1.34.07 2.62-.93 2.73-2.28.02-1.34.01-2.68.01-4.02V0l.86.02Z"/>
+                </svg>
+              </a>
+            </div>
           </div>
 
+          {/* Col 2: Categories Links */}
+          <div className="lg:col-span-2 flex flex-col items-start">
+            <h4 className="text-sm text-white font-medium mb-6 uppercase tracking-wider">
+              Danh mục
+            </h4>
+            <ul className="space-y-4 text-left">
+              <li>
+                <Link href="/products?cat=Kitchen" className="text-xs text-gray-400 hover:text-white transition-colors font-light">
+                  Thiết bị nhà bếp
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?cat=Lock" className="text-xs text-gray-400 hover:text-white transition-colors font-light">
+                  Khóa thông minh
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?cat=Water" className="text-xs text-gray-400 hover:text-white transition-colors font-light">
+                  Thiết bị lọc nước
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?cat=Cabinet" className="text-xs text-gray-400 hover:text-white transition-colors font-light">
+                  Phụ kiện tủ bếp
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?cat=Smart" className="text-xs text-gray-400 hover:text-white transition-colors font-light">
+                  Thiết bị thông minh
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 3: Support Links */}
+          <div className="lg:col-span-2 flex flex-col items-start">
+            <h4 className="text-sm text-white font-medium mb-6 uppercase tracking-wider">
+              Hỗ trợ
+            </h4>
+            <ul className="space-y-4 text-left">
+              <li>
+                <Link href="/products" className="text-xs text-gray-400 hover:text-white transition-colors font-light">
+                  Hướng dẫn mua hàng
+                </Link>
+              </li>
+              <li>
+                <Link href="/products" className="text-xs text-gray-400 hover:text-white transition-colors font-light">
+                  Chính sách bảo hành
+                </Link>
+              </li>
+              <li>
+                <Link href="/products" className="text-xs text-gray-400 hover:text-white transition-colors font-light">
+                  Chính sách đổi trả
+                </Link>
+              </li>
+              <li>
+                <Link href="/products" className="text-xs text-gray-400 hover:text-white transition-colors font-light">
+                  Thanh toán &amp; vận chuyển
+                </Link>
+              </li>
+              <li>
+                <Link href="/products" className="text-xs text-gray-400 hover:text-white transition-colors font-light">
+                  Câu hỏi thường gặp
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 4: Contact details */}
+          <div className="lg:col-span-4 relative flex flex-col items-start text-left">
+            <h4 className="text-sm text-white font-medium mb-6 uppercase tracking-wider">
+              Liên hệ
+            </h4>
+            <ul className="space-y-4">
+              <li className="flex gap-3">
+                <MapPin className="w-4 h-4 shrink-0 text-gray-400 mt-0.5" />
+                <span className="text-xs text-gray-400 font-light leading-relaxed">
+                  961A Kha Vạn Cân, P. Linh Xuân,
+                  <br />
+                  TP. Thủ Đức, TP. HCM
+                </span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Phone className="w-4 h-4 shrink-0 text-gray-400" />
+                <a href="tel:0938824479" className="text-xs text-gray-400 hover:text-white transition-colors font-light">
+                  0938 824 479
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Mail className="w-4 h-4 shrink-0 text-gray-400" />
+                <a href="mailto:info@takit.vn" className="text-xs text-gray-400 hover:text-white transition-colors font-light">
+                  info@takit.vn
+                </a>
+              </li>
+            </ul>
+
+            {/* Back to top button */}
+            <button 
+              onClick={handleScrollToTop}
+              className="absolute bottom-0 right-0 w-10 h-10 bg-[#769b52] hover:bg-[#658744] rounded-full flex items-center justify-center text-white transition-colors cursor-pointer shadow-lg shadow-[#769b52]/10"
+              aria-label="Cuộn lên đầu trang"
+            >
+              <ArrowUp className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* Detailed Address Grid + Google Maps Embed */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-12 pb-8 border-t border-zinc-900">
-          
-          {/* Showroom Contacts Info */}
-          <div className="lg:col-span-1 flex flex-col gap-4">
-            <h4 className="text-sm font-bold text-white tracking-wide uppercase">Công ty Cổ phần Kassler Việt Nam</h4>
-            <div className="flex items-start gap-3 text-sm text-zinc-400">
-              <MapPin className="w-5 h-5 text-gold shrink-0 mt-0.5" />
-              <span>
-                <strong>Showroom chính:</strong> 123 Nguyễn Trãi, Phường Thượng Đình, Quận Thanh Xuân, Hà Nội
-              </span>
-            </div>
-            <div className="flex items-center gap-3 text-sm text-zinc-400">
-              <Phone className="w-4 h-4 text-gold shrink-0" />
-              <span>
-                <strong>Hotline tư vấn 24/7:</strong> 1900 8888 / 0988.888.888
-              </span>
-            </div>
-            <div className="flex items-center gap-3 text-sm text-zinc-400">
-              <Mail className="w-4 h-4 text-gold shrink-0" />
-              <span>
-                <strong>Email liên hệ:</strong> info@kassler-vietnam.vn
-              </span>
-            </div>
-            <div className="flex items-center gap-3 text-sm text-zinc-400">
-              <Clock className="w-4 h-4 text-gold shrink-0" />
-              <span>
-                <strong>Giờ làm việc:</strong> 8:00 - 21:00 (Cả Thứ Bảy & Chủ Nhật)
-              </span>
-            </div>
-          </div>
-
-          {/* Google Maps Embed iframe */}
-          <div className="lg:col-span-2 w-full h-48 rounded-xl overflow-hidden border border-gold/15 relative">
-            <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1m2!1m3!1m2!1s0x3135ac9a0397cc31%3A0xe1db09c8558cf778!2zMTIzIE5ndXnhu4VuIFRyw6NpLCBUaMaw4bujbmcgxJDDrG5oLCBUaGFuaCBYdcOibiwgSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1680000000000!5m2!1svi!2s" 
-              width="100%" 
-              height="100%" 
-              style={{ 
-                border: 0, 
-                filter: theme === "dark" ? "grayscale(1) invert(0.92) contrast(1.2)" : "grayscale(0.2) contrast(1.05)" 
-              }} 
-              allowFullScreen={true}
-              loading="lazy" 
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Kassler Vietnam Google Map Location"
-            />
-          </div>
-
-        </div>
-
-        {/* Bottom Rights Reserved */}
-        <div className="pt-8 border-t border-zinc-900/60 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-zinc-500">
-            © {new Date().getFullYear()} KASSLER VIETNAM. Bản quyền được bảo hộ. Thiết kế bởi Antigravity.
+        {/* Bottom Bar */}
+        <div className="border-t border-gray-700/50 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-[11px] text-gray-500 font-light">
+            © 2024 TA HOUSE. All rights reserved.
           </p>
-          <div className="flex gap-6 text-xs text-zinc-500">
-            <a href="#" className="hover:text-gold transition-colors">Điều khoản sử dụng</a>
-            <a href="#" className="hover:text-gold transition-colors">Chính sách bảo mật</a>
-            <a href="#" className="hover:text-gold transition-colors">Sơ đồ trang</a>
+          <div className="flex items-center gap-6">
+            <a href="#" className="text-[11px] text-gray-500 hover:text-gray-300 transition-colors font-light">
+              Điều khoản sử dụng
+            </a>
+            <span className="text-gray-700">|</span>
+            <a href="#" className="text-[11px] text-gray-500 hover:text-gray-300 transition-colors font-light">
+              Chính sách bảo mật
+            </a>
           </div>
         </div>
-
       </div>
     </footer>
   );

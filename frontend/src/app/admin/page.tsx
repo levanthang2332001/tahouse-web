@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { 
-  Plus, Trash2, Edit3, Settings, ShieldAlert, BarChart3, Database, MessageSquare, 
-  Sparkles, CheckCircle, ArrowLeft, RefreshCw, X, AlertTriangle, FileText, Lock
+  Plus, Trash2, Edit3, Settings, ShieldAlert, BarChart3, Database, 
+  Sparkles, CheckCircle, ArrowLeft, X, FileText
 } from "lucide-react";
 import { PRODUCTS, CATEGORIES, Product } from "@/data/products";
 import Header from "@/components/Header";
@@ -18,9 +18,32 @@ const INITIAL_QA = [
   { id: "4", keyword: "bảo hành", q: "Chính sách bảo hành ra sao?", a: "Dát vàng bảo hành 36 tháng, các mẫu khác bảo hành 24 tháng chính hãng." }
 ];
 
+function generateId(): string {
+  return Math.random().toString();
+}
+
 export default function AdminDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="bg-[#050505] min-h-screen flex items-center justify-center text-zinc-500 font-bold uppercase tracking-widest text-xs gap-3">
+        <div className="w-6 h-6 border-2 border-lime border-t-transparent rounded-full animate-spin" />
+        Đang tải bảng quản trị...
+      </div>
+    }>
+      <AdminDashboardContent />
+    </Suspense>
+  );
+}
+
+function AdminDashboardContent() {
   const [productsList, setProductsList] = useState<Product[]>(PRODUCTS);
   const [qaList, setQaList] = useState(INITIAL_QA);
+
+  const tabs = [
+    { key: "products", label: "Quản lý sản phẩm", icon: <Database className="w-4 h-4" /> },
+    { key: "leads", label: "Khách hàng đăng ký tư vấn", icon: <FileText className="w-4 h-4" /> },
+    { key: "chatbot", label: "Đào tạo chatbot AI", icon: <Sparkles className="w-4 h-4" /> }
+  ] as const;
   
   // Forms & Modals
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
@@ -29,16 +52,16 @@ export default function AdminDashboard() {
   
   // Product wizard state
   const [newProduct, setNewProduct] = useState({
-    name: "", code: "", category: "khoa-cua-go", priceRange: "",
+    name: "", code: "", category: "Lock", priceRange: "",
     shortDescription: "", description: "", warranty: 24,
-    colors: "Đen sần, Bạc Chrome", technologies: "Vân tay FPC Thụy Điển, Mã số ảo"
+    colors: "Đen sần, Champagne Gold", technologies: "Vân tay FPC Thụy Điển, App Wifi"
   });
 
   // Mock leads
   const [leadsList, setLeadsList] = useState([
-    { id: "lead-1", name: "Nguyễn Văn Hùng", phone: "0912.345.678", email: "hungnv@gmail.com", product: "KL-990 Gold", message: "Cần khảo sát lắp đặt cửa gỗ đại sảnh biệt thự đơn lập.", date: "2026-05-20" },
-    { id: "lead-2", name: "Trần Thị Mai", phone: "0987.654.321", email: "maitt@gmail.com", product: "KL-660 Slim", message: "Lắp đặt 3 bộ khóa cửa nhôm Xingfa lùa ban công.", date: "2026-05-19" },
-    { id: "lead-3", name: "Lê Minh Tuấn", phone: "0909.111.222", email: "tuanlm@yahoo.com", product: "KS-100 Safe", message: "Tư vấn két sắt thông minh âm tủ gia đình.", date: "2026-05-18" }
+    { id: "lead-1", name: "Nguyễn Văn Hùng", phone: "0912.345.678", email: "hungnv@gmail.com", product: "TA-9800", message: "Cần khảo sát lắp đặt cửa gỗ đại sảnh biệt thự đơn lập.", date: "2026-05-20" },
+    { id: "lead-2", name: "Trần Thị Mai", phone: "0987.654.321", email: "maitt@gmail.com", product: "Bosch Bếp", message: "Lắp đặt bếp từ đa điểm và hút mùi âm tủ bếp.", date: "2026-05-19" },
+    { id: "lead-3", name: "Lê Minh Tuấn", phone: "0909.111.222", email: "tuanlm@yahoo.com", product: "A.O. Smith M2", message: "Tư vấn máy lọc nước tinh khiết đặt gầm tủ bếp.", date: "2026-05-18" }
   ]);
 
   // Chatbot Q&A form states
@@ -48,19 +71,26 @@ export default function AdminDashboard() {
     e.preventDefault();
     if (newProduct.name && newProduct.code) {
       const addedProduct: Product = {
-        id: `kassler-${newProduct.code.toLowerCase().replace(/\s+/g, "-")}`,
+        id: `tahouse-${newProduct.code.toLowerCase().replace(/\s+/g, "-")}`,
         name: newProduct.name,
         code: newProduct.code,
         category: newProduct.category,
-        categoryName: CATEGORIES.find(c => c.slug === newProduct.category)?.name || "Khóa cửa gỗ",
+        categoryName: CATEGORIES.find(c => c.slug === newProduct.category)?.name || "Khóa thông minh",
+        imageUrl: "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80",
+        price: Number(newProduct.priceRange.replace(/\D/g, "")) || 0,
         priceRange: newProduct.priceRange || "Liên hệ hotline",
         shortDescription: newProduct.shortDescription,
         description: newProduct.description,
-        features: ["Bảo mật mã số ảo", "Mở khóa siêu tốc"],
+        features: ["Bảo mật mã số ảo", "Mở khóa siêu tốc", "Chất lượng cao cấp"],
+        specs: {
+          "Chất liệu": "Hợp kim kẽm hàng không CNC nguyên khối",
+          "Cách thức mở": "Vân tay sinh trắc học, Mã số ảo",
+          "Chế độ bảo hành": `${newProduct.warranty} Tháng`
+        },
         specifications: {
           dimensions: "Dài 380mm x Rộng 75mm",
           material: "Hợp kim kẽm siêu cường",
-          battery: "4 viên pin AA Alkaline 1.5V",
+          battery: "Pin sạc dung lượng cao",
           openingMethods: ["Vân tay", "Mã số", "Thẻ từ", "App Wifi"],
           lockingMechanism: "Thân khóa tự động Inox 304"
         },
@@ -68,16 +98,17 @@ export default function AdminDashboard() {
         colors: newProduct.colors.split(",").map(c => c.trim()),
         technologies: newProduct.technologies.split(",").map(t => t.trim()),
         warranty: Number(newProduct.warranty),
+        warrantyText: `${newProduct.warranty} Tháng`,
         installationManual: ["Kiểm tra cửa", "Khoan đục", "Bắt vít cố định", "Cấu hình pin và vân tay"],
-        faq: [{ question: "Khóa này dùng pin gì?", answer: "Sử dụng 4 viên pin AA Alkaline chính hãng." }]
+        faq: [{ question: "Khóa này dùng pin gì?", answer: "Sử dụng 4 viên pin AA Alkaline hoặc Pin Lithium chính hãng." }]
       };
 
       setProductsList([addedProduct, ...productsList]);
       setIsAddProductOpen(false);
       setNewProduct({
-        name: "", code: "", category: "khoa-cua-go", priceRange: "",
+        name: "", code: "", category: "Lock", priceRange: "",
         shortDescription: "", description: "", warranty: 24,
-        colors: "Đen sần, Bạc Chrome", technologies: "Vân tay FPC Thụy Điển, Mã số ảo"
+        colors: "Đen sần, Champagne Gold", technologies: "Vân tay FPC Thụy Điển, App Wifi"
       });
       triggerSuccess("Thêm sản phẩm thành công!");
     }
@@ -87,7 +118,7 @@ export default function AdminDashboard() {
     e.preventDefault();
     if (newQa.keyword && newQa.q) {
       const addedQa = {
-        id: Math.random().toString(),
+        id: generateId(),
         keyword: newQa.keyword,
         q: newQa.q,
         a: newQa.a
@@ -130,15 +161,15 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-3">
               <Link 
                 href="/" 
-                className="p-2 border border-zinc-800 hover:border-gold text-zinc-400 hover:text-gold rounded-lg transition-colors"
+                className="p-2 border border-zinc-800 hover:border-lime text-zinc-400 hover:text-lime rounded-lg transition-colors"
                 title="Quay về trang chủ"
               >
                 <ArrowLeft className="w-4 h-4" />
               </Link>
               <div>
                 <h1 className="text-xl sm:text-2xl font-black text-white uppercase tracking-wider flex items-center gap-2">
-                  <Settings className="w-5 h-5 text-gold animate-spin-slow" /> 
-                  Bảng Quản Trị Hệ Thống Kassler
+                  <Settings className="w-5 h-5 text-lime animate-spin-slow" /> 
+                  Bảng Quản Trị Hệ Thống TA HOUSE
                 </h1>
                 <span className="text-xxs text-zinc-500 font-semibold tracking-wider uppercase">Kiến trúc sẵn sàng mở rộng cơ sở dữ liệu (Admin-Ready Dashboard)</span>
               </div>
@@ -186,14 +217,10 @@ export default function AdminDashboard() {
             
             {/* Tab links */}
             <div className="flex border-b border-zinc-900 bg-zinc-950 px-4">
-              {[
-                { key: "products", label: "Quản lý sản phẩm", icon: <Database className="w-4 h-4" /> },
-                { key: "leads", label: "Khách hàng đăng ký tư vấn", icon: <FileText className="w-4 h-4" /> },
-                { key: "chatbot", label: "Đào tạo chatbot AI", icon: <Sparkles className="w-4 h-4" /> }
-              ].map(tab => (
+              {tabs.map(tab => (
                 <button
                   key={tab.key}
-                  onClick={() => setActiveTab(tab.key as any)}
+                  onClick={() => setActiveTab(tab.key)}
                   className={`flex items-center gap-2 px-5 py-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all focus:outline-none ${
                     activeTab === tab.key 
                       ? "border-gold text-gold bg-gold/5" 
