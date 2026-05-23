@@ -20,7 +20,7 @@ export interface Product {
     lockingMechanism: string;
   };
   technologies: string[];
-  warranty: number; // in months
+  warranty: number;
   warrantyText: string;
   colors: string[];
   installationManual: string[];
@@ -33,8 +33,8 @@ export const CATEGORIES = [
   { id: "Lock", slug: "Lock", name: "Khóa thông minh" },
   { id: "Water", slug: "Water", name: "Thiết bị lọc nước" },
   { id: "Cabinet", slug: "Cabinet", name: "Phụ kiện tủ bếp" },
-  { id: "Smart", slug: "Smart", name: "Thiết bị thông minh" }
-];
+  { id: "Smart", slug: "Smart", name: "Thiết bị thông minh" },
+] as const;
 
 export const PRODUCTS: Product[] = [
   {
@@ -87,11 +87,11 @@ export const PRODUCTS: Product[] = [
     faq: [
       {
         question: "Dung lượng pin sạc Lithium dùng được bao lâu và sạc như thế nào?",
-        answer: "Khóa sử dụng pin Lithium sạc dung lượng lớn 5000mAh. Với tần suất mở cửa trung bình, pin có thể hoạt động bền bỉ từ 8 đến 12 tháng. Khi pin yếu (dưới 10%), khóa sẽ phát âm thanh cảnh báo. Bạn chỉ cần tháo pin cắm sạc qua cổng Type-C khoảng 4 tiếng hoặc cắm sạc dự phòng trực tiếp vào ngõ sạc khẩn cấp ở phía dưới khóa."
+        answer: "Khóa sử dụng pin Lithium sạc dung lượng lớn 5000mAh. Với tần suất mở cửa trung bình, pin có thể hoạt động bền bỉ từ 8 đến 12 tháng."
       },
       {
         question: "Công nghệ Face ID 3D có nhận diện được trong bóng tối không?",
-        answer: "Có, khóa sử dụng camera hồng ngoại quét đa chiều (IR Face ID) tự động phát hiện và nhận diện khuôn mặt chính xác tuyệt đối ngay cả trong môi trường tối hoàn toàn, ngăn chặn triệt để các hành vi dùng hình ảnh hoặc video giả mạo."
+        answer: "Có, khóa sử dụng camera hồng ngoại quét đa chiều tự động phát hiện và nhận diện khuôn mặt chính xác ngay cả trong môi trường tối."
       }
     ]
   },
@@ -134,16 +134,14 @@ export const PRODUCTS: Product[] = [
     warrantyText: "24 Tháng chính hãng",
     colors: ["Vát cạnh trước, viền thép không gỉ đen bóng"],
     installationManual: [
-      "Khảo sát bàn đá bếp (yêu cầu kích thước khoét đá chuẩn xác 880mm x 490mm).",
-      "Dán gioăng cao su bọc quanh mép kính mặt dưới để chống thấm nước xuống tủ.",
-      "Đặt bếp từ từ trên xuống khoét đá nhẹ nhàng khớp khít.",
-      "Đấu nối dây điện nguồn qua aptomat chuyên dụng (khuyến nghị tối thiểu 30A-40A do công suất lớn).",
-      "Bật aptomat kiểm tra bảng điều khiển hiển thị và đun thử nước để nghiệm thu."
+      "Khảo sát bàn đá bếp.",
+      "Dán gioăng cao su bọc quanh mép kính mặt dưới để chống thấm nước.",
+      "Đặt bếp từ từ trên xuống khoét đá nhẹ nhàng khớp khít."
     ],
     faq: [
       {
         question: "Vùng nấu đa điểm FlexInduction hoạt động thế nào?",
-        answer: "FlexInduction cho phép bạn kết hợp hai vùng nấu nhỏ thành một vùng nấu phẳng cỡ lớn thống nhất. Bếp sẽ tự động nhận diện hình dạng và chu vi của xoong nồi (kể cả khay nướng hình chữ nhật) để chỉ truyền nhiệt trực tiếp dưới đáy nồi, giúp tiết kiệm tối đa năng lượng."
+        answer: "FlexInduction cho phép bạn kết hợp hai vùng nấu nhỏ thành một vùng nấu phẳng cỡ lớn thống nhất."
       }
     ]
   },
@@ -186,17 +184,14 @@ export const PRODUCTS: Product[] = [
     warrantyText: "60 Tháng (5 Năm hoàn hảo)",
     colors: ["Chalcis Carbon (Đen Kim Sa)", "Alba Off-White (Trắng Sữa Gạo)"],
     installationManual: [
-      "Đo đạc và xác định vị trí khoét hố bàn đá bếp (kích thước cắt đá tùy thuộc lắp âm hay lắp nổi).",
+      "Đo đạc và xác định vị trí khoét hố bàn đá bếp.",
       "Khoét đá và mài trơn mép vết cắt.",
-      "Lắp đặt hệ thống ống xả tràn và siphon vào chậu trước khi đặt chậu lên đá.",
-      "Thoa keo silicone chuyên dụng chịu nước xung quanh viền chậu rửa.",
-      "Đặt chậu vào bàn đá bếp, cố định chặt các đai kẹp sắt ở mặt dưới.",
-      "Kết nối siphon với đường nước thải gia đình, mở nước kiểm tra rò rỉ."
+      "Kết nối siphon với đường nước thải gia đình."
     ],
     faq: [
       {
         question: "Chất liệu Keratek Plus có dễ bị ố hay nứt vỡ không?",
-        answer: "Không, Keratek Plus là công nghệ độc quyền của Ý kết hợp 80% thạch anh tự nhiên và nhựa Acrylic đặc biệt, giúp bề mặt chậu rửa cực kỳ mịn màng, chống bám màu dầu mỡ, cà phê. Chậu có khả năng chịu nhiệt cao lên đến 340 độ C và chống nứt vỡ do sốc nhiệt cực kỳ an toàn."
+        answer: "Không, Keratek Plus giúp bề mặt chậu rửa cực kỳ mịn màng, chống bám màu và chịu nhiệt cao."
       }
     ]
   },
@@ -239,17 +234,14 @@ export const PRODUCTS: Product[] = [
     warrantyText: "12 Tháng chính hãng Mỹ",
     colors: ["Trắng Nhôm Cao Cấp", "Bản Titan Sần Cao Cấp"],
     installationManual: [
-      "Chọn vị trí lắp đặt khô ráo dưới gầm tủ bếp hoặc tủ độc lập.",
-      "Kết nối đường cấp nước lạnh qua bộ khóa chia chữ T có sẵn.",
-      "Lắp đặt vòi nước điện tử thông minh lên bàn chậu rửa.",
-      "Lắp đặt các lõi lọc vào máy theo đúng ký hiệu mã màu.",
-      "Kết nối đường xả nước thải của máy vào ống thoát chậu rửa.",
-      "Cắm điện nguồn, xả bỏ 3 bình lọc đầu tiên để làm sạch đường ống trước khi uống trực tiếp."
+      "Chọn vị trí lắp đặt khô ráo dưới gầm tủ bếp.",
+      "Kết nối đường cấp nước lạnh qua bộ khóa chia chữ T.",
+      "Cắm điện nguồn và xả bỏ nước đầu."
     ],
     faq: [
       {
         question: "Nước lọc ra từ máy A.O. Smith có cần đun sôi lại trước khi uống không?",
-        answer: "Không cần đun sôi. Nước qua màng lọc RO-Side Stream độc quyền của A.O. Smith đạt tiêu chuẩn NSF quốc tế và Bộ Y Tế Việt Nam về nước uống trực tiếp tại vòi. Hệ thống loại bỏ 99.9% kim loại nặng, vi khuẩn, virus và các tạp chất hữu cơ độc hại."
+        answer: "Không cần đun sôi. Nước qua màng lọc RO đạt chuẩn nước uống trực tiếp tại vòi."
       }
     ]
   },
@@ -292,16 +284,14 @@ export const PRODUCTS: Product[] = [
     warrantyText: "24 Tháng toàn quốc chính hãng Hafele",
     colors: ["Bạc Inox Gương", "Xám Matte Grey Luxury"],
     installationManual: [
-      "Kiểm tra kích thước lòng khoang tủ bếp (yêu cầu chiều rộng thông thủy tối thiểu 365mm).",
+      "Kiểm tra kích thước lòng khoang tủ bếp.",
       "Lắp đặt hệ thống ray âm giảm chấn xuống sàn đáy tủ.",
-      "Gắn khung gia vị Inox lên hệ thống ray trượt.",
-      "Căn chỉnh mặt cánh tủ gỗ bắt vít cố định vào mặt trước khung trượt.",
-      "Đóng mở thử nghiệm để điều chỉnh độ lệch khe cánh tủ gỗ cho khít đều đẹp mắt."
+      "Đóng mở thử nghiệm để điều chỉnh cánh tủ."
     ],
     faq: [
       {
         question: "Inox 304 có bị rỉ sét do mắm muối trong bếp không?",
-        answer: "Không. Chất liệu Inox 304 (SUS304) cao cấp chứa hàm lượng Crom và Niken cao, có khả năng chống oxy hóa tuyệt đối trước hơi muối mắm và gia vị trong gian bếp. Bạn chỉ cần lau chùi định kỳ bằng khăn ẩm sạch là khay luôn bóng sáng như mới."
+        answer: "Không. Chất liệu Inox 304 cao cấp có khả năng chống oxy hóa rất cao."
       }
     ]
   },
@@ -344,16 +334,14 @@ export const PRODUCTS: Product[] = [
     warrantyText: "36 Tháng Malloca Việt Nam",
     colors: ["Kính cường lực đen tuyền cao cấp mạ gương"],
     installationManual: [
-      "Thiết kế khoang tủ tủ gỗ âm (yêu cầu kích thước khoét tủ Rộng 560mm x Cao 590mm x Sâu tối thiểu 570mm).",
-      "Đảm bảo mặt sau của tủ có khe thông gió đối lưu khí nóng.",
-      "Đặt lò nướng vào khoang gỗ, cố định chắc chắn hai bên hông lò bằng vít gỗ chuyên dụng đi kèm.",
-      "Kết nối nguồn điện vào cầu đấu có tiếp địa an toàn chống rò điện.",
-      "Chạy lò không tải ở 200 độ C trong 30 phút đầu tiên để khử mùi sơn dầu lắp ráp."
+      "Thiết kế khoang tủ âm.",
+      "Đảm bảo mặt sau của tủ có khe thông gió.",
+      "Chạy lò không tải ở 200 độ C trong 30 phút đầu."
     ],
     faq: [
       {
         question: "Công nghệ tự làm sạch Hydroclean hoạt động như thế nào?",
-        answer: "Hydroclean sử dụng hơi nước để làm mềm dầu mỡ cứng đầu bám trên thành lò. Bạn chỉ cần đổ một ít nước vào đáy lò nướng, chọn chế độ Hydroclean. Lò sẽ gia nhiệt tạo hơi nước áp suất cao trong 24 phút. Sau khi kết thúc, bạn chỉ cần dùng khăn sạch lau nhẹ là các vết dầu mỡ trôi sạch hoàn toàn."
+        answer: "Hydroclean sử dụng hơi nước để làm mềm dầu mỡ bám trên thành lò."
       }
     ]
   },
@@ -396,17 +384,14 @@ export const PRODUCTS: Product[] = [
     warrantyText: "24 Tháng",
     colors: ["Bronze Brown (Vàng Cafe Đồng)", "Deep Jet Black (Đen Bóng Đêm)"],
     installationManual: [
-      "Đo đạc đố cửa gỗ chung cư/văn phòng (Độ dày >= 38mm, đố cửa >= 95mm).",
-      "Khoan lỗ lắp đặt bằng cách ốp dưỡng định vị của TA-8500 lên mép cửa.",
-      "Lắp đặt ruột chốt khóa Inox và siết vít giữ chặt hông cửa.",
-      "Gắn trục truyền chuyển động gạt và luồn cáp điện nối bo mạch.",
-      "Lắp ốp mặt trước và mặt sau, căn chỉnh cho cân xứng rồi siết ốc cố định.",
-      "Lắp pin AA kiểm tra đóng mở thử, thiết lập mật mã Admin ban đầu."
+      "Đo đạc đố cửa gỗ.",
+      "Khoan lỗ lắp đặt bằng cách ốp dưỡng định vị.",
+      "Lắp pin AA kiểm tra đóng mở thử."
     ],
     faq: [
       {
         question: "Khi khóa bị hết pin đột ngột mà đang ở ngoài thì làm cách nào?",
-        answer: "Nếu khóa hết pin khi bạn đang đứng ngoài, bạn có hai giải pháp nhanh chóng: (1) Sử dụng chìa khóa cơ chống đoản dự phòng cắm vào ổ khóa khẩn cấp ở đáy khóa để mở thủ công. (2) Sử dụng cục sạc dự phòng điện thoại cắm qua ngõ USB-C dưới đáy khóa để cấp điện tạm thời, sau đó nhập vân tay hoặc mật mã mở cửa bình thường."
+        answer: "Bạn có thể dùng chìa khóa cơ dự phòng hoặc cắm sạc dự phòng qua cổng USB-C."
       }
     ]
   },
@@ -449,24 +434,21 @@ export const PRODUCTS: Product[] = [
     warrantyText: "24 Tháng",
     colors: ["Matte Gold (Vàng Nhám)", "Matte Carbon Black (Đen Sợi Carbon)"],
     installationManual: [
-      "Chờ sẵn đế âm vuông chuẩn 86x86mm tại vị trí lắp đặt (yêu cầu kéo sẵn dây nguội N).",
-      "Nối dây nguồn điện 220V (L, N) vào cầu đấu phía sau màn hình trung tâm.",
-      "Gắn cố định thân đế màn hình vào vít đế âm tường.",
-      "Ốp khít viền phay nhôm mặt kính trước vào đế gá.",
-      "Bật aptomat điện, mở màn hình kết nối Wifi gia đình, tải app SmartLife/Tuya để quét và liên kết các thiết bị vệ tinh Zigbee."
+      "Chuẩn bị đế âm vuông 86x86mm.",
+      "Nối dây nguồn điện 220V vào cầu đấu phía sau.",
+      "Bật aptomat điện và kết nối Wifi gia đình."
     ],
     faq: [
       {
         question: "Hệ thống có tự động hóa bật tắt các thiết bị bếp và khóa không?",
-        answer: "Có, thông qua màn hình TA-Core, bạn có thể thiết lập các kịch bản tự động hóa cực kỳ tiện lợi: Ví dụ kịch bản 'Trở về nhà': Khi khóa vân tay TA-9800 mở cửa, máy hút mùi bếp sẽ tự khởi động, rèm cửa mở ra và hệ thống đèn chiếu sáng khu vực bếp được bật sáng chào đón bạn."
+        answer: "Có, TA-Core cho phép thiết lập nhiều kịch bản tự động hóa cho nhà thông minh."
       }
     ]
   }
 ];
 
-export const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("vi-VN", {
+export const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("vi-VN", {
     style: "currency",
-    currency: "VND"
+    currency: "VND",
   }).format(value);
-};

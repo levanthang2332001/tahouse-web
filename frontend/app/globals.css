@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --background: #fdfbf7;
+  --foreground: #1a1a1a;
+  --primary-color: #769b52;
+  --primary-dark: #658744;
+  --border-color: rgba(26, 26, 26, 0.08);
+  --card-bg: rgba(253, 251, 247, 0.96);
+}
+
+@theme {
+  --font-sans: var(--font-sans), "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif), "Cormorant Garamond", ui-serif, Georgia, serif;
+  --font-cursive: var(--font-cursive), "Great Vibes", cursive;
+  --color-lime: #769b52;
+  --color-lime-dark: #658744;
+  --color-warm-cream: #fdfbf7;
+  --color-graphite: #1a1a1a;
+  --animate-scroll-marquee: scroll-marquee 25s linear infinite;
+
+  @keyframes scroll-marquee {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+html {
+  scroll-behavior: auto !important;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), "Plus Jakarta Sans", sans-serif;
+  max-width: 100%;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+.heading {
+  font-family: var(--font-serif), "Cormorant Garamond", Georgia, serif;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
