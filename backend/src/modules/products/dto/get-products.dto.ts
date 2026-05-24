@@ -1,6 +1,16 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, Max, Min, IsString } from 'class-validator';
+import { IsInt, IsOptional, Max, Min, IsString, IsEnum } from 'class-validator';
+
+export enum ProductSortBy {
+  PRICE = 'price',
+  NAME = 'name',
+}
+
+export enum SortOrder {
+  ASC = 'asc',
+  DESC = 'desc',
+}
 
 export class GetProductsDto {
   @ApiPropertyOptional({
@@ -84,20 +94,18 @@ export class GetProductsDto {
 
   @ApiPropertyOptional({
     description: 'Trường sắp xếp (ví dụ: price, name)',
-    enum: ['price', 'name'],
-    type: String,
+    enum: ProductSortBy,
   })
   @IsOptional()
-  @IsString()
-  sortBy?: string;
+  @IsEnum(ProductSortBy)
+  sortBy?: ProductSortBy;
 
   @ApiPropertyOptional({
     description: 'Thứ tự sắp xếp (asc: tăng dần, desc: giảm dần)',
-    enum: ['asc', 'desc'],
-    type: String,
-    default: 'asc',
+    enum: SortOrder,
+    default: SortOrder.ASC,
   })
   @IsOptional()
-  @IsString()
-  sortOrder?: 'asc' | 'desc' = 'asc';
+  @IsEnum(SortOrder)
+  sortOrder?: SortOrder = SortOrder.ASC;
 }

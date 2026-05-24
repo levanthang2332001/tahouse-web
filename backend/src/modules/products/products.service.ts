@@ -1,6 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { removeDiacritics } from '@/common/utils/string.util';
 import { JsonDbService } from '../database/json-db.service';
+import {
+  GetProductsDto,
+  ProductSortBy,
+  SortOrder,
+} from './dto/get-products.dto';
+import {
+  GetInstallationMediaDto,
+  MediaType,
+} from './dto/get-installation-media.dto';
 
 @Injectable()
 export class ProductsService {
@@ -20,26 +29,21 @@ export class ProductsService {
 
   /**
    * Lấy danh sách sản phẩm phân trang, tìm kiếm thông minh, lọc theo danh mục, khoảng giá, sắp xếp và chỉ trả về các trường cơ bản.
-   * @param {number} page - Trang hiện tại cần lấy dữ liệu (mặc định là 1).
-   * @param {number} limit - Số lượng sản phẩm tối đa trên mỗi trang (mặc định là 10).
-   * @param {number} [categoryId] - ID danh mục sản phẩm cần lọc.
-   * @param {string} [search] - Từ khóa tìm kiếm thông minh.
-   * @param {number} [minPrice] - Giá tối thiểu để lọc.
-   * @param {number} [maxPrice] - Giá tối đa để lọc.
-   * @param {string} [sortBy] - Trường sắp xếp (ví dụ: price, name).
-   * @param {string} [sortOrder] - Thứ tự sắp xếp ('asc' | 'desc').
+   * @param query - Object chứa các thông tin truy vấn từ client.
    * @returns {{ items: any[], total: number, page: number, limit: number }} Đối tượng chứa danh sách sản phẩm phân trang và metadata.
    */
-  findAll(
-    page: number = 1,
-    limit: number = 10,
-    categoryId?: number,
-    search?: string,
-    minPrice?: number,
-    maxPrice?: number,
-    sortBy?: string,
-    sortOrder?: 'asc' | 'desc',
-  ) {
+  findAll(query: GetProductsDto) {
+    const {
+      page = 1,
+      limit = 10,
+      categoryId,
+      search,
+      minPrice,
+      maxPrice,
+      sortBy,
+      sortOrder = SortOrder.ASC,
+    } = query;
+
     // Sao chép nông (shallow copy) mảng để tránh thay đổi trực tiếp dữ liệu trong RAM cache
     let products = [...this.getProducts()];
 
@@ -74,14 +78,14 @@ export class ProductsService {
 
     // Sắp xếp (Sorting) trước khi phân trang
     if (sortBy) {
-      const order = sortOrder?.toLowerCase() === 'desc' ? -1 : 1;
+      const order = sortOrder === SortOrder.DESC ? -1 : 1;
       products.sort((a, b) => {
         const valA = a[sortBy];
         const valB = b[sortBy];
 
         // Xử lý giá trị null/undefined khi sắp xếp theo giá (price)
         // Luôn đẩy sản phẩm không có giá (hoặc giá là null/undefined) xuống cuối danh sách
-        if (sortBy === 'price') {
+        if (sortBy === ProductSortBy.PRICE) {
           const isNullA = valA === null || valA === undefined;
           const isNullB = valB === null || valB === undefined;
 
@@ -160,16 +164,11 @@ export class ProductsService {
   /**
    * Lấy danh sách ảnh / video lắp đặt thực tế của sản phẩm với phân trang.
    * @param idOrCode  - ID hoặc mã sản phẩm
-   * @param page      - Trang hiện tại (mặc định 1)
-   * @param limit     - Số lượng một trang (mặc định 12)
-   * @param type      - Loại media: 'all' | 'images' | 'videos'
+   * @param query     - Đối tượng chứa page, limit, type.
    */
-  getInstallationMedia(
-    idOrCode: string,
-    page: number = 1,
-    limit: number = 12,
-    type: 'all' | 'images' | 'videos' = 'all',
-  ) {
+  getInstallationMedia(idOrCode: string, query: GetInstallationMediaDto) {
+    const { page = 1, limit = 12, type = MediaType.ALL } = query;
+
     const products = this.getProducts();
     const cleanQuery = idOrCode.trim().toLowerCase().replace(/\s+/g, '');
     const product = products.find(
@@ -192,12 +191,12 @@ export class ProductsService {
     // Lấy mảng media theo type
     const mediaItems: Array<{ url: string; type: 'image' | 'video' }> = [];
 
-    if (type === 'images' || type === 'all') {
+    if (type === MediaType.IMAGES || type === MediaType.ALL) {
       mediaItems.push(
         ...installation.images.map((url) => ({ url, type: 'image' as const })),
       );
     }
-    if (type === 'videos' || type === 'all') {
+    if (type === MediaType.VIDEOS || type === MediaType.ALL) {
       mediaItems.push(
         ...installation.videos.map((url) => ({ url, type: 'video' as const })),
       );

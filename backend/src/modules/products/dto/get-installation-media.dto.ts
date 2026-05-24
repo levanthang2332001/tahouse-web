@@ -1,6 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, Max, Min, IsIn } from 'class-validator';
+import { IsInt, IsOptional, Max, Min, IsEnum } from 'class-validator';
+
+export enum MediaType {
+  ALL = 'all',
+  IMAGES = 'images',
+  VIDEOS = 'videos',
+}
 
 export class GetInstallationMediaDto {
   @ApiPropertyOptional({
@@ -35,11 +41,10 @@ export class GetInstallationMediaDto {
       '* all: Tất cả (ảnh + video)\n' +
       '* images: Chỉ ảnh\n' +
       '* videos: Chỉ video',
-    enum: ['all', 'images', 'videos'],
-    default: 'all',
-    type: String,
+    enum: MediaType,
+    default: MediaType.ALL,
   })
   @IsOptional()
-  @IsIn(['all', 'images', 'videos'])
-  type?: 'all' | 'images' | 'videos' = 'all';
+  @IsEnum(MediaType)
+  type?: MediaType = MediaType.ALL;
 }

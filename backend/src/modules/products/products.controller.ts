@@ -19,16 +19,7 @@ export class ProductsController {
     description: 'Danh sách sản phẩm phân trang được lấy thành công.',
   })
   findAll(@Query() query: GetProductsDto) {
-    return this.productsService.findAll(
-      query.page,
-      query.limit,
-      query.categoryId,
-      query.search,
-      query.minPrice,
-      query.maxPrice,
-      query.sortBy,
-      query.sortOrder,
-    );
+    return this.productsService.findAll(query);
   }
 
   @Get(ApiRoute.PRODUCTS_LOCKS_INSTALLATION)
@@ -74,12 +65,7 @@ export class ProductsController {
     @Param('idOrCode') idOrCode: string,
     @Query() query: GetInstallationMediaDto,
   ) {
-    return this.productsService.getInstallationMedia(
-      idOrCode,
-      query.page,
-      query.limit,
-      query.type,
-    );
+    return this.productsService.getInstallationMedia(idOrCode, query);
   }
 
   @Get(ApiRoute.PRODUCTS_LOCKS_DETAIL)
