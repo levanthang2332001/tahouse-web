@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from '@/common/logger/logger.module';
+import { DatabaseModule } from './modules/database/database.module';
 import { ProductsModule } from './modules/products/products.module';
 
 /**
@@ -14,6 +15,7 @@ import { ProductsModule } from './modules/products/products.module';
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
     LoggerModule,
+    DatabaseModule,
     ProductsModule,
   ],
   controllers: [],

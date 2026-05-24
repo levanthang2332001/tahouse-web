@@ -10,6 +10,7 @@ export const RETRY_CONFIG = {
 export enum ApiRoute {
   PRODUCTS_LOCKS = 'products/locks',
   PRODUCTS_LOCKS_DETAIL = 'products/locks/:idOrCode',
+  PRODUCTS_LOCKS_INSTALLATION = 'products/locks/:idOrCode/installation',
 }
 
 /**

@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ApiRoute, SwaggerTag } from '@/common/constants';
 import { ProductsService } from './products.service';
 import { GetProductsDto } from './dto/get-products.dto';
+import { GetInstallationMediaDto } from './dto/get-installation-media.dto';
 
 @ApiTags(SwaggerTag.PRODUCTS)
 @Controller()
@@ -27,6 +28,57 @@ export class ProductsController {
       query.maxPrice,
       query.sortBy,
       query.sortOrder,
+    );
+  }
+
+  @Get(ApiRoute.PRODUCTS_LOCKS_INSTALLATION)
+  @ApiOperation({
+    summary: 'Lấy ảnh và video lắp đặt thực tế của sản phẩm (có phân trang)',
+    description:
+      'Trả về danh sách ảnh / video lắp đặt thực tế của sản phẩm. ' +
+      'Hỗ trợ lọc theo loại (images/videos/all) và phân trang.',
+  })
+  @ApiParam({
+    name: 'idOrCode',
+    description: 'ID UUID hoặc mã sản phẩm',
+    example: 'kl-939-f',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Danh sách media lắp đặt được trả về thành công.',
+    schema: {
+      example: {
+        product_id: 'c1b4372f-73be-4666-9489-9a1fe774c000',
+        product_code: 'KL - 939 F',
+        product_name: 'KL - 939 F',
+        items: [
+          {
+            url: '/installation/Kassler/KL_-_939_F/IMG_0627.jpg',
+            type: 'image',
+          },
+          {
+            url: '/installation/Kassler/KL_-_939_F/IMG_0636.MOV',
+            type: 'video',
+          },
+        ],
+        total: 18,
+        total_images: 17,
+        total_videos: 1,
+        page: 1,
+        limit: 12,
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy sản phẩm.' })
+  getInstallationMedia(
+    @Param('idOrCode') idOrCode: string,
+    @Query() query: GetInstallationMediaDto,
+  ) {
+    return this.productsService.getInstallationMedia(
+      idOrCode,
+      query.page,
+      query.limit,
+      query.type,
     );
   }
 

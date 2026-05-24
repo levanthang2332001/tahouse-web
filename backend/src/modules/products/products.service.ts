@@ -1,58 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { removeDiacritics } from '@/common/utils/string.util';
+import { JsonDbService } from '../database/json-db.service';
 
 @Injectable()
-export class ProductsService implements OnModuleInit {
-  private readonly dbPath = path.resolve(
-    process.cwd(),
-    'database',
-    'products.json',
-  );
-  private products: any[] = [];
+export class ProductsService {
+  private getProducts: () => any[];
+  private getInstallationData: () => Record<
+    string,
+    { images: string[]; videos: string[] }
+  >;
 
-  /**
-   * Khởi tạo module: nạp dữ liệu và cấu hình watcher tự động reload khi file DB thay đổi.
-   */
-  onModuleInit() {
-    this.loadProducts();
-
-    if (fs.existsSync(this.dbPath)) {
-      fs.watch(this.dbPath, (eventType) => {
-        if (eventType === 'change') {
-          try {
-            this.loadProducts();
-          } catch (err) {
-            // Bỏ qua lỗi ghi dở dang để tránh crash ứng dụng khi file đang cập nhật
-          }
-        }
-      });
-    }
-  }
-
-  /**
-   * Tải và phân tích toàn bộ danh sách sản phẩm từ file JSON vào RAM.
-   */
-  public loadProducts() {
-    try {
-      if (!fs.existsSync(this.dbPath)) {
-        this.products = [];
-        return;
-      }
-      const rawData = fs.readFileSync(this.dbPath, 'utf8');
-      this.products = JSON.parse(rawData);
-    } catch (error) {
-      throw new Error(`Lỗi khi đọc cơ sở dữ liệu sản phẩm: ${error.message}`);
-    }
-  }
-
-  /**
-   * Truy xuất danh sách sản phẩm thô đang lưu trong RAM.
-   */
-  private getProducts(): any[] {
-    return this.products;
+  constructor(private readonly jsonDb: JsonDbService) {
+    this.getProducts = this.jsonDb.register('products.json', []);
+    this.getInstallationData = this.jsonDb.register(
+      'installation_images.json',
+      {},
+    );
   }
 
   /**
@@ -164,6 +127,7 @@ export class ProductsService implements OnModuleInit {
 
   /**
    * Tìm kiếm thông tin chi tiết của một sản phẩm theo ID (UUID) hoặc Mã sản phẩm (Code).
+   * Trả về kèm theo preview (tối đa 3 ảnh) từ dữ liệu lắp đặt thực tế.
    */
   findOne(idOrCode: string) {
     const products = this.getProducts();
@@ -183,6 +147,78 @@ export class ProductsService implements OnModuleInit {
     const productResponse = { ...product };
     delete productResponse.page_number;
     delete productResponse.category_id;
+
+    // Gắn preview ảnh lắp đặt (tối đa 3 ảnh đầu tiên)
+    const installation = this.getInstallationData()[product.id];
+    productResponse.installation_preview = installation
+      ? installation.images.slice(0, 3)
+      : [];
+
     return productResponse;
+  }
+
+  /**
+   * Lấy danh sách ảnh / video lắp đặt thực tế của sản phẩm với phân trang.
+   * @param idOrCode  - ID hoặc mã sản phẩm
+   * @param page      - Trang hiện tại (mặc định 1)
+   * @param limit     - Số lượng một trang (mặc định 12)
+   * @param type      - Loại media: 'all' | 'images' | 'videos'
+   */
+  getInstallationMedia(
+    idOrCode: string,
+    page: number = 1,
+    limit: number = 12,
+    type: 'all' | 'images' | 'videos' = 'all',
+  ) {
+    const products = this.getProducts();
+    const cleanQuery = idOrCode.trim().toLowerCase().replace(/\s+/g, '');
+    const product = products.find(
+      (p) =>
+        p.id?.toLowerCase() === idOrCode.toLowerCase() ||
+        p.code?.toLowerCase().replace(/\s+/g, '') === cleanQuery,
+    );
+
+    if (!product) {
+      throw new NotFoundException(
+        `Không tìm thấy sản phẩm với ID hoặc mã: ${idOrCode}`,
+      );
+    }
+
+    const installation = this.getInstallationData()[product.id] ?? {
+      images: [],
+      videos: [],
+    };
+
+    // Lấy mảng media theo type
+    const mediaItems: Array<{ url: string; type: 'image' | 'video' }> = [];
+
+    if (type === 'images' || type === 'all') {
+      mediaItems.push(
+        ...installation.images.map((url) => ({ url, type: 'image' as const })),
+      );
+    }
+    if (type === 'videos' || type === 'all') {
+      mediaItems.push(
+        ...installation.videos.map((url) => ({ url, type: 'video' as const })),
+      );
+    }
+
+    const total = mediaItems.length;
+    const pageNum = Math.max(1, page);
+    const limitNum = Math.max(1, limit);
+    const startIndex = (pageNum - 1) * limitNum;
+    const items = mediaItems.slice(startIndex, startIndex + limitNum);
+
+    return {
+      product_id: product.id,
+      product_code: product.code,
+      product_name: product.name,
+      items,
+      total,
+      total_images: installation.images.length,
+      total_videos: installation.videos.length,
+      page: pageNum,
+      limit: limitNum,
+    };
   }
 }
