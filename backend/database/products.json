@@ -1,0 +1,4609 @@
+[
+  {
+    "id": "c6b98f15-440e-4e69-a730-b2f79074be90",
+    "code": "KL - 989 F",
+    "name": "KL - 989 F",
+    "price": 64890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 84,5 x C 710 x D 34 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Đồng Đúc Nguyên Khối, Mạ Vàng 24K"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng Đồng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya, Face ID 3D",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 20 khuôn mặt",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có chế độ nắp trượt tự động bảo vệ màn hình khóa",
+      "Báo động khi nhập mã sai và tác động ngoại lực mạnh",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya, Face ID 3D. Mặt khóa ngoài và trong: Đồng Đúc Nguyên Khối, Mạ Vàng 24K. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 20 khuôn mặt. Màu hoàn thiện: Vàng Đồng.",
+    "page_number": 4,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Doorbell function",
+      "APP Wifi",
+      "Auto Lock",
+      "Face ID",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p4_1.jpg",
+      "/product/page_4_image_1_v2.jpg",
+      "/product/page_4_image_3_v2.jpg",
+      "/product/page_4_image_4_v2.jpg",
+      "/product/page_4_image_5_v2.jpg",
+      "/product/page_4_image_2_v2.jpg",
+      "/product/page_4_image_6_v2.jpg",
+      "/product/page_4_image_7_v2.jpg",
+      "/product/page_4_image_9_v2.jpg",
+      "/product/page_4_image_8_v2.jpg",
+      "/product/page_4_image_10_v2.jpg",
+      "/product/page_4_image_11_v2.jpg",
+      "/product/page_4_image_12_v2.jpg",
+      "/product/page_4_chart_1_v2.jpg",
+      "/product/page_4_image_13_v2.jpg",
+      "/product/page_4_image_14_v2.jpg",
+      "/product/page_4_image_15_v2.jpg",
+      "/product/page_4_image_17_v2.jpg",
+      "/product/page_4_image_16_v2.jpg",
+      "/product/page_4_image_18_v2.jpg",
+      "/product/page_4_image_19_v2.jpg",
+      "/product/page_4_image_20_v2.jpg",
+      "/product/page_4_image_22_v2.jpg",
+      "/product/page_4_image_21_v2.jpg",
+      "/product/page_4_image_23_v2.jpg",
+      "/product/page_4_image_24_v2.jpg"
+    ],
+    "formatted_price": "64.890.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "9e011967-4ad8-4c3f-bade-eee4166c558f",
+    "code": "KL - 989 FS",
+    "name": "KL - 989 FS",
+    "price": 61590000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 84,5 x C 587 x D 34 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Đồng Đúc Nguyên Khối, Mạ Vàng 24K"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng Đồng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya, Face ID 3D",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 20 khuôn mặt",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có chế độ nắp trượt tự động bảo vệ màn hình khóa",
+      "Báo động khi nhập mã sai và tác động ngoại lực mạnh",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya, Face ID 3D. Mặt khóa ngoài và trong: Đồng Đúc Nguyên Khối, Mạ Vàng 24K. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 20 khuôn mặt. Màu hoàn thiện: Vàng Đồng.",
+    "page_number": 5,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Doorbell function",
+      "APP Wifi",
+      "Auto Lock",
+      "Face ID",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p5_1.jpg",
+      "/product/page_5_image_1_v2.jpg",
+      "/product/page_5_image_2_v2.jpg",
+      "/product/page_5_chart_1_v2.jpg",
+      "/product/page_5_image_3_v2.jpg",
+      "/product/page_5_image_4_v2.jpg",
+      "/product/page_5_image_5_v2.jpg",
+      "/product/page_5_image_7_v2.jpg",
+      "/product/page_5_image_6_v2.jpg",
+      "/product/page_5_image_8_v2.jpg",
+      "/product/page_5_image_10_v2.jpg",
+      "/product/page_5_image_11_v2.jpg",
+      "/product/page_5_image_12_v2.jpg",
+      "/product/page_5_image_14_v2.jpg",
+      "/product/page_5_image_13_v2.jpg",
+      "/product/page_5_image_15_v2.jpg",
+      "/product/page_5_image_9_v2.jpg",
+      "/product/page_5_image_18_v2.jpg",
+      "/product/page_5_image_16_v2.jpg",
+      "/product/page_5_image_20_v2.jpg",
+      "/product/page_5_image_21_v2.jpg",
+      "/product/page_5_image_17_v2.jpg",
+      "/product/page_5_image_19_v2.jpg"
+    ],
+    "formatted_price": "61.590.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "ff70803e-0420-4bd5-b00a-3330aaf40590",
+    "code": "KL - 969C",
+    "name": "KL - 969C",
+    "price": 47890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 87 x C 782 x D 34mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Đồng Nguyên Khối"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng Đồng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 300 dấu vân tay, 300 thẻ từ, 300 mật mã",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Báo động khi nhập sai mã",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Mặt khóa ngoài: Đồng Nguyên Khối. Đăng ký lên đến 300 dấu vân tay, 300 thẻ từ, 300 mật mã. Màu hoàn thiện: Vàng Đồng.",
+    "page_number": 6,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key"
+    ],
+    "images": [
+      "/product/img_p6_1.jpg",
+      "/product/page_6_image_1_v2.jpg",
+      "/product/page_6_image_2_v2.jpg",
+      "/product/page_6_image_3_v2.jpg",
+      "/product/page_6_image_4_v2.jpg",
+      "/product/page_6_image_5_v2.jpg",
+      "/product/page_6_image_6_v2.jpg",
+      "/product/page_6_image_7_v2.jpg",
+      "/product/page_6_image_8_v2.jpg",
+      "/product/page_6_image_9_v2.jpg",
+      "/product/page_6_image_10_v2.jpg",
+      "/product/page_6_image_11_v2.jpg",
+      "/product/page_6_image_12_v2.jpg",
+      "/product/page_6_image_14_v2.jpg",
+      "/product/page_6_image_13_v2.jpg",
+      "/product/page_6_image_15_v2.jpg"
+    ],
+    "formatted_price": "47.890.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "e5f6cdd8-b76e-4997-a3ec-d6fea6a5d8de",
+    "code": "KL - 959 C",
+    "name": "KL - 959 C",
+    "price": 42790000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 87 x C 482 x D 34mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Đồng Nguyên Khối"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng Đồng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 300 dấu vân tay, 300 thẻ từ, 300 mật mã",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Báo động khi nhập sai mã",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Mặt khóa ngoài: Đồng Nguyên Khối. Đăng ký lên đến 300 dấu vân tay, 300 thẻ từ, 300 mật mã. Màu hoàn thiện: Vàng Đồng.",
+    "page_number": 7,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key"
+    ],
+    "images": [
+      "/product/img_p7_1.jpg",
+      "/product/page_7_image_2_v2.jpg",
+      "/product/page_7_image_3_v2.jpg",
+      "/product/page_7_image_4_v2.jpg",
+      "/product/page_7_image_1_v2.jpg",
+      "/product/page_7_image_6_v2.jpg",
+      "/product/page_7_image_5_v2.jpg",
+      "/product/page_7_image_7_v2.jpg",
+      "/product/page_7_image_8_v2.jpg",
+      "/product/page_7_image_9_v2.jpg",
+      "/product/page_7_image_10_v2.jpg",
+      "/product/page_7_image_11_v2.jpg",
+      "/product/page_7_image_13_v2.jpg",
+      "/product/page_7_image_12_v2.jpg",
+      "/product/page_7_image_14_v2.jpg",
+      "/product/page_7_image_15_v2.jpg",
+      "/product/page_7_image_16_v2.jpg"
+    ],
+    "formatted_price": "42.790.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "d49a8de1-7a09-4cb1-b5c3-24db0fcf3187",
+    "code": "KL - 969 GR",
+    "name": "KL - 969 GR",
+    "price": 47890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 87 x C 782 x D 34mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Đồng Nguyên Khối"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng Đen"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 300 dấu vân tay, 300 thẻ từ, 300 mật mã",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Báo động khi nhập sai mã",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Mặt khóa ngoài: Đồng Nguyên Khối. Đăng ký lên đến 300 dấu vân tay, 300 thẻ từ, 300 mật mã. Màu hoàn thiện: Vàng Đen.",
+    "page_number": 8,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key"
+    ],
+    "images": [
+      "/product/img_p8_1.jpg",
+      "/product/page_8_image_1_v2.jpg",
+      "/product/page_8_image_2_v2.jpg",
+      "/product/page_8_image_5_v2.jpg",
+      "/product/page_8_image_4_v2.jpg",
+      "/product/page_8_image_6_v2.jpg",
+      "/product/page_8_image_8_v2.jpg",
+      "/product/page_8_image_9_v2.jpg",
+      "/product/page_8_image_10_v2.jpg",
+      "/product/page_8_image_11_v2.jpg",
+      "/product/page_8_image_12_v2.jpg",
+      "/product/page_8_image_13_v2.jpg",
+      "/product/page_8_image_7_v2.jpg",
+      "/product/page_8_image_3_v2.jpg"
+    ],
+    "formatted_price": "47.890.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "c546f82d-7cdd-4086-a3da-4cf3c8635abb",
+    "code": "KL - 959 GR",
+    "name": "KL - 959 GR",
+    "price": 42790000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 87 x C 482 x D 34mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Đồng Nguyên Khối"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng Đen"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 300 dấu vân tay, 300 thẻ từ, 300 mật mã",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Báo động khi nhập sai mã",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Mặt khóa ngoài: Đồng Nguyên Khối. Đăng ký lên đến 300 dấu vân tay, 300 thẻ từ, 300 mật mã. Màu hoàn thiện: Vàng Đen.",
+    "page_number": 9,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key"
+    ],
+    "images": [
+      "/product/img_p9_1.jpg",
+      "/product/page_9_image_2_v2.jpg",
+      "/product/page_9_image_3_v2.jpg",
+      "/product/page_9_image_1_v2.jpg",
+      "/product/page_9_image_4_v2.jpg",
+      "/product/page_9_image_5_v2.jpg",
+      "/product/page_9_image_7_v2.jpg",
+      "/product/page_9_image_8_v2.jpg",
+      "/product/page_9_image_6_v2.jpg",
+      "/product/page_9_image_10_v2.jpg",
+      "/product/page_9_image_9_v2.jpg",
+      "/product/page_9_image_11_v2.jpg",
+      "/product/page_9_image_12_v2.jpg",
+      "/product/page_9_image_13_v2.jpg",
+      "/product/page_9_image_14_v2.jpg"
+    ],
+    "formatted_price": "42.790.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "b619df35-0058-47ec-a206-66426fd421b7",
+    "code": "KL - 939 F PRO",
+    "name": "KL - 939 F PRO",
+    "price": 43090000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 84,5 x C 710 x D 34 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp Kim Kẽm, Mạ Vàng 24K"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya, Face ID 3D",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 20 khuôn mặt",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có chế độ nắp trượt tự động bảo vệ màn hình khóa",
+      "Báo động khi nhập mã sai và tác động ngoại lực mạnh",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya, Face ID 3D. Mặt khóa ngoài và trong: Hợp Kim Kẽm, Mạ Vàng 24K. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 20 khuôn mặt. Màu hoàn thiện: Vàng.",
+    "page_number": 10,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Doorbell function",
+      "APP Wifi",
+      "Auto Lock",
+      "Face ID",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p10_1.jpg",
+      "/product/page_10_image_1_v2.jpg",
+      "/product/page_10_image_3_v2.jpg",
+      "/product/page_10_image_5_v2.jpg",
+      "/product/page_10_image_4_v2.jpg",
+      "/product/page_10_image_6_v2.jpg",
+      "/product/page_10_chart_1_v2.jpg",
+      "/product/page_10_image_7_v2.jpg",
+      "/product/page_10_image_8_v2.jpg",
+      "/product/page_10_image_2_v2.jpg",
+      "/product/page_10_image_9_v2.jpg",
+      "/product/page_10_image_11_v2.jpg",
+      "/product/page_10_image_10_v2.jpg",
+      "/product/page_10_image_12_v2.jpg",
+      "/product/page_10_image_14_v2.jpg",
+      "/product/page_10_image_15_v2.jpg",
+      "/product/page_10_image_13_v2.jpg",
+      "/product/page_10_image_19_v2.jpg",
+      "/product/page_10_image_17_v2.jpg",
+      "/product/page_10_image_18_v2.jpg",
+      "/product/page_10_image_20_v2.jpg",
+      "/product/page_10_image_22_v2.jpg",
+      "/product/page_10_image_16_v2.jpg",
+      "/product/page_10_image_24_v2.jpg",
+      "/product/page_10_image_21_v2.jpg",
+      "/product/page_10_image_23_v2.jpg"
+    ],
+    "formatted_price": "43.090.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "88db8ee9-fa5b-4ee6-8097-0484385be9d8",
+    "code": "KL - 929 F PRO",
+    "name": "KL - 929 F PRO",
+    "price": 39190000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 84,5 x C 587 x D 34 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp Kim Kẽm, Mạ Vàng 24K"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya, Face ID 3D",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 20 khuôn mặt",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có chế độ nắp trượt tự động bảo vệ màn hình khóa",
+      "Báo động khi nhập mã sai và tác động ngoại lực mạnh",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya, Face ID 3D. Mặt khóa ngoài và trong: Hợp Kim Kẽm, Mạ Vàng 24K. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 20 khuôn mặt. Màu hoàn thiện: Vàng.",
+    "page_number": 11,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Doorbell function",
+      "APP Wifi",
+      "Auto Lock",
+      "Face ID",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p11_1.jpg",
+      "/product/page_11_image_1_v2.jpg",
+      "/product/page_11_image_2_v2.jpg",
+      "/product/page_11_image_3_v2.jpg",
+      "/product/page_11_image_4_v2.jpg",
+      "/product/page_11_chart_1_v2.jpg",
+      "/product/page_11_image_5_v2.jpg",
+      "/product/page_11_image_6_v2.jpg",
+      "/product/page_11_image_7_v2.jpg",
+      "/product/page_11_image_9_v2.jpg",
+      "/product/page_11_image_10_v2.jpg",
+      "/product/page_11_image_12_v2.jpg",
+      "/product/page_11_image_11_v2.jpg",
+      "/product/page_11_image_13_v2.jpg",
+      "/product/page_11_image_14_v2.jpg",
+      "/product/page_11_image_16_v2.jpg",
+      "/product/page_11_image_8_v2.jpg",
+      "/product/page_11_image_18_v2.jpg",
+      "/product/page_11_image_19_v2.jpg",
+      "/product/page_11_image_15_v2.jpg",
+      "/product/page_11_image_17_v2.jpg",
+      "/product/page_11_image_20_v2.jpg",
+      "/product/page_11_image_21_v2.jpg",
+      "/product/page_11_image_22_v2.jpg"
+    ],
+    "formatted_price": "39.190.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "c1b4372f-73be-4666-9489-9a1fe774c000",
+    "code": "KL - 939 F",
+    "name": "KL - 939 F",
+    "price": 36890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 84,5 x C 710 x D 34 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp Kim, Mạ Vàng 24K"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya, Face ID 3D",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 20 khuôn mặt",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có chế độ nắp trượt tự động bảo vệ màn hình khóa",
+      "Báo động khi nhập mã sai và tác động ngoại lực mạnh",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya, Face ID 3D. Mặt khóa ngoài và trong: Hợp Kim, Mạ Vàng 24K. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 20 khuôn mặt. Màu hoàn thiện: Vàng.",
+    "page_number": 12,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Doorbell function",
+      "APP Wifi",
+      "Auto Lock",
+      "Face ID",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p12_1.jpg",
+      "/product/page_12_image_3_v2.jpg",
+      "/product/page_12_image_2_v2.jpg",
+      "/product/page_12_image_5_v2.jpg",
+      "/product/page_12_image_4_v2.jpg",
+      "/product/page_12_image_6_v2.jpg",
+      "/product/page_12_image_8_v2.jpg",
+      "/product/page_12_image_7_v2.jpg",
+      "/product/page_12_chart_1_v2.jpg",
+      "/product/page_12_image_9_v2.jpg",
+      "/product/page_12_image_1_v2.jpg",
+      "/product/page_12_image_10_v2.jpg",
+      "/product/page_12_image_11_v2.jpg",
+      "/product/page_12_image_12_v2.jpg",
+      "/product/page_12_image_13_v2.jpg",
+      "/product/page_12_image_15_v2.jpg",
+      "/product/page_12_image_17_v2.jpg",
+      "/product/page_12_image_16_v2.jpg",
+      "/product/page_12_image_19_v2.jpg",
+      "/product/page_12_image_14_v2.jpg",
+      "/product/page_12_image_18_v2.jpg"
+    ],
+    "formatted_price": "36.890.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "7f0f4638-768b-487a-9de0-6bd18a39ba63",
+    "code": "KL - 929 F",
+    "name": "KL - 929 F",
+    "price": 33590000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 84,5 x C 587 x D 34 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp Kim, Mạ Vàng 24K"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya, Face ID 3D",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 20 khuôn mặt",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có chế độ nắp trượt tự động bảo vệ màn hình khóa",
+      "Báo động khi nhập mã sai và tác động ngoại lực mạnh",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya, Face ID 3D. Mặt khóa ngoài và trong: Hợp Kim, Mạ Vàng 24K. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 20 khuôn mặt. Màu hoàn thiện: Vàng.",
+    "page_number": 13,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Doorbell function",
+      "APP Wifi",
+      "Auto Lock",
+      "Face ID",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p13_1.jpg",
+      "/product/page_13_image_1_v2.jpg",
+      "/product/page_13_image_2_v2.jpg",
+      "/product/page_13_image_3_v2.jpg",
+      "/product/page_13_image_4_v2.jpg",
+      "/product/page_13_chart_1_v2.jpg",
+      "/product/page_13_image_5_v2.jpg",
+      "/product/page_13_image_6_v2.jpg",
+      "/product/page_13_image_7_v2.jpg",
+      "/product/page_13_image_8_v2.jpg",
+      "/product/page_13_image_9_v2.jpg",
+      "/product/page_13_image_11_v2.jpg",
+      "/product/page_13_image_10_v2.jpg",
+      "/product/page_13_image_12_v2.jpg",
+      "/product/page_13_image_13_v2.jpg",
+      "/product/page_13_image_14_v2.jpg",
+      "/product/page_13_image_16_v2.jpg",
+      "/product/page_13_image_17_v2.jpg",
+      "/product/page_13_image_18_v2.jpg",
+      "/product/page_13_image_19_v2.jpg",
+      "/product/page_13_image_20_v2.jpg",
+      "/product/page_13_image_22_v2.jpg",
+      "/product/page_13_image_21_v2.jpg",
+      "/product/page_13_image_15_v2.jpg"
+    ],
+    "formatted_price": "33.590.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "589cc69e-4233-4ed2-8d30-acffe5809250",
+    "code": "KL - 939",
+    "name": "KL - 939",
+    "price": 25690000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 84,5 x C 695 x D 35 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp Kim, Mạ Vàng 24K"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có chế độ nắp trượt tự động bảo vệ màn hình khóa",
+      "Báo động khi nhập mã sai và tác động ngoại lực mạnh",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya. Mặt khóa ngoài và trong: Hợp Kim, Mạ Vàng 24K. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Vàng.",
+    "page_number": 14,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Doorbell function",
+      "APP Wifi",
+      "Auto Lock",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p14_1.jpg",
+      "/product/page_14_image_2_v2.jpg",
+      "/product/page_14_image_4_v2.jpg",
+      "/product/page_14_image_3_v2.jpg",
+      "/product/page_14_image_5_v2.jpg",
+      "/product/page_14_image_6_v2.jpg",
+      "/product/page_14_image_7_v2.jpg",
+      "/product/page_14_image_8_v2.jpg",
+      "/product/page_14_image_1_v2.jpg",
+      "/product/page_14_chart_1_v2.jpg",
+      "/product/page_14_image_10_v2.jpg",
+      "/product/page_14_image_9_v2.jpg",
+      "/product/page_14_image_11_v2.jpg",
+      "/product/page_14_image_14_v2.jpg",
+      "/product/page_14_image_12_v2.jpg",
+      "/product/page_14_image_13_v2.jpg",
+      "/product/page_14_image_15_v2.jpg",
+      "/product/page_14_image_17_v2.jpg",
+      "/product/page_14_image_16_v2.jpg",
+      "/product/page_14_image_18_v2.jpg",
+      "/product/page_14_image_19_v2.jpg"
+    ],
+    "formatted_price": "25.690.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "4800286b-2aa7-4b6b-a9d6-cfffd1f25c3a",
+    "code": "KL - 929 APP",
+    "name": "KL - 929 APP",
+    "price": 22390000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 84,5 x C 695 x D 35 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp Kim, Mạ Vàng 24K"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có chế độ nắp trượt tự động bảo vệ màn hình khóa",
+      "Báo động khi nhập mã sai và tác động ngoại lực mạnh",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App Tuya. Mặt khóa ngoài và trong: Hợp Kim, Mạ Vàng 24K. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Vàng.",
+    "page_number": 15,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Doorbell function",
+      "APP Wifi",
+      "Auto Lock",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p15_1.jpg",
+      "/product/page_15_image_1_v2.jpg",
+      "/product/page_15_image_3_v2.jpg",
+      "/product/page_15_image_2_v2.jpg",
+      "/product/page_15_image_5_v2.jpg",
+      "/product/page_15_image_4_v2.jpg",
+      "/product/page_15_image_7_v2.jpg",
+      "/product/page_15_image_6_v2.jpg",
+      "/product/page_15_image_8_v2.jpg",
+      "/product/page_15_image_9_v2.jpg",
+      "/product/page_15_image_10_v2.jpg",
+      "/product/page_15_image_11_v2.jpg",
+      "/product/page_15_image_12_v2.jpg",
+      "/product/page_15_image_13_v2.jpg",
+      "/product/page_15_image_14_v2.jpg",
+      "/product/page_15_image_15_v2.jpg",
+      "/product/page_15_image_17_v2.jpg",
+      "/product/page_15_image_16_v2.jpg",
+      "/product/page_15_image_19_v2.jpg",
+      "/product/page_15_image_20_v2.jpg",
+      "/product/page_15_image_22_v2.jpg",
+      "/product/page_15_image_21_v2.jpg",
+      "/product/page_15_image_18_v2.jpg"
+    ],
+    "formatted_price": "22.390.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "f1d6463a-d632-403f-a0c1-0cd4fb1c6656",
+    "code": "KL - 979 G",
+    "name": "KL - 979 G",
+    "price": 22390000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 76 x C 655 x D 34mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm, mạ đồng 3 lớp"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng Đồng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng app wifi",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có chế độ nắp trượt tự động bảo vệ màn hình khóa",
+      "Báo động khi nhập sai mã",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Mặt khóa ngoài: Hợp kim kẽm, mạ đồng 3 lớp. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Vàng Đồng.",
+    "page_number": 16,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi"
+    ],
+    "images": [
+      "/product/img_p16_1.jpg",
+      "/product/page_16_image_1_v2.jpg",
+      "/product/page_16_image_3_v2.jpg",
+      "/product/page_16_image_4_v2.jpg",
+      "/product/page_16_image_5_v2.jpg",
+      "/product/page_16_image_2_v2.jpg",
+      "/product/page_16_image_6_v2.jpg",
+      "/product/page_16_image_8_v2.jpg",
+      "/product/page_16_image_9_v2.jpg",
+      "/product/page_16_image_10_v2.jpg",
+      "/product/page_16_image_7_v2.jpg",
+      "/product/page_16_image_11_v2.jpg",
+      "/product/page_16_image_12_v2.jpg"
+    ],
+    "formatted_price": "22.390.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "230003a3-dced-444d-bbeb-a6d3f231936a",
+    "code": "KL - 979 R",
+    "name": "KL - 979 R",
+    "price": 19590000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 76 x C 655 x D 34mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm, mạ đồng 3 lớp"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB (không bao gồm)"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đồng Đỏ"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng app wifi",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có chế độ nắp trượt tự động bảo vệ màn hình khóa",
+      "Báo động khi nhập sai mã",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Mặt khóa ngoài: Hợp kim kẽm, mạ đồng 3 lớp. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Đồng Đỏ.",
+    "page_number": 17,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi"
+    ],
+    "images": [
+      "/product/img_p17_1.jpg",
+      "/product/page_17_image_2_v2.jpg",
+      "/product/page_17_image_3_v2.jpg",
+      "/product/page_17_image_4_v2.jpg",
+      "/product/page_17_image_6_v2.jpg",
+      "/product/page_17_image_8_v2.jpg",
+      "/product/page_17_image_7_v2.jpg",
+      "/product/page_17_image_10_v2.jpg",
+      "/product/page_17_image_11_v2.jpg",
+      "/product/page_17_image_1_v2.jpg",
+      "/product/page_17_image_5_v2.jpg",
+      "/product/page_17_image_9_v2.jpg"
+    ],
+    "formatted_price": "19.590.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "28be5859-d742-447d-bd3c-967e15a05cbc",
+    "code": "KL - 979 GR",
+    "name": "KL - 979 GR",
+    "price": 19590000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 76 x C 655 x D 34mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm, mạ đồng 3 lớp"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB (không bao gồm)"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đồng Rêu"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng app wifi",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có chế độ nắp trượt tự động bảo vệ màn hình khóa",
+      "Báo động khi nhập sai mã",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Mặt khóa ngoài: Hợp kim kẽm, mạ đồng 3 lớp. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Đồng Rêu.",
+    "page_number": 18,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi"
+    ],
+    "images": [
+      "/product/img_p18_1.jpg",
+      "/product/page_18_image_1_v2.jpg",
+      "/product/page_18_image_3_v2.jpg",
+      "/product/page_18_image_4_v2.jpg",
+      "/product/page_18_image_5_v2.jpg",
+      "/product/page_18_image_2_v2.jpg",
+      "/product/page_18_image_7_v2.jpg",
+      "/product/page_18_image_6_v2.jpg",
+      "/product/page_18_image_8_v2.jpg",
+      "/product/page_18_image_10_v2.jpg",
+      "/product/page_18_image_9_v2.jpg",
+      "/product/page_18_image_11_v2.jpg"
+    ],
+    "formatted_price": "19.590.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "d8a0f5bb-52ff-4960-b2ac-cde0797f4288",
+    "code": "KL - 919 PRO - GOLD",
+    "name": "KL - 919 PRO - GOLD",
+    "price": 18690000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 77.5 x C 347 x D 52mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Đồng đúc nguyên khối"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB (không bao gồm)"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "35~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng app ttlock bluetooth",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Báo động khi nhập sai mã",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa thông minh vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Vàng. Chức năng app ttlock bluetooth.",
+    "page_number": 19,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP TTlock"
+    ],
+    "images": [
+      "/product/img_p19_1.jpg",
+      "/product/page_19_image_1_v2.jpg",
+      "/product/page_19_image_2_v2.jpg",
+      "/product/page_19_image_3_v2.jpg",
+      "/product/page_19_image_4_v2.jpg",
+      "/product/page_19_image_5_v2.jpg",
+      "/product/page_19_image_6_v2.jpg",
+      "/product/page_19_image_7_v2.jpg",
+      "/product/page_19_image_8_v2.jpg",
+      "/product/page_19_image_9_v2.jpg",
+      "/product/page_19_image_11_v2.jpg",
+      "/product/page_19_image_12_v2.jpg",
+      "/product/page_19_image_13_v2.jpg",
+      "/product/page_19_image_10_v2.jpg",
+      "/product/page_19_image_14_v2.jpg"
+    ],
+    "formatted_price": "18.690.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "06197b69-1b84-4aa9-86e5-97ae03d6e744",
+    "code": null,
+    "name": "KL - 919 PRO - COPPER",
+    "price": 17590000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 77.5 x C 347 x D 52mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Đồng đúc nguyên khối"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB (không bao gồm)"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "35~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Màu Đồng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chức năng app ttlock bluetooth",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Báo động khi nhập sai mã",
+      "Chống ẩm, chống bụi tuyệt đối",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Màu Đồng. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: 4AA Batteries. Nguồn điện khẩn cấp: Cổng USB (không bao gồm). Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 20,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p20_1.jpg",
+      "/product/page_20_image_1_v2.jpg",
+      "/product/page_20_image_4_v2.jpg",
+      "/product/page_20_image_3_v2.jpg",
+      "/product/page_20_image_2_v2.jpg",
+      "/product/page_20_image_5_v2.jpg",
+      "/product/page_20_image_6_v2.jpg",
+      "/product/page_20_chart_1_v2.jpg",
+      "/product/page_20_image_8_v2.jpg",
+      "/product/page_20_image_9_v2.jpg",
+      "/product/page_20_image_7_v2.jpg",
+      "/product/page_20_image_12_v2.jpg",
+      "/product/page_20_image_10_v2.jpg",
+      "/product/page_20_image_13_v2.jpg",
+      "/product/page_20_image_15_v2.jpg",
+      "/product/page_20_image_14_v2.jpg",
+      "/product/page_20_image_11_v2.jpg"
+    ],
+    "formatted_price": "17.590.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "65e84360-92df-4578-8530-a76f8de3ce68",
+    "code": null,
+    "name": "KL - 919 PRO - GREEN",
+    "price": 17590000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 77.5 x C 347 x D 52mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Đồng đúc nguyên khối"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB (không bao gồm)"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "35~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đồng thau"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chức năng app ttlock bluetooth",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Báo động khi nhập sai mã",
+      "Chống ẩm, chống bụi tuyệt đối",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Đồng thau. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: 4AA Batteries. Nguồn điện khẩn cấp: Cổng USB (không bao gồm). Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 21,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p21_1.jpg",
+      "/product/page_21_image_1_v2.jpg",
+      "/product/page_21_image_2_v2.jpg",
+      "/product/page_21_image_3_v2.jpg",
+      "/product/page_21_image_4_v2.jpg",
+      "/product/page_21_image_5_v2.jpg",
+      "/product/page_21_image_6_v2.jpg",
+      "/product/page_21_image_7_v2.jpg",
+      "/product/page_21_image_8_v2.jpg",
+      "/product/page_21_image_9_v2.jpg",
+      "/product/page_21_image_10_v2.jpg",
+      "/product/page_21_image_11_v2.jpg",
+      "/product/page_21_image_13_v2.jpg",
+      "/product/page_21_image_14_v2.jpg",
+      "/product/page_21_image_17_v2.jpg",
+      "/product/page_21_image_12_v2.jpg",
+      "/product/page_21_image_15_v2.jpg",
+      "/product/page_21_image_16_v2.jpg"
+    ],
+    "formatted_price": "17.590.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "e9a68d4c-f7c7-4786-8f4d-64e1f054dd7d",
+    "code": null,
+    "name": "KL - 919",
+    "price": 10790000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 60 x C 280 x D 34mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm, mạ vàng 24k"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB (không bao gồm)"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "35~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng 24k"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chức năng app ttlock bluetooth",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Báo động khi nhập sai mã",
+      "Chống ẩm, chống bụi tuyệt đối",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Vàng 24k. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: 4AA Batteries. Nguồn điện khẩn cấp: Cổng USB (không bao gồm). Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 22,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p22_1.jpg",
+      "/product/page_22_image_2_v2.jpg",
+      "/product/page_22_image_1_v2.jpg",
+      "/product/page_22_image_4_v2.jpg",
+      "/product/page_22_image_3_v2.jpg",
+      "/product/page_22_image_7_v2.jpg",
+      "/product/page_22_image_6_v2.jpg",
+      "/product/page_22_image_8_v2.jpg",
+      "/product/page_22_image_5_v2.jpg",
+      "/product/page_22_image_10_v2.jpg",
+      "/product/page_22_image_9_v2.jpg"
+    ],
+    "formatted_price": "10.790.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "a0c5bc09-6c73-475c-9919-5849d7e12767",
+    "code": null,
+    "name": "KL - 968 CNC",
+    "price": 36690000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 74 x C 638 x D 60 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhôm hàng không CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đen"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Face ID 3D",
+      "Nhận diện lòng bàn tay",
+      "Mật mã, vân tay, thẻ từ, chìa khóa cơ, remote",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 50 Face ID 3D",
+      "Chống va đập",
+      "Chế độ tự động cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công",
+      "Face ID, Đàm Thoại 2 Chiều"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng Face ID 3D, nhận diện lòng bàn tay, mật mã, vân tay, thẻ từ, chìa khóa cơ, remote. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 50 Face ID 3D. Màu hoàn thiện: Đen. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 5000mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 23,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Face ID",
+      "Alarm",
+      "Palm Recognition"
+    ],
+    "images": [
+      "/product/img_p23_1.jpg",
+      "/product/page_23_image_2_v2.jpg",
+      "/product/page_23_image_3_v2.jpg",
+      "/product/page_23_image_1_v2.jpg",
+      "/product/page_23_image_6_v2.jpg",
+      "/product/page_23_image_4_v2.jpg",
+      "/product/page_23_image_5_v2.jpg",
+      "/product/page_23_image_10_v2.jpg",
+      "/product/page_23_image_8_v2.jpg",
+      "/product/page_23_image_9_v2.jpg",
+      "/product/page_23_image_11_v2.jpg",
+      "/product/page_23_image_12_v2.jpg",
+      "/product/page_23_image_13_v2.jpg",
+      "/product/page_23_image_14_v2.jpg",
+      "/product/page_23_image_15_v2.jpg",
+      "/product/page_23_image_17_v2.jpg",
+      "/product/page_23_image_16_v2.jpg",
+      "/product/page_23_image_18_v2.jpg",
+      "/product/page_23_image_7_v2.jpg",
+      "/product/page_23_image_19_v2.jpg",
+      "/product/page_23_image_20_v2.jpg",
+      "/product/page_23_chart_1_v2.jpg"
+    ],
+    "formatted_price": "36.690.000 đ",
+    "category_id": 1
+  },
+  {
+    "id": "6e2dfc64-8388-4916-a5f2-477f86738a2d",
+    "code": null,
+    "name": "KL - 968 CNC",
+    "price": 36690000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 74 x C 638 x D 60 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhôm hàng không CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "Vàng Cát Sa Mạc"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Face ID 3D",
+      "Nhận diện lòng bàn tay",
+      "Mật mã, vân tay, thẻ từ, chìa khóa cơ, remote",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 50 Face ID 3D",
+      "Chống va đập",
+      "Chế độ tự động cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công",
+      "Face ID, Đàm Thoại 2 Chiều"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng Face ID 3D, nhận diện lòng bàn tay, mật mã, vân tay, thẻ từ, chìa khóa cơ, remote. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 50 Face ID 3D. Màu hoàn thiện: Đen, Vàng Cát Sa Mạc. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 5000mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 24,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Face ID",
+      "Alarm",
+      "Palm Recognition"
+    ],
+    "images": [
+      "/product/img_p24_1.jpg",
+      "/product/page_24_image_1_v2.jpg",
+      "/product/page_24_image_2_v2.jpg",
+      "/product/page_24_image_3_v2.jpg",
+      "/product/page_24_image_4_v2.jpg",
+      "/product/page_24_image_5_v2.jpg",
+      "/product/page_24_image_7_v2.jpg",
+      "/product/page_24_image_8_v2.jpg",
+      "/product/page_24_image_6_v2.jpg",
+      "/product/page_24_image_10_v2.jpg",
+      "/product/page_24_image_11_v2.jpg",
+      "/product/page_24_image_12_v2.jpg",
+      "/product/page_24_image_9_v2.jpg",
+      "/product/page_24_chart_1_v2.jpg",
+      "/product/page_24_image_14_v2.jpg",
+      "/product/page_24_image_13_v2.jpg",
+      "/product/page_24_image_15_v2.jpg",
+      "/product/page_24_image_16_v2.jpg",
+      "/product/page_24_image_18_v2.jpg",
+      "/product/page_24_image_19_v2.jpg",
+      "/product/page_24_image_20_v2.jpg",
+      "/product/page_24_image_21_v2.jpg",
+      "/product/page_24_image_22_v2.jpg",
+      "/product/page_24_image_17_v2.jpg"
+    ],
+    "formatted_price": "36.690.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "f8657e25-435c-4339-97ae-06c32b957d67",
+    "code": null,
+    "name": "KL - 968 CNC",
+    "price": 36690000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 74 x C 638 x D 60 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhôm hàng không CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "Đồng Đỏ"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Face ID 3D",
+      "Nhận diện lòng bàn tay",
+      "Mật mã, vân tay, thẻ từ, chìa khóa cơ, remote",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 50 Face ID 3D",
+      "Chống va đập",
+      "Chế độ tự đóng cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công",
+      "Face ID, Đàm Thoại 2 Chiều"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng Face ID 3D, nhận diện lòng bàn tay, mật mã, vân tay, thẻ từ, chìa khóa cơ, remote. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 50 Face ID 3D. Màu hoàn thiện: Đen, Đồng Đỏ. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 5000mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 25,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Face ID",
+      "Alarm",
+      "Palm Recognition"
+    ],
+    "images": [
+      "/product/img_p25_1.jpg",
+      "/product/page_25_image_2_v2.jpg",
+      "/product/page_25_image_3_v2.jpg",
+      "/product/page_25_image_1_v2.jpg",
+      "/product/page_25_image_4_v2.jpg",
+      "/product/page_25_image_6_v2.jpg",
+      "/product/page_25_image_8_v2.jpg",
+      "/product/page_25_image_5_v2.jpg",
+      "/product/page_25_chart_1_v2.jpg",
+      "/product/page_25_image_10_v2.jpg",
+      "/product/page_25_image_9_v2.jpg",
+      "/product/page_25_image_11_v2.jpg",
+      "/product/page_25_image_13_v2.jpg",
+      "/product/page_25_image_14_v2.jpg",
+      "/product/page_25_image_7_v2.jpg",
+      "/product/page_25_image_17_v2.jpg",
+      "/product/page_25_image_16_v2.jpg",
+      "/product/page_25_image_15_v2.jpg",
+      "/product/page_25_image_18_v2.jpg",
+      "/product/page_25_image_19_v2.jpg",
+      "/product/page_25_image_12_v2.jpg"
+    ],
+    "formatted_price": "36.690.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "4249746d-1d38-401c-9b22-c25c1286bd54",
+    "code": null,
+    "name": "KL - 968 CNC",
+    "price": 36690000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 74 x C 638 x D 60 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhôm hàng không CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "Xanh xám"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Face ID 3D",
+      "Nhận diện lòng bàn tay",
+      "Mật mã, vân tay, thẻ từ, chìa khóa cơ, remote",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 50 Face ID 3D",
+      "Chống va đập",
+      "Chế độ tự đóng cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công",
+      "Face ID, Đàm Thoại 2 Chiều"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng Face ID 3D, nhận diện lòng bàn tay, mật mã, vân tay, thẻ từ, chìa khóa cơ, remote. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 50 Face ID 3D. Màu hoàn thiện: Đen, Xanh xám. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 5000mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 26,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Face ID",
+      "Alarm",
+      "Palm Recognition"
+    ],
+    "images": [
+      "/product/img_p26_1.jpg",
+      "/product/page_26_image_2_v2.jpg",
+      "/product/page_26_image_1_v2.jpg",
+      "/product/page_26_image_3_v2.jpg",
+      "/product/page_26_image_4_v2.jpg",
+      "/product/page_26_image_5_v2.jpg",
+      "/product/page_26_image_6_v2.jpg",
+      "/product/page_26_image_9_v2.jpg",
+      "/product/page_26_image_10_v2.jpg",
+      "/product/page_26_image_8_v2.jpg",
+      "/product/page_26_image_7_v2.jpg",
+      "/product/page_26_chart_1_v2.jpg",
+      "/product/page_26_image_11_v2.jpg",
+      "/product/page_26_image_12_v2.jpg",
+      "/product/page_26_image_13_v2.jpg",
+      "/product/page_26_image_14_v2.jpg",
+      "/product/page_26_image_18_v2.jpg",
+      "/product/page_26_image_16_v2.jpg",
+      "/product/page_26_image_19_v2.jpg",
+      "/product/page_26_image_20_v2.jpg",
+      "/product/page_26_image_17_v2.jpg",
+      "/product/page_26_image_21_v2.jpg",
+      "/product/page_26_image_15_v2.jpg"
+    ],
+    "formatted_price": "36.690.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "e38ac099-c255-426c-b115-08fb481da0aa",
+    "code": null,
+    "name": "KL - 899 PLUS CNC",
+    "price": 25890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 74 x C 439 x D 54 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhôm hàng không nguyên khối CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "xanh xám",
+      "nâu cà phê"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Face ID 3D",
+      "Nhận diện lòng bàn tay",
+      "Mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 30 Face ID, 30 lòng bàn tay",
+      "Chống va đập",
+      "Chế độ tự động cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công",
+      "Face ID, Đàm Thoại 2 Chiều, bật Camera trực tiếp, thêm ID từ xa"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng Face ID 3D, nhận diện lòng bàn tay, mật mã, vân tay, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 30 Face ID, 30 lòng bàn tay. Màu hoàn thiện: Đen, xanh xám, nâu cà phê. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 5000mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 27,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Face ID",
+      "Alarm",
+      "Palm Recognition"
+    ],
+    "images": [
+      "/product/img_p27_1.jpg",
+      "/product/page_27_image_2_v2.jpg",
+      "/product/page_27_image_1_v2.jpg",
+      "/product/page_27_image_3_v2.jpg",
+      "/product/page_27_image_4_v2.jpg",
+      "/product/page_27_image_5_v2.jpg",
+      "/product/page_27_image_6_v2.jpg",
+      "/product/page_27_image_7_v2.jpg",
+      "/product/page_27_image_8_v2.jpg",
+      "/product/page_27_image_9_v2.jpg",
+      "/product/page_27_image_10_v2.jpg",
+      "/product/page_27_image_11_v2.jpg",
+      "/product/page_27_image_13_v2.jpg",
+      "/product/page_27_image_14_v2.jpg",
+      "/product/page_27_image_15_v2.jpg",
+      "/product/page_27_image_12_v2.jpg",
+      "/product/page_27_image_17_v2.jpg",
+      "/product/page_27_image_16_v2.jpg",
+      "/product/page_27_image_18_v2.jpg",
+      "/product/page_27_image_21_v2.jpg",
+      "/product/page_27_image_19_v2.jpg",
+      "/product/page_27_image_20_v2.jpg",
+      "/product/page_27_image_23_v2.jpg",
+      "/product/page_27_image_24_v2.jpg",
+      "/product/page_27_image_22_v2.jpg"
+    ],
+    "formatted_price": "25.890.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "ba83493a-2bb9-4192-9cfe-21c235c1b5e0",
+    "code": null,
+    "name": "KL - 82T - SILVER",
+    "price": 24390000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 68 x C 428 x D 52 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhôm hàng không nguyên khối CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Bạc"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Face ID 3D",
+      "Nhận diện lòng bàn tay",
+      "Mật mã, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 thẻ từ, 100 mật mã, 30 Face ID, 30 lòng bàn tay",
+      "Chống va đập",
+      "Chế độ tự đóng cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công",
+      "Face ID, Đàm Thoại 2 Chiều",
+      "2 màn hình 5inch siêu nét, cài đặt hình nền mong muốn"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng Face ID 3D, nhận diện lòng bàn tay, mật mã, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 thẻ từ, 100 mật mã, 30 Face ID, 30 lòng bàn tay. Màu hoàn thiện: Bạc. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 5000mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 28,
+    "technologies": [
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Face ID",
+      "Alarm",
+      "Palm Recognition"
+    ],
+    "images": [
+      "/product/img_p28_1.jpg",
+      "/product/page_28_image_1_v2.jpg",
+      "/product/page_28_image_2_v2.jpg",
+      "/product/page_28_image_3_v2.jpg",
+      "/product/page_28_image_4_v2.jpg",
+      "/product/page_28_image_5_v2.jpg",
+      "/product/page_28_image_6_v2.jpg",
+      "/product/page_28_image_7_v2.jpg",
+      "/product/page_28_image_8_v2.jpg",
+      "/product/page_28_image_9_v2.jpg",
+      "/product/page_28_image_11_v2.jpg",
+      "/product/page_28_image_12_v2.jpg",
+      "/product/page_28_image_13_v2.jpg",
+      "/product/page_28_image_14_v2.jpg",
+      "/product/page_28_image_16_v2.jpg",
+      "/product/page_28_image_10_v2.jpg",
+      "/product/page_28_image_17_v2.jpg",
+      "/product/page_28_image_19_v2.jpg",
+      "/product/page_28_image_15_v2.jpg",
+      "/product/page_28_image_18_v2.jpg"
+    ],
+    "formatted_price": "24.390.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "cecdd493-8819-493f-93e7-6dcb89916c7d",
+    "code": null,
+    "name": "KL - 82T - BLACK",
+    "price": 23890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 68 x C 428 x D 52 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhôm hàng không nguyên khối CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đen"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Face ID 3D",
+      "Nhận diện lòng bàn tay",
+      "Mật mã, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 thẻ từ, 100 mật mã, 30 Face ID, 30 lòng bàn tay",
+      "Chống va đập",
+      "Chế độ tự đóng cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công",
+      "Face ID, Đàm Thoại 2 Chiều",
+      "2 màn hình 5inch siêu nét, cài đặt hình nền mong muốn"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng Face ID 3D, nhận diện lòng bàn tay, mật mã, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 thẻ từ, 100 mật mã, 30 Face ID, 30 lòng bàn tay. Màu hoàn thiện: Đen. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 5000mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 28,
+    "technologies": [
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Face ID",
+      "Alarm",
+      "Palm Recognition"
+    ],
+    "images": [
+      "/product/img_p28_1.jpg",
+      "/product/page_28_image_1_v2.jpg",
+      "/product/page_28_image_2_v2.jpg",
+      "/product/page_28_image_3_v2.jpg",
+      "/product/page_28_image_4_v2.jpg",
+      "/product/page_28_image_5_v2.jpg",
+      "/product/page_28_image_6_v2.jpg",
+      "/product/page_28_image_7_v2.jpg",
+      "/product/page_28_image_8_v2.jpg",
+      "/product/page_28_image_9_v2.jpg",
+      "/product/page_28_image_11_v2.jpg",
+      "/product/page_28_image_12_v2.jpg",
+      "/product/page_28_image_13_v2.jpg",
+      "/product/page_28_image_14_v2.jpg",
+      "/product/page_28_image_16_v2.jpg",
+      "/product/page_28_image_10_v2.jpg",
+      "/product/page_28_image_17_v2.jpg",
+      "/product/page_28_image_19_v2.jpg",
+      "/product/page_28_image_15_v2.jpg",
+      "/product/page_28_image_18_v2.jpg"
+    ],
+    "formatted_price": "23.890.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "fe372420-77d6-4468-b070-066ccd18940c",
+    "code": null,
+    "name": "KL - 899 CNC",
+    "price": 22390000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 68 x C 428 x D 52 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhôm hàng không nguyên khối CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "xanh xám",
+      "nâu cà phê"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Face ID 3D",
+      "Nhận diện lòng bàn tay",
+      "Mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 30 Face ID, 30 lòng bàn tay",
+      "Chống va đập",
+      "Chế độ tự đóng cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công",
+      "Face ID, Đàm Thoại 2 Chiều"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng Face ID 3D, nhận diện lòng bàn tay, mật mã, vân tay, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 30 Face ID, 30 lòng bàn tay. Màu hoàn thiện: Đen, xanh xám, nâu cà phê. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 5000mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 29,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Face ID",
+      "Alarm",
+      "Palm Recognition"
+    ],
+    "images": [
+      "/product/img_p29_1.jpg",
+      "/product/page_29_image_1_v2.jpg",
+      "/product/page_29_image_2_v2.jpg",
+      "/product/page_29_image_3_v2.jpg",
+      "/product/page_29_image_4_v2.jpg",
+      "/product/page_29_image_5_v2.jpg",
+      "/product/page_29_image_6_v2.jpg",
+      "/product/page_29_image_7_v2.jpg",
+      "/product/page_29_image_8_v2.jpg",
+      "/product/page_29_image_9_v2.jpg",
+      "/product/page_29_image_11_v2.jpg",
+      "/product/page_29_chart_1_v2.jpg",
+      "/product/page_29_image_12_v2.jpg",
+      "/product/page_29_image_10_v2.jpg",
+      "/product/page_29_image_14_v2.jpg",
+      "/product/page_29_image_15_v2.jpg",
+      "/product/page_29_image_16_v2.jpg",
+      "/product/page_29_image_13_v2.jpg",
+      "/product/page_29_image_17_v2.jpg",
+      "/product/page_29_image_18_v2.jpg",
+      "/product/page_29_image_19_v2.jpg",
+      "/product/page_29_image_21_v2.jpg",
+      "/product/page_29_image_20_v2.jpg"
+    ],
+    "formatted_price": "22.390.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "13ddbfc7-4845-4d5f-a3a7-0e6610cf53c0",
+    "code": null,
+    "name": "KL - 889 CNC",
+    "price": 20090000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 74 x C 416 x D 54 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhôm hàng không nguyên khối CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "xanh xám",
+      "nâu cà phê"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Face ID 3D",
+      "Nhận diện lòng bàn tay",
+      "Mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 30 Face ID, 30 lòng bàn tay",
+      "Chống va đập",
+      "Chế độ tự động cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công",
+      "Face ID, Đàm Thoại 2 Chiều"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng Face ID 3D, nhận diện lòng bàn tay, mật mã, vân tay, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 30 Face ID, 30 lòng bàn tay. Màu hoàn thiện: Đen, xanh xám, nâu cà phê. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 5000mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 30,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Face ID",
+      "Alarm",
+      "Palm Recognition"
+    ],
+    "images": [
+      "/product/img_p30_1.jpg",
+      "/product/page_30_image_1_v2.jpg",
+      "/product/page_30_image_2_v2.jpg",
+      "/product/page_30_image_3_v2.jpg",
+      "/product/page_30_image_4_v2.jpg",
+      "/product/page_30_image_5_v2.jpg",
+      "/product/page_30_image_6_v2.jpg",
+      "/product/page_30_image_7_v2.jpg",
+      "/product/page_30_image_8_v2.jpg",
+      "/product/page_30_image_9_v2.jpg",
+      "/product/page_30_chart_1_v2.jpg",
+      "/product/page_30_image_10_v2.jpg",
+      "/product/page_30_image_11_v2.jpg",
+      "/product/page_30_image_12_v2.jpg",
+      "/product/page_30_image_13_v2.jpg",
+      "/product/page_30_image_14_v2.jpg",
+      "/product/page_30_image_15_v2.jpg",
+      "/product/page_30_image_16_v2.jpg",
+      "/product/page_30_image_17_v2.jpg",
+      "/product/page_30_image_18_v2.jpg"
+    ],
+    "formatted_price": "20.090.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "24aec352-8d2d-4874-8b90-5b49706288aa",
+    "code": null,
+    "name": "KL - 838",
+    "price": 18590000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 75 x C 418 x D 56 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhựa ABS chịu lực, hợp kim"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đồng đỏ",
+      "xám"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Face ID 3D",
+      "Mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 30 Face ID",
+      "Chống va đập",
+      "Chế độ tự động cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công",
+      "Face ID, Đàm Thoại 2 Chiều"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng Face ID 3D, mật mã, vân tay, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 30 Face ID. Màu hoàn thiện: Đồng đỏ, xám. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 5000mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 31,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Face ID",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p31_1.jpg",
+      "/product/page_31_image_1_v2.jpg",
+      "/product/page_31_image_2_v2.jpg",
+      "/product/page_31_image_3_v2.jpg",
+      "/product/page_31_image_4_v2.jpg",
+      "/product/page_31_image_5_v2.jpg",
+      "/product/page_31_image_6_v2.jpg",
+      "/product/page_31_image_7_v2.jpg",
+      "/product/page_31_chart_1_v2.jpg",
+      "/product/page_31_image_8_v2.jpg",
+      "/product/page_31_image_9_v2.jpg",
+      "/product/page_31_image_10_v2.jpg",
+      "/product/page_31_image_11_v2.jpg",
+      "/product/page_31_image_12_v2.jpg",
+      "/product/page_31_image_13_v2.jpg",
+      "/product/page_31_image_16_v2.jpg",
+      "/product/page_31_image_14_v2.jpg",
+      "/product/page_31_image_15_v2.jpg",
+      "/product/page_31_image_18_v2.jpg",
+      "/product/page_31_image_19_v2.jpg",
+      "/product/page_31_image_17_v2.jpg"
+    ],
+    "formatted_price": "18.590.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "d73920fd-366e-4120-8fa1-86395a165b92",
+    "code": null,
+    "name": "KL - 868 CNC",
+    "price": 15690000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 74 x C 416 x D 54 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhôm hàng không nguyên khối CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Màu Đen",
+      "Xanh Xám"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Face ID 3D",
+      "Nhận diện lòng bàn tay",
+      "Mật mã, vân tay, thẻ từ, chìa khóa cơ, remote",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 50 Face ID 3D, 30 lòng bàn tay",
+      "Chống va đập",
+      "Chế độ tự đóng cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công",
+      "Face ID, Đàm Thoại 2 Chiều"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng Face ID 3D, nhận diện lòng bàn tay, mật mã, vân tay, thẻ từ, chìa khóa cơ, remote. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 50 Face ID 3D, 30 lòng bàn tay. Màu hoàn thiện: Màu Đen, Xanh Xám. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 5000mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 32,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Face ID",
+      "Alarm",
+      "Palm Recognition"
+    ],
+    "images": [
+      "/product/img_p32_1.jpg",
+      "/product/page_32_image_1_v2.jpg",
+      "/product/page_32_image_2_v2.jpg",
+      "/product/page_32_image_4_v2.jpg",
+      "/product/page_32_image_5_v2.jpg",
+      "/product/page_32_image_3_v2.jpg",
+      "/product/page_32_chart_1_v2.jpg",
+      "/product/page_32_image_6_v2.jpg",
+      "/product/page_32_image_8_v2.jpg",
+      "/product/page_32_image_9_v2.jpg",
+      "/product/page_32_image_7_v2.jpg",
+      "/product/page_32_image_11_v2.jpg",
+      "/product/page_32_image_12_v2.jpg",
+      "/product/page_32_image_10_v2.jpg",
+      "/product/page_32_image_13_v2.jpg",
+      "/product/page_32_image_15_v2.jpg",
+      "/product/page_32_image_16_v2.jpg",
+      "/product/page_32_image_17_v2.jpg",
+      "/product/page_32_image_14_v2.jpg",
+      "/product/page_32_image_18_v2.jpg",
+      "/product/page_32_image_20_v2.jpg",
+      "/product/page_32_image_19_v2.jpg",
+      "/product/page_32_image_21_v2.jpg",
+      "/product/page_32_image_22_v2.jpg",
+      "/product/page_32_image_23_v2.jpg"
+    ],
+    "formatted_price": "15.690.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "1102c0eb-70f6-4994-b2cc-4c3a7f84bbf8",
+    "code": null,
+    "name": "KL - 809 CNC",
+    "price": 11890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 74 x C 416 x D 54 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhôm hàng không nguyên khối CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 5000mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Màu Đen",
+      "Đồng"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Mật mã, vân tay, thẻ từ, chìa khóa cơ, remote",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chống va đập",
+      "Chế độ tự đóng cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, remote. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Màu Đen, Đồng. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 5000mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 33,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p33_1.jpg",
+      "/product/page_33_image_1_v2.jpg",
+      "/product/page_33_image_2_v2.jpg",
+      "/product/page_33_image_3_v2.jpg",
+      "/product/page_33_image_4_v2.jpg",
+      "/product/page_33_image_5_v2.jpg",
+      "/product/page_33_image_6_v2.jpg",
+      "/product/page_33_image_7_v2.jpg",
+      "/product/page_33_image_8_v2.jpg",
+      "/product/page_33_image_9_v2.jpg",
+      "/product/page_33_image_10_v2.jpg",
+      "/product/page_33_image_11_v2.jpg",
+      "/product/page_33_image_12_v2.jpg",
+      "/product/page_33_image_13_v2.jpg",
+      "/product/page_33_image_14_v2.jpg",
+      "/product/page_33_image_16_v2.jpg",
+      "/product/page_33_image_15_v2.jpg",
+      "/product/page_33_image_17_v2.jpg"
+    ],
+    "formatted_price": "11.890.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "d02ebc27-bb7b-49d6-9e1c-3bb247df92eb",
+    "code": null,
+    "name": "KL - 808 CNC",
+    "price": 9390000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 73 x C 420 x D 30 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Nhôm hàng không nguyên khối CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Lithium 4200mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40-100mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Màu Đen",
+      "Đồng"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Mật mã, vân tay, thẻ từ, chìa khóa cơ, remote, Face ID, nhận diện lòng bàn tay",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 30 Face ID hoặc lòng bàn tay",
+      "Chống va đập",
+      "Chế độ tự động cửa",
+      "Có thể điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Có thiết lập chế độ tự động hoặc chế độ thủ công"
+    ],
+    "warranty": "2 năm",
+    "description": "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, remote, Face ID, nhận diện lòng bàn tay. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã, 30 Face ID hoặc lòng bàn tay. Màu hoàn thiện: Màu Đen, Đồng. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: Lithium 4200mAh. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 35,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Auto Lock",
+      "Face ID",
+      "Alarm",
+      "Palm Recognition"
+    ],
+    "images": [
+      "/product/img_p35_1.jpg",
+      "/product/page_35_image_1_v2.jpg",
+      "/product/page_35_image_2_v2.jpg",
+      "/product/page_35_image_3_v2.jpg",
+      "/product/page_35_image_4_v2.jpg",
+      "/product/page_35_image_6_v2.jpg",
+      "/product/page_35_image_8_v2.jpg",
+      "/product/page_35_image_9_v2.jpg",
+      "/product/page_35_image_10_v2.jpg",
+      "/product/page_35_image_5_v2.jpg",
+      "/product/page_35_image_11_v2.jpg",
+      "/product/page_35_image_7_v2.jpg",
+      "/product/page_35_image_13_v2.jpg",
+      "/product/page_35_image_14_v2.jpg",
+      "/product/page_35_image_15_v2.jpg",
+      "/product/page_35_image_12_v2.jpg",
+      "/product/page_35_image_16_v2.jpg",
+      "/product/page_35_image_17_v2.jpg",
+      "/product/page_35_image_20_v2.jpg",
+      "/product/page_35_image_18_v2.jpg",
+      "/product/page_35_image_21_v2.jpg",
+      "/product/page_35_image_19_v2.jpg",
+      "/product/page_35_image_23_v2.jpg",
+      "/product/page_35_image_22_v2.jpg"
+    ],
+    "formatted_price": "9.390.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "19afde5e-dbbd-47ae-8e9b-711abb856d9a",
+    "code": null,
+    "name": "KL - 700",
+    "price": 12490000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 75 x C 370 x D 26 mm"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim siêu bền, phủ NANO (chống xuống màu, hoen gỉ)"
+      },
+      {
+        "key": "Mặt khóa trong",
+        "value": "Nhôm, kẽm, nhựa ABS"
+      },
+      {
+        "key": "Bề mặt bên ngoài",
+        "value": "Phủ kim loại 3 lớp"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "8AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Màu Đồng Đen"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Mở cửa từ xa",
+      "Xem lịch sử ra vào cửa trên app",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Màn hình cảm ứng nhiệt (độ nhạy cao, không bị liệt cảm ứng sau thời gian dài sử dụng)"
+    ],
+    "warranty": "3 năm",
+    "description": "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Màu Đồng Đen. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: 8AA Batteries. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng / mở).",
+    "page_number": 36,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p36_1.jpg",
+      "/product/page_36_image_1_v2.jpg",
+      "/product/page_36_image_2_v2.jpg",
+      "/product/page_36_image_3_v2.jpg",
+      "/product/page_36_image_4_v2.jpg",
+      "/product/page_36_image_5_v2.jpg",
+      "/product/page_36_image_6_v2.jpg",
+      "/product/page_36_image_7_v2.jpg",
+      "/product/page_36_image_8_v2.jpg"
+    ],
+    "formatted_price": "12.490.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "8ff92070-0ae5-4866-b321-0a46762fcd5d",
+    "code": "KL - 608 CNC",
+    "name": "Khóa cửa thông minh Kassler KL - 608 CNC",
+    "price": 8390000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 74.5 x C 380 x D 22 mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "Nhôm hàng không CNC"
+      },
+      {
+        "key": "Vật liệu mặt khóa trong",
+        "value": "Nhôm hàng không CNC"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "Đồng"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Cảnh báo khi Pin yếu và lỗi chức năng",
+      "Chế độ thông phòng"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, APP TUYA. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Đen, Đồng. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: 4AA Batteries. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng/mở).",
+    "page_number": 37,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p37_1.jpg",
+      "/product/page_37_image_2_v2.jpg",
+      "/product/page_37_image_3_v2.jpg",
+      "/product/page_37_image_4_v2.jpg",
+      "/product/page_37_image_5_v2.jpg",
+      "/product/page_37_image_6_v2.jpg",
+      "/product/page_37_image_7_v2.jpg",
+      "/product/page_37_image_8_v2.jpg",
+      "/product/page_37_image_1_v2.jpg"
+    ],
+    "formatted_price": "8.390.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "8fa38696-3481-4ae2-8cbc-80501935b03c",
+    "code": "KL - 600 PC",
+    "name": "Khóa cửa thông minh Kassler KL - 600 PC",
+    "price": 8390000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 73 x C 380 x D 26 mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "TiTan siêu bền (chống oxy hóa), nhựa ABS chịu lực"
+      },
+      {
+        "key": "Vật liệu mặt khóa trong",
+        "value": "TiTan siêu bền (chống oxy hóa)"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "8AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Cafe Sữa"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Cảnh báo khi Pin yếu và lỗi chức năng",
+      "Chế độ thông phòng"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Cafe Sữa. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: 8AA Batteries. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng/mở).",
+    "page_number": 38,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p38_1.jpg",
+      "/product/page_38_image_1_v2.jpg",
+      "/product/page_38_image_2_v2.jpg",
+      "/product/page_38_image_4_v2.jpg",
+      "/product/page_38_image_5_v2.jpg",
+      "/product/page_38_image_3_v2.jpg",
+      "/product/page_38_image_7_v2.jpg",
+      "/product/page_38_image_9_v2.jpg",
+      "/product/page_38_image_6_v2.jpg",
+      "/product/page_38_image_11_v2.jpg",
+      "/product/page_38_image_12_v2.jpg",
+      "/product/page_38_image_13_v2.jpg",
+      "/product/page_38_image_8_v2.jpg",
+      "/product/page_38_image_10_v2.jpg"
+    ],
+    "formatted_price": "8.390.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "c087ca7d-8698-45ff-a743-269b2a9aa97f",
+    "code": "KL - 600 PG",
+    "name": "Khóa cửa thông minh Kassler KL - 600 PG",
+    "price": 7890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 73 x C 380 x D 26 mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "TiTan siêu bền (chống oxy hóa), nhựa ABS chịu lực"
+      },
+      {
+        "key": "Vật liệu mặt khóa trong",
+        "value": "TiTan siêu bền (chống oxy hóa)"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "8AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Xám Mờ"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Điều chỉnh âm lượng khi hoạt động từ thấp đến cao",
+      "Chức năng xáo trộn mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Cảnh báo khi Pin yếu và lỗi chức năng",
+      "Chế độ thông phòng"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Màu hoàn thiện: Xám Mờ. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: 8AA Batteries. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng/mở).",
+    "page_number": 39,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p39_1.jpg",
+      "/product/page_39_image_1_v2.jpg",
+      "/product/page_39_image_2_v2.jpg",
+      "/product/page_39_image_4_v2.jpg",
+      "/product/page_39_image_5_v2.jpg",
+      "/product/page_39_image_3_v2.jpg",
+      "/product/page_39_image_6_v2.jpg",
+      "/product/page_39_image_7_v2.jpg",
+      "/product/page_39_image_8_v2.jpg",
+      "/product/page_39_image_9_v2.jpg",
+      "/product/page_39_image_10_v2.jpg"
+    ],
+    "formatted_price": "7.890.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "2d15d9de-30ef-42b2-8a71-60aa92410761",
+    "code": "KL - 668 APP TTLOCK",
+    "name": "Khóa cửa thông minh Kassler KL - 668 APP TTLOCK",
+    "price": 7190000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 72 X C 295 x D 25 mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "Hợp kim kẽm, mạ IML (chống xuống màu, hoen gỉ)"
+      },
+      {
+        "key": "Vật liệu mặt khóa trong",
+        "value": "Hợp kim kẽm, mạ IML (chống xuống màu, hoen gỉ)"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "40~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 80mm"
+      }
+    ],
+    "colors": [
+      "Vàng",
+      "Đen",
+      "Đồng đỏ",
+      "Đồng xanh rêu"
+    ],
+    "category": "Khóa Cửa Gỗ",
+    "features": [
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Tạo mật khẩu sử dụng theo thời gian hoặc một lần",
+      "Chống ẩm, chống bụi tuyệt đối"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa vận hành bằng vân tay, mật mã, thẻ từ, chìa khóa cơ, APP TTLOCK. Đăng ký lên đến 100 thẻ từ, 100 mật mã, 100 vân tay. Màu hoàn thiện: vàng, đen, đồng đỏ, đồng xanh rêu. Nhiệt độ vận hành: -20°C~60°C. Nguồn điện: 4AA Batteries. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng/mở). Chống nước: IP65.",
+    "page_number": 41,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p41_1.jpg",
+      "/product/page_41_image_1_v2.jpg",
+      "/product/page_41_image_2_v2.jpg",
+      "/product/page_41_image_3_v2.jpg",
+      "/product/page_41_image_4_v2.jpg",
+      "/product/page_41_image_5_v2.jpg",
+      "/product/page_41_image_7_v2.jpg",
+      "/product/page_41_image_8_v2.jpg",
+      "/product/page_41_image_9_v2.jpg",
+      "/product/page_41_image_10_v2.jpg",
+      "/product/page_41_image_11_v2.jpg",
+      "/product/page_41_image_12_v2.jpg",
+      "/product/page_41_image_13_v2.jpg",
+      "/product/page_41_image_6_v2.jpg"
+    ],
+    "formatted_price": "7.190.000 đ",
+    "category_id": 2
+  },
+  {
+    "id": "35bb5e10-8af0-424f-8746-7b8e4ed71ed2",
+    "code": "KL - 589",
+    "name": "Khóa cửa kính Kassler KL - 589",
+    "price": 8390000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 120 x C 190 x D 80 mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "Nhôm, Kẽm, Polyme, Nhựa ABS"
+      },
+      {
+        "key": "Bề mặt bên ngoài",
+        "value": "Phủ kim loại 3 lớp"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "10mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối đa 10mm"
+      }
+    ],
+    "colors": [
+      "Xám"
+    ],
+    "category": "Khóa Cửa Kính",
+    "features": [
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa vận hành bằng mật mã, vân tay, thẻ từ, chìa khoá cơ, App Tuya, Remote. Đăng ký lên đến 50 dấu vân tay, 50 thẻ từ, 50 mật mã. Màu hoàn thiện: Xám. Nhiệt độ vận hành: 20°C~50°C. Nguồn điện: 4AA Batteries. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng/mở).",
+    "page_number": 45,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p45_1.jpg",
+      "/product/page_45_image_1_v2.jpg",
+      "/product/page_45_image_2_v2.jpg",
+      "/product/page_45_image_3_v2.jpg",
+      "/product/page_45_image_4_v2.jpg",
+      "/product/page_45_image_5_v2.jpg",
+      "/product/page_45_image_7_v2.jpg",
+      "/product/page_45_image_6_v2.jpg",
+      "/product/page_45_image_8_v2.jpg",
+      "/product/page_45_image_11_v2.jpg",
+      "/product/page_45_image_9_v2.jpg",
+      "/product/page_45_image_12_v2.jpg",
+      "/product/page_45_image_10_v2.jpg",
+      "/product/page_45_image_13_v2.jpg"
+    ],
+    "formatted_price": "8.390.000 đ",
+    "category_id": 3
+  },
+  {
+    "id": "1dfb0161-d947-4795-9e1e-c8a0b7b1404e",
+    "code": "KL - 569",
+    "name": "Khóa cửa kính Kassler KL - 569",
+    "price": 7890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 120 x C 190 x D 80 mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "Nhôm, Kẽm, Polyme, Nhựa ABS"
+      },
+      {
+        "key": "Bề mặt bên ngoài",
+        "value": "Phủ kim loại 3 lớp"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "10mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối đa 10mm"
+      }
+    ],
+    "colors": [
+      "Xám"
+    ],
+    "category": "Khóa Cửa Kính",
+    "features": [
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa vận hành bằng mật mã, vân tay, thẻ từ, chìa khoá cơ, App Tuya, Remote. Đăng ký lên đến 50 dấu vân tay, 50 thẻ từ, 50 mật mã. Màu hoàn thiện: Xám. Nhiệt độ vận hành: 20°C~50°C. Nguồn điện: 4AA Batteries. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng/mở).",
+    "page_number": 46,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p46_1.jpg",
+      "/product/page_46_image_2_v2.jpg",
+      "/product/page_46_image_3_v2.jpg",
+      "/product/page_46_image_4_v2.jpg",
+      "/product/page_46_image_5_v2.jpg",
+      "/product/page_46_image_1_v2.jpg",
+      "/product/page_46_image_7_v2.jpg",
+      "/product/page_46_image_6_v2.jpg",
+      "/product/page_46_image_9_v2.jpg",
+      "/product/page_46_image_8_v2.jpg",
+      "/product/page_46_chart_1_v2.jpg"
+    ],
+    "formatted_price": "7.890.000 đ",
+    "category_id": 3
+  },
+  {
+    "id": "1a278d0b-e445-4c61-b45f-1e0fd289c54d",
+    "code": "KL - 559",
+    "name": "Khóa cửa kính Kassler KL - 559",
+    "price": 4890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 70 x C 175 x D 80 mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "Nhôm, Kẽm, Polyme, Nhựa ABS"
+      },
+      {
+        "key": "Bề mặt bên ngoài",
+        "value": "Phủ kim loại 3 lớp"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "8-10mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 5mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối đa 10mm"
+      }
+    ],
+    "colors": [
+      "Đen"
+    ],
+    "category": "Khóa Cửa Kính",
+    "features": [
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng"
+    ],
+    "warranty": "2 năm",
+    "description": "Khóa vận hành bằng mật mã, vân tay, thẻ từ, chìa khoá cơ, App Tuya, Remote. Đăng ký lên đến 50 dấu vân tay, 50 thẻ từ, 50 mật mã. Màu hoàn thiện: Đen. Nhiệt độ vận hành: 20°C~50°C. Nguồn điện: 4AA Batteries. Nguồn điện khẩn cấp: Cổng USB. Tuổi thọ pin: 5.000 lần (đóng/mở).",
+    "page_number": 47,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p47_1.jpg",
+      "/product/page_47_image_2_v2.jpg",
+      "/product/page_47_image_3_v2.jpg",
+      "/product/page_47_image_4_v2.jpg",
+      "/product/page_47_image_5_v2.jpg",
+      "/product/page_47_image_6_v2.jpg",
+      "/product/page_47_image_7_v2.jpg",
+      "/product/page_47_image_1_v2.jpg",
+      "/product/page_47_image_8_v2.jpg",
+      "/product/page_47_image_9_v2.jpg"
+    ],
+    "formatted_price": "4.890.000 đ",
+    "category_id": 3
+  },
+  {
+    "id": "7319036d-b39b-422b-91dd-c03eb948e169",
+    "code": "KL-599TN",
+    "name": "KASSLER KL-599TN",
+    "price": 7890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 37 x C 32.5 x D 21.5mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "Hợp kim nhôm siêu bền, mặt kính cường lực"
+      },
+      {
+        "key": "Vật liệu mặt khóa trong",
+        "value": "Hợp kim nhôm siêu bền, mặt kính cường lực"
+      },
+      {
+        "key": "Màu hoàn thiện",
+        "value": "Màu Đen"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin lithium 3.200 mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "8.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "30~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 55mm"
+      }
+    ],
+    "colors": [
+      "Đen"
+    ],
+    "category": "Khóa Cửa Nhôm",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App TTlock",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Chống nước tuyệt đối IP67",
+      "Mở bằng App TTlock"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa cửa nhôm thông minh, vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App TTlock. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Chống nước tuyệt đối IP67. Chuyên dụng cho cửa nhôm Xingfa, Sắt.",
+    "page_number": 60,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p60_1.jpg",
+      "/product/page_60_image_2_v2.jpg",
+      "/product/page_60_image_3_v2.jpg",
+      "/product/page_60_image_4_v2.jpg",
+      "/product/page_60_image_5_v2.jpg",
+      "/product/page_60_image_7_v2.jpg",
+      "/product/page_60_image_8_v2.jpg",
+      "/product/page_60_image_6_v2.jpg",
+      "/product/page_60_image_9_v2.jpg",
+      "/product/page_60_image_10_v2.jpg",
+      "/product/page_60_image_1_v2.jpg"
+    ],
+    "formatted_price": "7.890.000 đ",
+    "category_id": 4
+  },
+  {
+    "id": "319ca3d7-33e5-4032-9381-9d22d2d5ae0f",
+    "code": "KL-599TD",
+    "name": "KASSLER KL-599TD",
+    "price": 7890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 37 x C 32.5 x D 21.5mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "Hợp kim nhôm siêu bền, mặt kính cường lực"
+      },
+      {
+        "key": "Vật liệu mặt khóa trong",
+        "value": "Hợp kim nhôm siêu bền, mặt kính cường lực"
+      },
+      {
+        "key": "Màu hoàn thiện",
+        "value": "Màu Đen"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin lithium 3.200 mAh"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "8.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "30~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 55mm"
+      }
+    ],
+    "colors": [
+      "Đen"
+    ],
+    "category": "Khóa Cửa Nhôm",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App TTlock",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Chống nước tuyệt đối IP67",
+      "Mở bằng App TTlock"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa cửa nhôm thông minh, vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App TTlock. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Chống nước tuyệt đối IP67. Chuyên dụng cho cửa nhôm Xingfa, Sắt.",
+    "page_number": 60,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p60_1.jpg",
+      "/product/page_60_image_2_v2.jpg",
+      "/product/page_60_image_3_v2.jpg",
+      "/product/page_60_image_4_v2.jpg",
+      "/product/page_60_image_5_v2.jpg",
+      "/product/page_60_image_7_v2.jpg",
+      "/product/page_60_image_8_v2.jpg",
+      "/product/page_60_image_6_v2.jpg",
+      "/product/page_60_image_9_v2.jpg",
+      "/product/page_60_image_10_v2.jpg",
+      "/product/page_60_image_1_v2.jpg"
+    ],
+    "formatted_price": "7.890.000 đ",
+    "category_id": 4
+  },
+  {
+    "id": "39bc6adb-7305-4de5-b4be-cb7e71393bdf",
+    "code": "KL-599RB",
+    "name": "KASSLER KL-599RB",
+    "price": 7890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R40 X C 320 x 26 mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "Hợp kim nhôm cao cấp, nhựa ABS chịu lực"
+      },
+      {
+        "key": "Vật liệu mặt khóa trong",
+        "value": "Hợp kim nhôm cao cấp"
+      },
+      {
+        "key": "Màu hoàn thiện",
+        "value": "Màu Xám, Đen"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "30~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 55mm"
+      }
+    ],
+    "colors": [
+      "Xám",
+      "Đen"
+    ],
+    "category": "Khóa Cửa Nhôm",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Chế độ thông phòng",
+      "Mã số ảo",
+      "Chống nước tuyệt đối IP67"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa cửa nhôm thông minh, vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App TUYA. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Chống nước tuyệt đối IP67. Chuyên dụng cho cửa nhôm Xingfa, Sắt.",
+    "page_number": 63,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p63_1.jpg",
+      "/product/page_63_image_1_v2.jpg",
+      "/product/page_63_image_3_v2.jpg",
+      "/product/page_63_image_4_v2.jpg",
+      "/product/page_63_image_5_v2.jpg",
+      "/product/page_63_image_6_v2.jpg",
+      "/product/page_63_image_7_v2.jpg",
+      "/product/page_63_image_8_v2.jpg",
+      "/product/page_63_image_9_v2.jpg",
+      "/product/page_63_image_10_v2.jpg",
+      "/product/page_63_image_11_v2.jpg",
+      "/product/page_63_image_12_v2.jpg",
+      "/product/page_63_image_14_v2.jpg",
+      "/product/page_63_image_13_v2.jpg",
+      "/product/page_63_image_15_v2.jpg",
+      "/product/page_63_image_16_v2.jpg",
+      "/product/page_63_image_17_v2.jpg",
+      "/product/page_63_image_2_v2.jpg"
+    ],
+    "formatted_price": "7.890.000 đ",
+    "category_id": 4
+  },
+  {
+    "id": "ba8dfcf1-bcd5-4c63-b938-bed79eaa44c8",
+    "code": "KL-599RG",
+    "name": "KASSLER KL-599RG",
+    "price": 7890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R40 X C 320 x 26 mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "Hợp kim nhôm cao cấp, nhựa ABS chịu lực"
+      },
+      {
+        "key": "Vật liệu mặt khóa trong",
+        "value": "Hợp kim nhôm cao cấp"
+      },
+      {
+        "key": "Màu hoàn thiện",
+        "value": "Màu Xám, Đen"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "30~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 55mm"
+      }
+    ],
+    "colors": [
+      "Xám",
+      "Đen"
+    ],
+    "category": "Khóa Cửa Nhôm",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Chế độ thông phòng",
+      "Mã số ảo",
+      "Chống nước tuyệt đối IP67"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa cửa nhôm thông minh, vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App TUYA. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Chống nước tuyệt đối IP67. Chuyên dụng cho cửa nhôm Xingfa, Sắt.",
+    "page_number": 63,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p63_1.jpg",
+      "/product/page_63_image_1_v2.jpg",
+      "/product/page_63_image_3_v2.jpg",
+      "/product/page_63_image_4_v2.jpg",
+      "/product/page_63_image_5_v2.jpg",
+      "/product/page_63_image_6_v2.jpg",
+      "/product/page_63_image_7_v2.jpg",
+      "/product/page_63_image_8_v2.jpg",
+      "/product/page_63_image_9_v2.jpg",
+      "/product/page_63_image_10_v2.jpg",
+      "/product/page_63_image_11_v2.jpg",
+      "/product/page_63_image_12_v2.jpg",
+      "/product/page_63_image_14_v2.jpg",
+      "/product/page_63_image_13_v2.jpg",
+      "/product/page_63_image_15_v2.jpg",
+      "/product/page_63_image_16_v2.jpg",
+      "/product/page_63_image_17_v2.jpg",
+      "/product/page_63_image_2_v2.jpg"
+    ],
+    "formatted_price": "7.890.000 đ",
+    "category_id": 4
+  },
+  {
+    "id": "b6b44b72-3077-4048-8c92-fd019e64378f",
+    "code": "KL-599I",
+    "name": "KASSLER KL-599I",
+    "price": 7890000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 37 x C 32.5 x D 21.5mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "INOX SUS 304, nhựa ABS chịu lực"
+      },
+      {
+        "key": "Vật liệu mặt khóa trong",
+        "value": "INOX SUS 304, nhựa ABS chịu lực"
+      },
+      {
+        "key": "Màu hoàn thiện",
+        "value": "Màu Đen, Inox"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AAA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "30~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 55mm"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "Inox"
+    ],
+    "category": "Khóa Cửa Nhôm",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Chống nước tuyệt đối IP67",
+      "Mở bằng App TTlock"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa cửa nhôm thông minh, vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App TTlock. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Chống nước tuyệt đối IP67. Chuyên dụng cho cửa nhôm Xingfa, Sắt.",
+    "page_number": 64,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p64_1.jpg",
+      "/product/page_64_image_2_v2.jpg",
+      "/product/page_64_image_1_v2.jpg",
+      "/product/page_64_image_3_v2.jpg",
+      "/product/page_64_image_6_v2.jpg",
+      "/product/page_64_image_7_v2.jpg",
+      "/product/page_64_image_8_v2.jpg",
+      "/product/page_64_image_9_v2.jpg",
+      "/product/page_64_image_10_v2.jpg",
+      "/product/page_64_image_4_v2.jpg",
+      "/product/page_64_image_12_v2.jpg",
+      "/product/page_64_image_11_v2.jpg",
+      "/product/page_64_image_13_v2.jpg",
+      "/product/page_64_image_15_v2.jpg",
+      "/product/page_64_image_14_v2.jpg",
+      "/product/page_64_image_5_v2.jpg"
+    ],
+    "formatted_price": "7.890.000 đ",
+    "category_id": 4
+  },
+  {
+    "id": "d89f63e4-8caf-4c8b-b5c5-2bc05054b187",
+    "code": "KL-599IB",
+    "name": "KASSLER KL-599IB",
+    "price": 7690000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 37 x C 32.5 x D 21.5mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "INOX SUS 304, nhựa ABS chịu lực"
+      },
+      {
+        "key": "Vật liệu mặt khóa trong",
+        "value": "INOX SUS 304, nhựa ABS chịu lực"
+      },
+      {
+        "key": "Màu hoàn thiện",
+        "value": "Màu Đen"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AAA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "30~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 55mm"
+      }
+    ],
+    "colors": [
+      "Đen"
+    ],
+    "category": "Khóa Cửa Nhôm",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Chống nước tuyệt đối IP67",
+      "Mở bằng App TTlock"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa cửa nhôm thông minh, vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App TTlock. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Chống nước tuyệt đối IP67. Chuyên dụng cho cửa nhôm Xingfa, Sắt.",
+    "page_number": 65,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p65_1.jpg",
+      "/product/page_65_image_1_v2.jpg",
+      "/product/page_65_image_2_v2.jpg",
+      "/product/page_65_image_3_v2.jpg",
+      "/product/page_65_image_4_v2.jpg",
+      "/product/page_65_image_5_v2.jpg",
+      "/product/page_65_image_7_v2.jpg",
+      "/product/page_65_image_6_v2.jpg",
+      "/product/page_65_image_9_v2.jpg",
+      "/product/page_65_chart_1_v2.jpg",
+      "/product/page_65_image_11_v2.jpg",
+      "/product/page_65_image_12_v2.jpg",
+      "/product/page_65_image_10_v2.jpg",
+      "/product/page_65_image_13_v2.jpg",
+      "/product/page_65_image_14_v2.jpg",
+      "/product/page_65_chart_2_v2.jpg",
+      "/product/page_65_image_8_v2.jpg"
+    ],
+    "formatted_price": "7.690.000 đ",
+    "category_id": 4
+  },
+  {
+    "id": "b460d101-00a0-4159-bad8-1fea03814a01",
+    "code": "KL-599 SLIDE APP TUYA",
+    "name": "KASSLER KL-599 SLIDE APP TUYA",
+    "price": 9390000,
+    "specs": [
+      {
+        "key": "Kích thước thân khóa ngoài",
+        "value": "R 134 X C 300 x D 34mm"
+      },
+      {
+        "key": "Vật liệu mặt khóa ngoài",
+        "value": "INOX SUS 304, nhựa ABS chịu lực"
+      },
+      {
+        "key": "Vật liệu mặt khóa trong",
+        "value": "INOX SUS 304, nhựa ABS chịu lực"
+      },
+      {
+        "key": "Màu hoàn thiện",
+        "value": "Màu Xám"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C~60°C"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "4AAA Batteries"
+      },
+      {
+        "key": "Nguồn điện khẩn cấp",
+        "value": "Cổng USB"
+      },
+      {
+        "key": "Tuổi thọ pin",
+        "value": "5.000 lần (đóng / mở)"
+      },
+      {
+        "key": "Độ dày cửa",
+        "value": "30~90mm"
+      },
+      {
+        "key": "Khoảng cách cửa - Khung cửa",
+        "value": "tối thiểu 3mm"
+      },
+      {
+        "key": "Đố cửa",
+        "value": "tối thiểu 55mm"
+      }
+    ],
+    "colors": [
+      "Xám"
+    ],
+    "category": "Khóa Cửa Nhôm",
+    "features": [
+      "Vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ",
+      "Mật mã chủ và mật mã người dùng",
+      "Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã",
+      "Chức năng Reset khi bị lỗi chương trình",
+      "Chức năng cảnh báo khi Pin yếu và lỗi chức năng",
+      "Chống nước tuyệt đối IP67"
+    ],
+    "warranty": "3 năm",
+    "description": "Khóa cửa nhôm thông minh, vận hành bằng mật mã, vân tay, thẻ từ, chìa khóa cơ, App TUYA. Đăng ký lên đến 100 dấu vân tay, 100 thẻ từ, 100 mật mã. Chống nước tuyệt đối IP67. Chuyên dụng cho cửa nhôm Xingfa, Sắt.",
+    "page_number": 67,
+    "technologies": [
+      "Fingerprint unlock",
+      "Password unlock",
+      "IC card unlock",
+      "Mechanical key",
+      "APP Wifi",
+      "Alarm"
+    ],
+    "images": [
+      "/product/img_p67_1.jpg",
+      "/product/page_67_image_2_v2.jpg",
+      "/product/page_67_image_3_v2.jpg",
+      "/product/page_67_image_4_v2.jpg",
+      "/product/page_67_image_5_v2.jpg",
+      "/product/page_67_image_6_v2.jpg",
+      "/product/page_67_image_7_v2.jpg",
+      "/product/page_67_chart_1_v2.jpg",
+      "/product/page_67_image_8_v2.jpg",
+      "/product/page_67_image_10_v2.jpg",
+      "/product/page_67_image_9_v2.jpg",
+      "/product/page_67_image_1_v2.jpg"
+    ],
+    "formatted_price": "9.390.000 đ",
+    "category_id": 4
+  },
+  {
+    "id": "504e2f1c-7561-4a74-bdf0-c6cd71a87ec2",
+    "code": "KL - 55H8 - PEARL",
+    "name": "KL - 55H8 - PEARL",
+    "price": 27390000,
+    "specs": [
+      {
+        "key": "Kích thước",
+        "value": "C 550 x R 420 x S 360 (mm)"
+      },
+      {
+        "key": "Cân nặng",
+        "value": "53kg"
+      }
+    ],
+    "colors": null,
+    "category": "Két Sắt Thông Minh",
+    "features": null,
+    "warranty": null,
+    "description": null,
+    "page_number": 89,
+    "technologies": null,
+    "images": [
+      "/product/img_p89_1.jpg",
+      "/product/page_89_image_4_v2.jpg",
+      "/product/page_89_image_1_v2.jpg",
+      "/product/page_89_image_3_v2.jpg",
+      "/product/page_89_image_5_v2.jpg",
+      "/product/page_89_image_2_v2.jpg",
+      "/product/page_89_image_6_v2.jpg",
+      "/product/page_89_chart_1_v2.jpg",
+      "/product/page_89_image_7_v2.jpg",
+      "/product/page_89_image_9_v2.jpg",
+      "/product/page_89_image_12_v2.jpg",
+      "/product/page_89_image_13_v2.jpg",
+      "/product/page_89_image_14_v2.jpg",
+      "/product/page_89_image_8_v2.jpg",
+      "/product/page_89_image_15_v2.jpg",
+      "/product/page_89_image_11_v2.jpg",
+      "/product/page_89_image_10_v2.jpg",
+      "/product/page_89_image_16_v2.jpg"
+    ],
+    "formatted_price": "27.390.000 đ",
+    "category_id": 8
+  },
+  {
+    "id": "6cc149aa-fe1a-4cd5-a286-586cc49164af",
+    "code": "KL - 65H8 - PEARL",
+    "name": "KL - 65H8 - PEARL",
+    "price": 31990000,
+    "specs": [
+      {
+        "key": "Kích thước",
+        "value": "C 650 x R 430 x S 390 (mm)"
+      },
+      {
+        "key": "Cân nặng",
+        "value": "63kg"
+      }
+    ],
+    "colors": null,
+    "category": "Két Sắt Thông Minh",
+    "features": null,
+    "warranty": null,
+    "description": null,
+    "page_number": 89,
+    "technologies": null,
+    "images": [
+      "/product/img_p89_1.jpg",
+      "/product/page_89_image_4_v2.jpg",
+      "/product/page_89_image_1_v2.jpg",
+      "/product/page_89_image_3_v2.jpg",
+      "/product/page_89_image_5_v2.jpg",
+      "/product/page_89_image_2_v2.jpg",
+      "/product/page_89_image_6_v2.jpg",
+      "/product/page_89_chart_1_v2.jpg",
+      "/product/page_89_image_7_v2.jpg",
+      "/product/page_89_image_9_v2.jpg",
+      "/product/page_89_image_12_v2.jpg",
+      "/product/page_89_image_13_v2.jpg",
+      "/product/page_89_image_14_v2.jpg",
+      "/product/page_89_image_8_v2.jpg",
+      "/product/page_89_image_15_v2.jpg",
+      "/product/page_89_image_11_v2.jpg",
+      "/product/page_89_image_10_v2.jpg",
+      "/product/page_89_image_16_v2.jpg"
+    ],
+    "formatted_price": "31.990.000 đ",
+    "category_id": 8
+  },
+  {
+    "id": "7d7659af-3ba8-4809-9050-599972985e89",
+    "code": "KL - 75H8 - PEARL",
+    "name": "KL - 75H8 - PEARL",
+    "price": 39390000,
+    "specs": [
+      {
+        "key": "Kích thước",
+        "value": "C 750 x R 450 x S 420 (mm)"
+      },
+      {
+        "key": "Cân nặng",
+        "value": "73kg"
+      }
+    ],
+    "colors": null,
+    "category": "Két Sắt Thông Minh",
+    "features": null,
+    "warranty": null,
+    "description": null,
+    "page_number": 89,
+    "technologies": null,
+    "images": [
+      "/product/img_p89_1.jpg",
+      "/product/page_89_image_4_v2.jpg",
+      "/product/page_89_image_1_v2.jpg",
+      "/product/page_89_image_3_v2.jpg",
+      "/product/page_89_image_5_v2.jpg",
+      "/product/page_89_image_2_v2.jpg",
+      "/product/page_89_image_6_v2.jpg",
+      "/product/page_89_chart_1_v2.jpg",
+      "/product/page_89_image_7_v2.jpg",
+      "/product/page_89_image_9_v2.jpg",
+      "/product/page_89_image_12_v2.jpg",
+      "/product/page_89_image_13_v2.jpg",
+      "/product/page_89_image_14_v2.jpg",
+      "/product/page_89_image_8_v2.jpg",
+      "/product/page_89_image_15_v2.jpg",
+      "/product/page_89_image_11_v2.jpg",
+      "/product/page_89_image_10_v2.jpg",
+      "/product/page_89_image_16_v2.jpg"
+    ],
+    "formatted_price": "39.390.000 đ",
+    "category_id": 8
+  },
+  {
+    "id": "8c87710c-f13b-4892-b48c-45def6bed076",
+    "code": "KL - 55H8 GOLD SAND",
+    "name": "KL - 55H8 GOLD SAND",
+    "price": 27390000,
+    "specs": [
+      {
+        "key": "Kích thước",
+        "value": "C 550 x R 420 x S 360 (mm)"
+      },
+      {
+        "key": "Cân nặng",
+        "value": "53kg"
+      }
+    ],
+    "colors": null,
+    "category": "Két Sắt Thông Minh",
+    "features": null,
+    "warranty": null,
+    "description": null,
+    "page_number": 91,
+    "technologies": null,
+    "images": [
+      "/product/img_p91_1.jpg",
+      "/product/page_91_image_1_v2.jpg",
+      "/product/page_91_image_2_v2.jpg",
+      "/product/page_91_image_4_v2.jpg",
+      "/product/page_91_image_3_v2.jpg",
+      "/product/page_91_image_6_v2.jpg",
+      "/product/page_91_image_7_v2.jpg",
+      "/product/page_91_image_8_v2.jpg",
+      "/product/page_91_image_10_v2.jpg",
+      "/product/page_91_image_11_v2.jpg",
+      "/product/page_91_image_5_v2.jpg",
+      "/product/page_91_image_13_v2.jpg",
+      "/product/page_91_image_14_v2.jpg",
+      "/product/page_91_image_15_v2.jpg",
+      "/product/page_91_image_12_v2.jpg",
+      "/product/page_91_image_9_v2.jpg",
+      "/product/page_91_image_16_v2.jpg"
+    ],
+    "formatted_price": "27.390.000 đ",
+    "category_id": 8
+  },
+  {
+    "id": "ffe8009a-0062-4977-a9e2-36bac6559862",
+    "code": "KL - 65H8 GOLD SAND",
+    "name": "KL - 65H8 GOLD SAND",
+    "price": 31990000,
+    "specs": [
+      {
+        "key": "Kích thước",
+        "value": "C 650 x R 430 x S 390 (mm)"
+      },
+      {
+        "key": "Cân nặng",
+        "value": "63kg"
+      }
+    ],
+    "colors": null,
+    "category": "Két Sắt Thông Minh",
+    "features": null,
+    "warranty": null,
+    "description": null,
+    "page_number": 91,
+    "technologies": null,
+    "images": [
+      "/product/img_p91_1.jpg",
+      "/product/page_91_image_1_v2.jpg",
+      "/product/page_91_image_2_v2.jpg",
+      "/product/page_91_image_4_v2.jpg",
+      "/product/page_91_image_3_v2.jpg",
+      "/product/page_91_image_6_v2.jpg",
+      "/product/page_91_image_7_v2.jpg",
+      "/product/page_91_image_8_v2.jpg",
+      "/product/page_91_image_10_v2.jpg",
+      "/product/page_91_image_11_v2.jpg",
+      "/product/page_91_image_5_v2.jpg",
+      "/product/page_91_image_13_v2.jpg",
+      "/product/page_91_image_14_v2.jpg",
+      "/product/page_91_image_15_v2.jpg",
+      "/product/page_91_image_12_v2.jpg",
+      "/product/page_91_image_9_v2.jpg",
+      "/product/page_91_image_16_v2.jpg"
+    ],
+    "formatted_price": "31.990.000 đ",
+    "category_id": 8
+  },
+  {
+    "id": "fc74cfb9-21e8-4af4-8248-a5308b568b30",
+    "code": "KL - 75H8 GOLD SAND",
+    "name": "KL - 75H8 GOLD SAND",
+    "price": 39390000,
+    "specs": [
+      {
+        "key": "Kích thước",
+        "value": "C 750 x R 450 x S 420 (mm)"
+      },
+      {
+        "key": "Cân nặng",
+        "value": "73kg"
+      }
+    ],
+    "colors": null,
+    "category": "Két Sắt Thông Minh",
+    "features": null,
+    "warranty": null,
+    "description": null,
+    "page_number": 91,
+    "technologies": null,
+    "images": [
+      "/product/img_p91_1.jpg",
+      "/product/page_91_image_1_v2.jpg",
+      "/product/page_91_image_2_v2.jpg",
+      "/product/page_91_image_4_v2.jpg",
+      "/product/page_91_image_3_v2.jpg",
+      "/product/page_91_image_6_v2.jpg",
+      "/product/page_91_image_7_v2.jpg",
+      "/product/page_91_image_8_v2.jpg",
+      "/product/page_91_image_10_v2.jpg",
+      "/product/page_91_image_11_v2.jpg",
+      "/product/page_91_image_5_v2.jpg",
+      "/product/page_91_image_13_v2.jpg",
+      "/product/page_91_image_14_v2.jpg",
+      "/product/page_91_image_15_v2.jpg",
+      "/product/page_91_image_12_v2.jpg",
+      "/product/page_91_image_9_v2.jpg",
+      "/product/page_91_image_16_v2.jpg"
+    ],
+    "formatted_price": "39.390.000 đ",
+    "category_id": 8
+  }
+]
