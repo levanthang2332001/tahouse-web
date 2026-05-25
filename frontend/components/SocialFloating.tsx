@@ -17,7 +17,7 @@ export default function SocialFloating() {
       </a>
       <a
         href="tel:19008899"
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-lime text-white shadow-xl transition-transform duration-300 hover:scale-110"
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-green text-white shadow-xl transition-transform duration-300 hover:scale-110"
         title="Gọi hotline"
       >
         <Phone size={20} />

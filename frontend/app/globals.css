@@ -2,22 +2,28 @@
 
 :root {
   color-scheme: light;
-  --background: #fdfbf7;
-  --foreground: #1a1a1a;
-  --primary-color: #769b52;
-  --primary-dark: #658744;
-  --border-color: rgba(26, 26, 26, 0.08);
-  --card-bg: rgba(253, 251, 247, 0.96);
+  --background: #F5F1EA;
+  --foreground: #062B3D;
+  --primary-color: #79C143;
+  --primary-dark: #64a635;
+  --border-color: #D9DDE1;
+  --card-bg: #F8F7F3;
 }
 
 @theme {
   --font-sans: var(--font-sans), "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-serif), "Cormorant Garamond", ui-serif, Georgia, serif;
   --font-cursive: var(--font-cursive), "Great Vibes", cursive;
-  --color-lime: #769b52;
-  --color-lime-dark: #658744;
-  --color-warm-cream: #fdfbf7;
-  --color-graphite: #1a1a1a;
+  --color-navy: #062B3D;
+  --color-brand-green: #79C143;
+  --color-lime: #79C143;
+  --color-lime-dark: #64a635;
+  --color-cream: #F8F7F3;
+  --color-gray-light: #D9DDE1;
+  --color-neutral: #F5F1EA;
+  --color-champagne: #C8A96B;
+  --color-warm-cream: #F8F7F3;
+  --color-graphite: #062B3D;
   --animate-scroll-marquee: scroll-marquee 25s linear infinite;
 
   @keyframes scroll-marquee {

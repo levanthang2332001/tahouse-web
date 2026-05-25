@@ -28,17 +28,17 @@ function HeaderContent() {
     <header
       className={`fixed left-0 top-0 z-50 h-20 w-full border-b backdrop-blur-md transition-[background-color,border-color,box-shadow] duration-500 ease-out ${
         isScrolled
-          ? "border-gray-200/30 bg-[#fcfbf9]/80 shadow-[0_8px_30px_rgba(0,0,0,0.03)]"
-          : "border-gray-100 bg-[#fcfbf9] shadow-none"
+          ? "border-gray-light/30 bg-cream/80 shadow-[0_8px_30px_rgba(0,0,0,0.03)]"
+          : "border-gray-light bg-cream shadow-none"
       }`}
     >
       <div className="relative mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 lg:px-12">
         <Link href="/" className="group flex items-center gap-2">
           <div className="flex items-end leading-none">
-            <span className="text-3xl font-medium tracking-tight text-[#769b52] transition-opacity group-hover:opacity-80">
+            <span className="text-3xl font-medium tracking-tight text-brand-green transition-opacity group-hover:opacity-80">
               TA
             </span>
-            <span className="ml-1 text-3xl font-medium tracking-tight text-gray-900 transition-colors group-hover:text-[#769b52]">
+            <span className="ml-1 text-3xl font-medium tracking-tight text-navy transition-colors group-hover:text-brand-green">
               HOUSE
             </span>
           </div>
@@ -49,7 +49,7 @@ function HeaderContent() {
             <Link
               key={link.name}
               href={link.path}
-              className="text-xs font-medium uppercase tracking-wider text-gray-600 transition-colors duration-300 hover:text-gray-900"
+              className="text-xs font-semibold uppercase tracking-wider text-navy/70 transition-colors duration-300 hover:text-brand-green"
             >
               {link.name}
             </Link>
@@ -59,7 +59,7 @@ function HeaderContent() {
         <div className="hidden items-center gap-6 lg:flex">
           <button
             onClick={() => setSearchOpen((prev) => !prev)}
-            className="cursor-pointer p-1 text-gray-600 transition-colors hover:text-gray-900"
+            className="cursor-pointer p-1 text-navy/70 transition-colors hover:text-brand-green"
             aria-label="Tìm kiếm"
           >
             <Search className="h-5 w-5" />
@@ -70,37 +70,37 @@ function HeaderContent() {
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                className="absolute right-12 top-16 z-50 mt-3 w-80 rounded-md border border-gray-200 bg-white p-3 shadow-xl"
+                className="absolute right-12 top-16 z-50 mt-3 w-80 rounded-md border border-gray-light bg-cream p-3 shadow-xl"
               >
-                <div className="rounded bg-[#faf9f6] px-3 py-2 text-xs text-gray-500">
+                <div className="rounded bg-neutral px-3 py-2 text-xs text-navy/60">
                   Ô tìm kiếm demo cho `frontend-2`.
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-          <Link href="#categories" className="relative p-1 text-gray-600 transition-colors hover:text-gray-900">
+          <Link href="#categories" className="relative p-1 text-navy/70 transition-colors hover:text-brand-green">
             <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-gray-200 bg-white text-[10px] font-medium text-gray-600">
+            <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-gray-light bg-cream text-[10px] font-bold text-navy/70">
               0
             </span>
           </Link>
           <Link
             href="#contact"
-            className="rounded-sm bg-[#769b52] px-6 py-3 text-xs font-medium uppercase tracking-wider text-white transition-colors hover:bg-[#658744]"
+            className="rounded-sm bg-brand-green px-6 py-3 text-xs font-medium uppercase tracking-wider text-white transition-colors hover:bg-lime-dark"
           >
             Tư vấn ngay
           </Link>
         </div>
 
         <div className="flex items-center gap-4 lg:hidden">
-          <Link href="#categories" className="relative p-1 text-gray-600 transition-colors hover:text-gray-900">
+          <Link href="#categories" className="relative p-1 text-navy/70 transition-colors hover:text-brand-green">
             <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-gray-200 bg-white text-[10px] font-medium text-gray-600">
+            <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-gray-light bg-cream text-[10px] font-bold text-navy/70">
               0
             </span>
           </Link>
           <button
-            className="cursor-pointer rounded p-1.5 text-gray-600"
+            className="cursor-pointer rounded p-1.5 text-navy/70"
             onClick={() => setIsOpen((prev) => !prev)}
             aria-label="Menu"
           >
@@ -115,9 +115,9 @@ function HeaderContent() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="absolute left-0 top-20 flex max-h-[calc(100vh-5rem)] w-full flex-col gap-6 overflow-y-auto border-b border-gray-200 bg-[#fcfbf9] px-6 py-6 shadow-xl lg:hidden"
+            className="absolute left-0 top-20 flex max-h-[calc(100vh-5rem)] w-full flex-col gap-6 overflow-y-auto border-b border-gray-light bg-cream px-6 py-6 shadow-xl lg:hidden"
           >
-            <div className="rounded border border-gray-200 bg-white px-3 py-2.5 text-xs text-gray-500">
+            <div className="rounded border border-gray-light bg-neutral px-3 py-2.5 text-xs text-navy/60">
               Ô tìm kiếm demo cho `frontend-2`.
             </div>
             <div className="flex flex-col gap-4">
@@ -125,7 +125,7 @@ function HeaderContent() {
                 <Link
                   key={link.name}
                   href={link.path}
-                  className="border-b border-gray-100 py-2 text-xs font-medium uppercase tracking-wider text-gray-700 transition-colors hover:text-[#769b52]"
+                  className="border-b border-gray-light/30 py-2 text-xs font-semibold uppercase tracking-wider text-navy/80 transition-colors hover:text-brand-green"
                 >
                   {link.name}
                 </Link>
@@ -143,13 +143,13 @@ export default function Header() {
     <>
       <Suspense
         fallback={
-          <header className="fixed left-0 top-0 z-50 h-20 w-full border-b border-gray-100 bg-[#fcfbf9]">
+          <header className="fixed left-0 top-0 z-50 h-20 w-full border-b border-gray-light bg-cream">
             <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 lg:px-12">
               <div className="flex items-center gap-2">
-                <span className="text-3xl font-medium tracking-tight text-[#769b52]">TA</span>
-                <span className="ml-1 text-3xl font-medium tracking-tight text-gray-900">HOUSE</span>
+                <span className="text-3xl font-medium tracking-tight text-brand-green">TA</span>
+                <span className="ml-1 text-3xl font-medium tracking-tight text-navy">HOUSE</span>
               </div>
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#769b52] border-t-transparent" />
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-brand-green border-t-transparent" />
             </div>
           </header>
         }
