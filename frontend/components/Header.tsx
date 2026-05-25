@@ -28,8 +28,8 @@ function HeaderContent() {
     <header
       className={`fixed left-0 top-0 z-50 h-20 w-full border-b backdrop-blur-md transition-[background-color,border-color,box-shadow] duration-500 ease-out ${
         isScrolled
-          ? "border-gray-light/30 bg-cream/80 shadow-[0_8px_30px_rgba(0,0,0,0.03)]"
-          : "border-gray-light bg-cream shadow-none"
+          ? "border-gray-light/30 bg-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.03)]"
+          : "border-gray-light bg-white shadow-none"
       }`}
     >
       <div className="relative mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 lg:px-12">
@@ -143,7 +143,7 @@ export default function Header() {
     <>
       <Suspense
         fallback={
-          <header className="fixed left-0 top-0 z-50 h-20 w-full border-b border-gray-light bg-cream">
+          <header className="fixed left-0 top-0 z-50 h-20 w-full border-b border-gray-light bg-white">
             <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 lg:px-12">
               <div className="flex items-center gap-2">
                 <span className="text-3xl font-medium tracking-tight text-brand-green">TA</span>

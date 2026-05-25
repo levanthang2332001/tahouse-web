@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   Smartphone,
   Sparkles,
+  Utensils,
   Wrench,
 } from "lucide-react";
 import AIChatbot from "@/components/AIChatbot";
@@ -44,36 +45,38 @@ export default function Home() {
       title: content.home.solutions.items[0].title,
       desc: content.home.solutions.items[0].desc,
       img: "https://images.unsplash.com/photo-1510137600163-2729bc6959a6?auto=format&fit=crop&q=80",
+      icon: ShieldCheck,
     },
     {
       title: content.home.solutions.items[1].title,
       desc: content.home.solutions.items[1].desc,
       img: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80",
+      icon: Utensils,
     },
   ];
 
   const services = [
     {
       title: "Thiết bị bếp",
-      desc: "Thiết bị bếp cao cấp chính hãng, bền đẹp, tiết kiệm và an toàn.",
+      desc: "+ 150 sản phẩm",
       icon: Flame,
       img: "https://images.unsplash.com/photo-1563298723-dcfebaa392e3?auto=format&fit=crop&q=80",
     },
     {
       title: "Phụ kiện tủ bếp",
-      desc: "Phụ kiện thông minh, tối ưu công năng, tăng trải nghiệm sử dụng.",
+      desc: "+ 150 sản phẩm",
       icon: LayoutGrid,
       img: "https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80",
     },
     {
       title: "Khóa điện tử - khóa vân tay",
-      desc: "Giải pháp khóa thông minh, bảo mật cao, tiện lợi cho mọi gia đình.",
+      desc: "+ 150 sản phẩm",
       icon: Lock,
       img: "https://images.unsplash.com/photo-1599839619722-39751411ea63?auto=format&fit=crop&q=80",
     },
     {
       title: "Két sắt thông minh",
-      desc: "An toàn tuyệt đối, bảo vệ tài sản, điều khiển thông minh.",
+      desc: "+ 150 sản phẩm",
       icon: Shield,
       img: "https://images.unsplash.com/photo-1589834390005-5d4fb9bf3d32?auto=format&fit=crop&q=80",
     },
@@ -89,7 +92,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-neutral text-navy antialiased selection:bg-brand-green selection:text-white">
       <Header />
-      <section className="relative w-full bg-cream overflow-hidden py-12 lg:py-20 flex items-center min-h-[550px] lg:min-h-[650px] border-b border-gray-light/35">
+      <section className="relative w-full bg-white overflow-hidden py-12 lg:py-20 flex items-center min-h-[550px] lg:min-h-[650px] border-b border-gray-light/35">
         {/* Right-aligned Background Image with elegant split fade */}
         <div className="absolute top-0 right-0 h-full w-full lg:w-1/2 z-0">
           <div className="relative h-full w-full">
@@ -102,14 +105,14 @@ export default function Home() {
               className="object-cover"
             />
             {/* Smooth Fade Overlay to merge the image with the Warm White Cream background on the left */}
-            <div className="absolute inset-0 bg-gradient-to-r from-cream via-cream/60 to-transparent lg:from-cream lg:via-cream/15 lg:to-transparent z-10" />
-            <div className="absolute inset-0 bg-gradient-to-t from-cream via-transparent to-transparent lg:hidden z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-white via-white/60 to-transparent lg:from-white lg:via-white/15 lg:to-transparent z-10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent lg:hidden z-10" />
           </div>
         </div>
 
         {/* Content Container (Left Aligned on desktop) */}
         <div className="relative z-20 mx-auto flex w-full max-w-[1440px] px-6 lg:px-12">
-          <div className="max-w-2xl text-left bg-cream/85 p-6 rounded-2xl backdrop-blur-xs lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+          <div className="max-w-2xl text-left bg-white/85 p-6 rounded-2xl backdrop-blur-xs lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
             {/* Subtitle Accent Champagne with line */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -128,7 +131,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="mb-6 font-sans text-4xl font-bold leading-tight text-navy sm:text-5xl lg:text-6xl"
+              className="mb-6 font-sans text-5xl font-bold leading-tight text-navy sm:text-6xl lg:text-7xl"
             >
               Thiết bị phù hợp<br />cho từng gia đình
             </motion.h1>
@@ -216,11 +219,11 @@ export default function Home() {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
               }}
-              className="flex flex-col items-center px-4 text-center"
+              className="flex flex-col items-center px-4 text-center md:border-r border-gray-light/40 last:border-r-0"
             >
-              <span className="mb-2 font-serif text-5xl tracking-tight text-brand-green">
+              <span className="mb-2 font-serif text-6xl md:text-7xl tracking-normal text-brand-green">
                 {stat.value}
-                <span className="text-3xl">{stat.suffix}</span>
+                <span className="text-4xl">{stat.suffix}</span>
               </span>
               <span className="mb-1 text-sm font-semibold text-navy">{stat.label}</span>
               <span className="text-xs text-navy/60">{stat.sublabel}</span>
@@ -229,7 +232,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      <section id="categories" className="w-full bg-neutral py-12 lg:py-16">
+      <section id="categories" className="w-full bg-white py-12 lg:py-16">
         <motion.div
           variants={{
             hidden: { opacity: 0 },
@@ -240,21 +243,30 @@ export default function Home() {
           viewport={{ once: true, margin: "-100px" }}
           className="mx-auto max-w-[1440px] px-6 lg:px-12 text-center"
         >
-          {/* Centered Heading Layout matching mockup exactly */}
+          {/* Left/Right Aligned Heading Layout */}
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 15 },
               visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
             }}
-            className="text-center max-w-3xl mx-auto mb-10 space-y-3"
+            className="flex flex-col md:flex-row md:items-end md:justify-between text-left mb-12 gap-6"
           >
-            <h3 className="text-xs font-bold uppercase tracking-widest text-champagne">
-              DỊCH VỤ CỦA CHÚNG TÔI
-            </h3>
-            <h2 className="font-sans text-3xl font-bold leading-tight text-navy md:text-4xl">
-              Giải pháp toàn diện cho không gian sống hiện đại
-            </h2>
-            <div className="mx-auto h-[3px] w-12 bg-brand-green mt-4 rounded-full" />
+            <div className="space-y-3 max-w-3xl">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-champagne">
+                DỊCH VỤ CỦA CHÚNG TÔI
+              </h3>
+              <h2 className="font-sans text-3xl font-bold leading-tight text-navy md:text-4xl">
+                Giải pháp toàn diện<br />cho không gian sống hiện đại
+              </h2>
+              <div className="h-[3px] w-12 bg-brand-green mt-4 rounded-full" />
+            </div>
+            <Link
+              href="/products"
+              className="group flex items-center gap-2 shrink-0 text-xs font-bold uppercase tracking-wider text-navy/70 hover:text-brand-green transition-colors pb-1"
+            >
+              {content.home.categories.viewAll}
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
           </motion.div>
 
           {/* 4 columns layout with high-quality custom service cards */}
@@ -271,25 +283,8 @@ export default function Home() {
                   className="rounded-2xl border border-gray-light bg-cream text-left shadow-sm flex flex-col justify-between hover:shadow-lg hover:border-brand-green/30 transition-all duration-300 group overflow-hidden"
                 >
                   <Link href="/products" className="block cursor-pointer flex-grow flex flex-col justify-between">
-                    {/* Top content wrapper with inner padding */}
-                    <div className="p-6 lg:p-7 pb-0">
-                      <div className="flex items-start gap-4">
-                        {/* Outlined thin green icon box */}
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-brand-green/20 bg-brand-green/5 text-brand-green group-hover:bg-brand-green group-hover:text-white transition-all duration-300">
-                          <Icon className="h-6 w-6" />
-                        </div>
-                        <div className="flex-grow">
-                          <h4 className="text-base lg:text-lg font-bold uppercase tracking-wide text-navy group-hover:text-brand-green transition-colors leading-tight">
-                            {service.title}
-                          </h4>
-                          <p className="text-xs font-semibold text-navy/60 mt-2 leading-relaxed">
-                            {service.desc}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Full-bleed Category Image at the bottom of the card - naturally spans edge to edge */}
-                    <div className="relative mt-6 aspect-[16/10] overflow-hidden bg-neutral shadow-inner border-t border-gray-light/35">
+                    {/* Full-bleed Category Image at the top of the card */}
+                    <div className="relative aspect-[16/10] overflow-hidden bg-neutral shadow-inner border-b border-gray-light/35">
                       <Image
                         src={service.img}
                         alt={service.title}
@@ -297,6 +292,24 @@ export default function Home() {
                         sizes="(max-width: 1024px) 100vw, 25vw"
                         className="object-cover transition-transform duration-750 group-hover:scale-105"
                       />
+                    </div>
+                    {/* Content wrapper with inner padding at the bottom */}
+                    <div className="p-6 lg:p-7 pt-5">
+                      <div className="flex items-center justify-between gap-4">
+                        {/* Title and count on the left */}
+                        <div className="flex-grow">
+                          <h4 className="text-base lg:text-lg font-bold uppercase tracking-wide text-navy group-hover:text-brand-green transition-colors leading-tight min-h-[3rem] lg:min-h-[3.5rem] flex items-center">
+                            {service.title}
+                          </h4>
+                          <p className="text-xs font-semibold text-navy/60 mt-2 leading-relaxed">
+                            {service.desc}
+                          </p>
+                        </div>
+                        {/* Circular arrow icon on the right */}
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-green/20 bg-brand-green/5 text-brand-green group-hover:bg-brand-green group-hover:text-white transition-all duration-300">
+                          <ArrowRight className="h-4 w-4" />
+                        </div>
+                      </div>
                     </div>
                   </Link>
                 </motion.div>
@@ -382,26 +395,32 @@ export default function Home() {
               hidden: { opacity: 0, x: 30 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.7, ease: "easeOut" } },
             }}
-            className="relative h-[400px] w-full overflow-hidden rounded-sm shadow-lg lg:h-[600px] lg:w-2/3"
+            className="relative h-[400px] w-full lg:h-[600px] lg:w-2/3"
           >
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={activeSolution}
-                src={solutions[activeSolution].img}
-                alt={solutions[activeSolution].title}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="h-full w-full object-cover"
-              />
-            </AnimatePresence>
-            <div className="absolute bottom-0 left-0 z-10 w-[85%] max-w-[340px] rounded-sm bg-navy p-8 text-left text-cream shadow-xl sm:w-[80%] lg:-left-12 lg:bottom-12">
+            {/* Smooth rounded image wrapper with clip to prevent cutting of the terracotta card */}
+            <div className="absolute inset-0 overflow-hidden rounded-2xl shadow-lg">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeSolution}
+                  src={solutions[activeSolution].img}
+                  alt={solutions[activeSolution].title}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="h-full w-full object-cover"
+                />
+              </AnimatePresence>
+            </div>
+            <div className="absolute bottom-0 left-0 z-10 w-[85%] max-w-[340px] rounded-2xl bg-[#A14833] p-8 text-left text-white shadow-xl sm:w-[80%] lg:-left-[170px] lg:bottom-12 border border-white/10 transition-all duration-300">
               <div className="mb-6 flex items-start gap-4">
-                <ShieldCheck className="h-8 w-8 shrink-0 opacity-80 text-brand-green" />
-                <p className="text-sm font-medium leading-snug">{solutions[activeSolution].title}</p>
+                {(() => {
+                  const Icon = solutions[activeSolution].icon;
+                  return <Icon className="h-8 w-8 shrink-0 opacity-90 text-white" />;
+                })()}
+                <p className="text-sm font-bold leading-snug">{solutions[activeSolution].title}</p>
               </div>
-              <Link href="/products" className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-white/95 hover:text-white">
+              <Link href="/products" className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/75 hover:text-white transition-colors">
                 Xem chi tiết
                 <ArrowRight className="h-3 w-3" />
               </Link>

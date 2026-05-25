@@ -7,6 +7,7 @@ import {
 import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
 import SmoothScroll from "@/components/SmoothScroll";
+import AgentationProvider from "@/components/AgentationProvider";
 
 const sansFont = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -51,6 +52,7 @@ export default function RootLayout({
         <AppProvider>
           <SmoothScroll />
           {children}
+          <AgentationProvider />
         </AppProvider>
       </body>
     </html>
