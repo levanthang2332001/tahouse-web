@@ -18,10 +18,10 @@ function HeaderContent() {
 
   const navLinks = [
     { name: "Trang chủ", path: "/" },
-    { name: "Sản phẩm", path: "#categories" },
-    { name: "Giải pháp", path: "#solutions" },
-    { name: "Tin tức", path: "#news" },
-    { name: "Liên hệ", path: "#contact" },
+    { name: "Sản phẩm", path: "/#categories" },
+    { name: "Giải pháp", path: "/#solutions" },
+    { name: "Tin tức", path: "/#news" },
+    { name: "Liên hệ", path: "/#contact" },
   ];
 
   return (
@@ -78,12 +78,7 @@ function HeaderContent() {
               </motion.div>
             )}
           </AnimatePresence>
-          <Link href="#categories" className="relative p-1 text-navy/70 transition-colors hover:text-brand-green">
-            <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-gray-light bg-cream text-[10px] font-bold text-navy/70">
-              0
-            </span>
-          </Link>
+
           <Link
             href="#contact"
             className="rounded-sm bg-brand-green px-6 py-3 text-xs font-medium uppercase tracking-wider text-white transition-colors hover:bg-lime-dark"
@@ -93,12 +88,7 @@ function HeaderContent() {
         </div>
 
         <div className="flex items-center gap-4 lg:hidden">
-          <Link href="#categories" className="relative p-1 text-navy/70 transition-colors hover:text-brand-green">
-            <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -right-2 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-gray-light bg-cream text-[10px] font-bold text-navy/70">
-              0
-            </span>
-          </Link>
+
           <button
             className="cursor-pointer rounded p-1.5 text-navy/70"
             onClick={() => setIsOpen((prev) => !prev)}

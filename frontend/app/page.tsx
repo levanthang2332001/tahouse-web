@@ -97,16 +97,16 @@ export default function Home() {
         <div className="absolute top-0 right-0 h-full w-full lg:w-1/2 z-0">
           <div className="relative h-full w-full">
             <Image
-              src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80"
+              src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=1920&q=95"
               alt="TA HOUSE Smart Kitchen Solutions"
               fill
               priority
+              unoptimized
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
             {/* Smooth Fade Overlay to merge the image with the Warm White Cream background on the left */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white via-white/60 to-transparent lg:from-white lg:via-white/15 lg:to-transparent z-10" />
-            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent lg:hidden z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-white from-0% to-transparent to-25% z-10" />
           </div>
         </div>
 
@@ -151,27 +151,27 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
-              className="flex flex-wrap items-center gap-y-3 gap-x-4 mb-10 text-xs font-bold text-navy"
+              className="flex flex-wrap items-center gap-y-4 gap-x-6 mb-10 text-sm font-semibold text-navy"
             >
-              <div className="flex items-center gap-2">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full border border-navy/20 bg-brand-green/10 text-brand-green">
-                  <Check size={11} strokeWidth={3} />
+              <div className="flex items-center gap-3 group">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
+                  <Sparkles size={14} strokeWidth={2.2} />
                 </div>
-                <span>Chọn đúng</span>
+                <span className="tracking-wide">Chọn đúng</span>
               </div>
-              <span className="text-navy/30">•</span>
-              <div className="flex items-center gap-2">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full border border-navy/20 bg-brand-green/10 text-brand-green">
-                  <Wrench size={11} strokeWidth={2.5} />
+              <span className="text-navy/25">•</span>
+              <div className="flex items-center gap-3 group">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
+                  <Wrench size={14} strokeWidth={2.2} />
                 </div>
-                <span>Lắp đúng</span>
+                <span className="tracking-wide">Lắp đúng</span>
               </div>
-              <span className="text-navy/30">•</span>
-              <div className="flex items-center gap-2">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full border border-navy/20 bg-brand-green/10 text-brand-green">
-                  <ShieldCheck size={11} strokeWidth={2.5} />
+              <span className="text-navy/25">•</span>
+              <div className="flex items-center gap-3 group">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
+                  <ShieldCheck size={14} strokeWidth={2.2} />
                 </div>
-                <span>Sử dụng lâu dài</span>
+                <span className="tracking-wide">Sử dụng lâu dài</span>
               </div>
             </motion.div>
 
@@ -511,19 +511,19 @@ export default function Home() {
       </section>
 
       {/* Call-to-Action Brand Banner */}
-      <section className="w-full bg-navy py-12 text-cream border-t border-cream/10 select-none">
+      <section className="w-full bg-navy py-14 text-cream border-t border-cream/10 select-none">
         <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-8 px-6 md:flex-row lg:px-12">
           <div className="text-left space-y-2">
-            <h2 className="text-xl md:text-2xl font-serif font-semibold tracking-wide text-cream">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-cream">
               Đang làm nhà <span className="text-brand-green">•</span> sửa bếp <span className="text-brand-green">•</span> thay khóa điện tử?
             </h2>
-            <p className="text-xs md:text-sm font-medium text-cream/70">
-              Inbox TA HOUSE để được tư vấn giải pháp phù hợp nhất với nhu cầu của gia đình.
+            <p className="text-sm md:text-base font-normal text-cream/80 mt-3">
+              Liên hệ TA HOUSE để được tư vấn giải pháp phù hợp nhất với nhu cầu của gia đình.
             </p>
           </div>
           <Link
             href="#contact"
-            className="group flex shrink-0 items-center gap-2 rounded-sm bg-brand-green px-8 py-4 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-lime-dark"
+            className="group flex shrink-0 items-center gap-2.5 rounded-full bg-brand-green px-8 py-4 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-lime-dark shadow-md shadow-brand-green/20"
           >
             Liên hệ tư vấn
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
