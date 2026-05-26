@@ -11,9 +11,9 @@
 }
 
 @theme {
-  --font-sans: var(--font-sans), "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-serif), "Cormorant Garamond", ui-serif, Georgia, serif;
-  --font-cursive: var(--font-cursive), "Great Vibes", cursive;
+  --font-sans: var(--font-sans), "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-sans);
+  --font-cursive: var(--font-sans);
   --color-navy: #062B3D;
   --color-brand-green: #79C143;
   --color-lime: #79C143;
@@ -43,7 +43,7 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), "Plus Jakarta Sans", sans-serif;
+  font-family: var(--font-sans), "Be Vietnam Pro", sans-serif;
   max-width: 100%;
   overflow-x: hidden;
   width: 100%;
@@ -56,7 +56,7 @@ body {
 h1,
 h2,
 .heading {
-  font-family: var(--font-serif), "Cormorant Garamond", Georgia, serif;
+  font-family: var(--font-sans), "Be Vietnam Pro", sans-serif;
 }
 
 html.lenis,
