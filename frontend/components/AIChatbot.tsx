@@ -89,7 +89,7 @@ export default function AIChatbot() {
     return (
       <button
         onClick={() => setIsChatbotOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full bg-[#769b52] px-5 py-3 text-sm font-medium text-white shadow-xl transition-colors hover:bg-[#658744]"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full bg-brand-green px-5 py-3 text-sm font-medium text-white shadow-xl transition-colors hover:bg-lime-dark"
       >
         <Sparkles className="h-4 w-4" />
         Tư vấn nhanh
@@ -98,14 +98,14 @@ export default function AIChatbot() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex h-[540px] w-[92vw] max-w-[420px] flex-col overflow-hidden rounded-3xl border border-lime/20 bg-white/95 shadow-2xl backdrop-blur-xl">
-      <div className="flex items-center justify-between border-b border-lime/10 bg-gradient-to-r from-[#f7f4eb] to-white px-5 py-4">
+    <div className="fixed bottom-6 right-6 z-50 flex h-[540px] w-[92vw] max-w-[420px] flex-col overflow-hidden rounded-3xl border border-brand-green/20 bg-cream/95 shadow-2xl backdrop-blur-xl">
+      <div className="flex items-center justify-between border-b border-brand-green/10 bg-gradient-to-r from-neutral to-cream px-5 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-lime/20 bg-lime/10 text-lime">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-green/20 bg-brand-green/10 text-brand-green">
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-xs font-black uppercase tracking-wider text-[#1a1a1a]">
+            <h3 className="text-xs font-black uppercase tracking-wider text-navy">
               TA HOUSE AI
             </h3>
             <span className="text-[10px] font-bold text-emerald-500">
@@ -115,7 +115,7 @@ export default function AIChatbot() {
         </div>
         <button
           onClick={() => setIsChatbotOpen(false)}
-          className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-black/5 hover:text-[#1a1a1a]"
+          className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-navy/5 hover:text-navy"
         >
           <X className="h-5 w-5" />
         </button>
@@ -130,8 +130,8 @@ export default function AIChatbot() {
             <div
               className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed ${
                 message.sender === "user"
-                  ? "rounded-tr-none bg-lime font-bold text-white"
-                  : "rounded-tl-none border border-black/5 bg-[#f7f4eb] text-[#1a1a1a]"
+                  ? "rounded-tr-none bg-brand-green font-bold text-white"
+                  : "rounded-tl-none border border-gray-light bg-neutral text-navy"
               }`}
             >
               {message.text}
@@ -140,7 +140,7 @@ export default function AIChatbot() {
         ))}
         {isTyping && (
           <div className="flex justify-start">
-            <div className="rounded-2xl rounded-tl-none border border-black/5 bg-[#f7f4eb] px-4 py-3">
+            <div className="rounded-2xl rounded-tl-none border border-gray-light bg-neutral px-4 py-3">
               <span className="text-xs text-zinc-500">Đang soạn...</span>
             </div>
           </div>
@@ -148,12 +148,12 @@ export default function AIChatbot() {
         <div ref={scrollRef} />
       </div>
 
-      <div className="flex gap-2 overflow-x-auto border-t border-black/5 bg-[#fcfbf9] px-5 py-2">
+      <div className="flex gap-2 overflow-x-auto border-t border-gray-light bg-cream px-5 py-2">
         {quickReplies.map((reply) => (
           <button
             key={reply}
             onClick={() => sendMessage(reply)}
-            className="shrink-0 rounded-full border border-black/5 bg-white px-3 py-1.5 text-[10px] font-bold text-zinc-500 transition-all hover:border-lime hover:text-lime"
+            className="shrink-0 rounded-full border border-gray-light bg-white px-3 py-1.5 text-[10px] font-bold text-zinc-500 transition-all hover:border-brand-green hover:text-brand-green"
           >
             {reply}
           </button>
@@ -165,18 +165,18 @@ export default function AIChatbot() {
           event.preventDefault();
           sendMessage(inputValue);
         }}
-        className="flex gap-2 border-t border-black/5 bg-[#f7f4eb] p-4"
+        className="flex gap-2 border-t border-gray-light bg-neutral p-4"
       >
         <input
           type="text"
           value={inputValue}
           onChange={(event) => setInputValue(event.target.value)}
           placeholder="Nhập câu hỏi của bạn..."
-          className="flex-1 rounded-xl border border-black/10 bg-white px-4 py-2.5 text-xs text-[#1a1a1a] placeholder-zinc-400 focus:border-lime focus:outline-none"
+          className="flex-1 rounded-xl border border-gray-light bg-white px-4 py-2.5 text-xs text-navy placeholder-zinc-400 focus:border-brand-green focus:outline-none"
         />
         <button
           type="submit"
-          className="shrink-0 rounded-xl bg-lime p-3 text-white transition-all hover:scale-105"
+          className="shrink-0 rounded-xl bg-brand-green p-3 text-white transition-all hover:scale-105"
         >
           <Send className="h-3.5 w-3.5" />
         </button>

@@ -6,12 +6,20 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
+  Check,
   ChevronLeft,
   ChevronRight,
+  FileText,
+  Flame,
+  LayoutGrid,
   Leaf,
+  Lock,
+  Shield,
   ShieldCheck,
   Smartphone,
   Sparkles,
+  Utensils,
+  Wrench,
 } from "lucide-react";
 import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
@@ -37,11 +45,40 @@ export default function Home() {
       title: content.home.solutions.items[0].title,
       desc: content.home.solutions.items[0].desc,
       img: "https://images.unsplash.com/photo-1510137600163-2729bc6959a6?auto=format&fit=crop&q=80",
+      icon: ShieldCheck,
     },
     {
       title: content.home.solutions.items[1].title,
       desc: content.home.solutions.items[1].desc,
       img: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80",
+      icon: Utensils,
+    },
+  ];
+
+  const services = [
+    {
+      title: "Thiết bị bếp",
+      desc: "+ 150 sản phẩm",
+      icon: Flame,
+      img: "https://images.unsplash.com/photo-1563298723-dcfebaa392e3?auto=format&fit=crop&q=80",
+    },
+    {
+      title: "Phụ kiện tủ bếp",
+      desc: "+ 150 sản phẩm",
+      icon: LayoutGrid,
+      img: "https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80",
+    },
+    {
+      title: "Khóa điện tử - khóa vân tay",
+      desc: "+ 150 sản phẩm",
+      icon: Lock,
+      img: "https://images.unsplash.com/photo-1599839619722-39751411ea63?auto=format&fit=crop&q=80",
+    },
+    {
+      title: "Két sắt thông minh",
+      desc: "+ 150 sản phẩm",
+      icon: Shield,
+      img: "https://images.unsplash.com/photo-1589834390005-5d4fb9bf3d32?auto=format&fit=crop&q=80",
     },
   ];
 
@@ -53,102 +90,118 @@ export default function Home() {
   }, [brands.length]);
 
   return (
-    <div className="min-h-screen bg-[#fcfbf9] text-[#2a2a2a] antialiased selection:bg-[#769b52] selection:text-white">
+    <div className="min-h-screen bg-neutral text-navy antialiased selection:bg-brand-green selection:text-white">
       <Header />
-      <section className="relative flex min-h-[650px] h-[calc(100vh-80px)] max-h-[900px] w-full items-center overflow-hidden">
-        <motion.div
-          initial={{ scale: 1.05 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="absolute inset-0 h-full w-full"
-        >
-          <Image
-            src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80"
-            alt="Modern interior"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-        <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col px-6 text-left lg:px-12">
-          <div className="max-w-2xl">
-            <motion.span
+      <section className="relative w-full bg-white overflow-hidden py-12 lg:py-20 flex items-center min-h-[550px] lg:min-h-[650px] border-b border-gray-light/35">
+        {/* Right-aligned Background Image with elegant split fade */}
+        <div className="absolute top-0 right-0 h-full w-full lg:w-1/2 z-0">
+          <div className="relative h-full w-full">
+            <Image
+              src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=1920&q=95"
+              alt="TA HOUSE Smart Kitchen Solutions"
+              fill
+              priority
+              unoptimized
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+            />
+            {/* Smooth Fade Overlay to merge the image with the Warm White Cream background on the left */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white from-0% to-transparent to-25% z-10" />
+          </div>
+        </div>
+
+        {/* Content Container (Left Aligned on desktop) */}
+        <div className="relative z-20 mx-auto flex w-full max-w-[1440px] px-6 lg:px-12">
+          <div className="max-w-2xl text-left bg-white/85 p-6 rounded-2xl backdrop-blur-xs lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+            {/* Subtitle Accent Champagne with line */}
+            <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="mb-4 inline-block select-none font-cursive text-5xl text-[#769b52] lg:text-6xl"
+              className="flex items-center gap-3 mb-6"
             >
-              {content.home.hero.prefix}
-            </motion.span>
+              <span className="h-[1.5px] w-8 bg-champagne" />
+              <span className="text-xs font-bold uppercase tracking-widest text-champagne">
+                SMART LIVING SOLUTIONS
+              </span>
+            </motion.div>
+
+            {/* Title Primary Navy bold */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="mb-6 whitespace-pre-line font-serif text-5xl leading-[1.1] text-white lg:text-7xl xl:text-8xl"
+              className="mb-6 font-sans text-5xl font-bold leading-tight text-navy sm:text-6xl lg:text-7xl"
             >
-              {content.home.hero.title}
+              Thiết bị phù hợp<br />cho từng gia đình
             </motion.h1>
+
+            {/* Description */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="mb-10 max-w-lg text-base leading-relaxed text-gray-200 lg:text-lg"
+              className="mb-8 max-w-lg text-sm font-semibold leading-relaxed text-navy/80 md:text-base"
             >
-              {content.home.hero.desc}
+              TA HOUSE chuyên tư vấn giải pháp thiết bị bếp, phụ kiện tủ bếp và khóa điện tử phù hợp với nhu cầu sử dụng thực tế.
             </motion.p>
+
+            {/* Checklist items inline separated by dots */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="flex flex-wrap items-center gap-y-4 gap-x-6 mb-10 text-sm font-semibold text-navy"
+            >
+              <div className="flex items-center gap-3 group">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
+                  <Sparkles size={14} strokeWidth={2.2} />
+                </div>
+                <span className="tracking-wide">Chọn đúng</span>
+              </div>
+              <span className="text-navy/25">•</span>
+              <div className="flex items-center gap-3 group">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
+                  <Wrench size={14} strokeWidth={2.2} />
+                </div>
+                <span className="tracking-wide">Lắp đúng</span>
+              </div>
+              <span className="text-navy/25">•</span>
+              <div className="flex items-center gap-3 group">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
+                  <ShieldCheck size={14} strokeWidth={2.2} />
+                </div>
+                <span className="tracking-wide">Sử dụng lâu dài</span>
+              </div>
+            </motion.div>
+
+            {/* Buttons Pill shaped */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="flex flex-wrap items-center gap-6"
+              className="flex flex-wrap items-center gap-4"
             >
               <Link
                 href="/products"
-                className="flex items-center gap-2 bg-[#769b52] px-8 py-4 text-xs font-medium uppercase tracking-wider text-white transition-colors hover:bg-[#658744] lg:text-sm"
+                className="flex items-center gap-2 bg-brand-green hover:bg-lime-dark px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider text-white transition-all shadow-md shadow-brand-green/20"
               >
-                {content.home.hero.ctaPrimary}
+                Tư vấn giải pháp
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/products"
-                className="group flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-white transition-colors hover:text-[#769b52] lg:text-sm"
+                className="group flex items-center gap-2 bg-cream border border-gray-light hover:border-brand-green hover:text-brand-green px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider text-navy transition-all shadow-sm"
               >
-                {content.home.hero.ctaSecondary}
-                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/50 transition-colors group-hover:border-[#769b52]">
-                  <ArrowRight className="h-4 w-4" />
-                </div>
+                Xem catalogue
+                <FileText className="h-4 w-4 text-navy/70 group-hover:text-brand-green" />
               </Link>
             </motion.div>
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 z-20 hidden w-full border-t border-white/10 bg-black/40 backdrop-blur-md lg:block">
-          <div className="mx-auto max-w-[1440px] px-12 py-6">
-            <div className="grid grid-cols-4 gap-8 text-left">
-              {content.home.benefits.map((benefit, idx) => {
-                const Icon =
-                  [ShieldCheck, Smartphone, Sparkles, Leaf][idx] || ShieldCheck;
-                return (
-                  <div key={benefit.title} className="flex items-center gap-4">
-                    <div className="text-[#769b52]">
-                      <Icon className="h-7 w-7" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium uppercase tracking-wide text-white">
-                        {benefit.title}
-                      </h3>
-                      <p className="mt-0.5 text-xs text-gray-300">{benefit.desc}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
       </section>
 
-      <section className="w-full bg-[#ebe8df] py-16">
+      <section className="w-full bg-cream py-16 border-y border-gray-light/35">
         <motion.div
           variants={{
             hidden: { opacity: 0 },
@@ -166,20 +219,20 @@ export default function Home() {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
               }}
-              className="flex flex-col items-center px-4 text-center"
+              className="flex flex-col items-center px-4 text-center md:border-r border-gray-light/40 last:border-r-0"
             >
-              <span className="mb-2 font-serif text-5xl tracking-tight text-[#769b52]">
+              <span className="mb-2 font-serif text-6xl md:text-7xl tracking-normal text-brand-green">
                 {stat.value}
-                <span className="text-3xl">{stat.suffix}</span>
+                <span className="text-4xl">{stat.suffix}</span>
               </span>
-              <span className="mb-1 text-sm font-medium text-gray-900">{stat.label}</span>
-              <span className="text-xs text-gray-500">{stat.sublabel}</span>
+              <span className="mb-1 text-sm font-semibold text-navy">{stat.label}</span>
+              <span className="text-xs text-navy/60">{stat.sublabel}</span>
             </motion.div>
           ))}
         </motion.div>
       </section>
 
-      <section id="categories" className="w-full bg-[#faf9f6] py-20 lg:py-28">
+      <section id="categories" className="w-full bg-white py-12 lg:py-16">
         <motion.div
           variants={{
             hidden: { opacity: 0 },
@@ -188,65 +241,74 @@ export default function Home() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="mx-auto max-w-[1440px] px-6 lg:px-12"
+          className="mx-auto max-w-[1440px] px-6 lg:px-12 text-center"
         >
+          {/* Left/Right Aligned Heading Layout */}
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 15 },
               visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
             }}
-            className="mb-12 flex flex-col justify-between gap-6 text-left md:flex-row md:items-end"
+            className="flex flex-col md:flex-row md:items-end md:justify-between text-left mb-12 gap-6"
           >
-            <div>
-              <h3 className="mb-3 text-xs font-medium uppercase tracking-widest text-[#769b52]">
-                {content.home.categories.prefix}
+            <div className="space-y-3 max-w-3xl">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-champagne">
+                DỊCH VỤ CỦA CHÚNG TÔI
               </h3>
-              <h2 className="whitespace-pre-line font-serif text-3xl leading-tight text-gray-900 md:text-4xl">
-                {content.home.categories.title}
+              <h2 className="font-sans text-3xl font-bold leading-tight text-navy md:text-4xl">
+                Giải pháp toàn diện<br />cho không gian sống hiện đại
               </h2>
+              <div className="h-[3px] w-12 bg-brand-green mt-4 rounded-full" />
             </div>
-            <Link href="#news" className="flex items-center gap-2 text-xs font-medium text-gray-600 transition-colors hover:text-gray-900">
+            <Link
+              href="/products"
+              className="group flex items-center gap-2 shrink-0 text-xs font-bold uppercase tracking-wider text-navy/70 hover:text-brand-green transition-colors pb-1"
+            >
               {content.home.categories.viewAll}
-              <ArrowRight className="h-3 w-3" />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </motion.div>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
-            {content.home.categories.items.map((cat, idx) => {
-              const img = [
-                "https://images.unsplash.com/photo-1563298723-dcfebaa392e3?auto=format&fit=crop&q=80",
-                "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80",
-                "https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80",
-                "https://images.unsplash.com/photo-1589834390005-5d4fb9bf3d32?auto=format&fit=crop&q=80",
-                "https://images.unsplash.com/photo-1599839619722-39751411ea63?auto=format&fit=crop&q=80",
-              ][idx];
 
+          {/* 4 columns layout with high-quality custom service cards */}
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+            {services.map((service) => {
+              const Icon = service.icon;
               return (
                 <motion.div
-                  key={cat.title}
+                  key={service.title}
                   variants={{
                     hidden: { opacity: 0, y: 25 },
                     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
                   }}
+                  className="rounded-2xl border border-gray-light bg-cream text-left shadow-sm flex flex-col justify-between hover:shadow-lg hover:border-brand-green/30 transition-all duration-300 group overflow-hidden"
                 >
-                  <Link href="/products" className="group block cursor-pointer text-left">
-                    <div className="relative mb-4 aspect-[4/3] overflow-hidden rounded-md bg-[#eeeae2] shadow-sm">
+                  <Link href="/products" className="block cursor-pointer flex-grow flex flex-col justify-between">
+                    {/* Full-bleed Category Image at the top of the card */}
+                    <div className="relative aspect-[16/10] overflow-hidden bg-neutral shadow-inner border-b border-gray-light/35">
                       <Image
-                        src={img}
-                        alt={cat.title}
+                        src={service.img}
+                        alt={service.title}
                         fill
-                        sizes="(max-width: 1024px) 100vw, 20vw"
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        sizes="(max-width: 1024px) 100vw, 25vw"
+                        className="object-cover transition-transform duration-750 group-hover:scale-105"
                       />
                     </div>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="mb-1 text-sm font-medium uppercase tracking-wide text-gray-900 transition-colors group-hover:text-[#769b52]">
-                          {cat.title}
-                        </h4>
-                        <p className="text-xs text-gray-500">{cat.count}</p>
-                      </div>
-                      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gray-300 text-gray-400 transition-all group-hover:border-[#769b52] group-hover:bg-[#769b52] group-hover:text-white">
-                        <ArrowRight className="h-3 w-3 -rotate-45 transform" />
+                    {/* Content wrapper with inner padding at the bottom */}
+                    <div className="p-6 lg:p-7 pt-5">
+                      <div className="flex items-center justify-between gap-4">
+                        {/* Title and count on the left */}
+                        <div className="flex-grow">
+                          <h4 className="text-base lg:text-lg font-bold uppercase tracking-wide text-navy group-hover:text-brand-green transition-colors leading-tight min-h-[3rem] lg:min-h-[3.5rem] flex items-center">
+                            {service.title}
+                          </h4>
+                          <p className="text-xs font-semibold text-navy/60 mt-2 leading-relaxed">
+                            {service.desc}
+                          </p>
+                        </div>
+                        {/* Circular arrow icon on the right */}
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-green/20 bg-brand-green/5 text-brand-green group-hover:bg-brand-green group-hover:text-white transition-all duration-300">
+                          <ArrowRight className="h-4 w-4" />
+                        </div>
                       </div>
                     </div>
                   </Link>
@@ -257,14 +319,14 @@ export default function Home() {
         </motion.div>
       </section>
 
-      <section className="relative w-full overflow-hidden bg-[#27292a] py-12 select-none">
+      <section className="relative w-full overflow-hidden bg-navy py-12 select-none">
         <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-12 px-6 text-left md:flex-row lg:px-12">
           <div className="relative z-10 flex w-full items-center justify-between md:block md:w-1/4">
             <div>
-              <h3 className="mb-1 text-xs font-medium uppercase tracking-widest text-[#769b52]">
+              <h3 className="mb-1 text-xs font-semibold uppercase tracking-widest text-brand-green">
                 {content.home.partners.prefix}
               </h3>
-              <h2 className="text-base font-medium uppercase tracking-wide text-white">
+              <h2 className="text-base font-semibold uppercase tracking-wide text-cream">
                 {content.home.partners.title}
               </h2>
             </div>
@@ -281,7 +343,7 @@ export default function Home() {
                 {brands.map((brand, idx) => (
                   <span
                     key={brand.name}
-                    className={`whitespace-nowrap text-white transition-all duration-500 ${brand.style} ${activeBrand === idx ? "scale-110 text-[#769b52] opacity-100" : "opacity-40 hover:opacity-100"}`}
+                    className={`whitespace-nowrap text-cream transition-all duration-500 ${brand.style} ${activeBrand === idx ? "scale-110 text-brand-green opacity-100 font-bold" : "opacity-40 hover:opacity-100"}`}
                   >
                     {brand.name}
                   </span>
@@ -295,7 +357,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="solutions" className="w-full overflow-hidden bg-[#f4f3ec] py-20 lg:py-28">
+      <section id="solutions" className="w-full overflow-hidden bg-neutral py-20 lg:py-28">
         <motion.div
           variants={{
             hidden: { opacity: 0 },
@@ -313,16 +375,16 @@ export default function Home() {
             }}
             className="text-left lg:w-1/3"
           >
-            <h3 className="mb-3 text-xs font-medium uppercase tracking-widest text-[#769b52]">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-green">
               {content.home.solutions.prefix}
             </h3>
-            <h2 className="mb-6 whitespace-pre-line font-serif text-4xl leading-tight text-gray-900 lg:text-5xl">
+            <h2 className="mb-6 whitespace-pre-line font-serif text-4xl leading-tight text-navy lg:text-5xl">
               {content.home.solutions.title}
             </h2>
-            <p className="mb-10 text-base leading-relaxed text-gray-600">
+            <p className="mb-10 text-base leading-relaxed text-navy/70">
               {content.home.solutions.items[activeSolution].desc}
             </p>
-            <Link href="#contact" className="inline-flex items-center gap-4 border border-gray-900 px-8 py-3.5 text-xs font-medium uppercase tracking-wider text-gray-900 transition-all hover:bg-gray-900 hover:text-white">
+            <Link href="#contact" className="inline-flex items-center gap-4 border border-navy px-8 py-3.5 text-xs font-semibold uppercase tracking-wider text-navy transition-all hover:bg-navy hover:text-cream">
               {content.home.solutions.cta}
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -333,26 +395,32 @@ export default function Home() {
               hidden: { opacity: 0, x: 30 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.7, ease: "easeOut" } },
             }}
-            className="relative h-[400px] w-full overflow-hidden rounded-sm shadow-lg lg:h-[600px] lg:w-2/3"
+            className="relative h-[400px] w-full lg:h-[600px] lg:w-2/3"
           >
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={activeSolution}
-                src={solutions[activeSolution].img}
-                alt={solutions[activeSolution].title}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="h-full w-full object-cover"
-              />
-            </AnimatePresence>
-            <div className="absolute bottom-0 left-0 z-10 w-[85%] max-w-[340px] rounded-sm bg-[#a35e4e] p-8 text-left text-white shadow-xl sm:w-[80%] lg:-left-12 lg:bottom-12">
+            {/* Smooth rounded image wrapper with clip to prevent cutting of the terracotta card */}
+            <div className="absolute inset-0 overflow-hidden rounded-2xl shadow-lg">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeSolution}
+                  src={solutions[activeSolution].img}
+                  alt={solutions[activeSolution].title}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="h-full w-full object-cover"
+                />
+              </AnimatePresence>
+            </div>
+            <div className="absolute bottom-0 left-0 z-10 w-[85%] max-w-[340px] rounded-2xl bg-[#A14833] p-8 text-left text-white shadow-xl sm:w-[80%] lg:-left-[170px] lg:bottom-12 border border-white/10 transition-all duration-300">
               <div className="mb-6 flex items-start gap-4">
-                <ShieldCheck className="h-8 w-8 shrink-0 opacity-80" />
-                <p className="text-sm font-medium leading-snug">{solutions[activeSolution].title}</p>
+                {(() => {
+                  const Icon = solutions[activeSolution].icon;
+                  return <Icon className="h-8 w-8 shrink-0 opacity-90 text-white" />;
+                })()}
+                <p className="text-sm font-bold leading-snug">{solutions[activeSolution].title}</p>
               </div>
-              <Link href="/products" className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-white/95 hover:text-white">
+              <Link href="/products" className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/75 hover:text-white transition-colors">
                 Xem chi tiết
                 <ArrowRight className="h-3 w-3" />
               </Link>
@@ -369,7 +437,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      <section id="news" className="w-full bg-[#faf9f6] py-20 lg:py-28">
+      <section id="news" className="w-full bg-cream py-20 lg:py-28 border-t border-gray-light/35">
         <motion.div
           variants={{
             hidden: { opacity: 0 },
@@ -388,11 +456,11 @@ export default function Home() {
             className="mb-12 flex flex-col justify-between gap-6 text-left md:flex-row md:items-end"
           >
             <div>
-              <h3 className="mb-3 text-xs font-medium uppercase tracking-widest text-[#769b52]">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-green">
                 {content.home.news.prefix}
               </h3>
             </div>
-            <Link href="#categories" className="flex items-center gap-2 text-xs font-medium text-gray-600 transition-colors hover:text-gray-900">
+            <Link href="#categories" className="flex items-center gap-2 text-xs font-semibold text-navy/70 transition-colors hover:text-brand-green">
               {content.home.news.viewAll}
               <ArrowRight className="h-3 w-3" />
             </Link>
@@ -414,7 +482,7 @@ export default function Home() {
                   }}
                   className="group flex cursor-pointer flex-col gap-6 text-left sm:flex-row"
                 >
-                  <div className="aspect-video shrink-0 overflow-hidden rounded-sm bg-gray-200 shadow-xs sm:w-1/2 sm:aspect-square">
+                  <div className="relative aspect-video shrink-0 overflow-hidden rounded-sm bg-gray-200 shadow-xs sm:w-1/2 sm:aspect-square">
                     <Image
                       src={img}
                       alt={article.title}
@@ -426,11 +494,11 @@ export default function Home() {
                   <div className="flex flex-col justify-between py-2 sm:w-1/2">
                     <div>
                       <span className="mb-3 block text-xs text-gray-500">{article.date}</span>
-                      <h4 className="mb-4 line-clamp-3 text-sm font-medium leading-snug text-gray-900 transition-colors group-hover:text-[#769b52]">
+                      <h4 className="mb-4 line-clamp-3 text-sm font-semibold leading-snug text-navy transition-colors group-hover:text-brand-green">
                         {article.title}
                       </h4>
                     </div>
-                    <span className="flex items-center gap-2 text-xs font-medium text-gray-600 transition-colors group-hover:text-[#769b52]">
+                    <span className="flex items-center gap-2 text-xs font-semibold text-navy/60 transition-colors group-hover:text-brand-green">
                       Xem thêm
                       <ArrowRight className="h-3 w-3" />
                     </span>
@@ -440,6 +508,27 @@ export default function Home() {
             })}
           </div>
         </motion.div>
+      </section>
+
+      {/* Call-to-Action Brand Banner */}
+      <section className="w-full bg-navy py-14 text-cream border-t border-cream/10 select-none">
+        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-8 px-6 md:flex-row lg:px-12">
+          <div className="text-left space-y-2">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-cream">
+              Đang làm nhà <span className="text-brand-green">•</span> sửa bếp <span className="text-brand-green">•</span> thay khóa điện tử?
+            </h2>
+            <p className="text-sm md:text-base font-normal text-cream/80 mt-3">
+              Liên hệ TA HOUSE để được tư vấn giải pháp phù hợp nhất với nhu cầu của gia đình.
+            </p>
+          </div>
+          <Link
+            href="#contact"
+            className="group flex shrink-0 items-center gap-2.5 rounded-full bg-brand-green px-8 py-4 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-lime-dark shadow-md shadow-brand-green/20"
+          >
+            Liên hệ tư vấn
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
       </section>
 
       <Footer />
