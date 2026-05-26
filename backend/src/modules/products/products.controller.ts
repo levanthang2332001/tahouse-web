@@ -30,17 +30,16 @@ export class ProductsController {
       'Hỗ trợ lọc theo loại (images/videos/all) và phân trang.',
   })
   @ApiParam({
-    name: 'idOrCode',
-    description: 'ID UUID hoặc mã sản phẩm',
-    example: 'kl-939-f',
+    name: 'code',
+    description: 'Mã sản phẩm (ví dụ: KL-939F)',
+    example: 'KL-939F',
   })
   @ApiResponse({
     status: 200,
     description: 'Danh sách media lắp đặt được trả về thành công.',
     schema: {
       example: {
-        product_id: 'c1b4372f-73be-4666-9489-9a1fe774c000',
-        product_code: 'KL - 939 F',
+        product_code: 'KL-939F',
         product_name: 'KL - 939 F',
         items: [
           {
@@ -62,29 +61,27 @@ export class ProductsController {
   })
   @ApiResponse({ status: 404, description: 'Không tìm thấy sản phẩm.' })
   getInstallationMedia(
-    @Param('idOrCode') idOrCode: string,
+    @Param('code') code: string,
     @Query() query: GetInstallationMediaDto,
   ) {
-    return this.productsService.getInstallationMedia(idOrCode, query);
+    return this.productsService.getInstallationMedia(code, query);
   }
 
   @Get(ApiRoute.PRODUCTS_LOCKS_DETAIL)
   @ApiOperation({
-    summary:
-      'Lấy chi tiết một sản phẩm khóa cửa theo ID (UUID) hoặc Mã sản phẩm (Code)',
+    summary: 'Lấy chi tiết một sản phẩm khóa cửa theo Mã sản phẩm (Code)',
   })
   @ApiParam({
-    name: 'idOrCode',
-    description:
-      'ID UUID (ví dụ: c6b98f15-440e-4e69-a730-b2f79074be90) hoặc mã sản phẩm (ví dụ: kl-989-f)',
-    example: 'kl-989-f',
+    name: 'code',
+    description: 'Mã sản phẩm (ví dụ: KL-989F)',
+    example: 'KL-989F',
   })
   @ApiResponse({ status: 200, description: 'Chi tiết sản phẩm được tìm thấy.' })
   @ApiResponse({
     status: 404,
-    description: 'Không tìm thấy sản phẩm với ID hoặc mã tương ứng.',
+    description: 'Không tìm thấy sản phẩm với mã tương ứng.',
   })
-  findOne(@Param('idOrCode') idOrCode: string) {
-    return this.productsService.findOne(idOrCode);
+  findOne(@Param('code') code: string) {
+    return this.productsService.findOne(code);
   }
 }

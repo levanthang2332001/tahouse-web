@@ -77,6 +77,7 @@ export class ProductsService {
     }
 
     // Sắp xếp (Sorting) trước khi phân trang
+    // Mặc định sort theo priority (1, 2, 3, null), null luôn ở cuối
     if (sortBy) {
       const order = sortOrder === SortOrder.DESC ? -1 : 1;
       products.sort((a, b) => {
@@ -101,6 +102,20 @@ export class ProductsService {
         const strA = String(valA || '').toLowerCase();
         const strB = String(valB || '').toLowerCase();
         return strA.localeCompare(strB, 'vi', { sensitivity: 'base' }) * order;
+      });
+    } else {
+      // Default: sort theo priority, null/undefined luôn ở cuối
+      products.sort((a, b) => {
+        const pA = a.priority;
+        const pB = b.priority;
+        const isNullA = pA === null || pA === undefined;
+        const isNullB = pB === null || pB === undefined;
+
+        if (isNullA && isNullB) return 0;
+        if (isNullA) return 1;
+        if (isNullB) return -1;
+
+        return pA - pB;
       });
     }
 
@@ -130,22 +145,18 @@ export class ProductsService {
   }
 
   /**
-   * Tìm kiếm thông tin chi tiết của một sản phẩm theo ID (UUID) hoặc Mã sản phẩm (Code).
+   * Tìm kiếm thông tin chi tiết của một sản phẩm theo Mã sản phẩm (Code).
    * Trả về kèm theo preview (tối đa 3 ảnh) từ dữ liệu lắp đặt thực tế.
    */
-  findOne(idOrCode: string) {
+  findOne(code: string) {
     const products = this.getProducts();
-    const cleanQuery = idOrCode.trim().toLowerCase().replace(/\s+/g, '');
+    const cleanQuery = code.trim().toLowerCase().replace(/\s+/g, '');
     const product = products.find(
-      (p) =>
-        p.id?.toLowerCase() === idOrCode.toLowerCase() ||
-        p.code?.toLowerCase().replace(/\s+/g, '') === cleanQuery,
+      (p) => p.code?.toLowerCase().replace(/\s+/g, '') === cleanQuery,
     );
 
     if (!product) {
-      throw new NotFoundException(
-        `Không tìm thấy sản phẩm với ID hoặc mã: ${idOrCode}`,
-      );
+      throw new NotFoundException(`Không tìm thấy sản phẩm với mã: ${code}`);
     }
 
     const productResponse = { ...product };
@@ -153,7 +164,7 @@ export class ProductsService {
     delete productResponse.category_id;
 
     // Gắn preview ảnh lắp đặt (tối đa 3 ảnh đầu tiên)
-    const installation = this.getInstallationData()[product.id];
+    const installation = this.getInstallationData()[product.code];
     productResponse.installation_preview = installation
       ? installation.images.slice(0, 3)
       : [];
@@ -163,27 +174,23 @@ export class ProductsService {
 
   /**
    * Lấy danh sách ảnh / video lắp đặt thực tế của sản phẩm với phân trang.
-   * @param idOrCode  - ID hoặc mã sản phẩm
-   * @param query     - Đối tượng chứa page, limit, type.
+   * @param code  - Mã sản phẩm
+   * @param query - Đối tượng chứa page, limit, type.
    */
-  getInstallationMedia(idOrCode: string, query: GetInstallationMediaDto) {
+  getInstallationMedia(code: string, query: GetInstallationMediaDto) {
     const { page = 1, limit = 12, type = MediaType.ALL } = query;
 
     const products = this.getProducts();
-    const cleanQuery = idOrCode.trim().toLowerCase().replace(/\s+/g, '');
+    const cleanQuery = code.trim().toLowerCase().replace(/\s+/g, '');
     const product = products.find(
-      (p) =>
-        p.id?.toLowerCase() === idOrCode.toLowerCase() ||
-        p.code?.toLowerCase().replace(/\s+/g, '') === cleanQuery,
+      (p) => p.code?.toLowerCase().replace(/\s+/g, '') === cleanQuery,
     );
 
     if (!product) {
-      throw new NotFoundException(
-        `Không tìm thấy sản phẩm với ID hoặc mã: ${idOrCode}`,
-      );
+      throw new NotFoundException(`Không tìm thấy sản phẩm với mã: ${code}`);
     }
 
-    const installation = this.getInstallationData()[product.id] ?? {
+    const installation = this.getInstallationData()[product.code] ?? {
       images: [],
       videos: [],
     };
@@ -209,7 +216,6 @@ export class ProductsService {
     const items = mediaItems.slice(startIndex, startIndex + limitNum);
 
     return {
-      product_id: product.id,
       product_code: product.code,
       product_name: product.name,
       items,
