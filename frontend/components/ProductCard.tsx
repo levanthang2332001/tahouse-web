@@ -9,6 +9,20 @@ import { Product, formatCurrency } from "@/data/products";
 export default function ProductCard({ product }: { product: Product }) {
   const getCategoryLabel = (category: string) => {
     switch (category) {
+      case "dai-sanh":
+        return "Khóa đại sảnh";
+      case "cua-go":
+        return "Khóa cửa gỗ";
+      case "cua-kinh":
+        return "Khóa cửa kính";
+      case "xingfa-sat":
+        return "Khóa nhôm, cửa sắt";
+      case "cua-cong":
+        return "Khóa cửa cổng";
+      case "khach-san":
+        return "Khóa khách sạn";
+      case "lock-parent":
+        return "Khóa thông minh";
       case "Lock":
         return "Khóa thông minh";
       case "Kitchen":

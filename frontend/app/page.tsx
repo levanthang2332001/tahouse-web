@@ -59,24 +59,28 @@ export default function Home() {
     {
       title: "Thiết bị bếp",
       desc: "+ 150 sản phẩm",
+      catId: "Kitchen",
       icon: Flame,
       img: "https://images.unsplash.com/photo-1563298723-dcfebaa392e3?auto=format&fit=crop&q=80",
     },
     {
       title: "Phụ kiện tủ bếp",
       desc: "+ 150 sản phẩm",
+      catId: "Cabinet",
       icon: LayoutGrid,
       img: "https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80",
     },
     {
       title: "Khóa điện tử - khóa vân tay",
       desc: "+ 150 sản phẩm",
+      catId: "lock-parent",
       icon: Lock,
       img: "https://images.unsplash.com/photo-1599839619722-39751411ea63?auto=format&fit=crop&q=80",
     },
     {
       title: "Két sắt thông minh",
       desc: "+ 150 sản phẩm",
+      catId: "Smart",
       icon: Shield,
       img: "https://images.unsplash.com/photo-1589834390005-5d4fb9bf3d32?auto=format&fit=crop&q=80",
     },
@@ -131,7 +135,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="mb-6 font-sans text-5xl font-bold leading-tight text-navy sm:text-6xl lg:text-7xl"
+              className="mb-6 font-sans text-5xl font-bold leading-tight tracking-tight text-navy sm:text-6xl lg:text-7xl lg:tracking-tighter"
             >
               Thiết bị phù hợp<br />cho từng gia đình
             </motion.h1>
@@ -141,9 +145,13 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="mb-8 max-w-lg text-sm font-semibold leading-relaxed text-navy/80 md:text-base"
+              className="mb-8 max-w-lg text-sm font-semibold leading-relaxed text-navy/80 md:text-base align-middle"
             >
-              TA HOUSE chuyên tư vấn giải pháp thiết bị bếp, phụ kiện tủ bếp và khóa điện tử phù hợp với nhu cầu sử dụng thực tế.
+              <span className="inline-flex items-center gap-1 rounded border border-gray-light bg-neutral px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-tight align-middle mr-1 shadow-2xs">
+                <span className="text-brand-green">TA</span>
+                <span className="text-navy">HOUSE</span>
+              </span>{" "}
+              chuyên tư vấn giải pháp thiết bị bếp, phụ kiện tủ bếp và khóa điện tử phù hợp với nhu cầu sử dụng thực tế.
             </motion.p>
 
             {/* Checklist items inline separated by dots */}
@@ -193,8 +201,8 @@ export default function Home() {
                 href="/products"
                 className="group flex items-center gap-2 bg-cream border border-gray-light hover:border-brand-green hover:text-brand-green px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider text-navy transition-all shadow-sm"
               >
-                Xem catalogue
-                <FileText className="h-4 w-4 text-navy/70 group-hover:text-brand-green" />
+                Xem sản phẩm
+                <LayoutGrid className="h-4 w-4 text-navy/70 group-hover:text-brand-green transition-colors" />
               </Link>
             </motion.div>
           </div>
@@ -282,7 +290,7 @@ export default function Home() {
                   }}
                   className="rounded-2xl border border-gray-light bg-cream text-left shadow-sm flex flex-col justify-between hover:shadow-lg hover:border-brand-green/30 transition-all duration-300 group overflow-hidden"
                 >
-                  <Link href="/products" className="block cursor-pointer flex-grow flex flex-col justify-between">
+                  <Link href={`/products?cat=${service.catId}`} className="block cursor-pointer flex-grow flex flex-col justify-between">
                     {/* Full-bleed Category Image at the top of the card */}
                     <div className="relative aspect-[16/10] overflow-hidden bg-neutral shadow-inner border-b border-gray-light/35">
                       <Image

@@ -29,8 +29,14 @@ export interface Product {
 
 export const CATEGORIES = [
   { id: "all", slug: "all", name: "Tất cả sản phẩm" },
+  { id: "lock-parent", slug: "lock-parent", name: "Khóa thông minh" },
+  { id: "dai-sanh", slug: "dai-sanh", name: "Khóa đại sảnh" },
+  { id: "cua-go", slug: "cua-go", name: "Khóa cửa gỗ" },
+  { id: "cua-kinh", slug: "cua-kinh", name: "Khóa cửa kính" },
+  { id: "xingfa-sat", slug: "xingfa-sat", name: "Khóa chuyên nhôm xingfa, cửa sắt" },
+  { id: "cua-cong", slug: "cua-cong", name: "Khóa cửa cổng" },
+  { id: "khach-san", slug: "khach-san", name: "Khóa khách sạn" },
   { id: "Kitchen", slug: "Kitchen", name: "Thiết bị nhà bếp" },
-  { id: "Lock", slug: "Lock", name: "Khóa thông minh" },
   { id: "Water", slug: "Water", name: "Thiết bị lọc nước" },
   { id: "Cabinet", slug: "Cabinet", name: "Phụ kiện tủ bếp" },
   { id: "Smart", slug: "Smart", name: "Thiết bị thông minh" },
@@ -41,8 +47,8 @@ export const PRODUCTS: Product[] = [
     id: "ta-9800",
     name: "Khóa Thông Minh FaceID 3D TA-9800",
     code: "TA-9800 PREMIUM",
-    category: "Lock",
-    categoryName: "Khóa thông minh",
+    category: "dai-sanh",
+    categoryName: "Khóa đại sảnh",
     imageUrl: "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000",
     price: 18500000,
     priceRange: "18.500.000 VNĐ",
@@ -151,14 +157,14 @@ export const PRODUCTS: Product[] = [
     code: "KONOX SINK LUXURY",
     category: "Kitchen",
     categoryName: "Thiết bị nhà bếp",
-    imageUrl: "https://images.unsplash.com/photo-1610557892470-76d318047648?q=80&w=1000",
+    imageUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1000",
     price: 11950000,
     priceRange: "11.950.000 VNĐ",
     description: "Chậu rửa bát đá thạch anh cao cấp nhập khẩu chính hãng từ Ý. Chất liệu Keratek kháng khuẩn 99.9%, bền bỉ chống bám bẩn trầy xước.",
     shortDescription: "Chậu rửa bát đá thạch anh cao cấp nhập khẩu chính hãng từ Ý, kháng khuẩn 99.9%.",
     images: [
-      "https://images.unsplash.com/photo-1610557892470-76d318047648?q=80&w=1000",
-      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1000"
+      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1000",
+      "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=1000"
     ],
     features: [
       "Chất liệu Keratek Plus độc quyền chịu nhiệt lên đến 340 độ C",
@@ -349,8 +355,8 @@ export const PRODUCTS: Product[] = [
     id: "ta-lock-wood",
     name: "Khóa Cửa Gỗ Vân Tay TA-8500",
     code: "TA-8500 SLIM",
-    category: "Lock",
-    categoryName: "Khóa thông minh",
+    category: "cua-go",
+    categoryName: "Khóa cửa gỗ",
     imageUrl: "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?q=80&w=1000",
     price: 9200000,
     priceRange: "9.200.000 VNĐ",
@@ -442,6 +448,212 @@ export const PRODUCTS: Product[] = [
       {
         question: "Hệ thống có tự động hóa bật tắt các thiết bị bếp và khóa không?",
         answer: "Có, TA-Core cho phép thiết lập nhiều kịch bản tự động hóa cho nhà thông minh."
+      }
+    ]
+  },
+  {
+    id: "ta-lock-glass",
+    name: "Khóa Vân Tay Cửa Kính TA-3300",
+    code: "TA-3300 GLASS",
+    category: "cua-kinh",
+    categoryName: "Khóa cửa kính",
+    imageUrl: "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?q=80&w=1000",
+    price: 6200000,
+    priceRange: "6.200.000 VNĐ",
+    description: "Khóa vân tay chuyên dụng cho cửa kính cường lực văn phòng, showroom, shop thời trang. Thiết kế kẹp kính không cần khoan đục tiện lợi, độ an toàn cao.",
+    shortDescription: "Khóa vân tay chuyên dụng cho cửa kính cường lực văn phòng, showroom.",
+    images: [
+      "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?q=80&w=1000",
+      "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000"
+    ],
+    features: [
+      "Vân tay bán dẫn FPC Thụy Điển nhận diện siêu nhạy 360 độ",
+      "Điều khiển từ xa qua Bluetooth/Wifi quản lý lịch sử ra vào",
+      "Dễ dàng lắp đặt dạng kẹp kính không cần đục hay cắt kính",
+      "Cảnh báo pin yếu trước 15 ngày và hỗ trợ cổng sạc khẩn cấp USB-C"
+    ],
+    specs: {
+      "Chất liệu": "Hợp kim nhôm cao cấp cường lực chịu lực, mặt kính acrylic chống xước",
+      "Chế độ mở khóa": "Vân tay, Mật mã, Thẻ từ, App di động, Remote điều khiển",
+      "Nguồn cấp năng lượng": "4 viên pin AA Alkaline 1.5V hoạt động bền bỉ 10 tháng",
+      "Độ dày cửa tương thích": "Cửa kính cường lực không khung có độ dày từ 10mm - 12mm"
+    },
+    specifications: {
+      dimensions: "Dài 190mm x Rộng 75mm x Dày 38mm",
+      material: "Hợp kim nhôm đúc nguyên khối chống gỉ, nhựa ABS",
+      battery: "4 viên pin AA Alkaline 1.5V thời lượng sử dụng 10 tháng",
+      openingMethods: ["Vân tay", "Mật mã ảo", "Thẻ từ RFID", "App Tuya Bluetooth"],
+      lockingMechanism: "Chốt đôi Inox 304 tròn phi 12mm siêu cứng"
+    },
+    technologies: ["FPC Swedish Bio-Sensor", "Double Lock Cylinder", "Tuya Mobile IoT", "Anti-Peeping PIN Code"],
+    warranty: 24,
+    warrantyText: "24 Tháng",
+    colors: ["Space Black (Đen Bóng Đêm)", "Champagne Silver (Bạc Ánh Trăng)"],
+    installationManual: [
+      "Lau sạch mép kính cường lực nơi dự kiến lắp đặt.",
+      "Ốp trực tiếp thân khóa chính vào mép kính và siết chặt các ốc lục giác định vị.",
+      "Dán hoặc gắn phần đối của khóa vào cánh kính đối diện.",
+      "Lắp pin và thiết lập mã số Admin để bắt đầu cấu hình."
+    ],
+    faq: [
+      {
+        question: "Cửa kính có khung nhôm hoặc khung gỗ thì có lắp được khóa này không?",
+        answer: "Khóa này thiết kế kẹp chuyên dụng cho kính không khung. Nếu kính có khung, bạn nên chọn dòng khóa nhôm xingfa mỏng."
+      }
+    ]
+  },
+  {
+    id: "ta-lock-xingfa",
+    name: "Khóa Thông Minh Cửa Nhôm Xingfa TA-5500",
+    code: "TA-5500 SLIM",
+    category: "xingfa-sat",
+    categoryName: "Khóa chuyên nhôm xingfa, cửa sắt",
+    imageUrl: "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000",
+    price: 7800000,
+    priceRange: "7.800.000 VNĐ",
+    description: "Dòng khóa thông minh chống nước tuyệt hảo tiêu chuẩn IP65, thân khóa thiết kế siêu mỏng (Slim profile 38mm) chuyên dụng cho các loại cửa nhôm kính Xingfa, cửa sắt hộp ngoài trời.",
+    shortDescription: "Khóa thông minh chống nước IP65, thân khóa thiết kế siêu mỏng chuyên nhôm xingfa.",
+    images: [
+      "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000",
+      "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?q=80&w=1000"
+    ],
+    features: [
+      "Chống nước IP65 an tâm lắp đặt cho cửa ban công, cửa có mái hiên",
+      "Thân khóa dáng Slim siêu nhỏ gọn rộng chỉ 38mm ôm khít đố cửa nhôm",
+      "Tay gạt đảo chiều linh hoạt phù hợp cho cả cửa mở trái và mở phải",
+      "Tích hợp vân tay ngay trên tay cầm mở cửa nhanh chóng tiện lợi"
+    ],
+    specs: {
+      "Chất liệu": "Hợp kim SUS 304 chống rỉ sét ăn mòn muối biển, mặt kính acrylic",
+      "Chế độ mở khóa": "Vân tay, Mật mã, Thẻ từ, App Wifi Tuya, Chìa cơ khẩn cấp",
+      "Nguồn cấp năng lượng": "4 viên pin AAA Alkaline sử dụng lên đến 10 tháng",
+      "Độ dày cửa tương thích": "Cửa nhôm Xingfa, cửa sắt hộp có đố cửa rộng >= 50mm, dày >= 35mm"
+    },
+    specifications: {
+      dimensions: "Dài 300mm x Rộng 38mm x Dày 21mm",
+      material: "Inox 304 không gỉ đúc đặc nguyên khối chống khoan đập",
+      battery: "4 viên pin AAA Alkaline 1.5V hoạt động bền bỉ 8-10 tháng",
+      openingMethods: ["Vân tay", "Mật mã chống nhìn trộm", "Thẻ từ thông minh", "Chìa cơ", "App Wifi Tuya"],
+      lockingMechanism: "Ruột khóa inox 304 móc đa điểm chuyên dụng cửa lùa hoặc chốt thẳng"
+    },
+    technologies: ["IP65 Waterproof", "Slim Body Fit", "Biometric Touch", "Tuya Smart Home"],
+    warranty: 24,
+    warrantyText: "24 Tháng (1 đổi 1 trong 12 tháng)",
+    colors: ["Jet Black (Đen Tuyền)", "Classic Silver (Inox Sáng)"],
+    installationManual: [
+      "Khảo sát đố cửa nhôm kính (đảm bảo đố rộng tối thiểu 50mm).",
+      "Khoan khoét đố cửa nhôm chính xác theo dưỡng kỹ thuật của khóa.",
+      "Lắp hộp ruột khóa đa điểm hoặc đơn điểm tùy cấu trúc cửa vào đố cửa.",
+      "Luồn cáp nối và bắt vít cố định hai mặt ốp trước sau của khóa.",
+      "Đặt pin AAA, lập cấu hình vân tay Admin và mật khẩu."
+    ],
+    faq: [
+      {
+        question: "Khóa này có lắp được cho cửa sắt hộp ngoài trời chịu mưa gió trực tiếp không?",
+        answer: "Được. Với vỏ hợp kim SUS 304 và gioăng cao su chống nước tiêu chuẩn IP65, khóa chịu tốt mưa ẩm."
+      }
+    ]
+  },
+  {
+    id: "ta-lock-gate",
+    name: "Khóa Cửa Cổng Vân Tay Ngoài Trời TA-6600",
+    code: "TA-6600 GATE",
+    category: "cua-cong",
+    categoryName: "Khóa cửa cổng",
+    imageUrl: "https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=1000",
+    price: 8500000,
+    priceRange: "8.500.000 VNĐ",
+    description: "Khóa cổng thông minh chuyên dụng ngoài trời với hai mặt vân tay độc lập cực kỳ an toàn. Chống nước tuyệt đối IP68 và vỏ hợp kim đúc dày chống chịu va đập mạnh.",
+    shortDescription: "Khóa cổng vân tay ngoài trời 2 mặt độc lập chống nước IP68.",
+    images: [
+      "https://images.unsplash.com/photo-1599839619722-39751411ea63?q=80&w=1000",
+      "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000"
+    ],
+    features: [
+      "Thiết kế 2 mặt vân tay độc lập chống thò tay vào trong mở cửa",
+      "Kháng nước tuyệt đối IP68 thoải mái lắp đặt dưới trời mưa trực tiếp",
+      "Hộp bảo vệ inox 304 chắc chắn chống cưa cắt phá khóa",
+      "Tự động chốt khóa khi đóng cổng vô cùng an tâm"
+    ],
+    specs: {
+      "Chất liệu": "Hợp kim đúc dày cường lực, ruột khóa Inox 304 siêu chịu lực",
+      "Chế độ mở khóa": "Vân tay 2 mặt, Thẻ từ, Chìa cơ khẩn cấp, App di động",
+      "Nguồn cấp năng lượng": "4 viên pin AA Alkaline hoặc hỗ trợ cấp nguồn điện trực tiếp 12V",
+      "Độ dày cửa tương thích": "Cửa sắt cổng, cửa cổng inox hộp, cửa sắt nan dày từ 30mm - 80mm"
+    },
+    specifications: {
+      dimensions: "Dài 170mm x Rộng 100mm x Dày 65mm",
+      material: "Hợp kim kẽm đúc nguyên khối chịu lực cao, thép chống rỉ",
+      battery: "4 viên pin AA Alkaline 1.5V (hoặc adapter nguồn 12V)",
+      openingMethods: ["Vân tay mặt ngoài + mặt trong", "Thẻ từ IC", "Chìa khóa cơ chống sao chép", "App Tuya"],
+      lockingMechanism: "Lưỡi chốt tự động móc xoay bằng Inox đúc dày 20mm"
+    },
+    technologies: ["Dual-Side Bio Fingerprint", "IP68 Weatherproof", "Heavy Duty Anti-Theft", "Smart Gateway integration"],
+    warranty: 36,
+    warrantyText: "36 Tháng chính hãng",
+    colors: ["Solid Black (Đen Nhám)", "Iron Gray (Xám Sần Sắt)"],
+    installationManual: [
+      "Hàn cố định hộp bảo vệ bằng thép/inox chuyên dụng lên đố cổng sắt.",
+      "Bắt vít cốt khóa và lắp mặt khóa ngoài qua lỗ đục.",
+      "Gắn thân khóa chính mặt trong vào hộp bảo vệ và căn chỉnh lưỡi đón chốt tự động.",
+      "Đấu nối cáp liên kết giữa mặt trong và mặt ngoài của khóa.",
+      "Lắp pin hoặc đấu điện nguồn, thiết lập vân tay Admin cho cả hai mặt."
+    ],
+    faq: [
+      {
+        question: "Tại sao lại cần vân tay 2 mặt cho cửa cổng sắt?",
+        answer: "Cửa cổng sắt nan thưa người ngoài có thể thọc tay qua khe cửa vào trong gạt chốt. Vân tay 2 mặt bắt buộc phải quét vân tay hợp lệ từ mặt trong mới có thể mở được cửa đi ra."
+      }
+    ]
+  },
+  {
+    id: "ta-lock-hotel",
+    name: "Khóa Khách Sạn Thẻ Từ Cao Cấp TA-2200",
+    code: "TA-2200 HOTEL",
+    category: "khach-san",
+    categoryName: "Khóa khách sạn",
+    imageUrl: "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000",
+    price: 3500000,
+    priceRange: "3.500.000 VNĐ",
+    description: "Giải pháp khóa thẻ từ thông minh chuyên sâu cho khách sạn, homestay, nhà nghỉ và văn phòng. Quản lý phân quyền thẻ từ cực kỳ dễ dàng bằng phần mềm chuyên nghiệp.",
+    shortDescription: "Khóa thẻ từ khách sạn thông minh, phần mềm quản lý phòng chuyên nghiệp.",
+    images: [
+      "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=1000",
+      "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?q=80&w=1000"
+    ],
+    features: [
+      "Thẻ từ RFID mã hóa chống ghi chép sao chép bất hợp pháp",
+      "Tích hợp phần mềm quản lý phòng khách sạn, cài đặt thời gian check-in/out",
+      "Lưu trữ lịch sử 200 lượt mở cửa trực tiếp trên khóa",
+      "Chất liệu chống gỉ hoàn hảo bền bỉ trong môi trường điều hòa muối biển"
+    ],
+    specs: {
+      "Chất liệu": "Hợp kim kẽm phủ PVD chống bay màu, tay nắm inox 304",
+      "Chế độ mở khóa": "Thẻ từ Mifare 13.56Mhz, Chìa khóa cơ khẩn cấp",
+      "Nguồn cấp năng lượng": "4 viên pin AA Alkaline sử dụng lên đến 18 tháng",
+      "Độ dày cửa tương thích": "Cửa gỗ khách sạn dày từ 38mm - 60mm"
+    },
+    specifications: {
+      dimensions: "Dài 290mm x Rộng 72mm x Dày 22mm",
+      material: "Hợp kim kẽm phủ PVD chống xước, bề mặt mạ điện chống oxy hóa",
+      battery: "4 viên pin AA Alkaline 1.5V thời lượng pin lên đến 18 tháng",
+      openingMethods: ["Thẻ từ Mifare", "Chìa cơ khẩn cấp giấu kín"],
+      lockingMechanism: "Thân khóa tiêu chuẩn 5 chốt Euro Mortise siêu bền chống cạy"
+    },
+    technologies: ["PVD Coating Finish", "RFID Encryption", "Euro Standard Mortise", "PMS Integration Support"],
+    warranty: 24,
+    warrantyText: "24 Tháng",
+    colors: ["Classic Gold (Vàng Cổ Điển)", "Sleek Chrome (Bạc Crom Cực Sang)"],
+    installationManual: [
+      "Dùng dưỡng giấy định vị các lỗ khoan trên cửa gỗ.",
+      "Khoan khoét đố cửa gỗ để lắp đặt thân khóa Mortise 5 chốt.",
+      "Lắp ráp trục kết nối tay cầm và cố định mặt trước mặt sau khóa.",
+      "Lắp pin và dùng thẻ Master Card để cấu hình hệ thống ban đầu."
+    ],
+    faq: [
+      {
+        question: "Hệ thống thẻ từ có tương thích với các công tắc tiết kiệm điện trong phòng không?",
+        answer: "Có, thẻ Mifare 13.56Mhz phát ra từ khóa hoàn toàn tương thích với các dòng công tắc thẻ từ tiết kiệm điện hiện nay."
       }
     ]
   }
