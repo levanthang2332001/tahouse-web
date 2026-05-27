@@ -4,7 +4,7 @@ import React, { use, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Check, ChevronRight, MessageCircle, Phone } from "lucide-react";
+import { Check, ChevronRight, MessageCircle, Phone, Sparkles } from "lucide-react";
 import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -28,7 +28,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   const [activeTab, setActiveTab] = useState("specs");
   const [copied, setCopied] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const { addToRecentlyViewed } = useApp();
+  const { addToRecentlyViewed, setIsChatbotOpen } = useApp();
 
   useEffect(() => {
     setSelectedImage(null);
@@ -84,7 +84,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
               <motion.div
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="relative aspect-square overflow-hidden rounded-3xl border border-gray-light bg-cream shadow-inner"
+                className="relative aspect-[4/3] max-h-[420px] overflow-hidden rounded-3xl border border-gray-light bg-cream shadow-inner mx-auto w-full"
               >
                 <Image
                   src={heroImage}
@@ -129,14 +129,26 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                 </button>
               </div>
 
-              <h1 className="mb-2 font-serif text-3xl font-light leading-tight tracking-tight md:text-5xl">
+              <h1 className="mb-2 font-serif text-3xl font-bold leading-tight tracking-tight text-navy md:text-5xl">
                 {product.name}
               </h1>
               <p className="mb-6 text-xs uppercase tracking-widest text-navy/60">
                 {content.detail.labels.modelCodePrefix} {product.code}
               </p>
-              <div className="mb-8 text-2xl font-black text-brand-green">{formatCurrency(product.price)}</div>
-              <p className="mb-8 text-xs font-semibold leading-relaxed text-navy/70 sm:text-sm">
+              <div className="mb-8 flex flex-col gap-1">
+                <span className="text-sm font-semibold text-zinc-400 line-through">
+                  {formatCurrency(Math.round((product.price * 1.18) / 100000) * 100000)}
+                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl font-black text-rose-600">
+                    {formatCurrency(product.price)}
+                  </span>
+                  <span className="inline-flex items-center rounded bg-rose-50 px-2.5 py-1 text-xs font-black text-rose-600 border border-rose-100 animate-pulse">
+                    GIẢM {Math.round(((Math.round((product.price * 1.18) / 100000) * 100000 - product.price) / (Math.round((product.price * 1.18) / 100000) * 100000)) * 100)}%
+                  </span>
+                </div>
+              </div>
+              <p className="mb-8 text-sm font-semibold leading-relaxed text-navy">
                 {product.description}
               </p>
 
@@ -157,15 +169,26 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
               </div>
 
               <div className="mt-auto grid grid-cols-1 gap-4 border-t border-gray-light pt-6 sm:grid-cols-3">
-                <a href="https://zalo.me" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 rounded-xl bg-brand-green py-4 text-center text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-lime-dark">
-                  <MessageCircle size={16} /> {content.detail.labels.ctaZalo}
+                <a 
+                  href="https://zalo.me" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="flex items-center justify-center gap-2 rounded-xl bg-[#0068ff] py-4 text-center text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#0056d6] shadow-sm"
+                >
+                  <MessageCircle size={16} /> Chat Zalo tư vấn
                 </a>
-                <a href="tel:19008899" className="flex items-center justify-center gap-2 rounded-xl border border-champagne bg-champagne py-4 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-champagne/80">
-                  <Phone size={16} /> {content.detail.labels.ctaCall}
+                <a 
+                  href="tel:19008899" 
+                  className="flex items-center justify-center gap-2 rounded-xl border border-rose-500 bg-rose-500 py-4 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-rose-600 shadow-sm"
+                >
+                  <Phone size={16} /> Gọi 1900 8899
                 </a>
-                <Link href="/contact" className="flex items-center justify-center gap-2 rounded-xl border border-gray-light py-4 text-center text-xs font-bold uppercase tracking-widest transition-all hover:bg-navy/5">
-                  {content.detail.labels.ctaSurvey}
-                </Link>
+                <button 
+                  onClick={() => setIsChatbotOpen(true)}
+                  className="flex items-center justify-center gap-2 rounded-xl border border-gray-light bg-cream hover:border-brand-green/40 py-4 text-center text-xs font-bold uppercase tracking-widest text-navy transition-all hover:bg-navy/5 shadow-2xs"
+                >
+                  <Sparkles size={16} className="text-brand-green animate-pulse" /> Bot tư vấn
+                </button>
               </div>
             </div>
           </div>
@@ -176,8 +199,10 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`relative whitespace-nowrap pb-4 text-[10px] font-bold uppercase tracking-widest ${
-                    activeTab === tab ? "text-brand-green before:absolute before:bottom-0 before:left-0 before:h-0.5 before:w-full before:bg-brand-green" : "text-navy/50"
+                  className={`relative whitespace-nowrap pb-4 text-xs font-extrabold uppercase tracking-wider transition-colors ${
+                    activeTab === tab 
+                      ? "text-brand-green before:absolute before:bottom-0 before:left-0 before:h-0.5 before:w-full before:bg-brand-green" 
+                      : "text-navy/60 hover:text-brand-green"
                   }`}
                 >
                   {tab === "specs"
@@ -193,16 +218,16 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
               {activeTab === "specs" && (
                 <div className="space-y-4">
                   {Object.entries(product.specs).map(([key, value]) => (
-                    <div key={key} className="flex flex-col justify-between border-b border-gray-light/35 py-4 text-xs sm:flex-row">
-                      <span className="font-bold uppercase tracking-wider text-navy/60">{key}</span>
-                      <span className="mt-1.5 font-bold text-navy sm:mt-0">{value}</span>
+                    <div key={key} className="flex flex-col justify-between border-b border-gray-light/35 py-4 text-sm sm:flex-row">
+                      <span className="font-bold uppercase tracking-wider text-navy/70">{key}</span>
+                      <span className="mt-1.5 font-extrabold text-navy sm:mt-0">{value}</span>
                     </div>
                   ))}
                 </div>
               )}
 
               {activeTab === "install" && (
-                <div className="space-y-4 text-xs font-semibold leading-relaxed text-navy/70">
+                <div className="space-y-4 text-sm font-semibold leading-relaxed text-navy">
                   {content.detail.installDetails.map((detail, index) => (
                     <p key={index}>{detail}</p>
                   ))}
@@ -212,14 +237,14 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
               {activeTab === "warranty" && (
                 <div className="space-y-6">
                   <div className="rounded-2xl bg-cream border border-gray-light p-6">
-                    <h4 className="mb-2 text-sm font-bold text-navy">
+                    <h4 className="mb-3 text-base font-bold text-navy">
                       {content.detail.warrantyDetails.title}
                     </h4>
-                    <p className="text-xs font-semibold leading-relaxed text-navy/70">
+                    <p className="text-sm font-semibold leading-relaxed text-navy mb-2">
                       {content.detail.warrantyDetails.warrantyPeriodPrefix} {product.warrantyText}.
                     </p>
                     {content.detail.warrantyDetails.points.map((point, index) => (
-                      <p key={index} className="text-xs font-semibold leading-relaxed text-navy/70">
+                      <p key={index} className="text-sm font-semibold leading-relaxed text-navy/90">
                         - {point}
                       </p>
                     ))}
