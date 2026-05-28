@@ -21,6 +21,9 @@ import {
   Utensils,
   Wrench,
 } from "lucide-react";
+import { GoGoal } from "react-icons/go";
+import { GiAutoRepair } from "react-icons/gi";
+import { MdOutlineSecurity } from "react-icons/md";
 import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -162,22 +165,22 @@ export default function Home() {
               className="flex flex-wrap items-center gap-y-4 gap-x-6 mb-10 text-sm font-semibold text-navy"
             >
               <div className="flex items-center gap-3 group">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
-                  <Sparkles size={14} strokeWidth={2.2} />
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy/10 text-navy border border-navy/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
+                  <GoGoal size={16} />
                 </div>
                 <span className="tracking-wide">Chọn đúng</span>
               </div>
               <span className="text-navy/25">•</span>
               <div className="flex items-center gap-3 group">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
-                  <Wrench size={14} strokeWidth={2.2} />
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy/10 text-navy border border-navy/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
+                  <GiAutoRepair size={16} />
                 </div>
                 <span className="tracking-wide">Lắp đúng</span>
               </div>
               <span className="text-navy/25">•</span>
               <div className="flex items-center gap-3 group">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
-                  <ShieldCheck size={14} strokeWidth={2.2} />
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy/10 text-navy border border-navy/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
+                  <MdOutlineSecurity size={16} />
                 </div>
                 <span className="tracking-wide">Sử dụng lâu dài</span>
               </div>
