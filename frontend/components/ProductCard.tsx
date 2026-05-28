@@ -9,6 +9,20 @@ import { Product, formatCurrency } from "@/data/products";
 export default function ProductCard({ product }: { product: Product }) {
   const getCategoryLabel = (category: string) => {
     switch (category) {
+      case "dai-sanh":
+        return "Khóa đại sảnh";
+      case "cua-go":
+        return "Khóa cửa gỗ";
+      case "cua-kinh":
+        return "Khóa cửa kính";
+      case "xingfa-sat":
+        return "Khóa nhôm, cửa sắt";
+      case "cua-cong":
+        return "Khóa cửa cổng";
+      case "khach-san":
+        return "Khóa khách sạn";
+      case "lock-parent":
+        return "Khóa thông minh";
       case "Lock":
         return "Khóa thông minh";
       case "Kitchen":
@@ -40,36 +54,31 @@ export default function ProductCard({ product }: { product: Product }) {
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        <div className="absolute left-4 top-4 rounded-full border border-gray-light bg-cream/90 px-3.5 py-1 shadow-sm backdrop-blur-md">
-          <span className="text-[9px] font-bold uppercase tracking-widest text-brand-green">
-            {getCategoryLabel(product.category)}
+        <div className="absolute left-3 top-3 flex h-6 items-center justify-center rounded-full bg-rose-600/95 px-2.5 shadow-lg border border-white/10 backdrop-blur-md transition-transform duration-300 group-hover:scale-110">
+          <span className="text-[10px] font-black tracking-wider text-cream leading-none">
+            -{Math.round(((Math.round((product.price * 1.18) / 100000) * 100000 - product.price) / (Math.round((product.price * 1.18) / 100000) * 100000)) * 100)}%
           </span>
         </div>
       </Link>
-      <div className="flex flex-grow flex-col p-6">
-        <Link href={`/product/${product.id}`} className="flex-grow">
-          <h3 className="mb-1.5 min-h-[3.5rem] font-serif text-lg font-bold leading-tight text-navy transition-colors group-hover:text-brand-green">
+      <div className="flex flex-grow flex-col p-6 text-center">
+        <span className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-brand-green/80">
+          {getCategoryLabel(product.category)}
+        </span>
+        <Link href={`/product/${product.id}`} className="flex-grow flex justify-center">
+          <h3 className="mb-1.5 min-h-[3.5rem] font-serif text-lg font-bold leading-tight text-navy transition-colors group-hover:text-brand-green text-center">
             {product.name}
           </h3>
         </Link>
         <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
           MD: {product.code}
         </p>
-        <div className="mb-5 flex flex-wrap gap-1.5">
-          {product.technologies.slice(0, 2).map((tech) => (
-            <span key={tech} className="rounded-md border border-gray-light bg-neutral px-2.5 py-1 text-[9px] font-medium text-navy/70">
-              {tech}
-            </span>
-          ))}
-        </div>
-        <div className="mt-auto flex items-center justify-between border-t border-gray-light pt-4">
-          <span className="text-sm font-black text-brand-green">{formatCurrency(product.price)}</span>
-          <Link
-            href={`/product/${product.id}`}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral text-navy transition-all hover:bg-brand-green hover:text-white"
-          >
-            <ChevronRight size={18} />
-          </Link>
+        <div className="mt-auto flex flex-col items-center justify-center border-t border-gray-light pt-4 w-full">
+          <span className="text-[11px] font-medium text-zinc-400 line-through">
+            {formatCurrency(Math.round((product.price * 1.18) / 100000) * 100000)}
+          </span>
+          <span className="text-sm font-black text-rose-600 mt-0.5">
+            {formatCurrency(product.price)}
+          </span>
         </div>
       </div>
     </motion.div>

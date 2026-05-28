@@ -18,7 +18,7 @@ function HeaderContent() {
 
   const navLinks = [
     { name: "Trang chủ", path: "/" },
-    { name: "Sản phẩm", path: "/#categories" },
+    { name: "Sản phẩm", path: "/products" },
     { name: "Giải pháp", path: "/#solutions" },
     { name: "Tin tức", path: "/#news" },
     { name: "Liên hệ", path: "/#contact" },
@@ -81,7 +81,7 @@ function HeaderContent() {
 
           <Link
             href="#contact"
-            className="rounded-sm bg-brand-green px-6 py-3 text-xs font-medium uppercase tracking-wider text-white transition-colors hover:bg-lime-dark"
+            className="rounded-full bg-brand-green px-6 py-3 text-xs font-medium uppercase tracking-wider text-white transition-colors hover:bg-lime-dark"
           >
             Tư vấn ngay
           </Link>
