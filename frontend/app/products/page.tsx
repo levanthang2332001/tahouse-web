@@ -3,13 +3,41 @@
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Search } from "lucide-react";
+import { 
+  ChevronDown, 
+  Search, 
+  CookingPot, 
+  LayoutGrid, 
+  Fingerprint, 
+  Vault, 
+  Flame, 
+  Wind, 
+  Droplets, 
+  Droplet, 
+  Microwave, 
+  Sparkles, 
+  Utensils, 
+  Layers, 
+  CornerDownRight, 
+  Database, 
+  Trash2, 
+  MoveHorizontal, 
+  Boxes, 
+  DoorClosed, 
+  Columns, 
+  Shield, 
+  Hotel, 
+  Crown, 
+  Box, 
+  Home, 
+  Briefcase 
+} from "lucide-react";
 import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import SocialFloating from "@/components/SocialFloating";
-import { CATEGORIES, PRODUCTS } from "@/data/products";
+import { CATEGORIES, PRODUCTS, Product } from "@/data/products";
 
 const BRANDS = [
   { id: "kassler", name: "Kassler", logo: <span className="font-sans font-black tracking-wide text-red-600 italic text-[12px] select-none">KASSLER</span> },
@@ -20,14 +48,170 @@ const BRANDS = [
   { id: "philips", name: "Philips", logo: <span className="font-sans font-extrabold tracking-widest text-[#0066a1] text-[10px] select-none">PHILIPS</span> },
 ];
 
+// Define sections and categories structure exactly matching the user's design image
+const SIDEBAR_SECTIONS = [
+  {
+    id: "thiet-bi-bep",
+    title: "THIẾT BỊ BẾP",
+    icon: CookingPot,
+    categoryId: "Kitchen",
+    subcategories: [
+      { id: "bep-tu", name: "Bếp từ", icon: Flame },
+      { id: "may-hut-mui", name: "Máy hút mùi", icon: Wind },
+      { id: "chau-rua", name: "Chậu rửa", icon: Droplets },
+      { id: "voi-rua", name: "Vòi rửa", icon: Droplet },
+      { id: "lo-nuong", name: "Lò nướng", icon: Microwave },
+      { id: "may-rua-chen", name: "Máy rửa chén", icon: Sparkles },
+      { id: "thiet-bi-bep-khac", name: "Thiết bị bếp khác", icon: Utensils },
+    ]
+  },
+  {
+    id: "phu-kien-tu-bep",
+    title: "PHỤ KIỆN TỦ BẾP",
+    icon: LayoutGrid,
+    categoryId: "Cabinet",
+    subcategories: [
+      { id: "gia-bat-nang-ha", name: "Giá bát nâng hạ", icon: Layers },
+      { id: "ke-goc-lien-hoan", name: "Kệ góc liên hoàn", icon: CornerDownRight },
+      { id: "thung-gao", name: "Thùng gạo", icon: Database },
+      { id: "thung-rac-am-tu", name: "Thùng rác âm tủ", icon: Trash2 },
+      { id: "ray-truot", name: "Ray trượt", icon: MoveHorizontal },
+      { id: "phu-kien-khac", name: "Phụ kiện khác", icon: Boxes },
+    ]
+  },
+  {
+    id: "khoa-dien-tu",
+    title: "KHÓA ĐIỆN TỬ",
+    icon: Fingerprint,
+    categoryId: "lock-parent",
+    subcategories: [
+      { id: "cua-go", name: "Khóa cửa gỗ", icon: DoorClosed },
+      { id: "xingfa-sat", name: "Khóa nhôm kính", icon: Columns },
+      { id: "cua-cong", name: "Khóa cửa cổng", icon: Shield },
+      { id: "khach-san", name: "Khóa khách sạn", icon: Hotel },
+      { id: "dai-sanh", name: "Khóa đại sảnh", icon: Crown },
+    ]
+  },
+  {
+    id: "ket-sat-thong-minh",
+    title: "KẾT SẮT THÔNG MINH",
+    icon: Vault,
+    categoryId: "Smart",
+    subcategories: [
+      { id: "ket-mini", name: "Két mini", icon: Box },
+      { id: "ket-gia-dinh", name: "Két gia đình", icon: Home },
+      { id: "ket-van-phong", name: "Két văn phòng", icon: Briefcase },
+    ]
+  }
+];
+
+// Smart subcategory matching helper for existing products
+const matchesSubcategory = (product: Product, subcatId: string) => {
+  const name = product.name.toLowerCase();
+  
+  switch (subcatId) {
+    // THIẾT BỊ BẾP (category: Kitchen or Water)
+    case "bep-tu":
+      return product.category === "Kitchen" && name.includes("bếp từ");
+    case "may-hut-mui":
+      return product.category === "Kitchen" && name.includes("hút mùi");
+    case "chau-rua":
+      return product.category === "Kitchen" && name.includes("chậu rửa");
+    case "voi-rua":
+      return product.category === "Kitchen" && name.includes("vòi rửa");
+    case "lo-nuong":
+      return product.category === "Kitchen" && name.includes("lò nướng");
+    case "may-rua-chen":
+      return product.category === "Kitchen" && name.includes("rửa chén");
+    case "thiet-bi-bep-khac":
+      return (product.category === "Kitchen" || product.category === "Water") && 
+        !name.includes("bếp từ") && 
+        !name.includes("hút mùi") && 
+        !name.includes("chậu rửa") && 
+        !name.includes("vòi rửa") && 
+        !name.includes("lò nướng") && 
+        !name.includes("rửa chén");
+
+    // PHỤ KIỆN TỦ BẾP (category: Cabinet)
+    case "gia-bat-nang-ha":
+      return product.category === "Cabinet" && (name.includes("giá bát") || name.includes("nâng hạ"));
+    case "ke-goc-lien-hoan":
+      return product.category === "Cabinet" && name.includes("góc");
+    case "thung-gao":
+      return product.category === "Cabinet" && name.includes("gạo");
+    case "thung-rac-am-tu":
+      return product.category === "Cabinet" && name.includes("rác");
+    case "ray-truot":
+      return product.category === "Cabinet" && name.includes("ray");
+    case "phu-kien-khac":
+      return product.category === "Cabinet" && 
+        !name.includes("giá bát") && !name.includes("nâng hạ") &&
+        !name.includes("góc") && 
+        !name.includes("gạo") && 
+        !name.includes("rác") && 
+        !name.includes("ray");
+
+    // KHÓA ĐIỆN TỬ
+    case "cua-go":
+      return product.category === "cua-go";
+    case "xingfa-sat":
+      return product.category === "xingfa-sat" || product.category === "cua-kinh";
+    case "cua-cong":
+      return product.category === "cua-cong";
+    case "khach-san":
+      return product.category === "khach-san";
+    case "dai-sanh":
+      return product.category === "dai-sanh";
+
+    // KẾT SẮT THÔNG MINH
+    case "ket-mini":
+      return product.category === "Smart" && name.includes("mini");
+    case "ket-gia-dinh":
+      return product.category === "Smart" && name.includes("gia đình");
+    case "ket-van-phong":
+      return product.category === "Smart" && name.includes("văn phòng");
+    
+    default:
+      return false;
+  }
+};
+
 function ProductListContent() {
   const searchParams = useSearchParams();
   const catParam = searchParams.get("cat") || "all";
   const qParam = searchParams.get("q") || "";
   const [filter, setFilter] = useState(catParam);
   const [search, setSearch] = useState(qParam);
-  const [isLockExpanded, setIsLockExpanded] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState("all");
+  const [sortBy, setSortBy] = useState<"newest" | "price-asc" | "price-desc">("newest");
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+
+  // Dual-range price filter states
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(40000000);
+  const [tempMinPrice, setTempMinPrice] = useState(0);
+  const [tempMaxPrice, setTempMaxPrice] = useState(40000000);
+  const [isPriceDropdownOpen, setIsPriceDropdownOpen] = useState(false);
+
+  // Keep track of which accordion section is expanded
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    "thiet-bi-bep": true,
+    "phu-kien-tu-bep": false,
+    "khoa-dien-tu": true,
+    "ket-sat-thong-minh": false,
+  });
+
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }));
+  };
+
+  const handleSubcategoryClick = (subcatId: string) => {
+    setFilter(subcatId);
+    setSelectedBrand("all");
+  };
 
   useEffect(() => {
     setFilter(catParam);
@@ -40,11 +224,25 @@ function ProductListContent() {
   const filteredProducts = useMemo(
     () => {
       const lockSubcategories = ["dai-sanh", "cua-go", "cua-kinh", "xingfa-sat", "cua-cong", "khach-san"];
-      return PRODUCTS.filter((product) => {
-        const matchesFilter =
-          filter === "all" ||
-          (filter === "lock-parent" && (lockSubcategories.includes(product.category) || product.category === "Lock")) ||
-          product.category === filter;
+      const filtered = PRODUCTS.filter((product) => {
+        // Base category filtering with our smart mapping support
+        let matchesFilter = false;
+
+        if (filter === "all") {
+          matchesFilter = true;
+        } else if (filter === "Kitchen") {
+          matchesFilter = product.category === "Kitchen";
+        } else if (filter === "Cabinet") {
+          matchesFilter = product.category === "Cabinet";
+        } else if (filter === "lock-parent" || filter === "Lock") {
+          matchesFilter = lockSubcategories.includes(product.category) || product.category === "Lock";
+        } else if (filter === "Smart") {
+          matchesFilter = product.category === "Smart";
+        } else {
+          // If filtering by specific subcategory ID
+          matchesFilter = matchesSubcategory(product, filter);
+        }
+
         const term = search.toLowerCase();
         const matchesSearch =
           product.name.toLowerCase().includes(term) ||
@@ -65,25 +263,23 @@ function ProductListContent() {
           )) ||
           (selectedBrand === "philips" && (product.code.toLowerCase().includes("philips") || product.name.toLowerCase().includes("philips")));
 
-        return matchesFilter && matchesSearch && matchesBrand;
+        const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
+
+        return matchesFilter && matchesSearch && matchesBrand && matchesPrice;
       });
+
+      if (sortBy === "price-asc") {
+        return [...filtered].sort((a, b) => a.price - b.price);
+      } else if (sortBy === "price-desc") {
+        return [...filtered].sort((a, b) => b.price - a.price);
+      }
+      return filtered;
     },
-    [filter, search, selectedBrand],
+    [filter, search, selectedBrand, minPrice, maxPrice, sortBy],
   );
 
-  const getCategoryCount = (catId: string) => {
-    if (catId === "all") {
-      return PRODUCTS.length;
-    }
-    if (catId === "lock-parent") {
-      const lockSubcategories = ["dai-sanh", "cua-go", "cua-kinh", "xingfa-sat", "cua-cong", "khach-san"];
-      return PRODUCTS.filter((product) => lockSubcategories.includes(product.category) || product.category === "Lock").length;
-    }
-    return PRODUCTS.filter((product) => product.category === catId).length;
-  };
-
   return (
-    <div className="min-h-screen bg-neutral pb-24 pt-20">
+    <div className="min-h-screen bg-neutral pb-24 pt-10">
       <div className="mx-auto max-w-[1600px] px-6 lg:px-12">
         <div className="mb-10 space-y-4">
           <div className="inline-flex items-center gap-2">
@@ -92,9 +288,9 @@ function ProductListContent() {
               BỘ SƯU TẬP TA HOUSE
             </span>
           </div>
-          <h1 className="font-serif text-3xl font-light leading-snug text-navy md:text-5xl">
+          <h1 className="font-serif text-3xl font-semibold leading-snug text-navy md:text-5xl">
             Khám phá hệ sinh thái <br />
-            <span className="font-semibold italic text-brand-green">thiết bị & khóa thông minh</span>
+            <span className="font-bold italic text-brand-green">thiết bị & khóa thông minh</span>
           </h1>
           <div className="flex flex-col items-stretch justify-between gap-6 pt-4 xl:flex-row xl:items-center">
             <div className="relative w-full shrink-0 md:max-w-md">
@@ -152,181 +348,163 @@ function ProductListContent() {
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
           {/* Left Sidebar Panel */}
           <aside className="w-full shrink-0 lg:w-80 lg:sticky lg:top-28">
-            {/* Desktop Vertical Categories with Hierarchy */}
-            <div className="hidden rounded-2xl border border-gray-light/60 bg-cream p-6 shadow-sm lg:block">
-              <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-navy/40">
-                DANH MỤC THIẾT BỊ
-              </h2>
-              <div className="flex flex-col gap-2.5">
+            {/* Desktop Vertical Categories with Hierarchy (Unified Card) */}
+            <div className="hidden lg:block border border-gray-light/35 rounded-3xl bg-white overflow-hidden divide-y divide-gray-light/35 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+              {/* 1. Tất cả sản phẩm Row */}
+              <button
+                onClick={() => {
+                  setFilter("all");
+                  setSelectedBrand("all");
+                }}
+                className={`flex w-full items-center justify-between px-4 py-4 text-left transition-colors cursor-pointer select-none ${
+                  filter === "all"
+                    ? "bg-brand-green/[0.02] text-brand-green font-bold"
+                    : "hover:bg-neutral/20 text-navy"
+                }`}
+              >
+                <span className="flex items-center gap-3">
+                  <Search className="text-brand-green shrink-0" size={18} />
+                  <span className={`text-[11px] font-extrabold tracking-wider uppercase transition-colors ${
+                    filter === "all" ? "text-brand-green" : "text-navy"
+                  }`}>
+                    Tất cả sản phẩm
+                  </span>
+                </span>
+                <span
+                  className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${
+                    filter === "all"
+                      ? "bg-brand-green text-white"
+                      : "bg-neutral text-navy/40"
+                  }`}
+                >
+                  {PRODUCTS.length}
+                </span>
+              </button>
+
+              {/* 2. Accordions */}
+              {SIDEBAR_SECTIONS.map((section) => {
+                const SectionIcon = section.icon;
+                const isExpanded = expandedSections[section.id];
+                const isParentActive = filter === section.categoryId || 
+                  section.subcategories.some(sub => filter === sub.id);
+                
+                return (
+                  <div key={section.id} className="flex flex-col">
+                    {/* Accordion Header */}
+                    <button
+                      onClick={() => {
+                        toggleSection(section.id);
+                        setFilter(section.categoryId);
+                        setSelectedBrand("all");
+                      }}
+                      className={`flex w-full items-center justify-between px-4 py-4 text-left transition-colors cursor-pointer select-none ${
+                        isParentActive ? "bg-brand-green/[0.02]" : "hover:bg-neutral/20"
+                      }`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <SectionIcon className="text-brand-green shrink-0" size={18} />
+                        <span className={`text-[11px] font-extrabold tracking-wider text-navy uppercase transition-colors ${
+                          isParentActive ? "text-brand-green" : "text-navy"
+                        }`}>
+                          {section.title}
+                        </span>
+                      </span>
+                      <ChevronDown
+                        size={15}
+                        className={`text-navy/45 transition-transform duration-300 ${
+                          isExpanded ? "rotate-180" : "rotate-0"
+                        }`}
+                      />
+                    </button>
+
+                    {/* Accordion Content */}
+                    <AnimatePresence initial={false}>
+                      {isExpanded && (
+                        <motion.div
+                          initial="collapsed"
+                          animate="open"
+                          exit="collapsed"
+                          variants={{
+                            open: { opacity: 1, height: "auto" },
+                            collapsed: { opacity: 0, height: 0 }
+                          }}
+                          transition={{ duration: 0.25, ease: [0.04, 0.62, 0.23, 0.98] }}
+                          className="overflow-hidden bg-cream/35 border-t border-gray-light/20"
+                        >
+                          <div className="p-2 flex flex-col gap-1">
+                            {section.subcategories.map((sub) => {
+                              const SubIcon = sub.icon;
+                              const isActive = filter === sub.id;
+                              
+                              return (
+                                <button
+                                  key={sub.id}
+                                  onClick={() => handleSubcategoryClick(sub.id)}
+                                  className={`group flex w-full items-center gap-3 rounded-xl px-4.5 py-3 text-left transition-all duration-200 cursor-pointer ${
+                                    isActive
+                                      ? "bg-brand-green/10 text-brand-green font-bold shadow-xs"
+                                      : "text-navy/75 hover:bg-neutral/40 hover:text-brand-green font-medium"
+                                  }`}
+                                >
+                                  <SubIcon className="text-brand-green shrink-0" size={14} />
+                                  <span className="text-[13px] tracking-wide truncate">{sub.name}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Mobile Horizontal Scrollable Categories with Matching Icons */}
+            <div className="lg:hidden w-full overflow-hidden mb-4">
+              <div className="invisible-scrollbar flex gap-2.5 overflow-x-auto pb-3 p-1">
                 {/* 1. All Products */}
                 <button
                   onClick={() => {
                     setFilter("all");
                     setSelectedBrand("all");
                   }}
-                  className={`group flex items-center justify-between rounded-xl px-5 py-3.5 text-left text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
+                  className={`flex items-center gap-2 whitespace-nowrap rounded-2xl px-5 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 border cursor-pointer ${
                     filter === "all"
-                      ? "bg-brand-green text-white shadow-md shadow-brand-green/20"
-                      : "text-navy/70 hover:bg-neutral hover:text-brand-green"
+                      ? "bg-brand-green text-white border-brand-green shadow-md shadow-brand-green/20"
+                      : "bg-white border-gray-light/50 text-navy/70"
                   }`}
                 >
-                  <span>Tất cả sản phẩm</span>
-                  <span
-                    className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${
-                      filter === "all"
-                        ? "bg-white/20 text-white"
-                        : "bg-neutral text-navy/40 group-hover:bg-brand-green/10 group-hover:text-brand-green"
-                    }`}
-                  >
-                    {getCategoryCount("all")}
-                  </span>
+                  <Search size={14} className={filter === "all" ? "text-white" : "text-brand-green"} />
+                  <span>Tất cả</span>
                 </button>
 
-                {/* 2. Parent Category: Khóa thông minh */}
-                <div className="mt-2 space-y-1.5">
-                  <button
-                    onClick={() => {
-                      setFilter("lock-parent");
-                      setIsLockExpanded(!isLockExpanded);
-                      setSelectedBrand("all");
-                    }}
-                    className={`group flex w-full items-center justify-between rounded-xl px-5 py-3.5 text-left text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
-                      filter === "lock-parent"
-                        ? "bg-brand-green text-white shadow-md shadow-brand-green/20"
-                        : "text-navy hover:bg-neutral hover:text-brand-green"
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <span>Khóa thông minh</span>
-                      <ChevronDown
-                        size={16}
-                        className={`transition-transform duration-300 ${
-                          isLockExpanded ? "rotate-0" : "-rotate-90"
-                        }`}
-                      />
-                    </span>
-                    <span
-                      className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${
-                        filter === "lock-parent"
-                          ? "bg-white/20 text-white"
-                          : "bg-brand-green/10 text-brand-green group-hover:bg-brand-green/10 group-hover:text-brand-green"
-                      }`}
-                    >
-                      {getCategoryCount("lock-parent")}
-                    </span>
-                  </button>
-
-                  {/* Nested Lock Subcategories (Children) */}
-                  <AnimatePresence initial={false}>
-                    {isLockExpanded && (
-                      <motion.div
-                        initial="collapsed"
-                        animate="open"
-                        exit="collapsed"
-                        variants={{
-                          open: { opacity: 1, height: "auto" },
-                          collapsed: { opacity: 0, height: 0 }
-                        }}
-                        transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
-                        className="overflow-hidden ml-6 border-l border-gray-light pl-4 flex flex-col gap-1.5 pt-1.5"
-                      >
-                        {CATEGORIES.filter((category) => 
-                          category.id !== "all" && 
-                          category.id !== "lock-parent" && 
-                          category.id !== "Kitchen" && 
-                          category.id !== "Water" && 
-                          category.id !== "Cabinet" && 
-                          category.id !== "Smart"
-                        ).map((category) => {
-                          const isActive = filter === category.id;
-                          return (
-                            <button
-                          key={category.id}
-                          onClick={() => {
-                            setFilter(category.id);
-                            setSelectedBrand("all");
-                          }}
-                          className={`group flex items-center justify-between rounded-lg px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
-                            isActive
-                              ? "bg-brand-green/10 text-brand-green"
-                              : "text-navy/60 hover:text-brand-green"
-                          }`}
-                        >
-                              <span className="truncate pr-1">{category.name}</span>
-                              <span
-                                className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                                  isActive
-                                    ? "bg-brand-green text-white"
-                                    : "bg-neutral text-navy/30 group-hover:bg-brand-green/10 group-hover:text-brand-green"
-                                }`}
-                              >
-                                {getCategoryCount(category.id)}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* 3. Other Categories (Kitchen, Water, Cabinet, Smart) */}
-                {CATEGORIES.filter((category) => 
-                  category.id === "Kitchen" || 
-                  category.id === "Water" || 
-                  category.id === "Cabinet" || 
-                  category.id === "Smart"
-                ).map((category) => {
-                  const isActive = filter === category.id;
+                {/* 2. Main Sections */}
+                {SIDEBAR_SECTIONS.map((section) => {
+                  const SectionIcon = section.icon;
+                  const isActive = filter === section.categoryId || 
+                    section.subcategories.some(sub => filter === sub.id);
+                  
                   return (
                     <button
-                      key={category.id}
+                      key={section.id}
                       onClick={() => {
-                        setFilter(category.id);
+                        setFilter(section.categoryId);
                         setSelectedBrand("all");
+                        // Expand this section in desktop in case they resize
+                        setExpandedSections(prev => ({
+                          ...prev,
+                          [section.id]: true
+                        }));
                       }}
-                      className={`group flex items-center justify-between rounded-xl px-5 py-3.5 text-left text-sm font-bold uppercase tracking-wider transition-all duration-300 ${
+                      className={`flex items-center gap-2 whitespace-nowrap rounded-2xl px-5 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 border cursor-pointer ${
                         isActive
-                          ? "bg-brand-green text-white shadow-md shadow-brand-green/20"
-                          : "text-navy/70 hover:bg-neutral hover:text-brand-green"
+                          ? "bg-brand-green text-white border-brand-green shadow-md shadow-brand-green/20"
+                          : "bg-white border-gray-light/50 text-navy/70"
                       }`}
                     >
-                      <span>{category.name}</span>
-                      <span
-                        className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full ${
-                          isActive
-                            ? "bg-white/20 text-white"
-                            : "bg-neutral text-navy/40 group-hover:bg-brand-green/10 group-hover:text-brand-green"
-                        }`}
-                      >
-                        {getCategoryCount(category.id)}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Mobile Horizontal Scrollable Categories */}
-            <div className="lg:hidden w-full overflow-hidden mb-2">
-              <div className="invisible-scrollbar flex gap-2 overflow-x-auto pb-2 p-1">
-                {CATEGORIES.map((category) => {
-                  const isActive = filter === category.id;
-                  const displayLabel = category.id === "lock-parent" ? "Khóa thông minh (Tất cả)" : category.name;
-                  return (
-                    <button
-                      key={category.id}
-                      onClick={() => {
-                        setFilter(category.id);
-                        setSelectedBrand("all");
-                      }}
-                      className={`whitespace-nowrap rounded-xl px-4.5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
-                        isActive
-                          ? "bg-brand-green text-white shadow-md shadow-brand-green/20"
-                          : "bg-cream border border-gray-light text-navy/60 hover:text-brand-green"
-                      }`}
-                    >
-                      {displayLabel} ({getCategoryCount(category.id)})
+                      <SectionIcon size={14} className={isActive ? "text-white" : "text-brand-green"} />
+                      <span>{section.title}</span>
                     </button>
                   );
                 })}
@@ -336,7 +514,235 @@ function ProductListContent() {
 
           {/* Right Product Grid */}
           <div className="flex-1">
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {/* Grid Header with Counts and Dropdowns */}
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="text-[13px] font-semibold text-navy/75 leading-none">
+                {filteredProducts.length > 0 ? (
+                  <>
+                    Hiển thị <span className="text-navy font-extrabold">1–{filteredProducts.length}</span> trong <span className="text-navy font-extrabold">{filteredProducts.length}</span> sản phẩm
+                  </>
+                ) : (
+                  "Hiển thị 0 trong 0 sản phẩm"
+                )}
+              </div>
+
+              {/* Dropdown Filters matching the screenshot */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* 1. Khoảng giá slider dropdown button */}
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      if (!isPriceDropdownOpen) {
+                        setTempMinPrice(minPrice);
+                        setTempMaxPrice(maxPrice);
+                      }
+                      setIsPriceDropdownOpen(!isPriceDropdownOpen);
+                    }}
+                    className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-bold transition-all duration-300 shadow-xs cursor-pointer select-none ${
+                      isPriceDropdownOpen || minPrice > 0 || maxPrice < 40000000
+                        ? "border-brand-green text-brand-green bg-brand-green/5"
+                        : "border-gray-light/60 bg-white text-navy/80 hover:text-brand-green hover:border-brand-green/30"
+                    }`}
+                  >
+                    <span>
+                      {minPrice === 0 && maxPrice === 40000000
+                        ? "Khoảng giá"
+                        : `Giá: ${(minPrice / 1000000).toFixed(0)}tr – ${(maxPrice / 1000000).toFixed(0)}tr`}
+                    </span>
+                    <ChevronDown size={13} className={`mt-0.5 shrink-0 transition-transform duration-200 ${
+                      isPriceDropdownOpen ? "rotate-180 text-brand-green" : "text-navy/40"
+                    }`} />
+                  </button>
+
+                  <AnimatePresence>
+                    {isPriceDropdownOpen && (
+                      <>
+                        {/* Invisible overlay backdrop for outside click close */}
+                        <div className="fixed inset-0 z-40 cursor-default" onClick={() => setIsPriceDropdownOpen(false)} />
+                        
+                        {/* Dropdown content */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 8 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute right-0 sm:left-0 top-full mt-2 z-50 w-72 rounded-2xl border border-gray-light/80 bg-white p-4.5 shadow-lg flex flex-col"
+                        >
+                          <span className="text-[11px] font-bold text-navy/50 uppercase tracking-widest mb-3">
+                            Chọn khoảng giá
+                          </span>
+
+                          {/* Live Min Max Price Labels */}
+                          <div className="flex items-center justify-between text-xs text-navy/80 font-bold mb-3 bg-neutral/35 p-2 rounded-xl border border-gray-light/20">
+                            <div>
+                              <span className="text-navy/45 font-medium block text-[9px] uppercase tracking-wider">Từ:</span>
+                              <span className="text-[13px]">{tempMinPrice.toLocaleString("vi-VN")}đ</span>
+                            </div>
+                            <div className="h-4 w-px bg-gray-light" />
+                            <div className="text-right">
+                              <span className="text-navy/45 font-medium block text-[9px] uppercase tracking-wider">Đến:</span>
+                              <span className="text-[13px]">{tempMaxPrice.toLocaleString("vi-VN")}đ</span>
+                            </div>
+                          </div>
+
+                          {/* Double-Range Slider Bar Component */}
+                          <div className="range-slider-container relative w-full h-8 flex items-center mt-2.5">
+                            {/* Track bar background */}
+                            <div className="absolute w-full h-1.5 bg-neutral rounded-full pointer-events-none" />
+                            
+                            {/* Highlighting active slider track bar */}
+                            <div 
+                              className="absolute h-1.5 bg-brand-green rounded-full pointer-events-none"
+                              style={{
+                                left: `${(tempMinPrice / 40000000) * 100}%`,
+                                right: `${100 - (tempMaxPrice / 40000000) * 100}%`
+                              }}
+                            />
+
+                            {/* Dual Inputs */}
+                            <input 
+                              type="range"
+                              min={0}
+                              max={40000000}
+                              step={500000}
+                              value={tempMinPrice}
+                              onChange={(e) => {
+                                const val = Math.min(Number(e.target.value), tempMaxPrice - 1000000);
+                                setTempMinPrice(val);
+                              }}
+                              className="absolute pointer-events-none appearance-none w-full h-1.5 bg-transparent outline-none z-20"
+                            />
+                            
+                            <input 
+                              type="range"
+                              min={0}
+                              max={40000000}
+                              step={500000}
+                              value={tempMaxPrice}
+                              onChange={(e) => {
+                                const val = Math.max(Number(e.target.value), tempMinPrice + 1000000);
+                                setTempMaxPrice(val);
+                              }}
+                              className="absolute pointer-events-none appearance-none w-full h-1.5 bg-transparent outline-none z-20"
+                            />
+                          </div>
+
+                          <div className="text-[10px] text-navy/40 italic text-center mt-1 select-none">
+                            Kéo hai nút tròn để lọc theo khoảng giá
+                          </div>
+
+                          {/* Reset and Apply Buttons */}
+                          <div className="flex items-center gap-2 mt-4.5 pt-3 border-t border-gray-light/35">
+                            <button
+                              onClick={() => {
+                                setTempMinPrice(0);
+                                setTempMaxPrice(40000000);
+                                setMinPrice(0);
+                                setMaxPrice(40000000);
+                              }}
+                              className="flex-1 rounded-xl border border-gray-light bg-neutral/35 py-2 text-center text-xs font-bold text-navy hover:bg-neutral/70 transition-all cursor-pointer"
+                            >
+                              Thiết lập lại
+                            </button>
+                            <button
+                              onClick={() => {
+                                setMinPrice(tempMinPrice);
+                                setMaxPrice(tempMaxPrice);
+                                setIsPriceDropdownOpen(false);
+                              }}
+                              className="flex-1 rounded-xl bg-brand-green py-2 text-center text-xs font-bold text-white hover:bg-lime-dark shadow-xs transition-all cursor-pointer"
+                            >
+                              Áp dụng
+                            </button>
+                          </div>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* 2. Sắp xếp dropdown button */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                    className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-bold transition-all duration-300 shadow-xs cursor-pointer select-none ${
+                      isSortDropdownOpen || sortBy !== "newest"
+                        ? "border-brand-green text-brand-green bg-brand-green/5"
+                        : "border-gray-light/60 bg-white text-navy/80 hover:text-brand-green hover:border-brand-green/30"
+                    }`}
+                  >
+                    <span>
+                      {sortBy === "newest" && "Sắp xếp: Mới nhất"}
+                      {sortBy === "price-asc" && "Giá từ thấp tới cao"}
+                      {sortBy === "price-desc" && "Giá từ cao tới thấp"}
+                    </span>
+                    <ChevronDown size={13} className={`mt-0.5 shrink-0 transition-transform duration-200 ${
+                      isSortDropdownOpen ? "rotate-180 text-brand-green" : "text-navy/40"
+                    }`} />
+                  </button>
+
+                  <AnimatePresence>
+                    {isSortDropdownOpen && (
+                      <>
+                        {/* Invisible overlay backdrop for outside click close */}
+                        <div className="fixed inset-0 z-40 cursor-default" onClick={() => setIsSortDropdownOpen(false)} />
+                        
+                        {/* Dropdown content */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 8 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute right-0 top-full mt-2 z-50 w-56 rounded-2xl border border-gray-light/80 bg-white p-2 shadow-lg flex flex-col gap-1"
+                        >
+                          <button
+                            onClick={() => {
+                              setSortBy("newest");
+                              setIsSortDropdownOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                              sortBy === "newest"
+                                ? "bg-brand-green/10 text-brand-green"
+                                : "text-navy/85 hover:bg-neutral hover:text-brand-green"
+                            }`}
+                          >
+                            Mới nhất
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSortBy("price-asc");
+                              setIsSortDropdownOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                              sortBy === "price-asc"
+                                ? "bg-brand-green/10 text-brand-green"
+                                : "text-navy/85 hover:bg-neutral hover:text-brand-green"
+                            }`}
+                          >
+                            Giá từ thấp tới cao
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSortBy("price-desc");
+                              setIsSortDropdownOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                              sortBy === "price-desc"
+                                ? "bg-brand-green/10 text-brand-green"
+                                : "text-navy/85 hover:bg-neutral hover:text-brand-green"
+                            }`}
+                          >
+                            Giá từ cao tới thấp
+                          </button>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
               <AnimatePresence mode="popLayout">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
