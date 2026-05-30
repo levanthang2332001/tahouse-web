@@ -157,7 +157,7 @@ export default function Home() {
               <img 
                 src="/logoTAtitle1.svg" 
                 alt="TA HOUSE" 
-                className="inline-block h-3.5 md:h-[15px] w-auto align-middle mr-1 relative top-[2px]" 
+                className="inline-block h-3.5 md:h-[15px] w-auto align-middle mr-1 relative top-1px]" 
               />{" "}
               chuyên tư vấn giải pháp thiết bị bếp, phụ kiện tủ bếp và khóa điện tử phù hợp với nhu cầu sử dụng thực tế.
             </motion.p>
