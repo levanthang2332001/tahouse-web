@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { 
@@ -37,7 +37,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import SocialFloating from "@/components/SocialFloating";
-import { CATEGORIES, PRODUCTS, Product } from "@/data/products";
+import { PRODUCTS, Product } from "@/data/products";
 
 const BRANDS = [
   { id: "kassler", name: "Kassler", logo: <span className="font-sans font-black tracking-wide text-red-600 italic text-[12px] select-none">KASSLER</span> },
@@ -50,6 +50,30 @@ const BRANDS = [
 
 // Define sections and categories structure exactly matching the user's design image
 const SIDEBAR_SECTIONS = [
+  {
+    id: "khoa-dien-tu",
+    title: "KHÓA ĐIỆN TỬ",
+    icon: Fingerprint,
+    categoryId: "lock-parent",
+    subcategories: [
+      { id: "cua-go", name: "Khóa cửa gỗ", icon: DoorClosed },
+      { id: "xingfa-sat", name: "Khóa nhôm kính", icon: Columns },
+      { id: "cua-cong", name: "Khóa cửa cổng", icon: Shield },
+      { id: "khach-san", name: "Khóa khách sạn", icon: Hotel },
+      { id: "dai-sanh", name: "Khóa đại sảnh", icon: Crown },
+    ]
+  },
+  {
+    id: "ket-sat-thong-minh",
+    title: "KẾT SẮT THÔNG MINH",
+    icon: Vault,
+    categoryId: "Smart",
+    subcategories: [
+      { id: "ket-mini", name: "Két mini", icon: Box },
+      { id: "ket-gia-dinh", name: "Két gia đình", icon: Home },
+      { id: "ket-van-phong", name: "Két văn phòng", icon: Briefcase },
+    ]
+  },
   {
     id: "thiet-bi-bep",
     title: "THIẾT BỊ BẾP",
@@ -80,27 +104,15 @@ const SIDEBAR_SECTIONS = [
     ]
   },
   {
-    id: "khoa-dien-tu",
-    title: "KHÓA ĐIỆN TỬ",
-    icon: Fingerprint,
-    categoryId: "lock-parent",
+    id: "loc-nuoc",
+    title: "LỌC NƯỚC",
+    icon: Droplets,
+    categoryId: "Water",
     subcategories: [
-      { id: "cua-go", name: "Khóa cửa gỗ", icon: DoorClosed },
-      { id: "xingfa-sat", name: "Khóa nhôm kính", icon: Columns },
-      { id: "cua-cong", name: "Khóa cửa cổng", icon: Shield },
-      { id: "khach-san", name: "Khóa khách sạn", icon: Hotel },
-      { id: "dai-sanh", name: "Khóa đại sảnh", icon: Crown },
-    ]
-  },
-  {
-    id: "ket-sat-thong-minh",
-    title: "KẾT SẮT THÔNG MINH",
-    icon: Vault,
-    categoryId: "Smart",
-    subcategories: [
-      { id: "ket-mini", name: "Két mini", icon: Box },
-      { id: "ket-gia-dinh", name: "Két gia đình", icon: Home },
-      { id: "ket-van-phong", name: "Két văn phòng", icon: Briefcase },
+      { id: "may-loc-nuoc-ro", name: "Máy lọc nước R.O", icon: Sparkles },
+      { id: "may-loc-nuoc-ion-kiem", name: "Máy lọc nước ion kiềm", icon: Droplet },
+      { id: "loc-tong-sinh-hoat", name: "Hệ thống lọc tổng", icon: Database },
+      { id: "loi-loc-phu-kien", name: "Lõi lọc & Phụ kiện", icon: Boxes },
     ]
   }
 ];
@@ -110,7 +122,7 @@ const matchesSubcategory = (product: Product, subcatId: string) => {
   const name = product.name.toLowerCase();
   
   switch (subcatId) {
-    // THIẾT BỊ BẾP (category: Kitchen or Water)
+    // THIẾT BỊ BẾP (category: Kitchen)
     case "bep-tu":
       return product.category === "Kitchen" && name.includes("bếp từ");
     case "may-hut-mui":
@@ -124,7 +136,7 @@ const matchesSubcategory = (product: Product, subcatId: string) => {
     case "may-rua-chen":
       return product.category === "Kitchen" && name.includes("rửa chén");
     case "thiet-bi-bep-khac":
-      return (product.category === "Kitchen" || product.category === "Water") && 
+      return product.category === "Kitchen" && 
         !name.includes("bếp từ") && 
         !name.includes("hút mùi") && 
         !name.includes("chậu rửa") && 
@@ -170,6 +182,16 @@ const matchesSubcategory = (product: Product, subcatId: string) => {
       return product.category === "Smart" && name.includes("gia đình");
     case "ket-van-phong":
       return product.category === "Smart" && name.includes("văn phòng");
+
+    // LỌC NƯỚC (category: Water)
+    case "may-loc-nuoc-ro":
+      return product.category === "Water" && (name.includes("ro") || name.includes("r.o") || name.includes("smith") || name.includes("lọc nước"));
+    case "may-loc-nuoc-ion-kiem":
+      return product.category === "Water" && (name.includes("kiềm") || name.includes("ion"));
+    case "loc-tong-sinh-hoat":
+      return product.category === "Water" && name.includes("tổng");
+    case "loi-loc-phu-kien":
+      return product.category === "Water" && (name.includes("lõi") || name.includes("phụ kiện"));
     
     default:
       return false;
@@ -180,8 +202,21 @@ function ProductListContent() {
   const searchParams = useSearchParams();
   const catParam = searchParams.get("cat") || "all";
   const qParam = searchParams.get("q") || "";
+
+  const [prevCatParam, setPrevCatParam] = useState(catParam);
+  const [prevQParam, setPrevQParam] = useState(qParam);
   const [filter, setFilter] = useState(catParam);
   const [search, setSearch] = useState(qParam);
+
+  if (catParam !== prevCatParam) {
+    setPrevCatParam(catParam);
+    setFilter(catParam);
+  }
+  if (qParam !== prevQParam) {
+    setPrevQParam(qParam);
+    setSearch(qParam);
+  }
+
   const [selectedBrand, setSelectedBrand] = useState("all");
   const [sortBy, setSortBy] = useState<"newest" | "price-asc" | "price-desc">("newest");
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
@@ -195,10 +230,11 @@ function ProductListContent() {
 
   // Keep track of which accordion section is expanded
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    "thiet-bi-bep": true,
-    "phu-kien-tu-bep": false,
     "khoa-dien-tu": true,
     "ket-sat-thong-minh": false,
+    "thiet-bi-bep": true,
+    "phu-kien-tu-bep": false,
+    "loc-nuoc": false,
   });
 
   const toggleSection = (sectionId: string) => {
@@ -213,13 +249,54 @@ function ProductListContent() {
     setSelectedBrand("all");
   };
 
-  useEffect(() => {
-    setFilter(catParam);
-  }, [catParam]);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSearch(qParam);
-  }, [qParam]);
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    let animationFrameId: number;
+    let targetScrollTop = panel.scrollTop;
+    let currentScrollTop = panel.scrollTop;
+    const speed = 0.14; // Smooth scrolling speed factor (higher is faster/snappier)
+
+    const handleWheel = (e: WheelEvent) => {
+      const maxScroll = panel.scrollHeight - panel.clientHeight;
+      if (maxScroll <= 0) return;
+
+      const isScrollingUp = e.deltaY < 0;
+      const isScrollingDown = e.deltaY > 0;
+
+      // Allow native page scrolling if we are at top/bottom limits
+      if ((isScrollingUp && panel.scrollTop === 0) || (isScrollingDown && Math.ceil(panel.scrollTop) >= maxScroll)) {
+        return;
+      }
+
+      e.preventDefault();
+      targetScrollTop = Math.max(0, Math.min(maxScroll, targetScrollTop + e.deltaY * 1.35));
+
+      const animate = () => {
+        const diff = targetScrollTop - currentScrollTop;
+        if (Math.abs(diff) > 0.5) {
+          currentScrollTop += diff * speed;
+          panel.scrollTop = currentScrollTop;
+          animationFrameId = requestAnimationFrame(animate);
+        } else {
+          currentScrollTop = targetScrollTop;
+          panel.scrollTop = targetScrollTop;
+        }
+      };
+
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    panel.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      panel.removeEventListener("wheel", handleWheel);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
 
   const filteredProducts = useMemo(
     () => {
@@ -238,6 +315,8 @@ function ProductListContent() {
           matchesFilter = lockSubcategories.includes(product.category) || product.category === "Lock";
         } else if (filter === "Smart") {
           matchesFilter = product.category === "Smart";
+        } else if (filter === "Water") {
+          matchesFilter = product.category === "Water";
         } else {
           // If filtering by specific subcategory ID
           matchesFilter = matchesSubcategory(product, filter);
@@ -349,7 +428,11 @@ function ProductListContent() {
           {/* Left Sidebar Panel */}
           <aside className="w-full shrink-0 lg:w-80 lg:sticky lg:top-28">
             {/* Desktop Vertical Categories with Hierarchy (Unified Card) */}
-            <div className="hidden lg:block border border-gray-light/35 rounded-3xl bg-white overflow-hidden divide-y divide-gray-light/35 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+            <div 
+              ref={panelRef}
+              data-lenis-prevent
+              className="hidden lg:block border border-gray-light/35 rounded-3xl bg-white lg:max-h-[calc(100vh-9.5rem)] lg:overflow-y-auto invisible-scrollbar divide-y divide-gray-light/35 shadow-[0_8px_30px_rgb(0,0,0,0.02)]"
+            >
               {/* 1. Tất cả sản phẩm Row */}
               <button
                 onClick={() => {

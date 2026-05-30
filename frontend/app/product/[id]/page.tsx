@@ -27,12 +27,15 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   );
   const [activeTab, setActiveTab] = useState("specs");
   const [copied, setCopied] = useState(false);
+  const [prevId, setPrevId] = useState(id);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const { addToRecentlyViewed, setIsChatbotOpen } = useApp();
 
-  useEffect(() => {
+  if (id !== prevId) {
+    setPrevId(id);
     setSelectedImage(null);
-  }, [id]);
+  }
+
+  const { addToRecentlyViewed, setIsChatbotOpen } = useApp();
 
   useEffect(() => {
     if (product) {
