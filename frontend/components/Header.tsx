@@ -12,7 +12,6 @@ function HeaderContent() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  /** Khi đã ở trang chủ, click nav "Trang chủ" sẽ scroll lên đầu thay vì không làm gì */
   const handleNavClick = (path: string) => {
     if (path === "/" && pathname === "/") {
       window.scrollTo({ top: 0, behavior: "smooth" });
