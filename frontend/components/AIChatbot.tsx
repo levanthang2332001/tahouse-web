@@ -2,24 +2,13 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { 
-  Camera, 
-  HelpCircle, 
-  KeyRound, 
-  Lock, 
-  MessageCircle, 
-  Paperclip, 
-  PhoneCall, 
-  Send, 
-  ShieldCheck, 
-  Smartphone, 
-  Sparkles, 
-  Utensils, 
-  Wrench, 
-  X 
-} from "lucide-react";
+import { MessageCircle, Paperclip, Send, ShieldCheck, Smartphone, X } from "lucide-react";
 import { useApp } from "@/context/AppContext";
+import { HouseIcon } from "@/components/ui/icons";
 
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 type Message = {
   id: string;
   sender: "user" | "ai";
@@ -27,64 +16,31 @@ type Message = {
   time: string;
 };
 
-// Lucide icon helper
-const HouseIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-    <polyline points="9 22 9 12 15 12 15 22" />
-  </svg>
-);
+// ---------------------------------------------------------------------------
+// Keyword-based reply engine
+// ---------------------------------------------------------------------------
+function getReply(input: string): React.ReactNode {
+  const q = input.toLowerCase();
 
-const SafeIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="18" height="18" x="3" y="3" rx="2" />
-    <circle cx="12" cy="10" r="3" />
-    <path d="M12 2v2" />
-    <path d="M12 20v2" />
-    <path d="M20 12h2" />
-    <path d="M2 12h2" />
-  </svg>
-);
-
-const GateIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2 20V4" />
-    <path d="M22 20V4" />
-    <path d="M2 7h20" />
-    <path d="M2 12h20" />
-    <path d="M2 17h20" />
-  </svg>
-);
-
-const DoorIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="16" height="20" x="4" y="2" rx="2" />
-    <path d="M14 12v.01" />
-  </svg>
-);
-
-function getReply(input: string) {
-  const query = input.toLowerCase();
-
-  if (query.includes("bếp mới")) {
+  if (q.includes("bếp mới")) {
     return (
       <div className="space-y-2">
-        <p className="font-bold text-brand-green">Tư vấn thiết kế & làm bếp mới 🍳</p>
-        <p>TA HOUSE cung cấp giải pháp trọn gói thiết bị bếp & phụ kiện tủ bếp thông minh nhập khẩu chính hãng (Bosch, Hafele, Kaff, Cata...):</p>
+        <p className="font-bold text-brand-green">Tư vấn thiết kế &amp; làm bếp mới 🍳</p>
+        <p>TA HOUSE cung cấp giải pháp trọn gói thiết bị bếp &amp; phụ kiện tủ bếp thông minh nhập khẩu chính hãng (Bosch, Hafele, Kaff, Cata...):</p>
         <ul className="list-disc pl-4 space-y-1">
-          <li><strong>Bếp từ & Hút mùi:</strong> Đồng bộ, tự động cảm biến, tiết kiệm điện năng.</li>
+          <li><strong>Bếp từ &amp; Hút mùi:</strong> Đồng bộ, tự động cảm biến, tiết kiệm điện năng.</li>
           <li><strong>Phụ kiện tủ bếp:</strong> Giá bát đĩa nâng hạ, giá xoong nồi xoay góc inox 304 cao cấp.</li>
-          <li><strong>Bồn rửa & Vòi:</strong> Kháng khuẩn, chống ồn hiệu quả.</li>
+          <li><strong>Bồn rửa &amp; Vòi:</strong> Kháng khuẩn, chống ồn hiệu quả.</li>
         </ul>
         <p className="text-[11px] text-navy/60 italic mt-1">Đội ngũ kỹ thuật hỗ trợ khảo sát và lên bản vẽ thiết kế lắp ráp 3D miễn phí cho gia đình bạn.</p>
       </div>
     );
   }
 
-  if (query.includes("sửa bếp")) {
+  if (q.includes("sửa bếp")) {
     return (
       <div className="space-y-2">
-        <p className="font-bold text-brand-green">Dịch vụ sửa chữa & nâng cấp bếp chuyên nghiệp 🛠️</p>
+        <p className="font-bold text-brand-green">Dịch vụ sửa chữa &amp; nâng cấp bếp chuyên nghiệp 🛠️</p>
         <p>Chúng tôi chuyên hỗ trợ nâng cấp, sửa chữa thiết bị nhà bếp:</p>
         <ul className="list-disc pl-4 space-y-1">
           <li>Thay thế mặt kính bếp từ, sửa mạch bếp từ Châu Âu.</li>
@@ -96,10 +52,10 @@ function getReply(input: string) {
     );
   }
 
-  if (query.includes("thay khóa cửa") || query.includes("thay khóa")) {
+  if (q.includes("thay khóa cửa") || q.includes("thay khóa")) {
     return (
       <div className="space-y-2">
-        <p className="font-bold text-brand-green">Tư vấn khóa điện tử & khóa vân tay thông minh 🔑</p>
+        <p className="font-bold text-brand-green">Tư vấn khóa điện tử &amp; khóa vân tay thông minh 🔑</p>
         <p>Để chọn được dòng khóa cửa phù hợp nhất (Kaadas, Philips, Yale, Hafele, Samsung...), xin quý khách vui lòng cung cấp thêm thông tin:</p>
         <ul className="list-disc pl-4 space-y-1">
           <li><strong>Chất liệu cửa:</strong> Cửa gỗ tự nhiên, cửa gỗ công nghiệp hay cửa nhôm kính?</li>
@@ -111,7 +67,7 @@ function getReply(input: string) {
     );
   }
 
-  if (query.includes("nhôm kính")) {
+  if (q.includes("nhôm kính")) {
     return (
       <div className="space-y-2">
         <p className="font-bold text-brand-green">Khóa thông minh cho cửa nhôm kính 🪟</p>
@@ -125,7 +81,7 @@ function getReply(input: string) {
     );
   }
 
-  if (query.includes("khóa cổng")) {
+  if (q.includes("khóa cổng")) {
     return (
       <div className="space-y-2">
         <p className="font-bold text-brand-green">Khóa cổng vân tay ngoài trời cao cấp 🚪</p>
@@ -139,7 +95,7 @@ function getReply(input: string) {
     );
   }
 
-  if (query.includes("két sắt")) {
+  if (q.includes("két sắt")) {
     return (
       <div className="space-y-2">
         <p className="font-bold text-brand-green">Két sắt vân tay thông minh cao cấp 💼</p>
@@ -153,13 +109,15 @@ function getReply(input: string) {
     );
   }
 
-  if (query.includes("gửi hình") || query.includes("ảnh") || query.includes("hình ảnh")) {
+  if (q.includes("gửi hình") || q.includes("ảnh") || q.includes("hình ảnh")) {
     return (
       <div className="space-y-2">
         <p className="font-bold text-brand-green">Gửi hình ảnh chụp thực tế để được tư vấn chính xác nhất 📸</p>
         <p>Quý khách vui lòng gửi ảnh chụp tổng thể mặt trước, mặt sau và đố cửa (đối với khóa) hoặc khoang tủ bếp cũ cần cải tạo.</p>
         <p className="bg-brand-green/10 p-2.5 rounded-lg border border-brand-green/20">
-          👉 Quý khách có thể gửi trực tiếp qua Zalo Hotline: <a href="tel:0938824479" className="font-bold underline text-brand-green">0938 824 479</a> (Click để gọi) hoặc chọn file hình ảnh từ nút đính kèm bên dưới.
+          👉 Quý khách có thể gửi trực tiếp qua Zalo Hotline:{" "}
+          <a href="tel:0938824479" className="font-bold underline text-brand-green">0938 824 479</a>{" "}
+          (Click để gọi) hoặc chọn file hình ảnh từ nút đính kèm bên dưới.
         </p>
       </div>
     );
@@ -173,70 +131,78 @@ function getReply(input: string) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Welcome message content
+// ---------------------------------------------------------------------------
+const WELCOME_MESSAGE: Message = {
+  id: "welcome",
+  sender: "ai",
+  text: (
+    <div className="space-y-2 text-left font-sans text-[13px] leading-relaxed text-navy">
+      <p className="text-[14px]">Chào anh/chị 👋</p>
+      <p className="font-bold">TA HOUSE có thể hỗ trợ:</p>
+      <div className="space-y-1 pl-1">
+        {[
+          "Chọn thiết bị bếp phù hợp",
+          "Tư vấn khóa điện tử theo loại cửa",
+          "Báo giá và chính sách bảo hành",
+          "Gợi ý giải pháp theo ngân sách",
+        ].map((item) => (
+          <p key={item} className="flex items-center gap-1.5 font-semibold text-navy/90">
+            <span className="text-brand-green font-bold">✓</span> {item}
+          </p>
+        ))}
+      </div>
+      <p className="pt-1 mt-1 font-semibold border-t border-gray-light/30">
+        Anh/chị đang cần hỗ trợ nội dung nào ạ?
+      </p>
+    </div>
+  ),
+  time: "10:30",
+};
+
+// ---------------------------------------------------------------------------
+// Bot avatar (shared between message list and typing indicator)
+// ---------------------------------------------------------------------------
+function BotAvatar() {
+  return (
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full overflow-hidden border border-brand-green/15 shadow-sm">
+      <img src="/logoTAicon.svg" alt="TA House Icon" className="h-full w-full object-contain" />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
 export default function AIChatbot() {
   const { isChatbotOpen, setIsChatbotOpen } = useApp();
   const nextIdRef = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const getSystemTime = () => {
+  const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
+  const [inputValue, setInputValue] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  const getTime = () => {
     const now = new Date();
     return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
   };
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      sender: "ai",
-      text: (
-        <div className="space-y-2 text-left font-sans text-[13px] leading-relaxed text-navy">
-          <p className="text-[14px]">Chào anh/chị 👋</p>
-          <p className="font-bold">TA HOUSE có thể hỗ trợ:</p>
-          <div className="space-y-1 pl-1">
-            <p className="flex items-center gap-1.5 font-semibold text-navy/90">
-              <span className="text-brand-green font-bold">✓</span> Chọn thiết bị bếp phù hợp
-            </p>
-            <p className="flex items-center gap-1.5 font-semibold text-navy/90">
-              <span className="text-brand-green font-bold">✓</span> Tư vấn khóa điện tử theo loại cửa
-            </p>
-            <p className="flex items-center gap-1.5 font-semibold text-navy/90">
-              <span className="text-brand-green font-bold">✓</span> Báo giá và chính sách bảo hành
-            </p>
-            <p className="flex items-center gap-1.5 font-semibold text-navy/90">
-              <span className="text-brand-green font-bold">✓</span> Gợi ý giải pháp theo ngân sách
-            </p>
-          </div>
-          <p className="pt-1 mt-1 font-semibold border-t border-gray-light/30">Anh/chị đang cần hỗ trợ nội dung nào ạ?</p>
-        </div>
-      ),
-      time: "10:30",
-    },
-  ]);
-  const [inputValue, setInputValue] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-
-  const createId = (sender: Message["sender"]) => {
-    nextIdRef.current += 1;
-    return `${nextIdRef.current}-${sender}`;
-  };
+  const nextId = (sender: Message["sender"]) => `${++nextIdRef.current}-${sender}`;
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
   const sendMessage = (text: string, label?: string) => {
     if (!text.trim()) return;
 
-    const userMessage: Message = {
-      id: createId("user"),
-      sender: "user",
-      text: label || text,
-      time: getSystemTime(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [
+      ...prev,
+      { id: nextId("user"), sender: "user", text: label ?? text, time: getTime() },
+    ]);
     setInputValue("");
     setIsTyping(true);
 
@@ -244,14 +210,14 @@ export default function AIChatbot() {
       setMessages((prev) => [
         ...prev,
         {
-          id: createId("ai"),
+          id: nextId("ai"),
           sender: "ai",
           text: (
             <div className="font-sans text-[13px] leading-relaxed text-navy text-left">
               {getReply(text)}
             </div>
           ),
-          time: getSystemTime(),
+          time: getTime(),
         },
       ]);
       setIsTyping(false);
@@ -259,19 +225,21 @@ export default function AIChatbot() {
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const fileName = e.target.files[0].name;
-      sendMessage("gửi hình để tư vấn", `📷 Đính kèm ảnh: ${fileName}`);
+    if (e.target.files?.length) {
+      sendMessage("gửi hình để tư vấn", `📷 Đính kèm ảnh: ${e.target.files[0].name}`);
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendMessage(inputValue);
+  };
 
   return (
     <>
-      {/* Floating Trigger Button with curving handwritten arrow prompt */}
+      {/* Floating trigger button */}
       {!isChatbotOpen && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2">
-          {/* Main circle trigger */}
           <button
             onClick={() => setIsChatbotOpen(true)}
             className="flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-brand-green text-white shadow-[0_10px_30px_rgba(121,193,67,0.4)] transition-all hover:bg-lime-dark hover:scale-105"
@@ -282,7 +250,7 @@ export default function AIChatbot() {
         </div>
       )}
 
-      {/* Main Chatbot Window exactly matching mockup image */}
+      {/* Chat window */}
       <AnimatePresence>
         {isChatbotOpen && (
           <motion.div
@@ -292,16 +260,11 @@ export default function AIChatbot() {
             transition={{ duration: 0.3, ease: "easeOut" }}
             className="fixed bottom-6 right-6 z-50 flex h-[640px] w-[94vw] max-w-[400px] flex-col overflow-hidden rounded-[28px] bg-cream shadow-2xl"
           >
-            {/* Dark Teal Header block */}
+            {/* Header */}
             <div className="flex h-[72px] items-center justify-between bg-[#092f3a] px-5 text-white shadow-md">
               <div className="flex items-center gap-3">
-                {/* Brand Green logoTAicon.svg Icon wrapped inside circle */}
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl overflow-hidden shadow-xs">
-                  <img 
-                    src="/logoTAicon.svg" 
-                    alt="TA House Icon" 
-                    className="h-full w-full object-contain" 
-                  />
+                  <img src="/logoTAicon.svg" alt="TA House Icon" className="h-full w-full object-contain" />
                 </div>
                 <div>
                   <h3 className="font-sans text-[15px] font-black uppercase tracking-wider text-white">
@@ -327,44 +290,35 @@ export default function AIChatbot() {
               </div>
             </div>
 
-            {/* Hidden native file input for attachments */}
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileUpload} 
+            {/* Hidden file input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
               accept="image/*"
-              className="hidden" 
+              className="hidden"
             />
 
-            {/* Conversation view scroll area */}
+            {/* Message list */}
             <div className="flex-1 overflow-y-auto bg-warm-cream/50 px-4 py-5 space-y-6 invisible-scrollbar">
-              {messages.map((message) => (
-                <div key={message.id} className="space-y-1">
-                  {message.sender === "ai" ? (
+              {messages.map((msg) => (
+                <div key={msg.id} className="space-y-1">
+                  {msg.sender === "ai" ? (
                     <div className="flex gap-2.5 items-start">
-                      {/* Round logoTAicon.svg brand icon avatar */}
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full overflow-hidden border border-brand-green/15 shadow-sm">
-                        <img 
-                          src="/logoTAicon.svg" 
-                          alt="TA House Icon" 
-                          className="h-full w-full object-contain" 
-                        />
-                      </div>
-                      {/* Bot bubble light cream styled */}
+                      <BotAvatar />
                       <div className="max-w-[78%] rounded-2xl rounded-tl-sm border border-gray-light bg-white p-4 shadow-xs">
-                        {message.text}
+                        {msg.text}
                         <span className="block mt-2 text-right text-[9px] font-semibold text-navy/40">
-                          {message.time}
+                          {msg.time}
                         </span>
                       </div>
                     </div>
                   ) : (
                     <div className="flex justify-end">
-                      {/* User bubble brand green */}
                       <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-brand-green p-4 font-sans text-[13px] font-semibold leading-relaxed text-white shadow-sm">
-                        <p className="text-left">{message.text}</p>
+                        <p className="text-left">{msg.text}</p>
                         <span className="block mt-2 text-right text-[9px] font-semibold text-white/70">
-                          {message.time}
+                          {msg.time}
                         </span>
                       </div>
                     </div>
@@ -372,15 +326,10 @@ export default function AIChatbot() {
                 </div>
               ))}
 
+              {/* Typing indicator */}
               {isTyping && (
                 <div className="flex gap-2.5 items-start">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full overflow-hidden border border-brand-green/15 shadow-sm">
-                    <img 
-                      src="/logoTAicon.svg" 
-                      alt="TA House Icon" 
-                      className="h-full w-full object-contain" 
-                    />
-                  </div>
+                  <BotAvatar />
                   <div className="rounded-2xl rounded-tl-sm border border-gray-light bg-white px-4 py-3 shadow-xs flex items-center gap-1">
                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-navy/40" />
                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-navy/40 [animation-delay:0.2s]" />
@@ -391,16 +340,10 @@ export default function AIChatbot() {
               <div ref={scrollRef} />
             </div>
 
-
-            {/* Custom Send Input form bar inside rounded container */}
+            {/* Input bar */}
             <div className="bg-white px-4 pb-2 pt-1">
               <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (inputValue.trim()) {
-                    sendMessage(inputValue);
-                  }
-                }}
+                onSubmit={handleSubmit}
                 className="flex items-center gap-2 rounded-full border border-gray-light bg-cream/45 px-4.5 py-1.5 focus-within:border-brand-green/60"
               >
                 <input
@@ -410,8 +353,6 @@ export default function AIChatbot() {
                   placeholder="Nhập tin nhắn của bạn..."
                   className="flex-1 border-none bg-transparent py-1.5 text-[12px] font-semibold text-navy placeholder-navy/35 focus:outline-none"
                 />
-                
-                {/* File Attachment Icon */}
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
@@ -420,8 +361,6 @@ export default function AIChatbot() {
                 >
                   <Paperclip className="h-4.5 w-4.5 rotate-45 stroke-[2.2]" />
                 </button>
-
-                {/* Submit button inside green square with paper airplane */}
                 <button
                   type="submit"
                   className="flex h-8 w-8 cursor-pointer shrink-0 items-center justify-center rounded-xl bg-brand-green text-white shadow-sm transition-all hover:scale-105 hover:bg-lime-dark"
@@ -432,7 +371,7 @@ export default function AIChatbot() {
               </form>
             </div>
 
-            {/* Brand Bottom Banner with core guarantees */}
+            {/* Guarantee banner */}
             <div className="flex h-11 shrink-0 items-center justify-around bg-[#F5F1EA]/70 px-2 text-[10px] font-bold text-navy/80">
               <div className="flex items-center gap-1">
                 <Smartphone className="h-3.5 w-3.5 text-brand-green" />
