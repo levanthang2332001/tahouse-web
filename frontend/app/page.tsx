@@ -113,7 +113,7 @@ export default function Home() {
               className="object-cover"
             />
             {/* Smooth Fade Overlay to merge the image with the Warm White Cream background on the left */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white from-0% to-transparent to-25% z-10" />
+            <div className="hidden lg:block absolute inset-0 bg-gradient-to-r from-white from-0% to-transparent to-25% z-10" />
           </div>
         </div>
 
@@ -138,7 +138,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="mb-6 font-sans text-5xl font-bold leading-tight tracking-tight text-navy sm:text-6xl lg:text-7xl lg:tracking-tighter"
+              className="mb-6 font-sans text-3xl sm:text-6xl lg:text-7xl font-bold leading-tight tracking-tight text-navy lg:tracking-tighter"
             >
               Thiết bị phù hợp<br />cho từng gia đình
             </motion.h1>
@@ -162,24 +162,24 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
-              className="flex flex-wrap items-center gap-y-4 gap-x-6 mb-10 text-sm font-semibold text-navy"
+              className="flex flex-col sm:flex-row sm:items-center gap-y-3.5 gap-x-6 mb-10 text-sm font-semibold text-navy"
             >
               <div className="flex items-center gap-3 group">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy/10 text-navy border border-navy/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
                   <GoGoal size={16} />
                 </div>
                 <span className="tracking-wide">Chọn đúng</span>
               </div>
-              <span className="text-navy/25">•</span>
+              <span className="hidden sm:inline text-navy/25">•</span>
               <div className="flex items-center gap-3 group">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy/10 text-navy border border-navy/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
                   <GiAutoRepair size={16} />
                 </div>
                 <span className="tracking-wide">Lắp đúng</span>
               </div>
-              <span className="text-navy/25">•</span>
+              <span className="hidden sm:inline text-navy/25">•</span>
               <div className="flex items-center gap-3 group">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy/10 text-navy border border-navy/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-green/10 text-brand-green border border-brand-green/20 shadow-xs transition-transform duration-300 group-hover:scale-110">
                   <MdOutlineSecurity size={16} />
                 </div>
                 <span className="tracking-wide">Sử dụng lâu dài</span>
