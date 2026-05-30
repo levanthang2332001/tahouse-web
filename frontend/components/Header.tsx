@@ -26,22 +26,19 @@ function HeaderContent() {
 
   return (
     <header
-      className={`fixed left-0 top-0 z-50 h-20 w-full border-b backdrop-blur-md transition-[background-color,border-color,box-shadow] duration-500 ease-out ${
+      className={`fixed left-0 top-0 z-50 h-24 w-full border-b backdrop-blur-md transition-[background-color,border-color,box-shadow] duration-500 ease-out ${
         isScrolled
-          ? "border-gray-light/30 bg-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.03)]"
-          : "border-gray-light bg-white shadow-none"
+          ? "border-gray-light/30 bg-cream/80 shadow-[0_8px_30px_rgba(0,0,0,0.03)]"
+          : "border-gray-light bg-cream shadow-none"
       }`}
     >
       <div className="relative mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 lg:px-12">
         <Link href="/" className="group flex items-center gap-2">
-          <div className="flex items-end leading-none">
-            <span className="text-3xl font-medium tracking-tight text-brand-green transition-opacity group-hover:opacity-80">
-              TA
-            </span>
-            <span className="ml-1 text-3xl font-medium tracking-tight text-navy transition-colors group-hover:text-brand-green">
-              HOUSE
-            </span>
-          </div>
+          <img 
+            src="/logoTA2.svg" 
+            alt="TA House Logo" 
+            className="h-14 w-auto object-contain transition-opacity group-hover:opacity-80" 
+          />
         </Link>
 
         <nav className="hidden items-center gap-10 lg:flex">
@@ -49,7 +46,7 @@ function HeaderContent() {
             <Link
               key={link.name}
               href={link.path}
-              className="text-xs font-semibold uppercase tracking-wider text-navy/70 transition-colors duration-300 hover:text-brand-green"
+              className="text-sm font-semibold uppercase tracking-wider text-navy/70 transition-colors duration-300 hover:text-brand-green"
             >
               {link.name}
             </Link>
@@ -105,7 +102,7 @@ function HeaderContent() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="absolute left-0 top-20 flex max-h-[calc(100vh-5rem)] w-full flex-col gap-6 overflow-y-auto border-b border-gray-light bg-cream px-6 py-6 shadow-xl lg:hidden"
+            className="absolute left-0 top-24 flex max-h-[calc(100vh-5rem)] w-full flex-col gap-6 overflow-y-auto border-b border-gray-light bg-cream px-6 py-6 shadow-xl lg:hidden"
           >
             <div className="rounded border border-gray-light bg-neutral px-3 py-2.5 text-xs text-navy/60">
               Ô tìm kiếm demo cho `frontend-2`.
@@ -115,7 +112,7 @@ function HeaderContent() {
                 <Link
                   key={link.name}
                   href={link.path}
-                  className="border-b border-gray-light/30 py-2 text-xs font-semibold uppercase tracking-wider text-navy/80 transition-colors hover:text-brand-green"
+                  className="border-b border-gray-light/30 py-2 text-sm font-semibold uppercase tracking-wider text-navy/80 transition-colors hover:text-brand-green"
                 >
                   {link.name}
                 </Link>
@@ -133,11 +130,14 @@ export default function Header() {
     <>
       <Suspense
         fallback={
-          <header className="fixed left-0 top-0 z-50 h-20 w-full border-b border-gray-light bg-white">
+          <header className="fixed left-0 top-0 z-50 h-24 w-full border-b border-gray-light bg-cream">
             <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 lg:px-12">
               <div className="flex items-center gap-2">
-                <span className="text-3xl font-medium tracking-tight text-brand-green">TA</span>
-                <span className="ml-1 text-3xl font-medium tracking-tight text-navy">HOUSE</span>
+                <img 
+                  src="/logoTA2.svg" 
+                  alt="TA House Logo" 
+                  className="h-14 w-auto object-contain" 
+                />
               </div>
               <div className="h-5 w-5 animate-spin rounded-full border-2 border-brand-green border-t-transparent" />
             </div>
@@ -146,7 +146,7 @@ export default function Header() {
       >
         <HeaderContent />
       </Suspense>
-      <div className="h-20 w-full shrink-0" />
+      <div className="h-24 w-full shrink-0" />
     </>
   );
 }

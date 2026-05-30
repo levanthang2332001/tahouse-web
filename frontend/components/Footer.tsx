@@ -28,25 +28,15 @@ export default function Footer() {
         <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           {/* Column 1: Logo & Slogan */}
           <div className="flex flex-col items-start lg:col-span-3">
-            <Link href="/" className="mb-6 block">
-              <div className="flex items-center gap-3">
-                {/* Modern Brand Green House Icon */}
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-brand-green/20 bg-brand-green/5 text-brand-green shadow-xs">
-                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <polyline points="9 22 9 12 15 12 15 22" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="flex items-center leading-none">
-                    <span className="text-xl font-extrabold tracking-tight text-brand-green">TA</span>
-                    <span className="ml-0.5 text-xl font-extrabold tracking-tight text-navy">HOUSE</span>
-                  </div>
-                  <span className="text-[10px] font-bold text-navy/60 block mt-1 tracking-wide">
-                    Thiết bị bếp & Khóa thông minh
-                  </span>
-                </div>
-              </div>
+            <Link href="/" className="mb-6 block group">
+              <img 
+                src="/logoTA2.svg" 
+                alt="TA House Logo" 
+                className="h-16 w-auto object-contain transition-opacity group-hover:opacity-80" 
+              />
+              <span className="text-[10px] font-bold text-navy/60 block mt-3 tracking-wide">
+                Thiết bị bếp & Khóa thông minh
+              </span>
             </Link>
             <p className="mb-6 max-w-xs text-left text-xs font-semibold leading-relaxed text-navy/70">
               TA HOUSE chuyên tư vấn giải pháp thiết bị bếp, phụ kiện tủ bếp, khóa điện tử và két sắt thông minh phù hợp với từng gia đình.

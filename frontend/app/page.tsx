@@ -47,45 +47,49 @@ export default function Home() {
     {
       title: content.home.solutions.items[0].title,
       desc: content.home.solutions.items[0].desc,
-      img: "https://images.unsplash.com/photo-1510137600163-2729bc6959a6?auto=format&fit=crop&q=80",
+      img: "/pic/khoa2.jpg",
       icon: ShieldCheck,
     },
     {
       title: content.home.solutions.items[1].title,
       desc: content.home.solutions.items[1].desc,
-      img: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80",
+      img: "/pic/bep2.webp",
       icon: Utensils,
     },
   ];
 
   const services = [
     {
-      title: "Thiết bị bếp",
-      desc: "+ 150 sản phẩm",
-      catId: "Kitchen",
-      icon: Flame,
-      img: "https://images.unsplash.com/photo-1563298723-dcfebaa392e3?auto=format&fit=crop&q=80",
-    },
-    {
-      title: "Phụ kiện tủ bếp",
-      desc: "+ 150 sản phẩm",
-      catId: "Cabinet",
-      icon: LayoutGrid,
-      img: "https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80",
-    },
-    {
       title: "Khóa điện tử - khóa vân tay",
       desc: "+ 150 sản phẩm",
       catId: "lock-parent",
       icon: Lock,
-      img: "https://images.unsplash.com/photo-1599839619722-39751411ea63?auto=format&fit=crop&q=80",
+      img: "/pic/khoa.jpg",
+      imgClass: "object-contain bg-white p-3",
     },
     {
       title: "Két sắt thông minh",
       desc: "+ 150 sản phẩm",
       catId: "Smart",
       icon: Shield,
-      img: "https://images.unsplash.com/photo-1589834390005-5d4fb9bf3d32?auto=format&fit=crop&q=80",
+      img: "/pic/ket.webp",
+      imgClass: "object-contain bg-white p-3",
+    },
+    {
+      title: "Thiết bị bếp",
+      desc: "+ 150 sản phẩm",
+      catId: "Kitchen",
+      icon: Flame,
+      img: "/pic/bep.webp",
+      imgClass: "object-cover",
+    },
+    {
+      title: "Phụ kiện tủ bếp",
+      desc: "+ 150 sản phẩm",
+      catId: "Cabinet",
+      icon: LayoutGrid,
+      img: "/pic/phukienbep.webp",
+      imgClass: "object-cover",
     },
   ];
 
@@ -104,7 +108,7 @@ export default function Home() {
         <div className="absolute top-0 right-0 h-full w-full lg:w-1/2 z-0">
           <div className="relative h-full w-full">
             <Image
-              src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=1920&q=95"
+              src="/parner.png"
               alt="TA HOUSE Smart Kitchen Solutions"
               fill
               priority
@@ -150,10 +154,11 @@ export default function Home() {
               transition={{ delay: 0.6 }}
               className="mb-8 max-w-lg text-sm font-semibold leading-relaxed text-navy/80 md:text-base align-middle"
             >
-              <span className="inline-flex items-center gap-1 rounded border border-gray-light bg-neutral px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-tight align-middle mr-1 shadow-2xs">
-                <span className="text-brand-green">TA</span>
-                <span className="text-navy">HOUSE</span>
-              </span>{" "}
+              <img 
+                src="/logoTAtitle1.svg" 
+                alt="TA HOUSE" 
+                className="inline-block h-3.5 md:h-[15px] w-auto align-middle mr-1 relative top-1px]" 
+              />{" "}
               chuyên tư vấn giải pháp thiết bị bếp, phụ kiện tủ bếp và khóa điện tử phù hợp với nhu cầu sử dụng thực tế.
             </motion.p>
 
@@ -301,7 +306,7 @@ export default function Home() {
                         alt={service.title}
                         fill
                         sizes="(max-width: 1024px) 100vw, 25vw"
-                        className="object-cover transition-transform duration-750 group-hover:scale-105"
+                        className={`${service.imgClass || "object-cover"} transition-transform duration-750 group-hover:scale-105`}
                       />
                     </div>
                     {/* Content wrapper with inner padding at the bottom */}
