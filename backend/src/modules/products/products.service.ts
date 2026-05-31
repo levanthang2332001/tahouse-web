@@ -10,6 +10,17 @@ import {
   GetInstallationMediaDto,
   MediaType,
 } from './dto/get-installation-media.dto';
+import {
+  PRODUCT_DEFAULTS,
+  PRODUCT_SORT_ORDER,
+} from './constants/product.constants';
+import type {
+  IProduct,
+  IProductListItem,
+  IInstallation,
+  IInstallationMediaResponse,
+  IProductsListResponse,
+} from './types/product.types';
 
 @Injectable()
 export class ProductsService {
@@ -37,15 +48,10 @@ export class ProductsService {
     return price.toLocaleString('vi-VN') + ' đ';
   }
 
-  /**
-   * Lấy danh sách sản phẩm phân trang, tìm kiếm thông minh, lọc theo danh mục, khoảng giá, sắp xếp và chỉ trả về các trường cơ bản.
-   * @param query - Object chứa các thông tin truy vấn từ client.
-   * @returns {{ items: any[], total: number, page: number, limit: number }} Đối tượng chứa danh sách sản phẩm phân trang và metadata.
-   */
-  findAll(query: GetProductsDto) {
+  findAll(query: GetProductsDto): IProductsListResponse {
     const {
-      page = 1,
-      limit = 10,
+      page = PRODUCT_DEFAULTS.PAGINATION.DEFAULT_PAGE,
+      limit = PRODUCT_DEFAULTS.PAGINATION.DEFAULT_LIMIT,
       categoryId,
       brand,
       search,
@@ -79,7 +85,9 @@ export class ProductsService {
     }
     if (search && search.trim()) {
       const searchNorm = removeDiacritics(search.trim().toLowerCase());
-      const searchKeywords = searchNorm.split(/\s+/).filter(Boolean);
+      const searchKeywords = searchNorm
+        .split(PRODUCT_DEFAULTS.SEARCH.SPLIT_REGEX)
+        .filter(Boolean);
 
       products = products.filter((p) => {
         const name = p.name || '';
@@ -97,10 +105,11 @@ export class ProductsService {
       });
     }
 
-    // Sắp xếp (Sorting) trước khi phân trang
-    // Mặc định sort theo priority (1, 2, 3, null), null luôn ở cuối
     if (sortBy) {
-      const order = sortOrder === SortOrder.ASC ? -1 : 1;
+      const order =
+        sortOrder === SortOrder.ASC
+          ? PRODUCT_SORT_ORDER.ASCENDING
+          : PRODUCT_SORT_ORDER.DESCENDING;
       products.sort((a, b) => {
         const valA =
           sortBy === ProductSortBy.PRICE ? this.resolvePrice(a) : a[sortBy];
@@ -171,11 +180,7 @@ export class ProductsService {
     };
   }
 
-  /**
-   * Tìm kiếm thông tin chi tiết của một sản phẩm theo Mã sản phẩm (Code).
-   * Trả về kèm theo preview (tối đa 3 ảnh) từ dữ liệu lắp đặt thực tế.
-   */
-  findOne(code: string) {
+  findOne(code: string): IProduct {
     const products = this.getProducts();
     const cleanQuery = code.trim().toLowerCase().replace(/\s+/g, '');
     const product = products.find(
@@ -208,10 +213,9 @@ export class ProductsService {
       productResponse.variants = [];
     }
 
-    // Gắn preview ảnh lắp đặt (tối đa 3 ảnh đầu tiên) từ trường installation nhúng trong product
-    const installation = product.installation ?? { images: [], videos: [] };
+    const installation = product.installation ?? PRODUCT_DEFAULTS.INSTALLATION;
     productResponse.installation_preview = installation.images
-      ? installation.images.slice(0, 3)
+      ? installation.images.slice(0, PRODUCT_DEFAULTS.INSTALLATION_PREVIEW_LIMIT)
       : [];
 
     // Xóa trường installation đầy đủ để tối ưu dung lượng tải trang chi tiết sản phẩm
@@ -220,12 +224,10 @@ export class ProductsService {
     return productResponse;
   }
 
-  /**
-   * Lấy danh sách ảnh / video lắp đặt thực tế của sản phẩm với phân trang.
-   * @param code  - Mã sản phẩm
-   * @param query - Đối tượng chứa page, limit, type.
-   */
-  getInstallationMedia(code: string, query: GetInstallationMediaDto) {
+  getInstallationMedia(
+    code: string,
+    query: GetInstallationMediaDto,
+  ): IInstallationMediaResponse {
     const { page = 1, limit = 12, type = MediaType.ALL } = query;
 
     const products = this.getProducts();
@@ -238,11 +240,7 @@ export class ProductsService {
       throw new NotFoundException(`Không tìm thấy sản phẩm với mã: ${code}`);
     }
 
-    // Đọc trực tiếp từ trường installation nhúng trong sản phẩm
-    const installation = product.installation ?? {
-      images: [],
-      videos: [],
-    };
+    const installation = product.installation ?? PRODUCT_DEFAULTS.INSTALLATION;
 
     // Lấy mảng media theo type
     const mediaItems: Array<{ url: string; type: 'image' | 'video' }> = [];
@@ -250,14 +248,20 @@ export class ProductsService {
     if (type === MediaType.IMAGES || type === MediaType.ALL) {
       if (Array.isArray(installation.images)) {
         mediaItems.push(
-          ...installation.images.map((url) => ({ url, type: 'image' as const })),
+          ...installation.images.map((url) => ({
+            url,
+            type: 'image' as const,
+          })),
         );
       }
     }
     if (type === MediaType.VIDEOS || type === MediaType.ALL) {
       if (Array.isArray(installation.videos)) {
         mediaItems.push(
-          ...installation.videos.map((url) => ({ url, type: 'video' as const })),
+          ...installation.videos.map((url) => ({
+            url,
+            type: 'video' as const,
+          })),
         );
       }
     }
@@ -273,8 +277,12 @@ export class ProductsService {
       product_name: product.name,
       items,
       total,
-      total_images: Array.isArray(installation.images) ? installation.images.length : 0,
-      total_videos: Array.isArray(installation.videos) ? installation.videos.length : 0,
+      total_images: Array.isArray(installation.images)
+        ? installation.images.length
+        : 0,
+      total_videos: Array.isArray(installation.videos)
+        ? installation.videos.length
+        : 0,
       page: pageNum,
       limit: limitNum,
     };
