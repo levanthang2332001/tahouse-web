@@ -273,8 +273,8 @@ export class ProductsService {
       product_name: product.name,
       items,
       total,
-      total_images: installation.images.length,
-      total_videos: installation.videos.length,
+      total_images: Array.isArray(installation.images) ? installation.images.length : 0,
+      total_videos: Array.isArray(installation.videos) ? installation.videos.length : 0,
       page: pageNum,
       limit: limitNum,
     };
