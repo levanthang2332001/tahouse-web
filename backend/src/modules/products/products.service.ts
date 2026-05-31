@@ -14,17 +14,27 @@ import {
 @Injectable()
 export class ProductsService {
   private getProducts: () => any[];
-  private getInstallationData: () => Record<
-    string,
-    { images: string[]; videos: string[] }
-  >;
 
   constructor(private readonly jsonDb: JsonDbService) {
     this.getProducts = this.jsonDb.register('products.json', []);
-    this.getInstallationData = this.jsonDb.register(
-      'installation_images.json',
-      {},
-    );
+  }
+
+  /** Giá hiệu dụng: dùng root price nếu có, nếu không lấy giá thấp nhất trong variants. */
+  private resolvePrice(product: any): number | null {
+    if (product.price !== null && product.price !== undefined)
+      return product.price;
+    if (Array.isArray(product.variants) && product.variants.length > 0) {
+      const prices = product.variants
+        .map((v: any) => v.price)
+        .filter((p: any) => p !== null && p !== undefined) as number[];
+      if (prices.length > 0) return Math.min(...prices);
+    }
+    return null;
+  }
+
+  private formatPrice(price: number | null): string | null {
+    if (price === null || price === undefined) return null;
+    return price.toLocaleString('vi-VN') + ' đ';
   }
 
   /**
@@ -37,6 +47,7 @@ export class ProductsService {
       page = 1,
       limit = 10,
       categoryId,
+      brand,
       search,
       minPrice,
       maxPrice,
@@ -50,11 +61,21 @@ export class ProductsService {
     if (categoryId !== undefined && categoryId !== null && !isNaN(categoryId)) {
       products = products.filter((p) => p.category_id === categoryId);
     }
+    if (brand && brand.trim()) {
+      products = products.filter(
+        (p) => p.brand && p.brand.toLowerCase() === brand.toLowerCase(),
+      );
+    }
     if (minPrice !== undefined && minPrice !== null && !isNaN(minPrice)) {
-      products = products.filter((p) => p.price >= minPrice);
+      products = products.filter(
+        (p) => (this.resolvePrice(p) ?? 0) >= minPrice,
+      );
     }
     if (maxPrice !== undefined && maxPrice !== null && !isNaN(maxPrice)) {
-      products = products.filter((p) => p.price <= maxPrice);
+      products = products.filter((p) => {
+        const ep = this.resolvePrice(p);
+        return ep !== null && ep <= maxPrice;
+      });
     }
     if (search && search.trim()) {
       const searchNorm = removeDiacritics(search.trim().toLowerCase());
@@ -79,13 +100,13 @@ export class ProductsService {
     // Sắp xếp (Sorting) trước khi phân trang
     // Mặc định sort theo priority (1, 2, 3, null), null luôn ở cuối
     if (sortBy) {
-      const order = sortOrder === SortOrder.DESC ? -1 : 1;
+      const order = sortOrder === SortOrder.ASC ? -1 : 1;
       products.sort((a, b) => {
-        const valA = a[sortBy];
-        const valB = b[sortBy];
+        const valA =
+          sortBy === ProductSortBy.PRICE ? this.resolvePrice(a) : a[sortBy];
+        const valB =
+          sortBy === ProductSortBy.PRICE ? this.resolvePrice(b) : b[sortBy];
 
-        // Xử lý giá trị null/undefined khi sắp xếp theo giá (price)
-        // Luôn đẩy sản phẩm không có giá (hoặc giá là null/undefined) xuống cuối danh sách
         if (sortBy === ProductSortBy.PRICE) {
           const isNullA = valA === null || valA === undefined;
           const isNullB = valB === null || valB === undefined;
@@ -124,17 +145,23 @@ export class ProductsService {
     const limitNum = Math.max(1, limit);
     const startIndex = (pageNum - 1) * limitNum;
     const paginatedProducts = products.slice(startIndex, startIndex + limitNum);
-    const items = paginatedProducts.map(
-      ({ id, code, name, price, formatted_price, category, images }) => ({
-        id,
-        code,
-        name,
-        price,
-        formatted_price,
-        category,
-        images: images && images.length > 0 ? [images[0]] : [],
-      }),
-    );
+    const items = paginatedProducts.map((p) => {
+      const effectivePrice = this.resolvePrice(p);
+      return {
+        id: p.id,
+        code: p.code,
+        name: p.name,
+        price: effectivePrice,
+        formatted_price:
+          effectivePrice !== null
+            ? this.formatPrice(effectivePrice)
+            : p.formatted_price,
+        brand: p.brand,
+        category: p.category,
+        images: p.images && p.images.length > 0 ? [p.images[0]] : [],
+        has_variants: Array.isArray(p.variants) && p.variants.length > 1,
+      };
+    });
 
     return {
       items,
@@ -163,11 +190,32 @@ export class ProductsService {
     delete productResponse.page_number;
     delete productResponse.category_id;
 
-    // Gắn preview ảnh lắp đặt (tối đa 3 ảnh đầu tiên)
-    const installation = this.getInstallationData()[product.code];
-    productResponse.installation_preview = installation
+    // Resolve effective price (root price or min variant price)
+    const effectivePrice = this.resolvePrice(product);
+    productResponse.price = effectivePrice;
+    productResponse.formatted_price =
+      effectivePrice !== null
+        ? this.formatPrice(effectivePrice)
+        : product.formatted_price;
+
+    // Normalize variants: ensure each variant has formatted_price
+    if (Array.isArray(product.variants) && product.variants.length > 0) {
+      productResponse.variants = product.variants.map((v: any) => ({
+        ...v,
+        formatted_price: v.formatted_price ?? this.formatPrice(v.price),
+      }));
+    } else {
+      productResponse.variants = [];
+    }
+
+    // Gắn preview ảnh lắp đặt (tối đa 3 ảnh đầu tiên) từ trường installation nhúng trong product
+    const installation = product.installation ?? { images: [], videos: [] };
+    productResponse.installation_preview = installation.images
       ? installation.images.slice(0, 3)
       : [];
+
+    // Xóa trường installation đầy đủ để tối ưu dung lượng tải trang chi tiết sản phẩm
+    delete productResponse.installation;
 
     return productResponse;
   }
@@ -190,7 +238,8 @@ export class ProductsService {
       throw new NotFoundException(`Không tìm thấy sản phẩm với mã: ${code}`);
     }
 
-    const installation = this.getInstallationData()[product.code] ?? {
+    // Đọc trực tiếp từ trường installation nhúng trong sản phẩm
+    const installation = product.installation ?? {
       images: [],
       videos: [],
     };
@@ -199,14 +248,18 @@ export class ProductsService {
     const mediaItems: Array<{ url: string; type: 'image' | 'video' }> = [];
 
     if (type === MediaType.IMAGES || type === MediaType.ALL) {
-      mediaItems.push(
-        ...installation.images.map((url) => ({ url, type: 'image' as const })),
-      );
+      if (Array.isArray(installation.images)) {
+        mediaItems.push(
+          ...installation.images.map((url) => ({ url, type: 'image' as const })),
+        );
+      }
     }
     if (type === MediaType.VIDEOS || type === MediaType.ALL) {
-      mediaItems.push(
-        ...installation.videos.map((url) => ({ url, type: 'video' as const })),
-      );
+      if (Array.isArray(installation.videos)) {
+        mediaItems.push(
+          ...installation.videos.map((url) => ({ url, type: 'video' as const })),
+        );
+      }
     }
 
     const total = mediaItems.length;
