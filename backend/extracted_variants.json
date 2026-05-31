@@ -1,0 +1,135 @@
+{
+  "KL-979G": {
+    "name": "KL - 979 G",
+    "base_price": 22390000,
+    "formatted_base_price": "22.390.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [16],
+    "variants": [
+      {
+        "description": "Không có phụ kiện",
+        "price": 22390000,
+        "formatted_price": "22.390.000 đ"
+      },
+      {
+        "description": "Thêm APP WISHOME",
+        "price": 24590000,
+        "formatted_price": "24.590.000 đ"
+      }
+    ]
+  },
+  "KL-979R": {
+    "name": "KL - 979 R",
+    "base_price": 19590000,
+    "formatted_base_price": "19.590.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [17],
+    "variants": [
+      {
+        "description": "Không có phụ kiện",
+        "price": 19590000,
+        "formatted_price": "19.590.000 đ"
+      },
+      {
+        "description": "Thêm WISHOME",
+        "price": 21590000,
+        "formatted_price": "21.590.000 đ"
+      }
+    ]
+  },
+  "KL-979GR": {
+    "name": "KL - 979 GR",
+    "base_price": 19590000,
+    "formatted_base_price": "19.590.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [18],
+    "variants": [
+      {
+        "description": "Không có phụ kiện",
+        "price": 19590000,
+        "formatted_price": "19.590.000 đ"
+      },
+      {
+        "description": "Thêm APP WISHOME",
+        "price": 21590000,
+        "formatted_price": "21.590.000 đ"
+      }
+    ]
+  },
+  "KL-968CNC": {
+    "name": "KL - 968 CNC",
+    "base_price": 36690000,
+    "formatted_base_price": "36.690.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [23],
+    "variants": [
+      {
+        "description": "USMART GO",
+        "price": 36690000,
+        "formatted_price": "36.690.000 đ"
+      },
+      {
+        "description": "+ REMOTE",
+        "price": 37690000,
+        "formatted_price": "37.690.000 đ"
+      }
+    ]
+  },
+  "KL-808CNC": {
+    "name": "KL - 808 CNC",
+    "base_price": 9390000,
+    "formatted_base_price": "9.390.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [35],
+    "variants": [
+      {
+        "description": "APP TUYA",
+        "price": 9390000,
+        "formatted_price": "9.390.000 đ"
+      },
+      {
+        "description": "+ REMOTE",
+        "price": 10390000,
+        "formatted_price": "10.390.000 đ"
+      }
+    ]
+  },
+  "KL-600PC": {
+    "name": "KL - 600 PC",
+    "base_price": 8390000,
+    "formatted_base_price": "8.390.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [38],
+    "variants": [
+      {
+        "description": "Không có phụ kiện",
+        "price": 8390000,
+        "formatted_price": "8.390.000 đ"
+      },
+      {
+        "description": "+ APP TUYA",
+        "price": 9390000,
+        "formatted_price": "9.390.000 đ"
+      }
+    ]
+  },
+  "KL-838": {
+    "name": "KL - 838",
+    "base_price": 17590000,
+    "formatted_base_price": "17.590.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [31],
+    "variants": [
+      {
+        "description": "SILVER BLUE",
+        "price": 17590000,
+        "formatted_price": "17.590.000 đ"
+      },
+      {
+        "description": "RED BRONZE",
+        "price": 18590000,
+        "formatted_price": "18.590.000 đ"
+      }
+    ]
+  }
+}
