@@ -62,7 +62,7 @@ export class GetProductsDto {
   categoryId?: number;
 
   @ApiPropertyOptional({
-    description: 'Tên thương hiệu để lọc sản phẩm (ví dụ: Kassler, Philips, Bosch)',
+    description: 'Tên thương hiệu để lọc sản phẩm (không phân biệt hoa/thường, ví dụ: kassler, PHILIPS, bosch)',
     type: String,
   })
   @IsOptional()
