@@ -2796,7 +2796,7 @@
     "brand": "Kassler",
     "options": [
       {
-        "name": "Màu",
+        "name": "Màu sắc",
         "values": [
           "SILVER BLUE",
           "RED BRONZE"
@@ -3649,7 +3649,35 @@
       ],
       "videos": []
     },
-    "brand": "Kassler"
+    "brand": "Kassler",
+    "options": [
+      {
+        "name": "Phụ kiện",
+        "values": [
+          "Không",
+          "+ APP TUYA + REMOTE (WIFI)"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-589_v1",
+        "label": "Không",
+        "attributes": {},
+        "price": 5290000,
+        "formatted_price": "5.290.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-589_v2",
+        "label": "+ APP TUYA + REMOTE (WIFI)",
+        "attributes": {},
+        "price": 5790000,
+        "formatted_price": "5.790.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
   },
   {
     "id": "1dfb0161-d947-4795-9e1e-c8a0b7b1404e",
@@ -3732,7 +3760,35 @@
       ],
       "videos": []
     },
-    "brand": "Kassler"
+    "brand": "Kassler",
+    "options": [
+      {
+        "name": "Phụ kiện",
+        "values": [
+          "Không",
+          "+ APP TUYA + REMOTE"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-569_v1",
+        "label": "Không",
+        "attributes": {},
+        "price": 5690000,
+        "formatted_price": "5.690.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-569_v2",
+        "label": "+ APP TUYA + REMOTE",
+        "attributes": {},
+        "price": 6690000,
+        "formatted_price": "6.690.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
   },
   {
     "id": "1a278d0b-e445-4c61-b45f-1e0fd289c54d",
