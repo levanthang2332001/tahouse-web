@@ -16,8 +16,6 @@ import {
 } from './constants/product.constants';
 import type {
   IProduct,
-  IProductListItem,
-  IInstallation,
   IInstallationMediaResponse,
   IProductsListResponse,
 } from './types/product.types';
@@ -215,7 +213,10 @@ export class ProductsService {
 
     const installation = product.installation ?? PRODUCT_DEFAULTS.INSTALLATION;
     productResponse.installation_preview = installation.images
-      ? installation.images.slice(0, PRODUCT_DEFAULTS.INSTALLATION_PREVIEW_LIMIT)
+      ? installation.images.slice(
+          0,
+          PRODUCT_DEFAULTS.INSTALLATION_PREVIEW_LIMIT,
+        )
       : [];
 
     // Xóa trường installation đầy đủ để tối ưu dung lượng tải trang chi tiết sản phẩm
