@@ -17455,5 +17455,1828 @@
     },
     "priority": null,
     "page_number": null
+  },
+  {
+    "id": "34e0115d-8a0a-46a6-bed6-9502d8e68c77",
+    "code": "KL-589FG",
+    "name": "KL - 589 FG",
+    "price": 22690000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Đen"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 589 FG - Khóa thông minh chất lượng cao",
+    "page_number": 39,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "22.690.000 đ",
+    "category_id": 1,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Phụ kiện",
+        "values": [
+          "Không",
+          "+ APP TUYA"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-589FG_v1",
+        "label": "Không",
+        "attributes": {
+          "Phụ kiện": "Không"
+        },
+        "price": 22690000,
+        "formatted_price": "22.690.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-589FG_v2",
+        "label": "+ APP TUYA",
+        "attributes": {
+          "Phụ kiện": "+ APP TUYA"
+        },
+        "price": 22690000,
+        "formatted_price": "22.690.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "a241f9a6-2f7a-4ab8-9632-26b7c01a76eb",
+    "code": "KL-838B",
+    "name": "KL - 838 B",
+    "price": 5390000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Vàng",
+      "Đỏ Đồng",
+      "Đen",
+      "Đồng",
+      "Xanh Đồng"
+    ],
+    "category": "Khóa Cửa Thường",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 838 B - Khóa thông minh chất lượng cao",
+    "page_number": 40,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "5.390.000 đ",
+    "category_id": 2,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "GOLD",
+          "RED BRONZE",
+          "BLACK",
+          "BRONZE",
+          "GREEN BRONZE"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-838B_v1",
+        "label": "GOLD",
+        "attributes": {
+          "Màu sắc": "GOLD"
+        },
+        "price": 5390000,
+        "formatted_price": "5.390.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-838B_v2",
+        "label": "RED BRONZE",
+        "attributes": {
+          "Màu sắc": "RED BRONZE"
+        },
+        "price": 5790000,
+        "formatted_price": "5.790.000 đ",
+        "is_default": false
+      },
+      {
+        "id": "KL-838B_v3",
+        "label": "BLACK",
+        "attributes": {
+          "Màu sắc": "BLACK"
+        },
+        "price": 5790000,
+        "formatted_price": "5.790.000 đ",
+        "is_default": false
+      },
+      {
+        "id": "KL-838B_v4",
+        "label": "BRONZE",
+        "attributes": {
+          "Màu sắc": "BRONZE"
+        },
+        "price": 5790000,
+        "formatted_price": "5.790.000 đ",
+        "is_default": false
+      },
+      {
+        "id": "KL-838B_v5",
+        "label": "GREEN BRONZE",
+        "attributes": {
+          "Màu sắc": "GREEN BRONZE"
+        },
+        "price": 5690000,
+        "formatted_price": "5.690.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "47d6dc25-f42d-48c3-9823-4e259f315812",
+    "code": "KL-878",
+    "name": "KL - 878",
+    "price": 5190000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "Đỏ Đồng"
+    ],
+    "category": "Khóa Cửa Thường",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 878 - Khóa thông minh chất lượng cao",
+    "page_number": 41,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "5.190.000 đ",
+    "category_id": 2,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "Không",
+          "RED BRONZE"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-878_v1",
+        "label": "Không",
+        "attributes": {
+          "Màu sắc": "Không"
+        },
+        "price": 5190000,
+        "formatted_price": "5.190.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-878_v2",
+        "label": "RED BRONZE",
+        "attributes": {
+          "Màu sắc": "RED BRONZE"
+        },
+        "price": 5790000,
+        "formatted_price": "5.790.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "a5c23168-b087-4c9f-bb92-0ff71e701d6d",
+    "code": "KL-371",
+    "name": "KL - 371",
+    "price": 6990000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Đen"
+    ],
+    "category": "Khóa Cửa Thường",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 371 - Khóa thông minh chất lượng cao",
+    "page_number": 42,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "6.990.000 đ",
+    "category_id": 2,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Phụ kiện",
+        "values": [
+          "Không",
+          "+ APP TUYA"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-371_v1",
+        "label": "Không",
+        "attributes": {
+          "Phụ kiện": "Không"
+        },
+        "price": 6990000,
+        "formatted_price": "6.990.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-371_v2",
+        "label": "+ APP TUYA",
+        "attributes": {
+          "Phụ kiện": "+ APP TUYA"
+        },
+        "price": 7990000,
+        "formatted_price": "7.990.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "8fbb8874-4f34-46ab-af82-6f0c92e639fa",
+    "code": "KL-287CNC",
+    "name": "KL - 287 CNC",
+    "price": 5390000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Đen"
+    ],
+    "category": "Khóa Cửa Thường",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 287 CNC - Khóa thông minh chất lượng cao",
+    "page_number": 43,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "5.390.000 đ",
+    "category_id": 2,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Phụ kiện",
+        "values": [
+          "Không",
+          "+ TIUA"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-287CNC_v1",
+        "label": "Không",
+        "attributes": {
+          "Phụ kiện": "Không"
+        },
+        "price": 5390000,
+        "formatted_price": "5.390.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-287CNC_v2",
+        "label": "+ TIUA",
+        "attributes": {
+          "Phụ kiện": "+ TIUA"
+        },
+        "price": 5390000,
+        "formatted_price": "5.390.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "d2d9ccbe-2771-4622-aa89-dad75605ccb8",
+    "code": "KL-587CNC",
+    "name": "KL - 587 CNC",
+    "price": 5690000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Xám"
+    ],
+    "category": "Khóa Cửa Thường",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 587 CNC - Khóa thông minh chất lượng cao",
+    "page_number": 43,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "5.690.000 đ",
+    "category_id": 2,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Phụ kiện",
+        "values": [
+          "Không",
+          "+ TIUA"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-587CNC_v1",
+        "label": "Không",
+        "attributes": {
+          "Phụ kiện": "Không"
+        },
+        "price": 5690000,
+        "formatted_price": "5.690.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-587CNC_v2",
+        "label": "+ TIUA",
+        "attributes": {
+          "Phụ kiện": "+ TIUA"
+        },
+        "price": 5690000,
+        "formatted_price": "5.690.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "343e5b50-3c5f-49c3-b27c-e12cc5235908",
+    "code": "KL-266",
+    "name": "KL - 266",
+    "price": 5490000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Đồng",
+      "Đen"
+    ],
+    "category": "Khóa Cửa Thường",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 266 - Khóa thông minh chất lượng cao",
+    "page_number": 44,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "5.490.000 đ",
+    "category_id": 2,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "COPPER",
+          "BLACK"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-266_v1",
+        "label": "COPPER",
+        "attributes": {
+          "Màu sắc": "COPPER"
+        },
+        "price": 5490000,
+        "formatted_price": "5.490.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-266_v2",
+        "label": "BLACK",
+        "attributes": {
+          "Màu sắc": "BLACK"
+        },
+        "price": 5690000,
+        "formatted_price": "5.690.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "0287c4d9-6086-4d38-bb52-862f69940fa1",
+    "code": "KL-292CNC",
+    "name": "KL - 292 CNC",
+    "price": 13590000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Vàng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 292 CNC - Khóa thông minh chất lượng cao",
+    "page_number": 48,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "13.590.000 đ",
+    "category_id": 1,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "GOLD"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-292CNC_v1",
+        "label": "GOLD",
+        "attributes": {
+          "Màu sắc": "GOLD"
+        },
+        "price": 13590000,
+        "formatted_price": "13.590.000 đ",
+        "is_default": true
+      }
+    ],
+    "has_variants": false
+  },
+  {
+    "id": "80ff2b5f-d5d9-4257-bde9-5c228a0480c0",
+    "code": "KL-592CNC",
+    "name": "KL - 592 CNC",
+    "price": 13590000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Xám"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 592 CNC - Khóa thông minh chất lượng cao",
+    "page_number": 48,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "13.590.000 đ",
+    "category_id": 1,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "GREY"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-592CNC_v1",
+        "label": "GREY",
+        "attributes": {
+          "Màu sắc": "GREY"
+        },
+        "price": 13590000,
+        "formatted_price": "13.590.000 đ",
+        "is_default": true
+      }
+    ],
+    "has_variants": false
+  },
+  {
+    "id": "01104af0-2db8-452f-b314-405d62ade58e",
+    "code": "KL-999AT",
+    "name": "KL - 999 AT",
+    "price": 16190000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "Xám"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 999 AT - Khóa thông minh chất lượng cao",
+    "page_number": 49,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "16.190.000 đ",
+    "category_id": 1,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "BLACK",
+          "GREY"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-999AT_v1",
+        "label": "BLACK",
+        "attributes": {
+          "Màu sắc": "BLACK"
+        },
+        "price": 16190000,
+        "formatted_price": "16.190.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-999AT_v2",
+        "label": "GREY",
+        "attributes": {
+          "Màu sắc": "GREY"
+        },
+        "price": 16190000,
+        "formatted_price": "16.190.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "c5e979dc-9cc3-4ef0-b895-10424b4bb2f1",
+    "code": "KL-999PRO",
+    "name": "KL - 999 PRO",
+    "price": 14390000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Xám",
+      "Vàng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 999 PRO - Khóa thông minh chất lượng cao",
+    "page_number": 51,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "14.390.000 đ",
+    "category_id": 1,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "GREY",
+          "CHAMPAGNE GOLD"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-999PRO_v1",
+        "label": "GREY",
+        "attributes": {
+          "Màu sắc": "GREY"
+        },
+        "price": 14390000,
+        "formatted_price": "14.390.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-999PRO_v2",
+        "label": "CHAMPAGNE GOLD",
+        "attributes": {
+          "Màu sắc": "CHAMPAGNE GOLD"
+        },
+        "price": 14390000,
+        "formatted_price": "14.390.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "63136995-83d0-4e51-9c2d-78ef1dc90af1",
+    "code": "KL-999CNC",
+    "name": "KL - 999 CNC",
+    "price": 13900000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Vàng",
+      "Xám",
+      "Đen"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 999 CNC - Khóa thông minh chất lượng cao",
+    "page_number": 54,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "13.900.000 đ",
+    "category_id": 1,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "CHAMPAGNE GOLD",
+          "GREY",
+          "BLACK"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-999CNC_v1",
+        "label": "CHAMPAGNE GOLD",
+        "attributes": {
+          "Màu sắc": "CHAMPAGNE GOLD"
+        },
+        "price": 14900000,
+        "formatted_price": "14.900.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-999CNC_v2",
+        "label": "GREY",
+        "attributes": {
+          "Màu sắc": "GREY"
+        },
+        "price": 13900000,
+        "formatted_price": "13.900.000 đ",
+        "is_default": false
+      },
+      {
+        "id": "KL-999CNC_v3",
+        "label": "BLACK",
+        "attributes": {
+          "Màu sắc": "BLACK"
+        },
+        "price": 13900000,
+        "formatted_price": "13.900.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "d0ab921c-bee9-453e-9e79-e43a358d870f",
+    "code": "KL-999LX",
+    "name": "KL - 999 LX",
+    "price": 10690000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "Vàng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 999 LX - Khóa thông minh chất lượng cao",
+    "page_number": 57,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "10.690.000 đ",
+    "category_id": 1,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "BLACK",
+          "CHAMPAGNE"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-999LX_v1",
+        "label": "BLACK",
+        "attributes": {
+          "Màu sắc": "BLACK"
+        },
+        "price": 10690000,
+        "formatted_price": "10.690.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-999LX_v2",
+        "label": "CHAMPAGNE",
+        "attributes": {
+          "Màu sắc": "CHAMPAGNE"
+        },
+        "price": 11690000,
+        "formatted_price": "11.690.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "fedab683-a4d5-4a0b-a661-6b9991a1f621",
+    "code": "KL-999PROPLUS",
+    "name": "KL - 999 PRO PLUS",
+    "price": 11390000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "Xám"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 999 PRO PLUS - Khóa thông minh chất lượng cao",
+    "page_number": 59,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "11.390.000 đ",
+    "category_id": 1,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "BLACK",
+          "GREY"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-999PROPLUS_v1",
+        "label": "BLACK",
+        "attributes": {
+          "Màu sắc": "BLACK"
+        },
+        "price": 11390000,
+        "formatted_price": "11.390.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-999PROPLUS_v2",
+        "label": "GREY",
+        "attributes": {
+          "Màu sắc": "GREY"
+        },
+        "price": 12390000,
+        "formatted_price": "12.390.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "652c011e-e895-46b7-b3ab-61f30463b61b",
+    "code": "KL-999IS",
+    "name": "KL - 999 IS",
+    "price": 7490000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Vàng",
+      "Xám",
+      "Đen"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 999 IS - Khóa thông minh chất lượng cao",
+    "page_number": 60,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "7.490.000 đ",
+    "category_id": 1,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "CHAMPAGNE GOLD",
+          "GREY",
+          "BLACK"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-999IS_v1",
+        "label": "CHAMPAGNE GOLD",
+        "attributes": {
+          "Màu sắc": "CHAMPAGNE GOLD"
+        },
+        "price": 8990000,
+        "formatted_price": "8.990.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-999IS_v2",
+        "label": "GREY",
+        "attributes": {
+          "Màu sắc": "GREY"
+        },
+        "price": 7490000,
+        "formatted_price": "7.490.000 đ",
+        "is_default": false
+      },
+      {
+        "id": "KL-999IS_v3",
+        "label": "BLACK",
+        "attributes": {
+          "Màu sắc": "BLACK"
+        },
+        "price": 7490000,
+        "formatted_price": "7.490.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "d6c3c525-3d68-45bb-95ff-4286ad32283e",
+    "code": "KL-999SR",
+    "name": "KL - 999 SR",
+    "price": 7690000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Xám"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 999 SR - Khóa thông minh chất lượng cao",
+    "page_number": 63,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "7.690.000 đ",
+    "category_id": 1,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "GREY"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-999SR_v1",
+        "label": "GREY",
+        "attributes": {
+          "Màu sắc": "GREY"
+        },
+        "price": 7690000,
+        "formatted_price": "7.690.000 đ",
+        "is_default": true
+      }
+    ],
+    "has_variants": false
+  },
+  {
+    "id": "2d6618dc-0ac2-407a-b877-69ef2442418a",
+    "code": "KL-599",
+    "name": "KL - 599",
+    "price": 5690000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Đen"
+    ],
+    "category": "Khóa Cửa Thường",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 599 - Khóa thông minh chất lượng cao",
+    "page_number": 64,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "5.690.000 đ",
+    "category_id": 2,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Phụ kiện",
+        "values": [
+          "Không",
+          "+ APP TUYA"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-599_v1",
+        "label": "Không",
+        "attributes": {
+          "Phụ kiện": "Không"
+        },
+        "price": 5690000,
+        "formatted_price": "5.690.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-599_v2",
+        "label": "+ APP TUYA",
+        "attributes": {
+          "Phụ kiện": "+ APP TUYA"
+        },
+        "price": 6690000,
+        "formatted_price": "6.690.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "e58c501f-eabd-4a08-893a-a2b6ce7be170",
+    "code": "KL-599SR",
+    "name": "KL - 599 SR",
+    "price": 6390000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Xám"
+    ],
+    "category": "Khóa Cửa Thường",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 599 SR - Khóa thông minh chất lượng cao",
+    "page_number": 66,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "6.390.000 đ",
+    "category_id": 2,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "GREY"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-599SR_v1",
+        "label": "GREY",
+        "attributes": {
+          "Màu sắc": "GREY"
+        },
+        "price": 6390000,
+        "formatted_price": "6.390.000 đ",
+        "is_default": true
+      }
+    ],
+    "has_variants": false
+  },
+  {
+    "id": "847b1acc-95f0-451c-8f0c-3e2f17267f11",
+    "code": "KL-999L",
+    "name": "KL - 999 L",
+    "price": 9390000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Đen",
+      "Xám"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 999 L - Khóa thông minh chất lượng cao",
+    "page_number": 67,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "9.390.000 đ",
+    "category_id": 1,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Màu sắc",
+        "values": [
+          "BLACK",
+          "GREY"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-999L_v1",
+        "label": "BLACK",
+        "attributes": {
+          "Màu sắc": "BLACK"
+        },
+        "price": 9390000,
+        "formatted_price": "9.390.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-999L_v2",
+        "label": "GREY",
+        "attributes": {
+          "Màu sắc": "GREY"
+        },
+        "price": 9690000,
+        "formatted_price": "9.690.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "4eb604df-4da1-4092-bd8e-b6ce8f4abf89",
+    "code": "KL-576CNC",
+    "name": "KL - 576 CNC",
+    "price": 12690000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Xám",
+      "Vàng"
+    ],
+    "category": "Khóa Đại Sảnh",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 576 CNC - Khóa thông minh chất lượng cao",
+    "page_number": 68,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "12.690.000 đ",
+    "category_id": 1,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Phụ kiện",
+        "values": [
+          "SILVER GREY",
+          "+ REMOTE (WIFI)",
+          "GOLD GREY + REMOTE (WIFI)"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-576CNC_v1",
+        "label": "SILVER GREY",
+        "attributes": {
+          "Phụ kiện": "SILVER GREY"
+        },
+        "price": 12690000,
+        "formatted_price": "12.690.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-576CNC_v2",
+        "label": "+ REMOTE (WIFI)",
+        "attributes": {
+          "Phụ kiện": "+ REMOTE (WIFI)"
+        },
+        "price": 13690000,
+        "formatted_price": "13.690.000 đ",
+        "is_default": false
+      },
+      {
+        "id": "KL-576CNC_v3",
+        "label": "GOLD GREY + REMOTE (WIFI)",
+        "attributes": {
+          "Phụ kiện": "GOLD GREY + REMOTE (WIFI)"
+        },
+        "price": 14690000,
+        "formatted_price": "14.690.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
+  },
+  {
+    "id": "61800c41-c81f-4753-9f1c-ad4169ec9e99",
+    "code": "KL-573",
+    "name": "KL - 573",
+    "price": 7690000,
+    "specs": [
+      {
+        "key": "Loại khóa",
+        "value": "Khóa thông minh"
+      },
+      {
+        "key": "Vật liệu",
+        "value": "Hợp kim kẽm"
+      },
+      {
+        "key": "Nguồn điện",
+        "value": "Pin AA"
+      },
+      {
+        "key": "Số lần mở/khóa",
+        "value": "3000 lần"
+      },
+      {
+        "key": "Nhiệt độ vận hành",
+        "value": "-20°C ~ 60°C"
+      }
+    ],
+    "colors": [
+      "Đen"
+    ],
+    "category": "Khóa Cửa Thường",
+    "features": [
+      "Vận hành bằng mã PIN",
+      "Điều khiển từ xa qua APP",
+      "Khóa tự động",
+      "Chống nước, chống bụi"
+    ],
+    "warranty": "2 năm",
+    "description": "KL - 573 - Khóa thông minh chất lượng cao",
+    "page_number": 70,
+    "technologies": [
+      "Smart Lock",
+      "App Control"
+    ],
+    "images": [],
+    "formatted_price": "7.690.000 đ",
+    "category_id": 2,
+    "priority": null,
+    "installation": {
+      "images": [],
+      "videos": []
+    },
+    "options": [
+      {
+        "name": "Phụ kiện",
+        "values": [
+          "Không",
+          "+ APP TUYA"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "id": "KL-573_v1",
+        "label": "Không",
+        "attributes": {
+          "Phụ kiện": "Không"
+        },
+        "price": 7690000,
+        "formatted_price": "7.690.000 đ",
+        "is_default": true
+      },
+      {
+        "id": "KL-573_v2",
+        "label": "+ APP TUYA",
+        "attributes": {
+          "Phụ kiện": "+ APP TUYA"
+        },
+        "price": 7690000,
+        "formatted_price": "7.690.000 đ",
+        "is_default": false
+      }
+    ],
+    "has_variants": true
   }
 ]
