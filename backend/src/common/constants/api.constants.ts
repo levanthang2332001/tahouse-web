@@ -11,6 +11,7 @@ export enum ApiRoute {
   PRODUCTS_LOCKS = 'products/locks',
   PRODUCTS_LOCKS_DETAIL = 'products/locks/:code',
   PRODUCTS_LOCKS_INSTALLATION = 'products/locks/:code/installation',
+  BRANDS = 'brands',
 }
 
 /**
@@ -18,4 +19,5 @@ export enum ApiRoute {
  */
 export enum SwaggerTag {
   PRODUCTS = 'products',
+  BRANDS = 'brands',
 }

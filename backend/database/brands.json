@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "name": "Kassler",
+    "logo": "/brand/kassler.png",
+    "categories": [
+      {
+        "id": 1,
+        "name": "Khóa Đại Sảnh"
+      },
+      {
+        "id": 2,
+        "name": "Khóa Cửa Gỗ"
+      },
+      {
+        "id": 3,
+        "name": "Khóa Cửa Kính"
+      },
+      {
+        "id": 4,
+        "name": "Khóa Cửa Nhôm"
+      },
+      {
+        "id": 8,
+        "name": "Két Sắt Thông Minh"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Philips",
+    "logo": "/brand/philips.png",
+    "categories": [
+      {
+        "id": 1,
+        "name": "Khóa Đại Sảnh"
+      },
+      {
+        "id": 2,
+        "name": "Khóa Cửa Gỗ"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Bosch",
+    "logo": "/brand/bosch.png",
+    "categories": [
+      {
+        "id": 2,
+        "name": "Khóa Cửa Gỗ"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Sharp",
+    "logo": "/brand/sharp.png",
+    "categories": [
+      {
+        "id": 2,
+        "name": "Khóa Cửa Gỗ"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Hyundai",
+    "logo": "/brand/hyundai.png",
+    "categories": [
+      {
+        "id": 1,
+        "name": "Khóa Đại Sảnh"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Hubert",
+    "logo": "/brand/hubert.png",
+    "categories": [
+      {
+        "id": 1,
+        "name": "Khóa Đại Sảnh"
+      },
+      {
+        "id": 2,
+        "name": "Khóa Cửa Gỗ"
+      },
+      {
+        "id": 3,
+        "name": "Khóa Cửa Kính"
+      },
+      {
+        "id": 4,
+        "name": "Khóa Cửa Nhôm"
+      },
+      {
+        "id": 5,
+        "name": "Khóa Cửa Cổng"
+      },
+      {
+        "id": 6,
+        "name": "Khóa Khách Sạn"
+      },
+      {
+        "id": 8,
+        "name": "Két Sắt Thông Minh"
+      }
+    ]
+  }
+]

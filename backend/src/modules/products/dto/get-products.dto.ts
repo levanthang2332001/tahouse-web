@@ -29,14 +29,14 @@ export class GetProductsDto {
     description: 'Số lượng sản phẩm trên mỗi trang',
     default: 10,
     minimum: 1,
-    maximum: 100,
+    maximum: 500,
     type: Number,
   })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(100)
+  @Max(500)
   limit?: number = 10;
 
   @ApiPropertyOptional({
@@ -60,6 +60,14 @@ export class GetProductsDto {
   @Min(1)
   @Max(8)
   categoryId?: number;
+
+  @ApiPropertyOptional({
+    description: 'Tên thương hiệu để lọc sản phẩm (ví dụ: Kassler, Philips, Bosch)',
+    type: String,
+  })
+  @IsOptional()
+  @IsString()
+  brand?: string;
 
   @ApiPropertyOptional({
     description:
