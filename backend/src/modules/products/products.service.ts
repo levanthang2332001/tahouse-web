@@ -17,6 +17,10 @@ export class ProductsService {
     this.getProducts = this.jsonDb.register('products.json', []);
   }
 
+  getRawProducts(): any[] {
+    return this.getProducts();
+  }
+
   /** Giá hiệu dụng: dùng root price nếu có, nếu không lấy giá thấp nhất trong variants. */
   private resolvePrice(product: any): number | null {
     if (product.price !== null && product.price !== undefined) {
