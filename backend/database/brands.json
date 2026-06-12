@@ -2,26 +2,28 @@
   {
     "id": 1,
     "name": "Kassler",
+    "slug": "kassler",
     "logo": "/brand/kassler.png",
+    "logoHtml": "<span class=\"font-sans font-black tracking-wide text-red-600 italic text-[12px] select-none\">KASSLER</span>",
     "categories": [
       {
-        "id": 1,
+        "slug": "dai-sanh",
         "name": "Khóa Đại Sảnh"
       },
       {
-        "id": 2,
+        "slug": "cua-go",
         "name": "Khóa Cửa Gỗ"
       },
       {
-        "id": 3,
+        "slug": "cua-kinh",
         "name": "Khóa Cửa Kính"
       },
       {
-        "id": 4,
+        "slug": "xingfa-sat",
         "name": "Khóa Cửa Nhôm"
       },
       {
-        "id": 8,
+        "slug": "Smart",
         "name": "Két Sắt Thông Minh"
       }
     ]
@@ -29,14 +31,16 @@
   {
     "id": 2,
     "name": "Philips",
+    "slug": "philips",
     "logo": "/brand/philips.png",
+    "logoHtml": "<span class=\"font-sans font-extrabold tracking-widest text-[#0066a1] text-[10px] select-none\">PHILIPS</span>",
     "categories": [
       {
-        "id": 1,
+        "slug": "dai-sanh",
         "name": "Khóa Đại Sảnh"
       },
       {
-        "id": 2,
+        "slug": "cua-go",
         "name": "Khóa Cửa Gỗ"
       }
     ]
@@ -44,10 +48,12 @@
   {
     "id": 3,
     "name": "Bosch",
+    "slug": "bosch",
     "logo": "/brand/bosch.png",
+    "logoHtml": "<span class=\"font-sans font-black tracking-tighter text-[#0056A8] text-[14px] select-none\">BOSCH</span>",
     "categories": [
       {
-        "id": 2,
+        "slug": "cua-go",
         "name": "Khóa Cửa Gỗ"
       }
     ]
@@ -55,10 +61,12 @@
   {
     "id": 4,
     "name": "Sharp",
+    "slug": "sharp",
     "logo": "/brand/sharp.png",
+    "logoHtml": "<span class=\"font-sans font-black text-red-600 text-[14px] select-none\">SHARP</span>",
     "categories": [
       {
-        "id": 2,
+        "slug": "cua-go",
         "name": "Khóa Cửa Gỗ"
       }
     ]
@@ -66,10 +74,12 @@
   {
     "id": 5,
     "name": "Hyundai",
+    "slug": "hyundai",
     "logo": "/brand/hyundai.png",
+    "logoHtml": "<span class=\"font-sans font-bold tracking-widest text-[#002c5f] text-[12px] select-none\">HYUNDAI</span>",
     "categories": [
       {
-        "id": 1,
+        "slug": "dai-sanh",
         "name": "Khóa Đại Sảnh"
       }
     ]
@@ -77,34 +87,36 @@
   {
     "id": 6,
     "name": "Hubert",
+    "slug": "hubert",
     "logo": "/brand/hubert.png",
+    "logoHtml": "<span class=\"font-sans font-extrabold text-black text-[14px] select-none\">HUBERT</span>",
     "categories": [
       {
-        "id": 1,
+        "slug": "dai-sanh",
         "name": "Khóa Đại Sảnh"
       },
       {
-        "id": 2,
+        "slug": "cua-go",
         "name": "Khóa Cửa Gỗ"
       },
       {
-        "id": 3,
+        "slug": "cua-kinh",
         "name": "Khóa Cửa Kính"
       },
       {
-        "id": 4,
+        "slug": "xingfa-sat",
         "name": "Khóa Cửa Nhôm"
       },
       {
-        "id": 5,
+        "slug": "cua-cong",
         "name": "Khóa Cửa Cổng"
       },
       {
-        "id": 6,
+        "slug": "khach-san",
         "name": "Khóa Khách Sạn"
       },
       {
-        "id": 8,
+        "slug": "Smart",
         "name": "Két Sắt Thông Minh"
       }
     ]

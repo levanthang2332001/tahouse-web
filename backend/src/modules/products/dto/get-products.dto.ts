@@ -3,13 +3,9 @@ import { Type } from 'class-transformer';
 import { IsInt, IsOptional, Max, Min, IsString, IsEnum } from 'class-validator';
 
 export enum ProductSortBy {
-  PRICE = 'price',
-  NAME = 'name',
-}
-
-export enum SortOrder {
-  ASC = 'asc',
-  DESC = 'desc',
+  NEWEST = 'newest',
+  PRICE_ASC = 'price-asc',
+  PRICE_DESC = 'price-desc',
 }
 
 export class GetProductsDto {
@@ -41,28 +37,49 @@ export class GetProductsDto {
 
   @ApiPropertyOptional({
     description:
-      'ID danh mục để lọc sản phẩm:\n' +
-      '* 1: Khóa Đại Sảnh\n' +
-      '* 2: Khóa Cửa Gỗ\n' +
-      '* 3: Khóa Cửa Kính\n' +
-      '* 4: Khóa Cửa Nhôm\n' +
-      '* 5: Khóa Cửa Cổng\n' +
-      '* 6: Khóa Khách Sạn\n' +
-      '* 7: Phụ Kiện\n' +
-      '* 8: Két Sắt Thông Minh',
-    type: Number,
-    minimum: 1,
-    maximum: 8,
+      'Slug danh mục chính để lọc sản phẩm:\n' +
+      '* lock-parent (toàn bộ khóa)\n' +
+      '* dai-sanh\n' +
+      '* cua-go\n' +
+      '* cua-kinh\n' +
+      '* xingfa-sat\n' +
+      '* cua-cong\n' +
+      '* khach-san\n' +
+      '* Kitchen\n' +
+      '* Water\n' +
+      '* Cabinet\n' +
+      '* Smart',
+    type: String,
   })
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(8)
-  categoryId?: number;
+  @IsString()
+  category?: string;
 
   @ApiPropertyOptional({
-    description: 'Tên thương hiệu để lọc sản phẩm (không phân biệt hoa/thường, ví dụ: kassler, PHILIPS, bosch)',
+    description:
+      'Slug danh mục con để lọc sản phẩm:\n' +
+      '* bep-tu\n' +
+      '* may-hut-mui\n' +
+      '* chau-rua\n' +
+      '* voi-rua\n' +
+      '* lo-nuong\n' +
+      '* may-rua-chen\n' +
+      '* ket-mini\n' +
+      '* ket-gia-dinh\n' +
+      '* ket-van-phong\n' +
+      '* may-loc-nuoc-ro\n' +
+      '* may-loc-nuoc-ion-kiem\n' +
+      '* loc-tong-sinh-hoat\n' +
+      '* loi-loc-phu-kien',
+    type: String,
+  })
+  @IsOptional()
+  @IsString()
+  subcategory?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Slug thương hiệu để lọc sản phẩm (ví dụ: kassler, philips, bosch)',
     type: String,
   })
   @IsOptional()
@@ -71,7 +88,7 @@ export class GetProductsDto {
 
   @ApiPropertyOptional({
     description:
-      'Từ khóa tìm kiếm thông minh (tìm theo tên, mã, mô tả, tính năng... hỗ trợ không dấu)',
+      'Từ khóa tìm kiếm thông minh (tìm theo tên, mã, danh mục, mô tả, tính năng... hỗ trợ không dấu)',
     type: String,
   })
   @IsOptional()
@@ -101,19 +118,11 @@ export class GetProductsDto {
   maxPrice?: number;
 
   @ApiPropertyOptional({
-    description: 'Trường sắp xếp (ví dụ: price, name)',
+    description: 'Tiêu chí sắp xếp sản phẩm',
     enum: ProductSortBy,
+    default: ProductSortBy.NEWEST,
   })
   @IsOptional()
   @IsEnum(ProductSortBy)
-  sortBy?: ProductSortBy;
-
-  @ApiPropertyOptional({
-    description: 'Thứ tự sắp xếp (asc: tăng dần, desc: giảm dần)',
-    enum: SortOrder,
-    default: SortOrder.ASC,
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  sortOrder?: SortOrder = SortOrder.ASC;
+  sortBy?: ProductSortBy = ProductSortBy.NEWEST;
 }

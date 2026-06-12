@@ -1,24 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { removeDiacritics } from '@/common/utils/string.util';
 import { JsonDbService } from '../database/json-db.service';
-import {
-  GetProductsDto,
-  ProductSortBy,
-  SortOrder,
-} from './dto/get-products.dto';
+import { GetProductsDto, ProductSortBy } from './dto/get-products.dto';
 import {
   GetInstallationMediaDto,
   MediaType,
 } from './dto/get-installation-media.dto';
-import {
-  PRODUCT_DEFAULTS,
-  PRODUCT_SORT_ORDER,
-} from './constants/product.constants';
-import type {
-  IProduct,
-  IInstallationMediaResponse,
-  IProductsListResponse,
-} from './types/product.types';
+import { PRODUCT_DEFAULTS } from './constants/product.constants';
+import type { IProduct, IProductsListResponse } from './types/product.types';
 
 @Injectable()
 export class ProductsService {
@@ -30,57 +19,91 @@ export class ProductsService {
 
   /** Giá hiệu dụng: dùng root price nếu có, nếu không lấy giá thấp nhất trong variants. */
   private resolvePrice(product: any): number | null {
-    if (product.price !== null && product.price !== undefined)
+    if (product.price !== null && product.price !== undefined) {
       return product.price;
+    }
     if (Array.isArray(product.variants) && product.variants.length > 0) {
       const prices = product.variants
         .map((v: any) => v.price)
         .filter((p: any) => p !== null && p !== undefined) as number[];
-      if (prices.length > 0) return Math.min(...prices);
+      if (prices.length > 0) {
+        return Math.min(...prices);
+      }
     }
     return null;
-  }
-
-  private formatPrice(price: number | null): string | null {
-    if (price === null || price === undefined) return null;
-    return price.toLocaleString('vi-VN') + ' đ';
   }
 
   findAll(query: GetProductsDto): IProductsListResponse {
     const {
       page = PRODUCT_DEFAULTS.PAGINATION.DEFAULT_PAGE,
       limit = PRODUCT_DEFAULTS.PAGINATION.DEFAULT_LIMIT,
-      categoryId,
+      category,
+      subcategory,
       brand,
       search,
       minPrice,
       maxPrice,
-      sortBy,
-      sortOrder = SortOrder.ASC,
+      sortBy = ProductSortBy.NEWEST,
     } = query;
 
-    // Sao chép nông (shallow copy) mảng để tránh thay đổi trực tiếp dữ liệu trong RAM cache
     let products = [...this.getProducts()];
 
-    if (categoryId !== undefined && categoryId !== null && !isNaN(categoryId)) {
-      products = products.filter((p) => p.category_id === categoryId);
+    // 1. Lọc theo category slug
+    if (category && category.trim()) {
+      const queryCat = category.trim().toLowerCase();
+      if (queryCat === 'lock-parent') {
+        const lockSlugs = [
+          'dai-sanh',
+          'cua-go',
+          'cua-kinh',
+          'xingfa-sat',
+          'cua-cong',
+          'khach-san',
+        ];
+        products = products.filter((p) =>
+          lockSlugs.includes(p.category?.toLowerCase()),
+        );
+      } else {
+        products = products.filter(
+          (p) => p.category?.toLowerCase() === queryCat,
+        );
+      }
     }
-    if (brand && brand.trim()) {
+
+    // 2. Lọc theo subcategory slug
+    if (subcategory && subcategory.trim()) {
+      const querySub = subcategory.trim().toLowerCase();
       products = products.filter(
-        (p) => p.brand && p.brand.toLowerCase() === brand.toLowerCase(),
+        (p) => p.subcategory?.toLowerCase() === querySub,
       );
     }
+
+    // 3. Lọc theo brand slug hoặc tên brand
+    if (brand && brand.trim()) {
+      const queryBrand = brand.trim().toLowerCase();
+      products = products.filter(
+        (p) =>
+          p.brandSlug === queryBrand ||
+          (p.brand && p.brand.toLowerCase() === queryBrand),
+      );
+    }
+
+    // 4. Lọc theo giá tối thiểu
     if (minPrice !== undefined && minPrice !== null && !isNaN(minPrice)) {
       products = products.filter(
         (p) => (this.resolvePrice(p) ?? 0) >= minPrice,
       );
     }
+
+    // 5. Lọc theo giá tối đa
     if (maxPrice !== undefined && maxPrice !== null && !isNaN(maxPrice)) {
       products = products.filter((p) => {
         const ep = this.resolvePrice(p);
         return ep !== null && ep <= maxPrice;
       });
     }
+
+    // 6. Tìm kiếm thông minh
     if (search && search.trim()) {
       const searchNorm = removeDiacritics(search.trim().toLowerCase());
       const searchKeywords = searchNorm
@@ -90,12 +113,13 @@ export class ProductsService {
       products = products.filter((p) => {
         const name = p.name || '';
         const code = p.code || '';
-        const category = p.category || '';
+        const catName = p.categoryName || '';
+        const catSlug = p.category || '';
         const desc = p.description || '';
         const features = Array.isArray(p.features) ? p.features.join(' ') : '';
 
         const searchableText = removeDiacritics(
-          `${name} ${code} ${category} ${desc} ${features}`.toLowerCase(),
+          `${name} ${code} ${catName} ${catSlug} ${desc} ${features}`.toLowerCase(),
         );
         return searchKeywords.every((keyword) =>
           searchableText.includes(keyword),
@@ -103,36 +127,33 @@ export class ProductsService {
       });
     }
 
-    if (sortBy) {
-      const order =
-        sortOrder === SortOrder.ASC
-          ? PRODUCT_SORT_ORDER.ASCENDING
-          : PRODUCT_SORT_ORDER.DESCENDING;
+    // 7. Sắp xếp sản phẩm
+    if (sortBy === ProductSortBy.PRICE_ASC) {
       products.sort((a, b) => {
-        const valA =
-          sortBy === ProductSortBy.PRICE ? this.resolvePrice(a) : a[sortBy];
-        const valB =
-          sortBy === ProductSortBy.PRICE ? this.resolvePrice(b) : b[sortBy];
+        const valA = this.resolvePrice(a);
+        const valB = this.resolvePrice(b);
+        const isNullA = valA === null || valA === undefined;
+        const isNullB = valB === null || valB === undefined;
 
-        if (sortBy === ProductSortBy.PRICE) {
-          const isNullA = valA === null || valA === undefined;
-          const isNullB = valB === null || valB === undefined;
+        if (isNullA && isNullB) return 0;
+        if (isNullA) return 1;
+        if (isNullB) return -1;
+        return valA - valB;
+      });
+    } else if (sortBy === ProductSortBy.PRICE_DESC) {
+      products.sort((a, b) => {
+        const valA = this.resolvePrice(a);
+        const valB = this.resolvePrice(b);
+        const isNullA = valA === null || valA === undefined;
+        const isNullB = valB === null || valB === undefined;
 
-          if (isNullA && isNullB) return 0;
-          if (isNullA) return 1;
-          if (isNullB) return -1;
-        }
-
-        if (typeof valA === 'number' && typeof valB === 'number') {
-          return (valA - valB) * order;
-        }
-
-        const strA = String(valA || '').toLowerCase();
-        const strB = String(valB || '').toLowerCase();
-        return strA.localeCompare(strB, 'vi', { sensitivity: 'base' }) * order;
+        if (isNullA && isNullB) return 0;
+        if (isNullA) return 1;
+        if (isNullB) return -1;
+        return valB - valA;
       });
     } else {
-      // Default: sort theo priority, null/undefined luôn ở cuối
+      // Mặc định (Newest/Priority): sắp xếp theo priority, null/undefined luôn ở cuối
       products.sort((a, b) => {
         const pA = a.priority;
         const pB = b.priority;
@@ -147,26 +168,26 @@ export class ProductsService {
       });
     }
 
-    // 3. Phân trang
+    // 8. Phân trang và Mapping Response List (tinh gọn)
     const pageNum = Math.max(1, page);
     const limitNum = Math.max(1, limit);
     const startIndex = (pageNum - 1) * limitNum;
     const paginatedProducts = products.slice(startIndex, startIndex + limitNum);
     const items = paginatedProducts.map((p) => {
-      const effectivePrice = this.resolvePrice(p);
       return {
         id: p.id,
         code: p.code,
         name: p.name,
-        price: effectivePrice,
-        formatted_price:
-          effectivePrice !== null
-            ? this.formatPrice(effectivePrice)
-            : p.formatted_price,
-        brand: p.brand,
+        brand: p.brand || '',
+        brandSlug: p.brandSlug || '',
         category: p.category,
-        images: p.images && p.images.length > 0 ? [p.images[0]] : [],
-        has_variants: Array.isArray(p.variants) && p.variants.length > 1,
+        categoryName: p.categoryName || '',
+        imageUrl: p.imageUrl || '',
+        price: this.resolvePrice(p),
+        originalPrice: p.originalPrice,
+        priceRange: p.priceRange || '',
+        features: Array.isArray(p.features) ? p.features.slice(0, 2) : [],
+        has_variants: p.has_variants || false,
       };
     });
 
@@ -178,72 +199,96 @@ export class ProductsService {
     };
   }
 
-  findOne(code: string): IProduct {
+  findOne(idOrCode: string): IProduct {
     const products = this.getProducts();
-    const cleanQuery = code.trim().toLowerCase().replace(/\s+/g, '');
+    const cleanQuery = idOrCode.trim().toLowerCase().replace(/\s+/g, '');
     const product = products.find(
-      (p) => p.code?.toLowerCase().replace(/\s+/g, '') === cleanQuery,
+      (p) =>
+        p.code?.toLowerCase().replace(/\s+/g, '') === cleanQuery ||
+        p.id?.toLowerCase().replace(/\s+/g, '') === cleanQuery,
     );
 
     if (!product) {
-      throw new NotFoundException(`Không tìm thấy sản phẩm với mã: ${code}`);
+      throw new NotFoundException(
+        `Không tìm thấy sản phẩm với ID hoặc mã: ${idOrCode}`,
+      );
     }
 
-    const productResponse = { ...product };
-    delete productResponse.page_number;
-    delete productResponse.category_id;
-
-    // Resolve effective price (root price or min variant price)
     const effectivePrice = this.resolvePrice(product);
-    productResponse.price = effectivePrice;
-    productResponse.formatted_price =
-      effectivePrice !== null
-        ? this.formatPrice(effectivePrice)
-        : product.formatted_price;
 
-    // Normalize variants: ensure each variant has formatted_price
-    if (Array.isArray(product.variants) && product.variants.length > 0) {
-      productResponse.variants = product.variants.map((v: any) => ({
-        ...v,
-        formatted_price: v.formatted_price ?? this.formatPrice(v.price),
-      }));
-    } else {
-      productResponse.variants = [];
-    }
-
-    const installation = product.installation ?? PRODUCT_DEFAULTS.INSTALLATION;
-    productResponse.installation_preview = installation.images
-      ? installation.images.slice(
+    // Tính toán installation_preview (tối đa 3 ảnh)
+    const installationPreview = product.installation?.images
+      ? product.installation.images.slice(
           0,
           PRODUCT_DEFAULTS.INSTALLATION_PREVIEW_LIMIT,
         )
       : [];
 
-    // Xóa trường installation đầy đủ để tối ưu dung lượng tải trang chi tiết sản phẩm
-    delete productResponse.installation;
+    const productResponse: IProduct = {
+      id: product.id,
+      code: product.code,
+      brand: product.brand,
+      brandSlug: product.brandSlug,
+      category: product.category,
+      categoryName: product.categoryName,
+      subcategory: product.subcategory,
+      subcategoryName: product.subcategoryName,
+      name: product.name,
+      description: product.description || '',
+      shortDescription: product.shortDescription || '',
+      imageUrl: product.imageUrl || '',
+      images: product.images || [],
+      price: effectivePrice,
+      originalPrice: product.originalPrice,
+      priceRange: product.priceRange || '',
+      features: product.features || [],
+      specs: product.specs || {},
+      technologies: product.technologies || [],
+      warranty: typeof product.warranty === 'number' ? product.warranty : 36,
+      warrantyText: product.warrantyText || '',
+      colors: product.colors || [],
+      installationManual: product.installationManual,
+      faq: product.faq,
+      has_variants: product.has_variants || false,
+      options: product.options || [],
+      variants: Array.isArray(product.variants)
+        ? product.variants.map((v: any) => ({
+            id: v.id,
+            label: v.label,
+            attributes: v.attributes || {},
+            price: v.price,
+            priceRange:
+              v.priceRange ||
+              (typeof v.price === 'number'
+                ? v.price.toLocaleString('vi-VN') + ' VNĐ'
+                : ''),
+            is_default: !!v.is_default,
+          }))
+        : [],
+      installation_preview: installationPreview,
+    };
 
     return productResponse;
   }
 
-  getInstallationMedia(
-    code: string,
-    query: GetInstallationMediaDto,
-  ): IInstallationMediaResponse {
+  getInstallationMedia(idOrCode: string, query: GetInstallationMediaDto) {
     const { page = 1, limit = 12, type = MediaType.ALL } = query;
 
     const products = this.getProducts();
-    const cleanQuery = code.trim().toLowerCase().replace(/\s+/g, '');
+    const cleanQuery = idOrCode.trim().toLowerCase().replace(/\s+/g, '');
     const product = products.find(
-      (p) => p.code?.toLowerCase().replace(/\s+/g, '') === cleanQuery,
+      (p) =>
+        p.code?.toLowerCase().replace(/\s+/g, '') === cleanQuery ||
+        p.id?.toLowerCase().replace(/\s+/g, '') === cleanQuery,
     );
 
     if (!product) {
-      throw new NotFoundException(`Không tìm thấy sản phẩm với mã: ${code}`);
+      throw new NotFoundException(
+        `Không tìm thấy sản phẩm với ID hoặc mã: ${idOrCode}`,
+      );
     }
 
     const installation = product.installation ?? PRODUCT_DEFAULTS.INSTALLATION;
-
-    // Lấy mảng media theo type
     const mediaItems: Array<{ url: string; type: 'image' | 'video' }> = [];
 
     if (type === MediaType.IMAGES || type === MediaType.ALL) {
@@ -274,7 +319,7 @@ export class ProductsService {
     const items = mediaItems.slice(startIndex, startIndex + limitNum);
 
     return {
-      product_code: product.code,
+      product_id: product.id,
       product_name: product.name,
       items,
       total,

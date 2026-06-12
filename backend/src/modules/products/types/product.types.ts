@@ -6,10 +6,10 @@ export interface IInstallation {
 export interface IProductVariant {
   id: string;
   label: string;
-  attributes?: Record<string, string>;
+  attributes: Record<string, string>;
   price: number;
-  formatted_price?: string;
-  is_default?: boolean;
+  priceRange: string;
+  is_default: boolean;
 }
 
 export interface IProductOption {
@@ -17,44 +17,50 @@ export interface IProductOption {
   values: string[];
 }
 
-export interface IProductSpec {
-  key: string;
-  value: string;
-}
-
 export interface IProduct {
   id: string;
   code: string;
-  name: string;
-  price: number | null;
-  formatted_price?: string;
-  specs?: IProductSpec[];
-  colors?: string[];
+  brand?: string;
+  brandSlug?: string;
   category: string;
-  category_id?: number;
-  features?: string[];
-  warranty?: string;
-  description?: string;
-  page_number?: number;
-  technologies?: string[];
-  images?: string[];
-  priority?: number | null;
-  installation?: IInstallation;
+  categoryName: string;
+  subcategory?: string;
+  subcategoryName?: string;
+  name: string;
+  description: string;
+  shortDescription: string;
+  imageUrl: string;
+  images: string[];
+  price: number | null;
+  originalPrice?: number;
+  priceRange: string;
+  features: string[];
+  specs: Record<string, string>;
+  technologies: string[];
+  warranty: number;
+  warrantyText: string;
+  colors: string[];
+  installationManual?: string[];
+  faq?: { question: string; answer: string }[];
+  has_variants: boolean;
   options?: IProductOption[];
   variants?: IProductVariant[];
-  has_variants?: boolean;
-  brand?: string;
+  installation_preview?: string[];
 }
 
 export interface IProductListItem {
   id: string;
   code: string;
   name: string;
-  price: number | null;
-  formatted_price: string;
-  brand?: string;
+  brand: string;
+  brandSlug: string;
   category: string;
-  images: string[];
+  categoryName: string;
+  imageUrl: string;
+  price: number | null;
+  originalPrice?: number;
+  priceRange: string;
+  features: string[];
   has_variants: boolean;
 }
 

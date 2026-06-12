@@ -31,24 +31,20 @@ export class ProductsController {
   })
   @ApiParam({
     name: 'code',
-    description: 'Mã sản phẩm (ví dụ: KL-939F)',
-    example: 'KL-939F',
+    description: 'ID dạng slug hoặc Mã sản phẩm (ví dụ: kl-939f hoặc KL-939F)',
+    example: 'kl-939f',
   })
   @ApiResponse({
     status: 200,
     description: 'Danh sách media lắp đặt được trả về thành công.',
     schema: {
       example: {
-        product_code: 'KL-939F',
+        product_id: 'kl-939f',
         product_name: 'KL - 939 F',
         items: [
           {
             url: '/installation/Kassler/KL_-_939_F/IMG_0627.jpg',
             type: 'image',
-          },
-          {
-            url: '/installation/Kassler/KL_-_939_F/IMG_0636.MOV',
-            type: 'video',
           },
         ],
         total: 18,
@@ -69,17 +65,18 @@ export class ProductsController {
 
   @Get(ApiRoute.PRODUCTS_LOCKS_DETAIL)
   @ApiOperation({
-    summary: 'Lấy chi tiết một sản phẩm khóa cửa theo Mã sản phẩm (Code)',
+    summary:
+      'Lấy chi tiết một sản phẩm khóa cửa theo ID (slug) hoặc Mã sản phẩm (Code)',
   })
   @ApiParam({
     name: 'code',
-    description: 'Mã sản phẩm (ví dụ: KL-989F)',
-    example: 'KL-989F',
+    description: 'ID dạng slug hoặc Mã sản phẩm (ví dụ: kl-989f hoặc KL-989F)',
+    example: 'kl-989f',
   })
   @ApiResponse({ status: 200, description: 'Chi tiết sản phẩm được tìm thấy.' })
   @ApiResponse({
     status: 404,
-    description: 'Không tìm thấy sản phẩm với mã tương ứng.',
+    description: 'Không tìm thấy sản phẩm với mã hoặc ID tương ứng.',
   })
   findOne(@Param('code') code: string) {
     return this.productsService.findOne(code);
