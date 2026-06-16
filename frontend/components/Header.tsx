@@ -2,13 +2,22 @@
 
 import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, Search, ShoppingCart, X } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
 
 function HeaderContent() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+
+  const handleNavClick = (path: string) => {
+    if (path === "/" && pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    setIsOpen(false);
+  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -33,11 +42,15 @@ function HeaderContent() {
       }`}
     >
       <div className="relative mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 lg:px-12">
-        <Link href="/" className="group flex items-center gap-2">
-          <img 
-            src="/logoTA2.svg" 
-            alt="TA House Logo" 
-            className="h-14 w-auto object-contain transition-opacity group-hover:opacity-80" 
+        <Link
+          href="/"
+          onClick={() => handleNavClick("/")}
+          className="group flex items-center gap-2"
+        >
+          <img
+            src="/logoTA2.svg"
+            alt="TA House Logo"
+            className="h-14 w-auto object-contain transition-opacity group-hover:opacity-80"
           />
         </Link>
 
@@ -46,6 +59,7 @@ function HeaderContent() {
             <Link
               key={link.name}
               href={link.path}
+              onClick={() => handleNavClick(link.path)}
               className="text-sm font-semibold uppercase tracking-wider text-navy/70 transition-colors duration-300 hover:text-brand-green"
             >
               {link.name}
@@ -112,6 +126,7 @@ function HeaderContent() {
                 <Link
                   key={link.name}
                   href={link.path}
+                  onClick={() => handleNavClick(link.path)}
                   className="border-b border-gray-light/30 py-2 text-sm font-semibold uppercase tracking-wider text-navy/80 transition-colors hover:text-brand-green"
                 >
                   {link.name}
