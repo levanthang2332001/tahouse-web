@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { removeDiacritics } from '@/common/utils/string.util';
+import { resolveMediaUrl, resolveMediaUrls } from '@/common/utils/url.util';
 import { JsonDbService } from '../database/json-db.service';
 import { GetProductsDto, ProductSortBy } from './dto/get-products.dto';
 import {
@@ -12,9 +14,14 @@ import type { IProduct, IProductsListResponse } from './types/product.types';
 @Injectable()
 export class ProductsService {
   private getProducts: () => any[];
+  private readonly imageBaseUrl: string;
 
-  constructor(private readonly jsonDb: JsonDbService) {
+  constructor(
+    private readonly jsonDb: JsonDbService,
+    private readonly configService: ConfigService,
+  ) {
     this.getProducts = this.jsonDb.register('products.json', []);
+    this.imageBaseUrl = this.configService.get<string>('IMAGE_BASE_URL') || '';
   }
 
   getRawProducts(): any[] {
@@ -186,7 +193,7 @@ export class ProductsService {
         brandSlug: p.brandSlug || '',
         category: p.category,
         categoryName: p.categoryName || '',
-        imageUrl: p.imageUrl || '',
+        imageUrl: resolveMediaUrl(p.imageUrl || '', this.imageBaseUrl),
         price: this.resolvePrice(p),
         originalPrice: p.originalPrice,
         priceRange: p.priceRange || '',
@@ -222,9 +229,12 @@ export class ProductsService {
 
     // Tính toán installation_preview (tối đa 3 ảnh)
     const installationPreview = product.installation?.images
-      ? product.installation.images.slice(
-          0,
-          PRODUCT_DEFAULTS.INSTALLATION_PREVIEW_LIMIT,
+      ? resolveMediaUrls(
+          product.installation.images.slice(
+            0,
+            PRODUCT_DEFAULTS.INSTALLATION_PREVIEW_LIMIT,
+          ),
+          this.imageBaseUrl,
         )
       : [];
 
@@ -240,8 +250,8 @@ export class ProductsService {
       name: product.name,
       description: product.description || '',
       shortDescription: product.shortDescription || '',
-      imageUrl: product.imageUrl || '',
-      images: product.images || [],
+      imageUrl: resolveMediaUrl(product.imageUrl || '', this.imageBaseUrl),
+      images: resolveMediaUrls(product.images || [], this.imageBaseUrl),
       price: effectivePrice,
       originalPrice: product.originalPrice,
       priceRange: product.priceRange || '',
@@ -299,7 +309,7 @@ export class ProductsService {
       if (Array.isArray(installation.images)) {
         mediaItems.push(
           ...installation.images.map((url) => ({
-            url,
+            url: resolveMediaUrl(url, this.imageBaseUrl),
             type: 'image' as const,
           })),
         );
@@ -309,7 +319,7 @@ export class ProductsService {
       if (Array.isArray(installation.videos)) {
         mediaItems.push(
           ...installation.videos.map((url) => ({
-            url,
+            url: resolveMediaUrl(url, this.imageBaseUrl),
             type: 'video' as const,
           })),
         );
