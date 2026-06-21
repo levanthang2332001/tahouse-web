@@ -3581,7 +3581,9 @@
     },
     "options": [],
     "variants": [],
-    "has_variants": false
+    "has_variants": false,
+    "subcategory": "ket-mini",
+    "subcategoryName": "Két Sắt Mini"
   },
   {
     "id": "kl-65h8-pearl",
@@ -3614,7 +3616,9 @@
     },
     "options": [],
     "variants": [],
-    "has_variants": false
+    "has_variants": false,
+    "subcategory": "ket-gia-dinh",
+    "subcategoryName": "Két Sắt Gia Đình"
   },
   {
     "id": "kl-75h8-pearl",
@@ -3647,7 +3651,9 @@
     },
     "options": [],
     "variants": [],
-    "has_variants": false
+    "has_variants": false,
+    "subcategory": "ket-van-phong",
+    "subcategoryName": "Két Sắt Văn Phòng"
   },
   {
     "id": "kl-55h8goldsand",
@@ -3680,7 +3686,9 @@
     },
     "options": [],
     "variants": [],
-    "has_variants": false
+    "has_variants": false,
+    "subcategory": "ket-mini",
+    "subcategoryName": "Két Sắt Mini"
   },
   {
     "id": "kl-65h8goldsand",
@@ -3718,7 +3726,9 @@
     },
     "options": [],
     "variants": [],
-    "has_variants": false
+    "has_variants": false,
+    "subcategory": "ket-gia-dinh",
+    "subcategoryName": "Két Sắt Gia Đình"
   },
   {
     "id": "kl-75h8goldsand",
@@ -3751,7 +3761,9 @@
     },
     "options": [],
     "variants": [],
-    "has_variants": false
+    "has_variants": false,
+    "subcategory": "ket-van-phong",
+    "subcategoryName": "Két Sắt Văn Phòng"
   },
   {
     "id": "kl-566-copper",
@@ -11415,8 +11427,8 @@
     "name": "Khóa điện tử Hubert Cửa Nhôm HB CN79 Black",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "xingfa-sat",
+    "categoryName": "Khóa Cửa Nhôm",
     "description": "",
     "shortDescription": "",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p81_1.jpg",
@@ -11465,8 +11477,8 @@
     "name": "Khoá điện tử Hubert Cửa Nhôm HB CN78",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "xingfa-sat",
+    "categoryName": "Khóa Cửa Nhôm",
     "description": "",
     "shortDescription": "",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p82_1.jpg",
@@ -11520,8 +11532,8 @@
     "name": "Khoá điện tử Hubert Cửa Nhôm HB CN77",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "xingfa-sat",
+    "categoryName": "Khóa Cửa Nhôm",
     "description": "Khoá điện tử Hubert Cửa Nhôm HB CN77 với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chia khoá cơ chống sao chép, chốt riêng tư, thông phòng, cảnh báo mở khoá trái phép, cảnh báo đột nhập, vô hiệu hoá thẻ từ khi bị mất, điều khiển App Wifi, chống nước chuẩn IP68.",
     "shortDescription": "Khoá điện tử Hubert Cửa Nhôm HB CN77 với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chia khoá cơ chống sao chép, chốt riêng tư",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p83_1.jpg",
@@ -11576,8 +11588,8 @@
     "name": "Khóa điện tử Hubert Cửa Nhôm HB CN68",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "xingfa-sat",
+    "categoryName": "Khóa Cửa Nhôm",
     "description": "Khóa điện tử Hubert Cửa Nhôm HB CN68 với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chia khoá cơ chống sao chép, chốt riêng tư, thông phòng, cảnh báo mở khoá trái phép, cảnh báo đột nhập, vô hiệu hoá thẻ từ khi bị mất, điều khiển App Wifi, chống nước chuẩn IP68.",
     "shortDescription": "Khóa điện tử Hubert Cửa Nhôm HB CN68 với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chia khoá cơ chống sao chép, chốt riêng tư",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p84_1.jpg",
@@ -11633,8 +11645,8 @@
     "name": "Khóa điện tử Hubert Cửa Nhôm HB CN39",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "xingfa-sat",
+    "categoryName": "Khóa Cửa Nhôm",
     "description": "Khóa điện tử Hubert Cửa Nhôm HB CN39 với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chia khoá cơ chống sao chép, chốt riêng tư, thông phòng, cảnh báo mở khoá trái phép, cảnh báo đột nhập, vô hiệu hoá thẻ từ khi bị mất, điều khiển App Wifi, chống nước chuẩn IP67.",
     "shortDescription": "Khóa điện tử Hubert Cửa Nhôm HB CN39 với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chia khoá cơ chống sao chép, chốt riêng tư",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p85_1.jpg",
@@ -11690,8 +11702,8 @@
     "name": "Khóa điện tử Hubert Cửa Nhôm HB CN39 Style B",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "xingfa-sat",
+    "categoryName": "Khóa Cửa Nhôm",
     "description": "Khóa điện tử Hubert Cửa Nhôm HB CN39 Style B với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chia khoá cơ chống sao chép, chốt riêng tư, thông phòng, cảnh báo mở khoá trái phép, cảnh báo đột nhập, vô hiệu hoá thẻ từ khi bị mất, điều khiển App Wifi, chống nước chuẩn IP67, phù hợp với dạng cửa lùa.",
     "shortDescription": "Khóa điện tử Hubert Cửa Nhôm HB CN39 Style B với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chia khoá cơ chống sao chép, chốt ",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p86_1.jpg",
@@ -11748,8 +11760,8 @@
     "name": "Khoá điện tử Hubert Cửa Cổng HB CC79 TITAN",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "cua-cong",
+    "categoryName": "Khóa Cửa Cổng",
     "description": "Khoá điện tử Hubert Cửa Cổng HB CC79 TITAN với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chìa khoá cơ chống sao chép, cảnh báo mở khoá trái phép, cảnh báo đột nhập, vô hiệu hoá thẻ từ khi bị mất, điều khiển qua App Wifi, chống nước chuẩn IP68, bảo mật cả 2 mặt trong và ngoài.",
     "shortDescription": "Khoá điện tử Hubert Cửa Cổng HB CC79 TITAN với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chìa khoá cơ chống sao chép, cảnh bá",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p87_1.jpg",
@@ -11802,8 +11814,8 @@
     "name": "Khoá điện tử Hubert Cửa Cổng HB CC78 Black",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "cua-cong",
+    "categoryName": "Khóa Cửa Cổng",
     "description": "Khoá điện tử Hubert Cửa Cổng HB CC78 Black với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chìa khoá cơ chống sao chép, cảnh báo mở khoá trái phép, cảnh báo đột nhập, vô hiệu hoá thẻ từ khi bị mất, điều khiển qua App, chống nước chuẩn IP68, bảo mật cả 2 mặt trong và ngoài.",
     "shortDescription": "Khoá điện tử Hubert Cửa Cổng HB CC78 Black với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chìa khoá cơ chống sao chép, cảnh bá",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p88_1.jpg",
@@ -11855,8 +11867,8 @@
     "name": "Khóa điện tử Hubert Cửa Kính HB CK79F Black",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "cua-kinh",
+    "categoryName": "Khóa Cửa Kính",
     "description": "Khóa điện tử Hubert Cửa Kính HB CK79F Black với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, cảnh báo mở khoá trái phép, cảnh báo đột nhập, vô hiệu hoá thẻ từ khi bị mất, điều khiển qua App, chống nước IP67, nhận diện vân tay nhanh chỉ trong 0,5s, remote điều khiển từ xa, chuông cửa báo hiệu có khách.",
     "shortDescription": "Khóa điện tử Hubert Cửa Kính HB CK79F Black với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, cảnh báo mở khoá trái phép, cảnh bá",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p89_1.jpg",
@@ -11909,8 +11921,8 @@
     "name": "Khóa điện tử Hubert Cửa Gỗ HB CG27",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "cua-go",
+    "categoryName": "Khóa Cửa Gỗ",
     "description": "Khóa điện tử Hubert Cửa Gỗ HB CG27 với công nghệ mở khoá bằng nhận diện khuôn mặt 3D, camera tích hợp chuông cửa hiển thị hình ảnh bên ngoài cửa, cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chìa khoá cơ chống sao chép, chốt an toàn, cảnh báo mở khoá trái phép, cảnh báo đột nhập, vô hiệu hoá thẻ từ khi bị mất, điều khiển App Wifi.",
     "shortDescription": "Khóa điện tử Hubert Cửa Gỗ HB CG27 với công nghệ mở khoá bằng nhận diện khuôn mặt 3D, camera tích hợp chuông cửa hiển thị hình ảnh bên ngoài cửa, cảm ",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p91_1.jpg",
@@ -11968,8 +11980,8 @@
     "name": "Khoá điện tử Hubert Cửa Gỗ HB CG26F",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "cua-go",
+    "categoryName": "Khóa Cửa Gỗ",
     "description": "Khoá điện tử Hubert Cửa Gỗ HB CG26F với công nghệ mở khoá bằng nhận diện khuôn mặt 3D, cảm biến vân tay FPC Thuỵ Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chìa khoá cơ chống sao chép, chốt an toàn, cảnh báo mở khoá trái phép, cảnh báo đột nhập, vô hiệu hoá thẻ từ khi bị mất, điều khiển App Wifi, pin sạc Lithium 5000mAh, camera hiển thị hình ảnh.",
     "shortDescription": "Khoá điện tử Hubert Cửa Gỗ HB CG26F với công nghệ mở khoá bằng nhận diện khuôn mặt 3D, cảm biến vân tay FPC Thuỵ Điển, xáo trộn mã, mật khẩu ảo 32 ký ",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p92_1.jpg",
@@ -12024,8 +12036,8 @@
     "name": "Khoá điện tử Hubert Cửa Gỗ HB CG26 Dark Gray",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "cua-go",
+    "categoryName": "Khóa Cửa Gỗ",
     "description": "Khoá điện tử Hubert Cửa Gỗ HB CG26 Dark Gray với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chìa khoá cơ chống sao chép, chốt an toàn, cảnh báo mở khoá trái phép, cảnh báo đột nhập, vô hiệu hoá thẻ từ khi bị mất, điều khiển App Wifi, nhận diện vân tay nhanh chóng, chuông cửa báo hiệu có khách, màn hình led hiển thị phần trăm pin.",
     "shortDescription": "Khoá điện tử Hubert Cửa Gỗ HB CG26 Dark Gray với cảm biến vân tay FPC Thụy Điển, xáo trộn mã, mật khẩu ảo 32 ký tự, chìa khoá cơ chống sao chép, chốt ",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p93_1.jpg",
@@ -12078,8 +12090,8 @@
     "name": "Khóa điện tử Hubert Cửa Gỗ HB CG25F Black",
     "brand": "Hubert",
     "brandSlug": "hubert",
-    "category": "Smart",
-    "categoryName": "Két Sắt Thông Minh",
+    "category": "cua-go",
+    "categoryName": "Khóa Cửa Gỗ",
     "description": "Khóa điện tử thông minh cho cửa gỗ, hỗ trợ mở khóa bằng vân tay, mật khẩu, chìa cơ, thẻ từ, App Wifi, chuông cửa. Công nghệ nhận diện khuôn mặt 3D, camera tích hợp chuông cửa, cảm biến vân tay FPC Thụy Điển, mật khẩu ảo 32 ký tự, chìa khoá cơ chống sao chép, cảnh báo mở khoá trái phép, điều khiển App Wifi.",
     "shortDescription": "Khóa điện tử thông minh cho cửa gỗ, hỗ trợ mở khóa bằng vân tay, mật khẩu, chìa cơ, thẻ từ, App Wifi, chuông cửa. Công nghệ nhận diện khuôn mặt 3D, ca",
     "imageUrl": "/HHB_CATALOGUE_2025/img_p94_1.jpg",
@@ -13159,7 +13171,9 @@
     },
     "options": [],
     "variants": [],
-    "has_variants": false
+    "has_variants": false,
+    "subcategory": "ket-gia-dinh",
+    "subcategoryName": "Két Sắt Gia Đình"
   },
   {
     "id": "sbx702",
@@ -13200,7 +13214,9 @@
     },
     "options": [],
     "variants": [],
-    "has_variants": false
+    "has_variants": false,
+    "subcategory": "ket-van-phong",
+    "subcategoryName": "Két Sắt Văn Phòng"
   },
   {
     "id": "sbx301",
@@ -13244,7 +13260,9 @@
     },
     "options": [],
     "variants": [],
-    "has_variants": false
+    "has_variants": false,
+    "subcategory": "ket-mini",
+    "subcategoryName": "Két Sắt Mini"
   },
   {
     "id": "sbx501",
@@ -13285,7 +13303,9 @@
     },
     "options": [],
     "variants": [],
-    "has_variants": false
+    "has_variants": false,
+    "subcategory": "ket-gia-dinh",
+    "subcategoryName": "Két Sắt Gia Đình"
   },
   {
     "id": "sbx602",
@@ -13326,7 +13346,9 @@
     },
     "options": [],
     "variants": [],
-    "has_variants": false
+    "has_variants": false,
+    "subcategory": "ket-van-phong",
+    "subcategoryName": "Két Sắt Văn Phòng"
   },
   {
     "id": "sbx202",
@@ -13367,7 +13389,9 @@
     },
     "options": [],
     "variants": [],
-    "has_variants": false
+    "has_variants": false,
+    "subcategory": "ket-mini",
+    "subcategoryName": "Két Sắt Mini"
   },
   {
     "id": "kl-999",
@@ -14085,7 +14109,7 @@
     "id": "kl-589fg",
     "code": "KL-589FG",
     "name": "KL - 589 FG",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "dai-sanh",
     "categoryName": "Khóa Đại Sảnh",
     "description": "KL - 589 FG - Khóa thông minh chất lượng cao",
@@ -14153,13 +14177,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-838b",
     "code": "KL-838B",
     "name": "KL - 838 B",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "cua-go",
     "categoryName": "Khóa Cửa Gỗ",
     "description": "KL - 838 B - Khóa thông minh chất lượng cao",
@@ -14264,13 +14289,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-878",
     "code": "KL-878",
     "name": "KL - 878",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "cua-go",
     "categoryName": "Khóa Cửa Gỗ",
     "description": "KL - 878 - Khóa thông minh chất lượng cao",
@@ -14339,13 +14365,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-371",
     "code": "KL-371",
     "name": "KL - 371",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "cua-go",
     "categoryName": "Khóa Cửa Gỗ",
     "description": "KL - 371 - Khóa thông minh chất lượng cao",
@@ -14413,13 +14440,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-287cnc",
     "code": "KL-287CNC",
     "name": "KL - 287 CNC",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "cua-go",
     "categoryName": "Khóa Cửa Gỗ",
     "description": "KL - 287 CNC - Khóa thông minh chất lượng cao",
@@ -14487,13 +14515,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-587cnc",
     "code": "KL-587CNC",
     "name": "KL - 587 CNC",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "cua-go",
     "categoryName": "Khóa Cửa Gỗ",
     "description": "KL - 587 CNC - Khóa thông minh chất lượng cao",
@@ -14561,13 +14590,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-266",
     "code": "KL-266",
     "name": "KL - 266",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "cua-go",
     "categoryName": "Khóa Cửa Gỗ",
     "description": "KL - 266 - Khóa thông minh chất lượng cao",
@@ -14636,13 +14666,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-292cnc",
     "code": "KL-292CNC",
     "name": "KL - 292 CNC",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "dai-sanh",
     "categoryName": "Khóa Đại Sảnh",
     "description": "KL - 292 CNC - Khóa thông minh chất lượng cao",
@@ -14699,13 +14730,14 @@
         "is_default": true
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-592cnc",
     "code": "KL-592CNC",
     "name": "KL - 592 CNC",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "dai-sanh",
     "categoryName": "Khóa Đại Sảnh",
     "description": "KL - 592 CNC - Khóa thông minh chất lượng cao",
@@ -14762,13 +14794,14 @@
         "is_default": true
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-999at",
     "code": "KL-999AT",
     "name": "KL - 999 AT",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "dai-sanh",
     "categoryName": "Khóa Đại Sảnh",
     "description": "KL - 999 AT - Khóa thông minh chất lượng cao",
@@ -14837,13 +14870,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-999pro",
     "code": "KL-999PRO",
     "name": "KL - 999 PRO",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "dai-sanh",
     "categoryName": "Khóa Đại Sảnh",
     "description": "KL - 999 PRO - Khóa thông minh chất lượng cao",
@@ -14912,13 +14946,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-999cnc",
     "code": "KL-999CNC",
     "name": "KL - 999 CNC",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "dai-sanh",
     "categoryName": "Khóa Đại Sảnh",
     "description": "KL - 999 CNC - Khóa thông minh chất lượng cao",
@@ -14999,13 +15034,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-999lx",
     "code": "KL-999LX",
     "name": "KL - 999 LX",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "dai-sanh",
     "categoryName": "Khóa Đại Sảnh",
     "description": "KL - 999 LX - Khóa thông minh chất lượng cao",
@@ -15074,13 +15110,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-999proplus",
     "code": "KL-999PROPLUS",
     "name": "KL - 999 PRO PLUS",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "dai-sanh",
     "categoryName": "Khóa Đại Sảnh",
     "description": "KL - 999 PRO PLUS - Khóa thông minh chất lượng cao",
@@ -15149,13 +15186,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-999is",
     "code": "KL-999IS",
     "name": "KL - 999 IS",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "dai-sanh",
     "categoryName": "Khóa Đại Sảnh",
     "description": "KL - 999 IS - Khóa thông minh chất lượng cao",
@@ -15236,13 +15274,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-999sr",
     "code": "KL-999SR",
     "name": "KL - 999 SR",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "dai-sanh",
     "categoryName": "Khóa Đại Sảnh",
     "description": "KL - 999 SR - Khóa thông minh chất lượng cao",
@@ -15299,13 +15338,14 @@
         "is_default": true
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-599",
     "code": "KL-599",
     "name": "KL - 599",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "cua-go",
     "categoryName": "Khóa Cửa Gỗ",
     "description": "KL - 599 - Khóa thông minh chất lượng cao",
@@ -15373,13 +15413,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-599sr",
     "code": "KL-599SR",
     "name": "KL - 599 SR",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "cua-go",
     "categoryName": "Khóa Cửa Gỗ",
     "description": "KL - 599 SR - Khóa thông minh chất lượng cao",
@@ -15436,13 +15477,14 @@
         "is_default": true
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-999l",
     "code": "KL-999L",
     "name": "KL - 999 L",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "dai-sanh",
     "categoryName": "Khóa Đại Sảnh",
     "description": "KL - 999 L - Khóa thông minh chất lượng cao",
@@ -15511,13 +15553,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-576cnc",
     "code": "KL-576CNC",
     "name": "KL - 576 CNC",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "dai-sanh",
     "categoryName": "Khóa Đại Sảnh",
     "description": "KL - 576 CNC - Khóa thông minh chất lượng cao",
@@ -15597,13 +15640,14 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   },
   {
     "id": "kl-573",
     "code": "KL-573",
     "name": "KL - 573",
-    "brandSlug": "",
+    "brandSlug": "kassler",
     "category": "cua-go",
     "categoryName": "Khóa Cửa Gỗ",
     "description": "KL - 573 - Khóa thông minh chất lượng cao",
@@ -15671,6 +15715,7 @@
         "is_default": false
       }
     ],
-    "has_variants": true
+    "has_variants": true,
+    "brand": "Kassler"
   }
 ]
