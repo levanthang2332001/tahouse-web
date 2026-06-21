@@ -45,9 +45,6 @@ export class GetProductsDto {
       '* xingfa-sat\n' +
       '* cua-cong\n' +
       '* khach-san\n' +
-      '* Kitchen\n' +
-      '* Water\n' +
-      '* Cabinet\n' +
       '* Smart',
     type: String,
   })
@@ -58,19 +55,9 @@ export class GetProductsDto {
   @ApiPropertyOptional({
     description:
       'Slug danh mục con để lọc sản phẩm:\n' +
-      '* bep-tu\n' +
-      '* may-hut-mui\n' +
-      '* chau-rua\n' +
-      '* voi-rua\n' +
-      '* lo-nuong\n' +
-      '* may-rua-chen\n' +
       '* ket-mini\n' +
       '* ket-gia-dinh\n' +
-      '* ket-van-phong\n' +
-      '* may-loc-nuoc-ro\n' +
-      '* may-loc-nuoc-ion-kiem\n' +
-      '* loc-tong-sinh-hoat\n' +
-      '* loi-loc-phu-kien',
+      '* ket-van-phong',
     type: String,
   })
   @IsOptional()
