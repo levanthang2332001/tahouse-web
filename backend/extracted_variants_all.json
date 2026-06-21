@@ -1,0 +1,653 @@
+{
+  "KL-979G": {
+    "name": "KL - 979 G",
+    "base_price": 22390000,
+    "formatted_base_price": "22.390.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      16
+    ],
+    "variants": [
+      {
+        "description": "Không có phụ kiện",
+        "price": 22390000,
+        "formatted_price": "22.390.000 đ"
+      },
+      {
+        "description": "Thêm APP WISHOME",
+        "price": 24590000,
+        "formatted_price": "24.590.000 đ"
+      }
+    ]
+  },
+  "KL-979R": {
+    "name": "KL - 979 R",
+    "base_price": 19590000,
+    "formatted_base_price": "19.590.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      17
+    ],
+    "variants": [
+      {
+        "description": "Không có phụ kiện",
+        "price": 19590000,
+        "formatted_price": "19.590.000 đ"
+      },
+      {
+        "description": "Thêm WISHOME",
+        "price": 21590000,
+        "formatted_price": "21.590.000 đ"
+      }
+    ]
+  },
+  "KL-979GR": {
+    "name": "KL - 979 GR",
+    "base_price": 19590000,
+    "formatted_base_price": "19.590.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      18
+    ],
+    "variants": [
+      {
+        "description": "Không có phụ kiện",
+        "price": 19590000,
+        "formatted_price": "19.590.000 đ"
+      },
+      {
+        "description": "Thêm APP WISHOME",
+        "price": 21590000,
+        "formatted_price": "21.590.000 đ"
+      }
+    ]
+  },
+  "KL-968CNC": {
+    "name": "KL - 968 CNC",
+    "base_price": 36690000,
+    "formatted_base_price": "36.690.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      23
+    ],
+    "variants": [
+      {
+        "description": "USMART GO",
+        "price": 36690000,
+        "formatted_price": "36.690.000 đ"
+      },
+      {
+        "description": "+ REMOTE",
+        "price": 37690000,
+        "formatted_price": "37.690.000 đ"
+      }
+    ]
+  },
+  "KL-808CNC": {
+    "name": "KL - 808 CNC",
+    "base_price": 9390000,
+    "formatted_base_price": "9.390.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      35
+    ],
+    "variants": [
+      {
+        "description": "APP TUYA",
+        "price": 9390000,
+        "formatted_price": "9.390.000 đ"
+      },
+      {
+        "description": "+ REMOTE",
+        "price": 10390000,
+        "formatted_price": "10.390.000 đ"
+      }
+    ]
+  },
+  "KL-600PC": {
+    "name": "KL - 600 PC",
+    "base_price": 8390000,
+    "formatted_base_price": "8.390.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      38
+    ],
+    "variants": [
+      {
+        "description": "Không có phụ kiện",
+        "price": 8390000,
+        "formatted_price": "8.390.000 đ"
+      },
+      {
+        "description": "+ APP TUYA",
+        "price": 9390000,
+        "formatted_price": "9.390.000 đ"
+      }
+    ]
+  },
+  "KL-838": {
+    "name": "KL - 838",
+    "base_price": 17590000,
+    "formatted_base_price": "17.590.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      31
+    ],
+    "variants": [
+      {
+        "description": "SILVER BLUE",
+        "price": 17590000,
+        "formatted_price": "17.590.000 đ"
+      },
+      {
+        "description": "RED BRONZE",
+        "price": 18590000,
+        "formatted_price": "18.590.000 đ"
+      }
+    ]
+  },
+  "KL-589FG": {
+    "name": "KL - 589 FG",
+    "base_price": 22690000,
+    "formatted_base_price": "22.690.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      39
+    ],
+    "variants": [
+      {
+        "description": "Không",
+        "price": 22690000,
+        "formatted_price": "22.690.000 đ"
+      },
+      {
+        "description": "+ APP TUYA",
+        "price": 22690000,
+        "formatted_price": "22.690.000 đ"
+      }
+    ]
+  },
+  "KL-838B": {
+    "name": "KL - 838 B",
+    "base_price": 5390000,
+    "formatted_base_price": "5.390.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      40
+    ],
+    "variants": [
+      {
+        "description": "GOLD",
+        "price": 5390000,
+        "formatted_price": "5.390.000 đ"
+      },
+      {
+        "description": "RED BRONZE",
+        "price": 5790000,
+        "formatted_price": "5.790.000 đ"
+      },
+      {
+        "description": "BLACK",
+        "price": 5790000,
+        "formatted_price": "5.790.000 đ"
+      },
+      {
+        "description": "BRONZE",
+        "price": 5790000,
+        "formatted_price": "5.790.000 đ"
+      },
+      {
+        "description": "GREEN BRONZE",
+        "price": 5690000,
+        "formatted_price": "5.690.000 đ"
+      }
+    ]
+  },
+  "KL-878": {
+    "name": "KL - 878",
+    "base_price": 5190000,
+    "formatted_base_price": "5.190.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      41
+    ],
+    "variants": [
+      {
+        "description": "Không",
+        "price": 5190000,
+        "formatted_price": "5.190.000 đ"
+      },
+      {
+        "description": "RED BRONZE",
+        "price": 5790000,
+        "formatted_price": "5.790.000 đ"
+      }
+    ]
+  },
+  "KL-371": {
+    "name": "KL - 371",
+    "base_price": 6990000,
+    "formatted_base_price": "6.990.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      42
+    ],
+    "variants": [
+      {
+        "description": "Không",
+        "price": 6990000,
+        "formatted_price": "6.990.000 đ"
+      },
+      {
+        "description": "+ APP TUYA",
+        "price": 7990000,
+        "formatted_price": "7.990.000 đ"
+      }
+    ]
+  },
+  "KL-287CNC": {
+    "name": "KL - 287 CNC",
+    "base_price": 5390000,
+    "formatted_base_price": "5.390.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      43
+    ],
+    "variants": [
+      {
+        "description": "Không",
+        "price": 5390000,
+        "formatted_price": "5.390.000 đ"
+      },
+      {
+        "description": "+ TIUA",
+        "price": 5390000,
+        "formatted_price": "5.390.000 đ"
+      }
+    ]
+  },
+  "KL-587CNC": {
+    "name": "KL - 587 CNC",
+    "base_price": 5690000,
+    "formatted_base_price": "5.690.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      43
+    ],
+    "variants": [
+      {
+        "description": "Không",
+        "price": 5690000,
+        "formatted_price": "5.690.000 đ"
+      },
+      {
+        "description": "+ TIUA",
+        "price": 5690000,
+        "formatted_price": "5.690.000 đ"
+      }
+    ]
+  },
+  "KL-266": {
+    "name": "KL - 266",
+    "base_price": 5490000,
+    "formatted_base_price": "5.490.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      44
+    ],
+    "variants": [
+      {
+        "description": "COPPER",
+        "price": 5490000,
+        "formatted_price": "5.490.000 đ"
+      },
+      {
+        "description": "BLACK",
+        "price": 5690000,
+        "formatted_price": "5.690.000 đ"
+      }
+    ]
+  },
+  "KL-589": {
+    "name": "KL - 589",
+    "base_price": 5290000,
+    "formatted_base_price": "5.290.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      45
+    ],
+    "variants": [
+      {
+        "description": "Không",
+        "price": 5290000,
+        "formatted_price": "5.290.000 đ"
+      },
+      {
+        "description": "+ APP TUYA + REMOTE (WIFI)",
+        "price": 5790000,
+        "formatted_price": "5.790.000 đ"
+      }
+    ]
+  },
+  "KL-569": {
+    "name": "KL - 569",
+    "base_price": 5690000,
+    "formatted_base_price": "5.690.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      46,
+      47
+    ],
+    "variants": [
+      {
+        "description": "Không",
+        "price": 5690000,
+        "formatted_price": "5.690.000 đ"
+      },
+      {
+        "description": "+ APP TUYA + REMOTE",
+        "price": 6690000,
+        "formatted_price": "6.690.000 đ"
+      }
+    ]
+  },
+  "KL-292CNC": {
+    "name": "KL - 292 CNC",
+    "base_price": 13590000,
+    "formatted_base_price": "13.590.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      48
+    ],
+    "variants": [
+      {
+        "description": "GOLD",
+        "price": 13590000,
+        "formatted_price": "13.590.000 đ"
+      }
+    ]
+  },
+  "KL-592CNC": {
+    "name": "KL - 592 CNC",
+    "base_price": 13590000,
+    "formatted_base_price": "13.590.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      48
+    ],
+    "variants": [
+      {
+        "description": "GREY",
+        "price": 13590000,
+        "formatted_price": "13.590.000 đ"
+      }
+    ]
+  },
+  "KL-999AT": {
+    "name": "KL - 999 AT",
+    "base_price": 16190000,
+    "formatted_base_price": "16.190.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      49,
+      50
+    ],
+    "variants": [
+      {
+        "description": "BLACK",
+        "price": 16190000,
+        "formatted_price": "16.190.000 đ"
+      },
+      {
+        "description": "GREY",
+        "price": 16190000,
+        "formatted_price": "16.190.000 đ"
+      }
+    ]
+  },
+  "KL-999PRO": {
+    "name": "KL - 999 PRO",
+    "base_price": 14390000,
+    "formatted_base_price": "14.390.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      51,
+      52
+    ],
+    "variants": [
+      {
+        "description": "GREY",
+        "price": 14390000,
+        "formatted_price": "14.390.000 đ"
+      },
+      {
+        "description": "CHAMPAGNE GOLD",
+        "price": 14390000,
+        "formatted_price": "14.390.000 đ"
+      }
+    ]
+  },
+  "KL-999CNC": {
+    "name": "KL - 999 CNC",
+    "base_price": 13900000,
+    "formatted_base_price": "13.900.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      54,
+      55
+    ],
+    "variants": [
+      {
+        "description": "CHAMPAGNE GOLD",
+        "price": 14900000,
+        "formatted_price": "14.900.000 đ"
+      },
+      {
+        "description": "GREY",
+        "price": 13900000,
+        "formatted_price": "13.900.000 đ"
+      },
+      {
+        "description": "BLACK",
+        "price": 13900000,
+        "formatted_price": "13.900.000 đ"
+      }
+    ]
+  },
+  "KL-999LX": {
+    "name": "KL - 999 LX",
+    "base_price": 10690000,
+    "formatted_base_price": "10.690.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      57,
+      58
+    ],
+    "variants": [
+      {
+        "description": "BLACK",
+        "price": 10690000,
+        "formatted_price": "10.690.000 đ"
+      },
+      {
+        "description": "CHAMPAGNE",
+        "price": 11690000,
+        "formatted_price": "11.690.000 đ"
+      }
+    ]
+  },
+  "KL-999PROPLUS": {
+    "name": "KL - 999 PRO PLUS",
+    "base_price": 11390000,
+    "formatted_base_price": "11.390.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      59
+    ],
+    "variants": [
+      {
+        "description": "BLACK",
+        "price": 11390000,
+        "formatted_price": "11.390.000 đ"
+      },
+      {
+        "description": "GREY",
+        "price": 12390000,
+        "formatted_price": "12.390.000 đ"
+      }
+    ]
+  },
+  "KL-999IS": {
+    "name": "KL - 999 IS",
+    "base_price": 7490000,
+    "formatted_base_price": "7.490.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      60,
+      61,
+      62
+    ],
+    "variants": [
+      {
+        "description": "CHAMPAGNE GOLD",
+        "price": 8990000,
+        "formatted_price": "8.990.000 đ"
+      },
+      {
+        "description": "GREY",
+        "price": 7490000,
+        "formatted_price": "7.490.000 đ"
+      },
+      {
+        "description": "BLACK",
+        "price": 7490000,
+        "formatted_price": "7.490.000 đ"
+      }
+    ]
+  },
+  "KL-999SR": {
+    "name": "KL - 999 SR",
+    "base_price": 7690000,
+    "formatted_base_price": "7.690.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      63
+    ],
+    "variants": [
+      {
+        "description": "GREY",
+        "price": 7690000,
+        "formatted_price": "7.690.000 đ"
+      }
+    ]
+  },
+  "KL-599": {
+    "name": "KL - 599",
+    "base_price": 5690000,
+    "formatted_base_price": "5.690.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      64,
+      65,
+      66
+    ],
+    "variants": [
+      {
+        "description": "Không",
+        "price": 5690000,
+        "formatted_price": "5.690.000 đ"
+      },
+      {
+        "description": "+ APP TUYA",
+        "price": 6690000,
+        "formatted_price": "6.690.000 đ"
+      }
+    ]
+  },
+  "KL-599SR": {
+    "name": "KL - 599 SR",
+    "base_price": 6390000,
+    "formatted_base_price": "6.390.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      66
+    ],
+    "variants": [
+      {
+        "description": "GREY",
+        "price": 6390000,
+        "formatted_price": "6.390.000 đ"
+      }
+    ]
+  },
+  "KL-999L": {
+    "name": "KL - 999 L",
+    "base_price": 9390000,
+    "formatted_base_price": "9.390.000 đ",
+    "option_type": "Màu sắc",
+    "pages_found": [
+      67
+    ],
+    "variants": [
+      {
+        "description": "BLACK",
+        "price": 9390000,
+        "formatted_price": "9.390.000 đ"
+      },
+      {
+        "description": "GREY",
+        "price": 9690000,
+        "formatted_price": "9.690.000 đ"
+      }
+    ]
+  },
+  "KL-576CNC": {
+    "name": "KL - 576 CNC",
+    "base_price": 12690000,
+    "formatted_base_price": "12.690.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      68,
+      69
+    ],
+    "variants": [
+      {
+        "description": "SILVER GREY",
+        "price": 12690000,
+        "formatted_price": "12.690.000 đ"
+      },
+      {
+        "description": "+ REMOTE (WIFI)",
+        "price": 13690000,
+        "formatted_price": "13.690.000 đ"
+      },
+      {
+        "description": "GOLD GREY + REMOTE (WIFI)",
+        "price": 14690000,
+        "formatted_price": "14.690.000 đ"
+      }
+    ]
+  },
+  "KL-573": {
+    "name": "KL - 573",
+    "base_price": 7690000,
+    "formatted_base_price": "7.690.000 đ",
+    "option_type": "Phụ kiện",
+    "pages_found": [
+      70,
+      71
+    ],
+    "variants": [
+      {
+        "description": "Không",
+        "price": 7690000,
+        "formatted_price": "7.690.000 đ"
+      },
+      {
+        "description": "+ APP TUYA",
+        "price": 7690000,
+        "formatted_price": "7.690.000 đ"
+      }
+    ]
+  }
+}
