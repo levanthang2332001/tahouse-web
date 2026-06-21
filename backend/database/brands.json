@@ -8,23 +8,51 @@
     "categories": [
       {
         "slug": "dai-sanh",
-        "name": "Khóa Đại Sảnh"
+        "name": "Khóa Đại Sảnh",
+        "subcategories": []
       },
       {
         "slug": "cua-go",
-        "name": "Khóa Cửa Gỗ"
+        "name": "Khóa Cửa Gỗ",
+        "subcategories": []
       },
       {
         "slug": "cua-kinh",
-        "name": "Khóa Cửa Kính"
+        "name": "Khóa Cửa Kính",
+        "subcategories": []
       },
       {
         "slug": "xingfa-sat",
-        "name": "Khóa Cửa Nhôm"
+        "name": "Khóa Cửa Nhôm",
+        "subcategories": []
       },
       {
         "slug": "Smart",
-        "name": "Két Sắt Thông Minh"
+        "name": "Két Sắt Thông Minh",
+        "subcategories": [
+          {
+            "slug": "ket-mini",
+            "name": "Két Sắt Mini"
+          },
+          {
+            "slug": "ket-gia-dinh",
+            "name": "Két Sắt Gia Đình"
+          },
+          {
+            "slug": "ket-van-phong",
+            "name": "Két Sắt Văn Phòng"
+          }
+        ]
+      },
+      {
+        "slug": "khach-san",
+        "name": "Khóa Khách Sạn",
+        "subcategories": []
+      },
+      {
+        "slug": "cua-cong",
+        "name": "Khóa Cửa Cổng",
+        "subcategories": []
       }
     ]
   },
@@ -37,11 +65,31 @@
     "categories": [
       {
         "slug": "dai-sanh",
-        "name": "Khóa Đại Sảnh"
+        "name": "Khóa Đại Sảnh",
+        "subcategories": []
       },
       {
         "slug": "cua-go",
-        "name": "Khóa Cửa Gỗ"
+        "name": "Khóa Cửa Gỗ",
+        "subcategories": []
+      },
+      {
+        "slug": "Smart",
+        "name": "Két Sắt Thông Minh",
+        "subcategories": [
+          {
+            "slug": "ket-mini",
+            "name": "Két Sắt Mini"
+          },
+          {
+            "slug": "ket-gia-dinh",
+            "name": "Két Sắt Gia Đình"
+          },
+          {
+            "slug": "ket-van-phong",
+            "name": "Két Sắt Văn Phòng"
+          }
+        ]
       }
     ]
   },
@@ -54,7 +102,8 @@
     "categories": [
       {
         "slug": "cua-go",
-        "name": "Khóa Cửa Gỗ"
+        "name": "Khóa Cửa Gỗ",
+        "subcategories": []
       }
     ]
   },
@@ -67,7 +116,8 @@
     "categories": [
       {
         "slug": "cua-go",
-        "name": "Khóa Cửa Gỗ"
+        "name": "Khóa Cửa Gỗ",
+        "subcategories": []
       }
     ]
   },
@@ -80,7 +130,8 @@
     "categories": [
       {
         "slug": "dai-sanh",
-        "name": "Khóa Đại Sảnh"
+        "name": "Khóa Đại Sảnh",
+        "subcategories": []
       }
     ]
   },
@@ -93,31 +144,33 @@
     "categories": [
       {
         "slug": "dai-sanh",
-        "name": "Khóa Đại Sảnh"
+        "name": "Khóa Đại Sảnh",
+        "subcategories": []
       },
       {
         "slug": "cua-go",
-        "name": "Khóa Cửa Gỗ"
+        "name": "Khóa Cửa Gỗ",
+        "subcategories": []
       },
       {
         "slug": "cua-kinh",
-        "name": "Khóa Cửa Kính"
+        "name": "Khóa Cửa Kính",
+        "subcategories": []
       },
       {
         "slug": "xingfa-sat",
-        "name": "Khóa Cửa Nhôm"
+        "name": "Khóa Cửa Nhôm",
+        "subcategories": []
       },
       {
         "slug": "cua-cong",
-        "name": "Khóa Cửa Cổng"
+        "name": "Khóa Cửa Cổng",
+        "subcategories": []
       },
       {
         "slug": "khach-san",
-        "name": "Khóa Khách Sạn"
-      },
-      {
-        "slug": "Smart",
-        "name": "Két Sắt Thông Minh"
+        "name": "Khóa Khách Sạn",
+        "subcategories": []
       }
     ]
   }

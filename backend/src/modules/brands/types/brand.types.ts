@@ -1,6 +1,10 @@
 export interface ICategory {
   slug: string;
   name: string;
+  subcategories?: {
+    slug: string;
+    name: string;
+  }[];
 }
 
 export interface IBrand {
