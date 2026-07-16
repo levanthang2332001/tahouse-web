@@ -3,10 +3,16 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Product } from "@/data/products";
+import type { Product } from "@/lib/types/product";
+import { formatProductPrice } from "@/lib/format-price";
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({
+  product,
+  priority = false,
+}: {
+  product: Product;
+  priority?: boolean;
+}) {
   const getCategoryLabel = (category: string) => {
     switch (category) {
       case "dai-sanh":
@@ -32,7 +38,7 @@ export default function ProductCard({ product }: { product: Product }) {
       case "Cabinet":
         return "Phụ kiện tủ bếp";
       case "Smart":
-        return "Thiết bị thông minh";
+        return "Két sắt thông minh";
       default:
         return "Phụ kiện";
     }
@@ -77,27 +83,25 @@ export default function ProductCard({ product }: { product: Product }) {
   const support = getSupportText(product.category);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4 }}
-      className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-gray-light bg-white shadow-[0_4px_20px_rgb(0,0,0,0.01)] transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-brand-green/30"
-    >
+    <div className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-gray-light bg-white shadow-[0_4px_20px_rgb(0,0,0,0.01)] transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-brand-green/30">
       {/* Product Image Area */}
       <div className="relative aspect-[1.4] w-full overflow-hidden bg-neutral/30 border-b border-gray-light/35">
-        <Link href={`/product/${product.id}`} className="block h-full w-full">
-          <Image
-            src={product.imageUrl}
-            alt={product.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-        </Link>
-        
+        <Image
+          src={product.imageUrl}
+          alt={product.name}
+          fill
+          priority={priority}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <Link
+          href={`/product/${product.id}`}
+          className="absolute inset-0 z-10"
+          aria-label={`Xem chi tiết ${product.name}`}
+        />
+
         {/* Dynamic status badge */}
-        <div className={`absolute left-3 top-3 rounded-md px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider select-none ${badge.className}`}>
+        <div className={`absolute left-3 top-3 z-20 rounded-md px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider select-none ${badge.className}`}>
           {badge.text}
         </div>
       </div>
@@ -133,7 +137,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Price */}
         <div className="mt-3 text-[15px] font-extrabold text-navy leading-none">
-          {product.price.toLocaleString("vi-VN")}đ
+          {formatProductPrice(product.price, product.priceRange)}
         </div>
 
         {/* Support Checkmark */}
@@ -151,6 +155,6 @@ export default function ProductCard({ product }: { product: Product }) {
           </Link>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

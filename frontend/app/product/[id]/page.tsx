@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useEffect, useMemo, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -10,8 +10,11 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import SocialFloating from "@/components/SocialFloating";
 import { useApp } from "@/context/AppContext";
+import { COMPANY_LEGAL } from "@/data/company-legal";
 import content from "@/data/content.json";
-import { PRODUCTS, formatCurrency } from "@/data/products";
+import { formatCurrency, formatProductPrice } from "@/data/products";
+import { fetchProduct } from "@/lib/api/products";
+import type { Product } from "@/lib/types/product";
 
 type ProductDetailPageProps = {
   params: Promise<{
@@ -21,29 +24,78 @@ type ProductDetailPageProps = {
 
 export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   const { id } = use(params);
-  const product = useMemo(
-    () => PRODUCTS.find((item) => item.id === id),
-    [id],
-  );
+  return <ProductDetailView key={id} id={id} />;
+}
+
+function ProductDetailView({ id }: { id: string }) {
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
   const [activeTab, setActiveTab] = useState("specs");
   const [copied, setCopied] = useState(false);
-  const [prevId, setPrevId] = useState(id);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-  if (id !== prevId) {
-    setPrevId(id);
-    setSelectedImage(null);
-  }
-
   const { addToRecentlyViewed, setIsChatbotOpen } = useApp();
 
   useEffect(() => {
-    if (product) {
-      addToRecentlyViewed(product.id);
-    }
-  }, [product, addToRecentlyViewed]);
+    let cancelled = false;
 
-  if (!product) {
+    fetchProduct(id)
+      .then((data) => {
+        if (cancelled) return;
+        setProduct(data);
+        addToRecentlyViewed(data.id);
+      })
+      .catch((error: Error) => {
+        if (cancelled) return;
+        if (error.message === "NOT_FOUND") {
+          setNotFound(true);
+          setProduct(null);
+          setFetchError(false);
+          return;
+        }
+        setProduct(null);
+        setNotFound(false);
+        setFetchError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, addToRecentlyViewed]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-neutral text-navy">
+        <Header />
+        <div className="flex min-h-[70vh] items-center justify-center pb-24 pt-40 text-sm font-bold text-brand-green">
+          Đang tải sản phẩm...
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="min-h-screen bg-neutral text-navy">
+        <Header />
+        <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 pb-24 pt-40 text-center">
+          <h2 className="font-serif text-2xl font-bold">Không thể tải sản phẩm</h2>
+          <p className="text-sm font-semibold text-navy/60">Vui lòng kiểm tra kết nối và thử lại.</p>
+          <Link href="/products" className="text-sm font-bold uppercase text-brand-green hover:underline">
+            Quay lại danh sách
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (notFound || !product) {
     return (
       <div className="min-h-screen bg-neutral text-navy">
         <Header />
@@ -58,7 +110,26 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     );
   }
 
+  const galleryImages =
+    product.images && product.images.length > 0
+      ? product.images
+      : product.imageUrl
+        ? [product.imageUrl]
+        : [];
   const heroImage = selectedImage || product.imageUrl;
+  const specs = product.specs ?? {};
+  const features = product.features ?? [];
+  const installSteps =
+    product.installationManual && product.installationManual.length > 0
+      ? product.installationManual
+      : content.detail.installDetails;
+  const showDiscount =
+    typeof product.price === "number" &&
+    typeof product.originalPrice === "number" &&
+    product.originalPrice > product.price;
+  const discountPercent = showDiscount
+    ? Math.round(((product.originalPrice! - product.price!) / product.originalPrice!) * 100)
+    : 0;
 
   const handleShare = async () => {
     if (typeof window === "undefined") {
@@ -93,30 +164,33 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                   src={heroImage}
                   alt={product.name}
                   fill
+                  priority
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover"
                 />
               </motion.div>
-              <div className="grid grid-cols-3 gap-4">
-                {product.images.map((image, index) => (
-                  <button
-                    key={image}
-                    onClick={() => setSelectedImage(image)}
-                    className={`relative aspect-square overflow-hidden rounded-xl border ${
-                      heroImage === image ? "border-brand-green" : "border-gray-light"
-                    }`}
-                    aria-label={`Xem ảnh ${index + 1}`}
-                  >
-                    <Image
-                      src={image}
-                      alt={`${product.name} ${index + 1}`}
-                      fill
-                      sizes="20vw"
-                      className="object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
+              {galleryImages.length > 1 && (
+                <div className="grid grid-cols-3 gap-4">
+                  {galleryImages.map((image, index) => (
+                    <button
+                      key={`${image}-${index}`}
+                      onClick={() => setSelectedImage(image)}
+                      className={`relative aspect-square overflow-hidden rounded-xl border ${
+                        heroImage === image ? "border-brand-green" : "border-gray-light"
+                      }`}
+                      aria-label={`Xem ảnh ${index + 1}`}
+                    >
+                      <Image
+                        src={image}
+                        alt={`${product.name} ${index + 1}`}
+                        fill
+                        sizes="20vw"
+                        className="object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col">
@@ -139,54 +213,64 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                 {content.detail.labels.modelCodePrefix} {product.code}
               </p>
               <div className="mb-8 flex flex-col gap-1">
-                <span className="text-sm font-semibold text-zinc-400 line-through">
-                  {formatCurrency(Math.round((product.price * 1.18) / 100000) * 100000)}
-                </span>
+                {showDiscount && (
+                  <span className="text-sm font-semibold text-zinc-400 line-through">
+                    {formatCurrency(product.originalPrice!)}
+                  </span>
+                )}
                 <div className="flex items-center gap-3">
                   <span className="text-3xl font-black text-rose-600">
-                    {formatCurrency(product.price)}
+                    {typeof product.price === "number"
+                      ? formatCurrency(product.price)
+                      : formatProductPrice(product.price, product.priceRange)}
                   </span>
-                  <span className="inline-flex items-center rounded bg-rose-50 px-2.5 py-1 text-xs font-black text-rose-600 border border-rose-100 animate-pulse">
-                    GIẢM {Math.round(((Math.round((product.price * 1.18) / 100000) * 100000 - product.price) / (Math.round((product.price * 1.18) / 100000) * 100000)) * 100)}%
-                  </span>
+                  {showDiscount && (
+                    <span className="inline-flex items-center rounded bg-rose-50 px-2.5 py-1 text-xs font-black text-rose-600 border border-rose-100 animate-pulse">
+                      GIẢM {discountPercent}%
+                    </span>
+                  )}
                 </div>
               </div>
-              <p className="mb-8 text-sm font-semibold leading-relaxed text-navy">
-                {product.description}
-              </p>
+              {product.description && (
+                <p className="mb-8 text-sm font-semibold leading-relaxed text-navy">
+                  {product.description}
+                </p>
+              )}
 
-              <div className="mb-8 space-y-4">
-                <h3 className="text-[10px] font-bold uppercase tracking-widest text-navy">
-                  {content.detail.labels.featuresTitle}
-                </h3>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {product.features.map((feature) => (
-                    <div key={feature} className="flex items-start gap-2.5">
-                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-green/15 text-brand-green">
-                        <Check size={11} strokeWidth={3} />
+              {features.length > 0 && (
+                <div className="mb-8 space-y-4">
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-navy">
+                    {content.detail.labels.featuresTitle}
+                  </h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {features.map((feature) => (
+                      <div key={feature} className="flex items-start gap-2.5">
+                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-green/15 text-brand-green">
+                          <Check size={11} strokeWidth={3} />
+                        </div>
+                        <span className="text-[11px] font-bold leading-tight text-navy/90">{feature}</span>
                       </div>
-                      <span className="text-[11px] font-bold leading-tight text-navy/90">{feature}</span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="mt-auto grid grid-cols-1 gap-4 border-t border-gray-light pt-6 sm:grid-cols-3">
-                <a 
-                  href="https://zalo.me" 
-                  target="_blank" 
-                  rel="noreferrer" 
+                <a
+                  href={COMPANY_LEGAL.zaloUrl}
+                  target="_blank"
+                  rel="noreferrer"
                   className="flex items-center justify-center gap-2 rounded-xl bg-[#0068ff] py-4 text-center text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-[#0056d6] shadow-sm"
                 >
                   <MessageCircle size={16} /> Chat Zalo tư vấn
                 </a>
-                <a 
-                  href="tel:19008899" 
+                <a
+                  href={`tel:${COMPANY_LEGAL.phoneTel}`}
                   className="flex items-center justify-center gap-2 rounded-xl border border-rose-500 bg-rose-500 py-4 text-xs font-bold uppercase tracking-widest text-white transition-colors hover:bg-rose-600 shadow-sm"
                 >
-                  <Phone size={16} /> Gọi 1900 8899
+                  <Phone size={16} /> Gọi {COMPANY_LEGAL.phone}
                 </a>
-                <button 
+                <button
                   onClick={() => setIsChatbotOpen(true)}
                   className="flex items-center justify-center gap-2 rounded-xl border border-gray-light bg-cream hover:border-brand-green/40 py-4 text-center text-xs font-bold uppercase tracking-widest text-navy transition-all hover:bg-navy/5 shadow-2xs"
                 >
@@ -203,8 +287,8 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`relative whitespace-nowrap pb-4 text-xs font-extrabold uppercase tracking-wider transition-colors ${
-                    activeTab === tab 
-                      ? "text-brand-green before:absolute before:bottom-0 before:left-0 before:h-0.5 before:w-full before:bg-brand-green" 
+                    activeTab === tab
+                      ? "text-brand-green before:absolute before:bottom-0 before:left-0 before:h-0.5 before:w-full before:bg-brand-green"
                       : "text-navy/60 hover:text-brand-green"
                   }`}
                 >
@@ -220,20 +304,39 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
             <div className="max-w-3xl">
               {activeTab === "specs" && (
                 <div className="space-y-4">
-                  {Object.entries(product.specs).map(([key, value]) => (
-                    <div key={key} className="flex flex-col justify-between border-b border-gray-light/35 py-4 text-sm sm:flex-row">
-                      <span className="font-bold uppercase tracking-wider text-navy/70">{key}</span>
-                      <span className="mt-1.5 font-extrabold text-navy sm:mt-0">{value}</span>
-                    </div>
-                  ))}
+                  {Object.keys(specs).length > 0 ? (
+                    Object.entries(specs).map(([key, value]) => (
+                      <div key={key} className="flex flex-col justify-between border-b border-gray-light/35 py-4 text-sm sm:flex-row">
+                        <span className="font-bold uppercase tracking-wider text-navy/70">{key}</span>
+                        <span className="mt-1.5 font-extrabold text-navy sm:mt-0">{value}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm font-semibold text-navy/60">Chưa có thông số kỹ thuật.</p>
+                  )}
                 </div>
               )}
 
               {activeTab === "install" && (
                 <div className="space-y-4 text-sm font-semibold leading-relaxed text-navy">
-                  {content.detail.installDetails.map((detail, index) => (
+                  {installSteps.map((detail, index) => (
                     <p key={index}>{detail}</p>
                   ))}
+                  {product.installation_preview && product.installation_preview.length > 0 && (
+                    <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-3">
+                      {product.installation_preview.map((image, index) => (
+                        <div key={image} className="relative aspect-square overflow-hidden rounded-xl border border-gray-light">
+                          <Image
+                            src={image}
+                            alt={`Lắp đặt ${product.name} ${index + 1}`}
+                            fill
+                            sizes="33vw"
+                            className="object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -244,7 +347,8 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                       {content.detail.warrantyDetails.title}
                     </h4>
                     <p className="text-sm font-semibold leading-relaxed text-navy mb-2">
-                      {content.detail.warrantyDetails.warrantyPeriodPrefix} {product.warrantyText}.
+                      {content.detail.warrantyDetails.warrantyPeriodPrefix}{" "}
+                      {product.warrantyText ?? `${product.warranty ?? 0} tháng`}.
                     </p>
                     {content.detail.warrantyDetails.points.map((point, index) => (
                       <p key={index} className="text-sm font-semibold leading-relaxed text-navy/90">

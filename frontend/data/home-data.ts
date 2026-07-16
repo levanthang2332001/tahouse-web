@@ -1,4 +1,4 @@
-import { Flame, LayoutGrid, Lock, Shield, ShieldCheck, Utensils } from "lucide-react";
+import { Columns, DoorClosed, Lock, Shield, ShieldCheck, Utensils } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ export type Service = {
 export const SERVICES: Service[] = [
   {
     title: "Khóa điện tử - khóa vân tay",
-    desc: "+ 150 sản phẩm",
+    desc: "252 sản phẩm đang có",
     catId: "lock-parent",
     icon: Lock,
     img: "/pic/khoa.jpg",
@@ -24,26 +24,26 @@ export const SERVICES: Service[] = [
   },
   {
     title: "Két sắt thông minh",
-    desc: "+ 150 sản phẩm",
+    desc: "12 sản phẩm đang có",
     catId: "Smart",
     icon: Shield,
     img: "/pic/ket.webp",
     imgClass: "object-contain bg-white p-3",
   },
   {
-    title: "Thiết bị bếp",
-    desc: "+ 150 sản phẩm",
-    catId: "Kitchen",
-    icon: Flame,
-    img: "/pic/bep.webp",
+    title: "Khóa cửa kính",
+    desc: "5 sản phẩm đang có",
+    catId: "cua-kinh",
+    icon: DoorClosed,
+    img: "/pic/khoa2.jpg",
     imgClass: "object-cover",
   },
   {
-    title: "Phụ kiện tủ bếp",
-    desc: "+ 150 sản phẩm",
-    catId: "Cabinet",
-    icon: LayoutGrid,
-    img: "/pic/phukienbep.webp",
+    title: "Khóa nhôm kính",
+    desc: "47 sản phẩm đang có",
+    catId: "xingfa-sat",
+    icon: Columns,
+    img: "/pic/khoa.jpg",
     imgClass: "object-cover",
   },
 ];

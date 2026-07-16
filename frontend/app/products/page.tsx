@@ -1,28 +1,13 @@
 "use client";
 
-import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, startTransition, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { 
   ChevronDown, 
   Search, 
-  CookingPot, 
-  LayoutGrid, 
   Fingerprint, 
   Vault, 
-  Flame, 
-  Wind, 
-  Droplets, 
-  Droplet, 
-  Microwave, 
-  Sparkles, 
-  Utensils, 
-  Layers, 
-  CornerDownRight, 
-  Database, 
-  Trash2, 
-  MoveHorizontal, 
-  Boxes, 
   DoorClosed, 
   Columns, 
   Shield, 
@@ -30,23 +15,83 @@ import {
   Crown, 
   Box, 
   Home, 
-  Briefcase 
+  Briefcase,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
+import BrandLogo from "@/components/BrandLogo";
 import SocialFloating from "@/components/SocialFloating";
-import { PRODUCTS, Product } from "@/data/products";
+import { fetchBrands, fetchProducts } from "@/lib/api/products";
+import { mapFilterToApiParams } from "@/lib/product-filters";
+import type { Brand, Product } from "@/lib/types/product";
+import { MAX_PRODUCT_PRICE } from "@/lib/types/product";
 
-const BRANDS = [
-  { id: "kassler", name: "Kassler", logo: <span className="font-sans font-black tracking-wide text-red-600 italic text-[12px] select-none">KASSLER</span> },
-  { id: "bosch", name: "Bosch", logo: <span className="font-sans font-black tracking-tighter text-[#0056A8] text-[14px] select-none">BOSCH</span> },
-  { id: "sharp", name: "Sharp", logo: <span className="font-sans font-extrabold tracking-tight text-[#E30613] text-[13px] select-none">SHARP</span> },
-  { id: "hubert", name: "Hubert", logo: <span className="font-serif font-black tracking-normal text-neutral-800 italic text-[13px] select-none">Hubert</span> },
-  { id: "hyundai", name: "Huyndai", logo: <span className="font-sans font-bold tracking-widest text-[#002c5f] italic text-[10px] select-none">HUYNDAI</span> },
-  { id: "philips", name: "Philips", logo: <span className="font-sans font-extrabold tracking-widest text-[#0066a1] text-[10px] select-none">PHILIPS</span> },
-];
+const GRID_COLUMNS = 3;
+const PAGE_SIZE = GRID_COLUMNS * 7; // 21 sản phẩm = 7 hàng × 3 cột
+
+type PaginationItem = number | "ellipsis";
+
+function buildPaginationItems(current: number, total: number): PaginationItem[] {
+  if (total <= 10) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  const pages = new Set<number>();
+
+  for (let i = 1; i <= 4; i++) pages.add(i);
+  for (let i = total - 3; i <= total; i++) pages.add(i);
+  for (let i = current - 1; i <= current + 1; i++) {
+    if (i >= 1 && i <= total) pages.add(i);
+  }
+
+  const sorted = [...pages].sort((a, b) => a - b);
+  const items: PaginationItem[] = [];
+  let prev = 0;
+
+  for (const pageNumber of sorted) {
+    if (prev && pageNumber - prev > 1) items.push("ellipsis");
+    items.push(pageNumber);
+    prev = pageNumber;
+  }
+
+  return items;
+}
+
+function ProductCardSkeleton() {
+  return (
+    <div className="flex h-full flex-col overflow-hidden rounded-[24px] border border-gray-light bg-white animate-pulse">
+      <div className="aspect-[1.4] w-full bg-neutral/45" />
+      <div className="flex flex-col gap-3 p-4.5">
+        <div className="h-2 w-16 rounded bg-neutral/40" />
+        <div className="h-4 w-full rounded bg-neutral/45" />
+        <div className="h-3 w-4/5 rounded bg-neutral/35" />
+        <div className="h-3 w-3/5 rounded bg-neutral/35" />
+        <div className="mt-2 h-5 w-24 rounded bg-neutral/45" />
+        <div className="mt-4 h-10 w-full rounded-xl bg-neutral/40" />
+      </div>
+    </div>
+  );
+}
+
+function isUnfilteredCatalogView(
+  filter: string,
+  selectedBrand: string,
+  debouncedSearch: string,
+  minPrice: number,
+  maxPrice: number,
+) {
+  return (
+    filter === "all" &&
+    selectedBrand === "all" &&
+    !debouncedSearch.trim() &&
+    minPrice === 0 &&
+    maxPrice === MAX_PRODUCT_PRICE
+  );
+}
 
 // Define sections and categories structure exactly matching the user's design image
 const SIDEBAR_SECTIONS = [
@@ -57,6 +102,7 @@ const SIDEBAR_SECTIONS = [
     categoryId: "lock-parent",
     subcategories: [
       { id: "cua-go", name: "Khóa cửa gỗ", icon: DoorClosed },
+      { id: "cua-kinh", name: "Khóa cửa kính", icon: DoorClosed },
       { id: "xingfa-sat", name: "Khóa nhôm kính", icon: Columns },
       { id: "cua-cong", name: "Khóa cửa cổng", icon: Shield },
       { id: "khach-san", name: "Khóa khách sạn", icon: Hotel },
@@ -73,130 +119,8 @@ const SIDEBAR_SECTIONS = [
       { id: "ket-gia-dinh", name: "Két gia đình", icon: Home },
       { id: "ket-van-phong", name: "Két văn phòng", icon: Briefcase },
     ]
-  },
-  {
-    id: "thiet-bi-bep",
-    title: "THIẾT BỊ BẾP",
-    icon: CookingPot,
-    categoryId: "Kitchen",
-    subcategories: [
-      { id: "bep-tu", name: "Bếp từ", icon: Flame },
-      { id: "may-hut-mui", name: "Máy hút mùi", icon: Wind },
-      { id: "chau-rua", name: "Chậu rửa", icon: Droplets },
-      { id: "voi-rua", name: "Vòi rửa", icon: Droplet },
-      { id: "lo-nuong", name: "Lò nướng", icon: Microwave },
-      { id: "may-rua-chen", name: "Máy rửa chén", icon: Sparkles },
-      { id: "thiet-bi-bep-khac", name: "Thiết bị bếp khác", icon: Utensils },
-    ]
-  },
-  {
-    id: "phu-kien-tu-bep",
-    title: "PHỤ KIỆN TỦ BẾP",
-    icon: LayoutGrid,
-    categoryId: "Cabinet",
-    subcategories: [
-      { id: "gia-bat-nang-ha", name: "Giá bát nâng hạ", icon: Layers },
-      { id: "ke-goc-lien-hoan", name: "Kệ góc liên hoàn", icon: CornerDownRight },
-      { id: "thung-gao", name: "Thùng gạo", icon: Database },
-      { id: "thung-rac-am-tu", name: "Thùng rác âm tủ", icon: Trash2 },
-      { id: "ray-truot", name: "Ray trượt", icon: MoveHorizontal },
-      { id: "phu-kien-khac", name: "Phụ kiện khác", icon: Boxes },
-    ]
-  },
-  {
-    id: "loc-nuoc",
-    title: "LỌC NƯỚC",
-    icon: Droplets,
-    categoryId: "Water",
-    subcategories: [
-      { id: "may-loc-nuoc-ro", name: "Máy lọc nước R.O", icon: Sparkles },
-      { id: "may-loc-nuoc-ion-kiem", name: "Máy lọc nước ion kiềm", icon: Droplet },
-      { id: "loc-tong-sinh-hoat", name: "Hệ thống lọc tổng", icon: Database },
-      { id: "loi-loc-phu-kien", name: "Lõi lọc & Phụ kiện", icon: Boxes },
-    ]
   }
 ];
-
-// Smart subcategory matching helper for existing products
-const matchesSubcategory = (product: Product, subcatId: string) => {
-  const name = product.name.toLowerCase();
-  
-  switch (subcatId) {
-    // THIẾT BỊ BẾP (category: Kitchen)
-    case "bep-tu":
-      return product.category === "Kitchen" && name.includes("bếp từ");
-    case "may-hut-mui":
-      return product.category === "Kitchen" && name.includes("hút mùi");
-    case "chau-rua":
-      return product.category === "Kitchen" && name.includes("chậu rửa");
-    case "voi-rua":
-      return product.category === "Kitchen" && name.includes("vòi rửa");
-    case "lo-nuong":
-      return product.category === "Kitchen" && name.includes("lò nướng");
-    case "may-rua-chen":
-      return product.category === "Kitchen" && name.includes("rửa chén");
-    case "thiet-bi-bep-khac":
-      return product.category === "Kitchen" && 
-        !name.includes("bếp từ") && 
-        !name.includes("hút mùi") && 
-        !name.includes("chậu rửa") && 
-        !name.includes("vòi rửa") && 
-        !name.includes("lò nướng") && 
-        !name.includes("rửa chén");
-
-    // PHỤ KIỆN TỦ BẾP (category: Cabinet)
-    case "gia-bat-nang-ha":
-      return product.category === "Cabinet" && (name.includes("giá bát") || name.includes("nâng hạ"));
-    case "ke-goc-lien-hoan":
-      return product.category === "Cabinet" && name.includes("góc");
-    case "thung-gao":
-      return product.category === "Cabinet" && name.includes("gạo");
-    case "thung-rac-am-tu":
-      return product.category === "Cabinet" && name.includes("rác");
-    case "ray-truot":
-      return product.category === "Cabinet" && name.includes("ray");
-    case "phu-kien-khac":
-      return product.category === "Cabinet" && 
-        !name.includes("giá bát") && !name.includes("nâng hạ") &&
-        !name.includes("góc") && 
-        !name.includes("gạo") && 
-        !name.includes("rác") && 
-        !name.includes("ray");
-
-    // KHÓA ĐIỆN TỬ
-    case "cua-go":
-      return product.category === "cua-go";
-    case "xingfa-sat":
-      return product.category === "xingfa-sat" || product.category === "cua-kinh";
-    case "cua-cong":
-      return product.category === "cua-cong";
-    case "khach-san":
-      return product.category === "khach-san";
-    case "dai-sanh":
-      return product.category === "dai-sanh";
-
-    // KẾT SẮT THÔNG MINH
-    case "ket-mini":
-      return product.category === "Smart" && name.includes("mini");
-    case "ket-gia-dinh":
-      return product.category === "Smart" && name.includes("gia đình");
-    case "ket-van-phong":
-      return product.category === "Smart" && name.includes("văn phòng");
-
-    // LỌC NƯỚC (category: Water)
-    case "may-loc-nuoc-ro":
-      return product.category === "Water" && (name.includes("ro") || name.includes("r.o") || name.includes("smith") || name.includes("lọc nước"));
-    case "may-loc-nuoc-ion-kiem":
-      return product.category === "Water" && (name.includes("kiềm") || name.includes("ion"));
-    case "loc-tong-sinh-hoat":
-      return product.category === "Water" && name.includes("tổng");
-    case "loi-loc-phu-kien":
-      return product.category === "Water" && (name.includes("lõi") || name.includes("phụ kiện"));
-    
-    default:
-      return false;
-  }
-};
 
 function ProductListContent() {
   const searchParams = useSearchParams();
@@ -207,34 +131,41 @@ function ProductListContent() {
   const [prevQParam, setPrevQParam] = useState(qParam);
   const [filter, setFilter] = useState(catParam);
   const [search, setSearch] = useState(qParam);
+  const [page, setPage] = useState(1);
 
   if (catParam !== prevCatParam) {
     setPrevCatParam(catParam);
     setFilter(catParam);
+    setPage(1);
   }
   if (qParam !== prevQParam) {
     setPrevQParam(qParam);
     setSearch(qParam);
+    setPage(1);
   }
 
   const [selectedBrand, setSelectedBrand] = useState("all");
   const [sortBy, setSortBy] = useState<"newest" | "price-asc" | "price-desc">("newest");
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [total, setTotal] = useState(0);
+  const [catalogTotal, setCatalogTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [debouncedSearch, setDebouncedSearch] = useState(qParam);
 
   // Dual-range price filter states
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(40000000);
+  const [maxPrice, setMaxPrice] = useState(MAX_PRODUCT_PRICE);
   const [tempMinPrice, setTempMinPrice] = useState(0);
-  const [tempMaxPrice, setTempMaxPrice] = useState(40000000);
+  const [tempMaxPrice, setTempMaxPrice] = useState(MAX_PRODUCT_PRICE);
   const [isPriceDropdownOpen, setIsPriceDropdownOpen] = useState(false);
 
   // Keep track of which accordion section is expanded
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     "khoa-dien-tu": true,
     "ket-sat-thong-minh": false,
-    "thiet-bi-bep": true,
-    "phu-kien-tu-bep": false,
-    "loc-nuoc": false,
   });
 
   const toggleSection = (sectionId: string) => {
@@ -247,9 +178,117 @@ function ProductListContent() {
   const handleSubcategoryClick = (subcatId: string) => {
     setFilter(subcatId);
     setSelectedBrand("all");
+    setPage(1);
   };
 
   const panelRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const skipInitialPageScrollRef = useRef(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch((prev) => {
+        if (search !== prev) {
+          setPage(1);
+        }
+        return search;
+      });
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => {
+    fetchBrands()
+      .then(setBrands)
+      .catch(() => setBrands([]));
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const apiFilter = mapFilterToApiParams(filter);
+
+    startTransition(() => {
+      setLoading(true);
+      setFetchError(null);
+    });
+
+    fetchProducts({
+      page,
+      limit: PAGE_SIZE,
+      ...apiFilter,
+      brand: selectedBrand === "all" ? undefined : selectedBrand,
+      search: debouncedSearch.trim() || undefined,
+      minPrice: minPrice > 0 ? minPrice : undefined,
+      maxPrice: maxPrice < MAX_PRODUCT_PRICE ? maxPrice : undefined,
+      sortBy,
+    })
+      .then((data) => {
+        if (cancelled) return;
+
+        const maxPage = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
+        if (page > maxPage) {
+          setPage(maxPage);
+          return;
+        }
+
+        setProducts(data.items);
+        setTotal(data.total);
+
+        if (
+          isUnfilteredCatalogView(
+            filter,
+            selectedBrand,
+            debouncedSearch,
+            minPrice,
+            maxPrice,
+          )
+        ) {
+          setCatalogTotal(data.total);
+        } else if (catalogTotal === 0) {
+          fetchProducts({ page: 1, limit: 1 })
+            .then((catalog) => {
+              if (!cancelled) setCatalogTotal(catalog.total);
+            })
+            .catch(() => {});
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setProducts([]);
+        setTotal(0);
+        setFetchError("Không thể tải danh sách sản phẩm. Vui lòng thử lại.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [page, filter, selectedBrand, debouncedSearch, minPrice, maxPrice, sortBy]);
+
+  useEffect(() => {
+    if (skipInitialPageScrollRef.current) {
+      skipInitialPageScrollRef.current = false;
+      return;
+    }
+    gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [page]);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const rangeEnd = total === 0 ? 0 : Math.min(page * PAGE_SIZE, total);
+
+  const goToPage = (nextPage: number) => {
+    setPage(Math.min(Math.max(1, nextPage), totalPages));
+  };
+
+  const paginationItems = buildPaginationItems(page, totalPages);
+
+  const gridPlaceholders =
+    products.length > 0
+      ? (GRID_COLUMNS - (products.length % GRID_COLUMNS)) % GRID_COLUMNS
+      : 0;
 
   useEffect(() => {
     const panel = panelRef.current;
@@ -298,65 +337,6 @@ function ProductListContent() {
     };
   }, []);
 
-  const filteredProducts = useMemo(
-    () => {
-      const lockSubcategories = ["dai-sanh", "cua-go", "cua-kinh", "xingfa-sat", "cua-cong", "khach-san"];
-      const filtered = PRODUCTS.filter((product) => {
-        // Base category filtering with our smart mapping support
-        let matchesFilter = false;
-
-        if (filter === "all") {
-          matchesFilter = true;
-        } else if (filter === "Kitchen") {
-          matchesFilter = product.category === "Kitchen";
-        } else if (filter === "Cabinet") {
-          matchesFilter = product.category === "Cabinet";
-        } else if (filter === "lock-parent" || filter === "Lock") {
-          matchesFilter = lockSubcategories.includes(product.category) || product.category === "Lock";
-        } else if (filter === "Smart") {
-          matchesFilter = product.category === "Smart";
-        } else if (filter === "Water") {
-          matchesFilter = product.category === "Water";
-        } else {
-          // If filtering by specific subcategory ID
-          matchesFilter = matchesSubcategory(product, filter);
-        }
-
-        const term = search.toLowerCase();
-        const matchesSearch =
-          product.name.toLowerCase().includes(term) ||
-          product.code.toLowerCase().includes(term) ||
-          product.description.toLowerCase().includes(term);
-
-        const matchesBrand =
-          selectedBrand === "all" ||
-          (selectedBrand === "kassler" && (product.code.toLowerCase().includes("kassler") || product.name.toLowerCase().includes("kassler"))) ||
-          (selectedBrand === "bosch" && (product.code.toLowerCase().includes("bosch") || product.name.toLowerCase().includes("bosch"))) ||
-          (selectedBrand === "sharp" && (product.code.toLowerCase().includes("sharp") || product.name.toLowerCase().includes("sharp"))) ||
-          (selectedBrand === "hubert" && (product.code.toLowerCase().includes("hubert") || product.name.toLowerCase().includes("hubert"))) ||
-          (selectedBrand === "hyundai" && (
-            product.code.toLowerCase().includes("huyndai") || 
-            product.name.toLowerCase().includes("huyndai") ||
-            product.code.toLowerCase().includes("hyundai") ||
-            product.name.toLowerCase().includes("hyundai")
-          )) ||
-          (selectedBrand === "philips" && (product.code.toLowerCase().includes("philips") || product.name.toLowerCase().includes("philips")));
-
-        const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
-
-        return matchesFilter && matchesSearch && matchesBrand && matchesPrice;
-      });
-
-      if (sortBy === "price-asc") {
-        return [...filtered].sort((a, b) => a.price - b.price);
-      } else if (sortBy === "price-desc") {
-        return [...filtered].sort((a, b) => b.price - a.price);
-      }
-      return filtered;
-    },
-    [filter, search, selectedBrand, minPrice, maxPrice, sortBy],
-  );
-
   return (
     <div className="min-h-screen bg-neutral pb-24 pt-10">
       <div className="mx-auto max-w-[1600px] px-6 lg:px-12">
@@ -391,6 +371,7 @@ function ProductListContent() {
                 <button
                   onClick={() => {
                     setSelectedBrand("all");
+                    setPage(1);
                   }}
                   className={`cursor-pointer rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 h-10 flex items-center justify-center ${
                     selectedBrand === "all"
@@ -400,14 +381,15 @@ function ProductListContent() {
                 >
                   Tất cả
                 </button>
-                {BRANDS.map((brand) => {
-                  const isActive = selectedBrand === brand.id;
+                {brands.map((brand) => {
+                  const isActive = selectedBrand === brand.slug;
                   return (
                     <button
-                      key={brand.id}
+                      key={brand.slug}
                       onClick={() => {
-                        setSelectedBrand(brand.id);
+                        setSelectedBrand(brand.slug);
                         setFilter("all");
+                        setPage(1);
                       }}
                       className={`cursor-pointer flex items-center justify-center rounded-xl bg-white border px-4 py-2 transition-all duration-300 h-10 min-w-[95px] shadow-xs hover:scale-102 hover:shadow-sm ${
                         isActive
@@ -415,7 +397,7 @@ function ProductListContent() {
                           : "border-gray-light/60 hover:border-brand-green/30"
                       }`}
                     >
-                      {brand.logo}
+                      <BrandLogo brand={brand} />
                     </button>
                   );
                 })}
@@ -438,6 +420,7 @@ function ProductListContent() {
                 onClick={() => {
                   setFilter("all");
                   setSelectedBrand("all");
+                  setPage(1);
                 }}
                 className={`flex w-full items-center justify-between px-4 py-4 text-left transition-colors cursor-pointer select-none ${
                   filter === "all"
@@ -460,7 +443,7 @@ function ProductListContent() {
                       : "bg-neutral text-navy/40"
                   }`}
                 >
-                  {PRODUCTS.length}
+                  {catalogTotal || total}
                 </span>
               </button>
 
@@ -479,6 +462,7 @@ function ProductListContent() {
                         toggleSection(section.id);
                         setFilter(section.categoryId);
                         setSelectedBrand("all");
+                        setPage(1);
                       }}
                       className={`flex w-full items-center justify-between px-4 py-4 text-left transition-colors cursor-pointer select-none ${
                         isParentActive ? "bg-brand-green/[0.02]" : "hover:bg-neutral/20"
@@ -551,6 +535,7 @@ function ProductListContent() {
                   onClick={() => {
                     setFilter("all");
                     setSelectedBrand("all");
+                    setPage(1);
                   }}
                   className={`flex items-center gap-2 whitespace-nowrap rounded-2xl px-5 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 border cursor-pointer ${
                     filter === "all"
@@ -574,7 +559,7 @@ function ProductListContent() {
                       onClick={() => {
                         setFilter(section.categoryId);
                         setSelectedBrand("all");
-                        // Expand this section in desktop in case they resize
+                        setPage(1);
                         setExpandedSections(prev => ({
                           ...prev,
                           [section.id]: true
@@ -596,13 +581,15 @@ function ProductListContent() {
           </aside>
 
           {/* Right Product Grid */}
-          <div className="flex-1">
+          <div className="flex-1" ref={gridRef}>
             {/* Grid Header with Counts and Dropdowns */}
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="text-[13px] font-semibold text-navy/75 leading-none">
-                {filteredProducts.length > 0 ? (
+                {loading && products.length === 0 ? (
+                  "Đang tải sản phẩm..."
+                ) : total > 0 ? (
                   <>
-                    Hiển thị <span className="text-navy font-extrabold">1–{filteredProducts.length}</span> trong <span className="text-navy font-extrabold">{filteredProducts.length}</span> sản phẩm
+                    Hiển thị <span className="text-navy font-extrabold">{rangeStart}–{rangeEnd}</span> trong <span className="text-navy font-extrabold">{total}</span> sản phẩm
                   </>
                 ) : (
                   "Hiển thị 0 trong 0 sản phẩm"
@@ -622,13 +609,13 @@ function ProductListContent() {
                       setIsPriceDropdownOpen(!isPriceDropdownOpen);
                     }}
                     className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-bold transition-all duration-300 shadow-xs cursor-pointer select-none ${
-                      isPriceDropdownOpen || minPrice > 0 || maxPrice < 40000000
+                      isPriceDropdownOpen || minPrice > 0 || maxPrice < MAX_PRODUCT_PRICE
                         ? "border-brand-green text-brand-green bg-brand-green/5"
                         : "border-gray-light/60 bg-white text-navy/80 hover:text-brand-green hover:border-brand-green/30"
                     }`}
                   >
                     <span>
-                      {minPrice === 0 && maxPrice === 40000000
+                      {minPrice === 0 && maxPrice === MAX_PRODUCT_PRICE
                         ? "Khoảng giá"
                         : `Giá: ${(minPrice / 1000000).toFixed(0)}tr – ${(maxPrice / 1000000).toFixed(0)}tr`}
                     </span>
@@ -677,8 +664,8 @@ function ProductListContent() {
                             <div 
                               className="absolute h-1.5 bg-brand-green rounded-full pointer-events-none"
                               style={{
-                                left: `${(tempMinPrice / 40000000) * 100}%`,
-                                right: `${100 - (tempMaxPrice / 40000000) * 100}%`
+                                left: `${(tempMinPrice / MAX_PRODUCT_PRICE) * 100}%`,
+                                right: `${100 - (tempMaxPrice / MAX_PRODUCT_PRICE) * 100}%`
                               }}
                             />
 
@@ -686,7 +673,7 @@ function ProductListContent() {
                             <input 
                               type="range"
                               min={0}
-                              max={40000000}
+                              max={MAX_PRODUCT_PRICE}
                               step={500000}
                               value={tempMinPrice}
                               onChange={(e) => {
@@ -699,7 +686,7 @@ function ProductListContent() {
                             <input 
                               type="range"
                               min={0}
-                              max={40000000}
+                              max={MAX_PRODUCT_PRICE}
                               step={500000}
                               value={tempMaxPrice}
                               onChange={(e) => {
@@ -719,9 +706,10 @@ function ProductListContent() {
                             <button
                               onClick={() => {
                                 setTempMinPrice(0);
-                                setTempMaxPrice(40000000);
+                                setTempMaxPrice(MAX_PRODUCT_PRICE);
                                 setMinPrice(0);
-                                setMaxPrice(40000000);
+                                setMaxPrice(MAX_PRODUCT_PRICE);
+                                setPage(1);
                               }}
                               className="flex-1 rounded-xl border border-gray-light bg-neutral/35 py-2 text-center text-xs font-bold text-navy hover:bg-neutral/70 transition-all cursor-pointer"
                             >
@@ -732,6 +720,7 @@ function ProductListContent() {
                                 setMinPrice(tempMinPrice);
                                 setMaxPrice(tempMaxPrice);
                                 setIsPriceDropdownOpen(false);
+                                setPage(1);
                               }}
                               className="flex-1 rounded-xl bg-brand-green py-2 text-center text-xs font-bold text-white hover:bg-lime-dark shadow-xs transition-all cursor-pointer"
                             >
@@ -782,6 +771,7 @@ function ProductListContent() {
                             onClick={() => {
                               setSortBy("newest");
                               setIsSortDropdownOpen(false);
+                              setPage(1);
                             }}
                             className={`w-full text-left px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                               sortBy === "newest"
@@ -795,6 +785,7 @@ function ProductListContent() {
                             onClick={() => {
                               setSortBy("price-asc");
                               setIsSortDropdownOpen(false);
+                              setPage(1);
                             }}
                             className={`w-full text-left px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                               sortBy === "price-asc"
@@ -808,6 +799,7 @@ function ProductListContent() {
                             onClick={() => {
                               setSortBy("price-desc");
                               setIsSortDropdownOpen(false);
+                              setPage(1);
                             }}
                             className={`w-full text-left px-3 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                               sortBy === "price-desc"
@@ -825,15 +817,95 @@ function ProductListContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-              <AnimatePresence mode="popLayout">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </AnimatePresence>
+            {fetchError && (
+              <div className="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-semibold text-rose-700">
+                {fetchError}
+              </div>
+            )}
+
+            <div
+              className={`grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8 md:items-stretch ${
+                loading && products.length > 0 ? "opacity-60 pointer-events-none" : ""
+              }`}
+            >
+              {loading && products.length === 0 ? (
+                Array.from({ length: PAGE_SIZE }).map((_, index) => (
+                  <ProductCardSkeleton key={`skeleton-${index}`} />
+                ))
+              ) : (
+                <>
+                  {products.map((product, index) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      priority={page === 1 && index < GRID_COLUMNS}
+                    />
+                  ))}
+                  {Array.from({ length: gridPlaceholders }).map((_, index) => (
+                    <div
+                      key={`grid-placeholder-${index}`}
+                      className="hidden md:block"
+                      aria-hidden="true"
+                    />
+                  ))}
+                </>
+              )}
             </div>
 
-            {filteredProducts.length === 0 && (
+            {totalPages > 1 && (
+              <nav
+                className="mt-12 flex flex-wrap items-center justify-center gap-2"
+                aria-label="Phân trang sản phẩm"
+              >
+                <button
+                  type="button"
+                  onClick={() => goToPage(page - 1)}
+                  disabled={page <= 1 || loading}
+                  className="flex h-11 items-center gap-1.5 rounded-xl border border-gray-light/60 bg-white px-4 text-sm font-bold text-navy/70 transition-all hover:border-brand-green/30 hover:text-brand-green disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <ChevronLeft size={18} />
+                  Trước
+                </button>
+
+                {paginationItems.map((item, index) =>
+                  item === "ellipsis" ? (
+                    <span
+                      key={`ellipsis-${index}`}
+                      className="flex h-11 min-w-11 items-center justify-center px-1 text-sm font-bold text-navy/35"
+                    >
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => goToPage(item)}
+                      disabled={loading}
+                      aria-current={item === page ? "page" : undefined}
+                      className={`flex h-11 min-w-11 items-center justify-center rounded-xl border px-3 text-sm font-bold transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
+                        item === page
+                          ? "border-brand-green bg-brand-green text-white shadow-sm"
+                          : "border-gray-light/60 bg-white text-navy/70 hover:border-brand-green/30 hover:text-brand-green"
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  ),
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => goToPage(page + 1)}
+                  disabled={page >= totalPages || loading}
+                  className="flex h-11 items-center gap-1.5 rounded-xl border border-gray-light/60 bg-white px-4 text-sm font-bold text-navy/70 transition-all hover:border-brand-green/30 hover:text-brand-green disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Sau
+                  <ChevronRight size={18} />
+                </button>
+              </nav>
+            )}
+
+            {!loading && products.length === 0 && !fetchError && (
               <div className="rounded-3xl border border-dashed border-gray-light bg-cream/40 py-28 text-center">
                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-brand-green/10 text-brand-green">
                   <Search size={28} />
