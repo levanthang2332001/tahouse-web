@@ -2,14 +2,14 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowUp, Facebook, Mail, MapPin, Phone, Youtube } from "lucide-react";
-import { ZaloIcon, TiktokIcon } from "@/components/ui/icons";
+import { ArrowUp, Facebook, Mail, MapPin, Phone } from "lucide-react";
+import { ZaloIcon } from "@/components/ui/icons";
+import { COMPANY_LEGAL } from "@/data/company-legal";
+import { POLICY_NAV_LINKS } from "@/data/policies";
 
 const SOCIAL_LINKS = [
-  { href: "#", icon: Facebook, label: "Facebook", iconClass: "h-3.5 w-3.5" },
-  { href: "#", icon: ZaloIcon,  label: "Zalo",    iconClass: undefined },
-  { href: "#", icon: Youtube,   label: "Youtube",  iconClass: "h-3.5 w-3.5" },
-  { href: "#", icon: TiktokIcon, label: "Tiktok",  iconClass: undefined },
+  { href: COMPANY_LEGAL.facebookUrl, icon: Facebook, label: "Facebook", iconClass: "h-3.5 w-3.5" },
+  { href: COMPANY_LEGAL.zaloUrl, icon: ZaloIcon,  label: "Zalo",    iconClass: undefined },
 ] as const;
 
 const SERVICE_LINKS = [
@@ -17,13 +17,6 @@ const SERVICE_LINKS = [
   "Phụ kiện tủ bếp",
   "Khóa điện tử – khóa vân tay",
   "Két sắt thông minh",
-];
-
-const SUPPORT_LINKS = [
-  "Hướng dẫn sử dụng",
-  "Chính sách bảo hành",
-  "Chính sách đổi trả",
-  "Câu hỏi thường gặp",
 ];
 
 const ABOUT_LINKS = ["Giới thiệu", "Giải pháp", "Dự án", "Tin tức"];
@@ -45,11 +38,11 @@ export default function Footer() {
                 alt="TA House Logo"
                 className="h-16 w-auto object-contain transition-opacity group-hover:opacity-80"
               />
-              <span className="text-[10px] font-bold text-navy/60 block mt-3 tracking-wide">
+              <span className="mt-3 block text-[10px] font-medium tracking-wide text-navy/60">
                 Thiết bị bếp &amp; Khóa thông minh
               </span>
             </Link>
-            <p className="mb-6 max-w-xs text-left text-xs font-semibold leading-relaxed text-navy/70">
+            <p className="mb-6 max-w-xs text-left text-xs font-normal leading-relaxed text-navy/70">
               TA HOUSE chuyên tư vấn giải pháp thiết bị bếp, phụ kiện tủ bếp, khóa điện tử và két sắt thông minh phù hợp với từng gia đình.
             </p>
             <div className="flex gap-2.5">
@@ -57,6 +50,8 @@ export default function Footer() {
                 <a
                   key={label}
                   href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-cream transition-all hover:bg-brand-green hover:scale-105"
                   aria-label={label}
                 >
@@ -69,10 +64,10 @@ export default function Footer() {
           {/* Column 2: Dịch vụ */}
           <div className="flex flex-col items-start lg:col-span-2 lg:pl-4">
             <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-navy">Dịch vụ</h4>
-            <ul className="space-y-4 text-left text-xs font-bold text-navy/70">
+            <ul className="space-y-4 text-left text-xs font-normal text-navy/70">
               {SERVICE_LINKS.map((label) => (
                 <li key={label}>
-                  <Link href="/products" className="hover:text-brand-green transition-colors">
+                  <Link href="/products" className="transition-colors hover:text-brand-green">
                     {label}
                   </Link>
                 </li>
@@ -80,13 +75,19 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Hỗ trợ */}
+          {/* Column 3: Chính sách mua hàng */}
           <div className="flex flex-col items-start lg:col-span-2 lg:pl-2">
-            <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-navy">Hỗ trợ</h4>
-            <ul className="space-y-4 text-left text-xs font-bold text-navy/70">
-              {SUPPORT_LINKS.map((label) => (
-                <li key={label}>
-                  <Link href="/products" className="hover:text-brand-green transition-colors">
+            <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-navy">
+              Chính sách mua hàng
+            </h4>
+            <ul className="space-y-3 text-left text-xs font-normal text-navy/70">
+              {POLICY_NAV_LINKS.map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    scroll={false}
+                    className="transition-colors hover:text-brand-green"
+                  >
                     {label}
                   </Link>
                 </li>
@@ -97,10 +98,10 @@ export default function Footer() {
           {/* Column 4: Về TA HOUSE */}
           <div className="flex flex-col items-start lg:col-span-2">
             <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-navy">Về TA HOUSE</h4>
-            <ul className="space-y-4 text-left text-xs font-bold text-navy/70">
+            <ul className="space-y-4 text-left text-xs font-normal text-navy/70">
               {ABOUT_LINKS.map((label) => (
                 <li key={label}>
-                  <Link href="/products" className="hover:text-brand-green transition-colors">
+                  <Link href="/products" className="transition-colors hover:text-brand-green">
                     {label}
                   </Link>
                 </li>
@@ -116,26 +117,26 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-green" />
-                <span className="text-xs font-bold leading-relaxed text-navy/80">
-                  961A Kha Vạn Cân,<br />P. Linh Xuân, TP.HCM
+                <span className="text-xs font-normal leading-relaxed text-navy/80">
+                  {COMPANY_LEGAL.address}
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-4 w-4 shrink-0 text-brand-green" />
                 <a
-                  href="tel:0938824479"
-                  className="text-xs font-bold text-navy/80 hover:text-brand-green transition-colors"
+                  href={`tel:${COMPANY_LEGAL.phoneTel}`}
+                  className="text-xs font-normal text-navy/80 transition-colors hover:text-brand-green"
                 >
-                  Hotline: 0938 824 479
+                  <span className="font-semibold">Hotline:</span> {COMPANY_LEGAL.phone}
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 shrink-0 text-brand-green" />
                 <a
-                  href="mailto:info@tahouse.vn"
-                  className="text-xs font-bold text-navy/80 hover:text-brand-green transition-colors"
+                  href={`mailto:${COMPANY_LEGAL.email}`}
+                  className="text-xs font-normal text-navy/80 transition-colors hover:text-brand-green"
                 >
-                  Email: info@tahouse.vn
+                  <span className="font-semibold">Email:</span> {COMPANY_LEGAL.email}
                 </a>
               </li>
             </ul>
@@ -149,11 +150,57 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom Line */}
-        <div className="flex flex-col items-center justify-center border-t border-gray-light/65 pt-8">
-          <p className="text-[11px] font-bold text-navy/40">
-            © 2024 TA HOUSE. All rights reserved.
+        {/* Bottom Line — kiểu thông tin pháp lý căn trái */}
+        <div className="border-t border-gray-light/65 pt-6 text-left">
+          <p className="mb-3 text-xs font-normal italic text-navy/50">
+            © {new Date().getFullYear()} {COMPANY_LEGAL.tradeName}. All rights reserved.
           </p>
+          <div className="space-y-1 text-[13px] font-normal leading-snug text-navy/70">
+            <p className="font-bold uppercase tracking-wide text-navy">
+              {COMPANY_LEGAL.legalName}
+            </p>
+            <p className="font-normal">{COMPANY_LEGAL.englishName}</p>
+            <p className="font-normal">{COMPANY_LEGAL.abbreviatedName}</p>
+            <p className="font-normal">
+              <span className="font-semibold text-navy/80">MST:</span> {COMPANY_LEGAL.taxCode}
+            </p>
+            <p className="font-normal">
+              <span className="font-semibold text-navy/80">
+                {COMPANY_LEGAL.representativeTitle}:
+              </span>{" "}
+              {COMPANY_LEGAL.representative}
+            </p>
+            <p className="font-normal">{COMPANY_LEGAL.address}</p>
+            <p className="font-normal">
+              <span className="font-semibold text-navy/80">Hotline:</span>{" "}
+              <a
+                href={`tel:${COMPANY_LEGAL.phoneTel}`}
+                className="transition-colors hover:text-brand-green"
+              >
+                {COMPANY_LEGAL.phone}
+              </a>
+            </p>
+            <p className="font-normal">
+              <span className="font-semibold text-navy/80">Website:</span>{" "}
+              <a
+                href={COMPANY_LEGAL.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-brand-green"
+              >
+                {COMPANY_LEGAL.website}
+              </a>
+            </p>
+            <p className="font-normal">
+              <span className="font-semibold text-navy/80">Email:</span>{" "}
+              <a
+                href={`mailto:${COMPANY_LEGAL.email}`}
+                className="transition-colors hover:text-brand-green"
+              >
+                {COMPANY_LEGAL.email}
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>

@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
 export default function SmoothScroll() {
+  const pathname = usePathname();
+  const lenisRef = useRef<Lenis | null>(null);
+
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
@@ -16,6 +20,8 @@ export default function SmoothScroll() {
       infinite: false,
     });
 
+    lenisRef.current = lenis;
+
     let rafId: number;
     const raf = (time: number) => {
       lenis.raf(time);
@@ -24,7 +30,6 @@ export default function SmoothScroll() {
 
     rafId = requestAnimationFrame(raf);
 
-    // Intercept all hash anchor clicks for smooth scrolling
     const handleAnchorClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const anchor = target.closest("a");
@@ -53,7 +58,6 @@ export default function SmoothScroll() {
 
     document.addEventListener("click", handleAnchorClick);
 
-    // Scroll to initial hash on page load
     if (window.location.hash) {
       setTimeout(() => {
         const targetElement = document.querySelector(window.location.hash);
@@ -67,8 +71,19 @@ export default function SmoothScroll() {
       cancelAnimationFrame(rafId);
       document.removeEventListener("click", handleAnchorClick);
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, []);
+
+  // Mỗi lần đổi route → về đầu trang (tránh giật vị trí cũ / sticky nhảy)
+  useEffect(() => {
+    const lenis = lenisRef.current;
+    if (lenis) {
+      lenis.scrollTo(0, { immediate: true });
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" in window ? "instant" : "auto" });
+    }
+  }, [pathname]);
 
   return null;
 }
