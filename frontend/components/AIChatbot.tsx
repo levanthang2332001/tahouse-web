@@ -20,7 +20,7 @@ type Message = {
   streaming?: boolean;
 };
 
-const FALLBACK_REPLY = `Xin lỗi, hệ thống tư vấn đang bận. Quý khách vui lòng gọi Hotline / Zalo: ${COMPANY_LEGAL.phone} để được hỗ trợ nhanh nhất.`;
+const FALLBACK_REPLY = `Xin lỗi, hệ thống tư vấn đang bận. Quý khách vui lòng gọi Hotline / Zalo: ${COMPANY_LEGAL.phonesDisplay} để được hỗ trợ nhanh nhất.`;
 
 // ---------------------------------------------------------------------------
 // Markdown-lite renderer for streamed AI replies

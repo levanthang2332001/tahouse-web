@@ -44,12 +44,20 @@ export default function ContactPage() {
               <Phone className="h-5 w-5 text-brand-green" />
               <h2 className="text-sm font-semibold uppercase tracking-wider text-navy">Hotline</h2>
             </div>
-            <a
-              href={`tel:${COMPANY_LEGAL.phoneTel}`}
-              className="text-lg font-black text-navy transition-colors hover:text-brand-green"
-            >
-              {COMPANY_LEGAL.phone}
-            </a>
+            <div className="space-y-1">
+              <a
+                href={`tel:${COMPANY_LEGAL.phoneTel}`}
+                className="block text-lg font-black text-navy transition-colors hover:text-brand-green"
+              >
+                {COMPANY_LEGAL.phone}
+              </a>
+              <a
+                href={`tel:${COMPANY_LEGAL.phoneSecondaryTel}`}
+                className="block text-lg font-black text-navy transition-colors hover:text-brand-green"
+              >
+                {COMPANY_LEGAL.phoneSecondary}
+              </a>
+            </div>
             <p className="mt-2 text-xs font-semibold text-navy/55">
               Giờ làm việc: {COMPANY_LEGAL.workingHours}
             </p>

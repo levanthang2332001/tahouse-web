@@ -100,7 +100,7 @@ export default function PolicyPageLayout({ policy }: PolicyPageLayoutProps) {
                 <p className="mt-1 font-normal">{COMPANY_LEGAL.address}</p>
                 <p className="mt-1 font-normal">
                   <span className="font-semibold text-navy/75">Hotline:</span>{" "}
-                  {COMPANY_LEGAL.phone}
+                  {COMPANY_LEGAL.phonesDisplay}
                 </p>
               </div>
             </div>

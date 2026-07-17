@@ -121,14 +121,24 @@ export default function Footer() {
                   {COMPANY_LEGAL.address}
                 </span>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="h-4 w-4 shrink-0 text-brand-green" />
-                <a
-                  href={`tel:${COMPANY_LEGAL.phoneTel}`}
-                  className="text-xs font-normal text-navy/80 transition-colors hover:text-brand-green"
-                >
-                  <span className="font-semibold">Hotline:</span> {COMPANY_LEGAL.phone}
-                </a>
+              <li className="flex items-start gap-3">
+                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-brand-green" />
+                <span className="text-xs font-normal text-navy/80">
+                  <span className="font-semibold">Hotline:</span>{" "}
+                  <a
+                    href={`tel:${COMPANY_LEGAL.phoneTel}`}
+                    className="transition-colors hover:text-brand-green"
+                  >
+                    {COMPANY_LEGAL.phone}
+                  </a>
+                  {" – "}
+                  <a
+                    href={`tel:${COMPANY_LEGAL.phoneSecondaryTel}`}
+                    className="transition-colors hover:text-brand-green"
+                  >
+                    {COMPANY_LEGAL.phoneSecondary}
+                  </a>
+                </span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 shrink-0 text-brand-green" />
@@ -179,6 +189,13 @@ export default function Footer() {
               >
                 {COMPANY_LEGAL.phone}
               </a>
+              {" – "}
+              <a
+                href={`tel:${COMPANY_LEGAL.phoneSecondaryTel}`}
+                className="transition-colors hover:text-brand-green"
+              >
+                {COMPANY_LEGAL.phoneSecondary}
+              </a>
             </p>
             <p className="font-normal">
               <span className="font-semibold text-navy/80">Website:</span>{" "}
@@ -188,7 +205,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="transition-colors hover:text-brand-green"
               >
-                {COMPANY_LEGAL.website}
+                {COMPANY_LEGAL.websiteDisplay}
               </a>
             </p>
             <p className="font-normal">
