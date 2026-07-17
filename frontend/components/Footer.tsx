@@ -5,45 +5,50 @@ import Link from "next/link";
 import { ArrowUp, Facebook, Mail, MapPin, Phone } from "lucide-react";
 import { ZaloIcon } from "@/components/ui/icons";
 import { COMPANY_LEGAL } from "@/data/company-legal";
-import { POLICY_NAV_LINKS } from "@/data/policies";
+import { POLICY_CORE_LINKS } from "@/data/policies";
 
 const SOCIAL_LINKS = [
   { href: COMPANY_LEGAL.facebookUrl, icon: Facebook, label: "Facebook", iconClass: "h-3.5 w-3.5" },
-  { href: COMPANY_LEGAL.zaloUrl, icon: ZaloIcon,  label: "Zalo",    iconClass: undefined },
+  { href: COMPANY_LEGAL.zaloUrl, icon: ZaloIcon, label: "Zalo", iconClass: undefined },
 ] as const;
 
 const SERVICE_LINKS = [
-  "Thiết bị bếp",
-  "Phụ kiện tủ bếp",
-  "Khóa điện tử – khóa vân tay",
-  "Két sắt thông minh",
+  { href: "/products", label: "Thiết bị bếp" },
+  { href: "/products", label: "Phụ kiện tủ bếp" },
+  { href: "/products", label: "Khóa điện tử – khóa vân tay" },
+  { href: "/products", label: "Két sắt thông minh" },
 ];
 
-const ABOUT_LINKS = ["Giới thiệu", "Giải pháp", "Dự án", "Tin tức"];
+const ABOUT_LINKS = [
+  { href: "/gioi-thieu", label: "Giới thiệu" },
+  { href: "/huong-dan-dat-hang", label: "Hướng dẫn đặt hàng" },
+  { href: "/chinh-sach/quy-che-hoat-dong", label: "Quy chế hoạt động" },
+  { href: "/contact", label: "Liên hệ" },
+];
 
 export default function Footer() {
   return (
     <footer
       id="contact"
-      className="relative z-10 w-full bg-cream border-t border-gray-light/65 pb-8 pt-16 font-sans leading-relaxed text-navy transition-colors duration-300"
+      className="relative z-10 w-full border-t border-gray-light/65 bg-cream pb-10 pt-14 font-sans leading-relaxed text-navy"
     >
       <div className="mx-auto max-w-[1440px] px-6 lg:px-12">
-        <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
-
-          {/* Column 1: Logo & Slogan */}
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
+          {/* Brand */}
           <div className="flex flex-col items-start lg:col-span-3">
-            <Link href="/" className="mb-6 block group">
+            <Link href="/" className="mb-5 block group">
               <img
                 src="/logoTA2.svg"
                 alt="TA House Logo"
-                className="h-16 w-auto object-contain transition-opacity group-hover:opacity-80"
+                className="h-14 w-auto object-contain transition-opacity group-hover:opacity-80"
               />
-              <span className="mt-3 block text-[10px] font-medium tracking-wide text-navy/60">
+              <span className="mt-2 block text-xs font-semibold tracking-wide text-navy/55">
                 Thiết bị bếp &amp; Khóa thông minh
               </span>
             </Link>
-            <p className="mb-6 max-w-xs text-left text-xs font-normal leading-relaxed text-navy/70">
-              TA HOUSE chuyên tư vấn giải pháp thiết bị bếp, phụ kiện tủ bếp, khóa điện tử và két sắt thông minh phù hợp với từng gia đình.
+            <p className="mb-5 max-w-xs text-left text-[13px] font-semibold leading-relaxed text-navy/65">
+              Tư vấn giải pháp thiết bị bếp, phụ kiện tủ bếp, khóa điện tử và két sắt thông minh phù
+              hợp từng gia đình.
             </p>
             <div className="flex gap-2.5">
               {SOCIAL_LINKS.map(({ href, icon: Icon, label, iconClass }) => (
@@ -52,7 +57,7 @@ export default function Footer() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-cream transition-all hover:bg-brand-green hover:scale-105"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-cream transition-all hover:scale-105 hover:bg-brand-green"
                   aria-label={label}
                 >
                   <Icon {...(iconClass ? { className: iconClass } : {})} />
@@ -61,13 +66,13 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Dịch vụ */}
-          <div className="flex flex-col items-start lg:col-span-2 lg:pl-4">
-            <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-navy">Dịch vụ</h4>
-            <ul className="space-y-4 text-left text-xs font-normal text-navy/70">
-              {SERVICE_LINKS.map((label) => (
+          {/* Dịch vụ */}
+          <div className="flex flex-col items-start lg:col-span-2 lg:pl-2">
+            <h4 className="mb-5 text-sm font-bold uppercase tracking-wider text-navy">Dịch vụ</h4>
+            <ul className="space-y-3 text-left text-[13px] font-semibold text-navy/70">
+              {SERVICE_LINKS.map(({ href, label }) => (
                 <li key={label}>
-                  <Link href="/products" className="transition-colors hover:text-brand-green">
+                  <Link href={href} className="transition-colors hover:text-brand-green">
                     {label}
                   </Link>
                 </li>
@@ -75,13 +80,13 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Chính sách mua hàng */}
-          <div className="flex flex-col items-start lg:col-span-2 lg:pl-2">
-            <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-navy">
-              Chính sách mua hàng
+          {/* Chính sách */}
+          <div className="flex flex-col items-start lg:col-span-2">
+            <h4 className="mb-5 text-sm font-bold uppercase tracking-wider text-navy">
+              Chính sách
             </h4>
-            <ul className="space-y-3 text-left text-xs font-normal text-navy/70">
-              {POLICY_NAV_LINKS.map(({ href, label }) => (
+            <ul className="space-y-3 text-left text-[13px] font-semibold text-navy/70">
+              {POLICY_CORE_LINKS.map(({ href, label }) => (
                 <li key={href}>
                   <Link
                     href={href}
@@ -95,13 +100,15 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Về TA HOUSE */}
+          {/* Về TA HOUSE */}
           <div className="flex flex-col items-start lg:col-span-2">
-            <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-navy">Về TA HOUSE</h4>
-            <ul className="space-y-4 text-left text-xs font-normal text-navy/70">
-              {ABOUT_LINKS.map((label) => (
-                <li key={label}>
-                  <Link href="/products" className="transition-colors hover:text-brand-green">
+            <h4 className="mb-5 text-sm font-bold uppercase tracking-wider text-navy">
+              Về TA HOUSE
+            </h4>
+            <ul className="space-y-3 text-left text-[13px] font-semibold text-navy/70">
+              {ABOUT_LINKS.map(({ href, label }) => (
+                <li key={href}>
+                  <Link href={href} className="transition-colors hover:text-brand-green">
                     {label}
                   </Link>
                 </li>
@@ -109,29 +116,28 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 5: Thông tin liên hệ */}
-          <div className="relative flex flex-col items-start text-left lg:col-span-3 lg:border-l lg:border-gray-light lg:pl-8">
-            <h4 className="mb-6 text-sm font-bold uppercase tracking-wider text-navy">
-              Thông tin liên hệ
+          {/* Liên hệ */}
+          <div className="flex flex-col items-start text-left lg:col-span-3 lg:border-l lg:border-gray-light/70 lg:pl-8">
+            <h4 className="mb-5 text-sm font-bold uppercase tracking-wider text-navy">
+              Liên hệ
             </h4>
-            <ul className="space-y-4">
+            <ul className="space-y-3.5">
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-green" />
-                <span className="text-xs font-normal leading-relaxed text-navy/80">
+                <span className="text-[13px] font-semibold leading-relaxed text-navy/75">
                   {COMPANY_LEGAL.address}
                 </span>
               </li>
               <li className="flex items-start gap-3">
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-brand-green" />
-                <span className="text-xs font-normal text-navy/80">
-                  <span className="font-semibold">Hotline:</span>{" "}
+                <span className="text-[13px] font-semibold leading-relaxed text-navy/75">
                   <a
                     href={`tel:${COMPANY_LEGAL.phoneTel}`}
                     className="transition-colors hover:text-brand-green"
                   >
                     {COMPANY_LEGAL.phone}
                   </a>
-                  {" – "}
+                  <br />
                   <a
                     href={`tel:${COMPANY_LEGAL.phoneSecondaryTel}`}
                     className="transition-colors hover:text-brand-green"
@@ -144,61 +150,31 @@ export default function Footer() {
                 <Mail className="h-4 w-4 shrink-0 text-brand-green" />
                 <a
                   href={`mailto:${COMPANY_LEGAL.email}`}
-                  className="text-xs font-normal text-navy/80 transition-colors hover:text-brand-green"
+                  className="text-[13px] font-semibold text-navy/75 transition-colors hover:text-brand-green"
                 >
-                  <span className="font-semibold">Email:</span> {COMPANY_LEGAL.email}
+                  {COMPANY_LEGAL.email}
                 </a>
               </li>
             </ul>
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="absolute bottom-0 right-0 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-navy text-cream hover:bg-brand-green hover:text-white transition-all shadow-md"
-              aria-label="Cuộn lên đầu trang"
-            >
-              <ArrowUp className="h-4 w-4" />
-            </button>
           </div>
         </div>
 
-        {/* Bottom Line — kiểu thông tin pháp lý căn trái */}
-        <div className="border-t border-gray-light/65 pt-6 text-left">
-          <p className="mb-3 text-xs font-normal italic text-navy/50">
-            © {new Date().getFullYear()} {COMPANY_LEGAL.tradeName}. All rights reserved.
-          </p>
-          <div className="space-y-1 text-[13px] font-normal leading-snug text-navy/70">
-            <p className="font-bold uppercase tracking-wide text-navy">
+        {/* Bottom — gọn: copyright + MST, không lặp lại hotline/email */}
+        <div className="mt-12 flex flex-col gap-4 border-t border-gray-light/65 pt-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-3xl space-y-1 text-left text-[13px] font-semibold leading-relaxed text-navy/55">
+            <p className="text-[13px] font-semibold text-navy/45">
+              © {new Date().getFullYear()} {COMPANY_LEGAL.tradeName}. All rights reserved.
+            </p>
+            <p className="font-bold uppercase tracking-wide text-navy/70">
               {COMPANY_LEGAL.legalName}
             </p>
-            <p className="font-normal">{COMPANY_LEGAL.englishName}</p>
-            <p className="font-normal">{COMPANY_LEGAL.abbreviatedName}</p>
-            <p className="font-normal">
-              <span className="font-semibold text-navy/80">MST:</span> {COMPANY_LEGAL.taxCode}
-            </p>
-            <p className="font-normal">
-              <span className="font-semibold text-navy/80">
-                {COMPANY_LEGAL.representativeTitle}:
-              </span>{" "}
+            <p>
+              MST: {COMPANY_LEGAL.taxCode} · {COMPANY_LEGAL.representativeTitle}:{" "}
               {COMPANY_LEGAL.representative}
             </p>
-            <p className="font-normal">{COMPANY_LEGAL.address}</p>
-            <p className="font-normal">
-              <span className="font-semibold text-navy/80">Hotline:</span>{" "}
-              <a
-                href={`tel:${COMPANY_LEGAL.phoneTel}`}
-                className="transition-colors hover:text-brand-green"
-              >
-                {COMPANY_LEGAL.phone}
-              </a>
-              {" – "}
-              <a
-                href={`tel:${COMPANY_LEGAL.phoneSecondaryTel}`}
-                className="transition-colors hover:text-brand-green"
-              >
-                {COMPANY_LEGAL.phoneSecondary}
-              </a>
-            </p>
-            <p className="font-normal">
-              <span className="font-semibold text-navy/80">Website:</span>{" "}
+            <p>{COMPANY_LEGAL.address}</p>
+            <p>
+              Website:{" "}
               <a
                 href={COMPANY_LEGAL.website}
                 target="_blank"
@@ -208,16 +184,16 @@ export default function Footer() {
                 {COMPANY_LEGAL.websiteDisplay}
               </a>
             </p>
-            <p className="font-normal">
-              <span className="font-semibold text-navy/80">Email:</span>{" "}
-              <a
-                href={`mailto:${COMPANY_LEGAL.email}`}
-                className="transition-colors hover:text-brand-green"
-              >
-                {COMPANY_LEGAL.email}
-              </a>
-            </p>
           </div>
+
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center self-start rounded-full bg-navy text-cream shadow-md transition-all hover:bg-brand-green hover:text-white sm:self-auto"
+            aria-label="Cuộn lên đầu trang"
+          >
+            <ArrowUp className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </footer>

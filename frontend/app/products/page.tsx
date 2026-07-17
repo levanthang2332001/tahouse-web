@@ -16,8 +16,6 @@ import {
   Box, 
   Home, 
   Briefcase,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
@@ -32,34 +30,6 @@ import { MAX_PRODUCT_PRICE } from "@/lib/types/product";
 
 const GRID_COLUMNS = 3;
 const PAGE_SIZE = GRID_COLUMNS * 7; // 21 sản phẩm = 7 hàng × 3 cột
-
-type PaginationItem = number | "ellipsis";
-
-function buildPaginationItems(current: number, total: number): PaginationItem[] {
-  if (total <= 10) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-
-  const pages = new Set<number>();
-
-  for (let i = 1; i <= 4; i++) pages.add(i);
-  for (let i = total - 3; i <= total; i++) pages.add(i);
-  for (let i = current - 1; i <= current + 1; i++) {
-    if (i >= 1 && i <= total) pages.add(i);
-  }
-
-  const sorted = [...pages].sort((a, b) => a - b);
-  const items: PaginationItem[] = [];
-  let prev = 0;
-
-  for (const pageNumber of sorted) {
-    if (prev && pageNumber - prev > 1) items.push("ellipsis");
-    items.push(pageNumber);
-    prev = pageNumber;
-  }
-
-  return items;
-}
 
 function ProductCardSkeleton() {
   return (
@@ -152,6 +122,7 @@ function ProductListContent() {
   const [total, setTotal] = useState(0);
   const [catalogTotal, setCatalogTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [debouncedSearch, setDebouncedSearch] = useState(qParam);
 
@@ -183,7 +154,6 @@ function ProductListContent() {
 
   const panelRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const skipInitialPageScrollRef = useRef(true);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -206,11 +176,16 @@ function ProductListContent() {
   useEffect(() => {
     let cancelled = false;
     const apiFilter = mapFilterToApiParams(filter);
+    const isLoadMore = page > 1;
 
-    startTransition(() => {
-      setLoading(true);
-      setFetchError(null);
-    });
+    if (isLoadMore) {
+      setLoadingMore(true);
+    } else {
+      startTransition(() => {
+        setLoading(true);
+        setFetchError(null);
+      });
+    }
 
     fetchProducts({
       page,
@@ -231,7 +206,11 @@ function ProductListContent() {
           return;
         }
 
-        setProducts(data.items);
+        setProducts((prev) => {
+          if (page === 1) return data.items;
+          const existingIds = new Set(prev.map((item) => item.id));
+          return [...prev, ...data.items.filter((item) => !existingIds.has(item.id))];
+        });
         setTotal(data.total);
 
         if (
@@ -254,12 +233,17 @@ function ProductListContent() {
       })
       .catch(() => {
         if (cancelled) return;
-        setProducts([]);
-        setTotal(0);
+        if (page === 1) {
+          setProducts([]);
+          setTotal(0);
+        }
         setFetchError("Không thể tải danh sách sản phẩm. Vui lòng thử lại.");
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          setLoadingMore(false);
+        }
       });
 
     return () => {
@@ -267,23 +251,12 @@ function ProductListContent() {
     };
   }, [page, filter, selectedBrand, debouncedSearch, minPrice, maxPrice, sortBy]);
 
-  useEffect(() => {
-    if (skipInitialPageScrollRef.current) {
-      skipInitialPageScrollRef.current = false;
-      return;
-    }
-    gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [page]);
+  const hasMore = products.length < total;
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
-  const rangeEnd = total === 0 ? 0 : Math.min(page * PAGE_SIZE, total);
-
-  const goToPage = (nextPage: number) => {
-    setPage(Math.min(Math.max(1, nextPage), totalPages));
+  const handleLoadMore = () => {
+    if (loading || loadingMore || !hasMore) return;
+    setPage((prev) => prev + 1);
   };
-
-  const paginationItems = buildPaginationItems(page, totalPages);
 
   const gridPlaceholders =
     products.length > 0
@@ -589,7 +562,7 @@ function ProductListContent() {
                   "Đang tải sản phẩm..."
                 ) : total > 0 ? (
                   <>
-                    Hiển thị <span className="text-navy font-extrabold">{rangeStart}–{rangeEnd}</span> trong <span className="text-navy font-extrabold">{total}</span> sản phẩm
+                    Hiển thị <span className="text-navy font-extrabold">{products.length}</span> trong <span className="text-navy font-extrabold">{total}</span> sản phẩm
                   </>
                 ) : (
                   "Hiển thị 0 trong 0 sản phẩm"
@@ -838,7 +811,7 @@ function ProductListContent() {
                     <ProductCard
                       key={product.id}
                       product={product}
-                      priority={page === 1 && index < GRID_COLUMNS}
+                      priority={index < GRID_COLUMNS}
                     />
                   ))}
                   {Array.from({ length: gridPlaceholders }).map((_, index) => (
@@ -852,57 +825,17 @@ function ProductListContent() {
               )}
             </div>
 
-            {totalPages > 1 && (
-              <nav
-                className="mt-12 flex flex-wrap items-center justify-center gap-2"
-                aria-label="Phân trang sản phẩm"
-              >
+            {hasMore && (
+              <div className="mt-12">
                 <button
                   type="button"
-                  onClick={() => goToPage(page - 1)}
-                  disabled={page <= 1 || loading}
-                  className="flex h-11 items-center gap-1.5 rounded-xl border border-gray-light/60 bg-white px-4 text-sm font-bold text-navy/70 transition-all hover:border-brand-green/30 hover:text-brand-green disabled:cursor-not-allowed disabled:opacity-40"
+                  onClick={handleLoadMore}
+                  disabled={loading || loadingMore}
+                  className="group flex min-h-14 w-full items-center justify-center rounded-2xl border border-brand-green/35 bg-brand-green/8 px-6 text-[15px] font-black tracking-wide text-lime-dark shadow-sm shadow-brand-green/5 transition-all hover:-translate-y-0.5 hover:border-brand-green/60 hover:bg-brand-green/12 hover:text-lime-dark hover:shadow-md hover:shadow-brand-green/10 disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  <ChevronLeft size={18} />
-                  Trước
+                  {loadingMore ? "Đang tải..." : "Xem thêm"}
                 </button>
-
-                {paginationItems.map((item, index) =>
-                  item === "ellipsis" ? (
-                    <span
-                      key={`ellipsis-${index}`}
-                      className="flex h-11 min-w-11 items-center justify-center px-1 text-sm font-bold text-navy/35"
-                    >
-                      …
-                    </span>
-                  ) : (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => goToPage(item)}
-                      disabled={loading}
-                      aria-current={item === page ? "page" : undefined}
-                      className={`flex h-11 min-w-11 items-center justify-center rounded-xl border px-3 text-sm font-bold transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
-                        item === page
-                          ? "border-brand-green bg-brand-green text-white shadow-sm"
-                          : "border-gray-light/60 bg-white text-navy/70 hover:border-brand-green/30 hover:text-brand-green"
-                      }`}
-                    >
-                      {item}
-                    </button>
-                  ),
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => goToPage(page + 1)}
-                  disabled={page >= totalPages || loading}
-                  className="flex h-11 items-center gap-1.5 rounded-xl border border-gray-light/60 bg-white px-4 text-sm font-bold text-navy/70 transition-all hover:border-brand-green/30 hover:text-brand-green disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Sau
-                  <ChevronRight size={18} />
-                </button>
-              </nav>
+              </div>
             )}
 
             {!loading && products.length === 0 && !fetchError && (

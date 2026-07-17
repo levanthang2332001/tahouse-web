@@ -1310,3 +1310,26 @@ export const POLICY_NAV_LINKS = POLICY_DOCUMENTS.map((doc) => ({
   href: `/chinh-sach/${doc.slug}`,
   label: doc.shortTitle,
 }));
+
+/** 6 chính sách mua hàng cốt lõi – hiển thị nổi bật ở footer/menu */
+const CORE_POLICY_SLUGS = [
+  "phuong-thuc-cung-cap",
+  "thanh-toan",
+  "giao-hang",
+  "doi-tra-hoan-tien",
+  "bao-hanh",
+  "bao-mat",
+] as const;
+
+export const POLICY_CORE_LINKS = CORE_POLICY_SLUGS.map((slug) => {
+  const doc = POLICY_BY_SLUG[slug];
+  return { href: `/chinh-sach/${slug}`, label: doc.shortTitle };
+});
+
+/** Các trang pháp lý còn lại – gom vào mục phụ */
+export const POLICY_LEGAL_LINKS = POLICY_DOCUMENTS.filter(
+  (doc) => !CORE_POLICY_SLUGS.includes(doc.slug as (typeof CORE_POLICY_SLUGS)[number]),
+).map((doc) => ({
+  href: `/chinh-sach/${doc.slug}`,
+  label: doc.shortTitle,
+}));
