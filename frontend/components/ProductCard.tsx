@@ -86,14 +86,20 @@ export default function ProductCard({
     <div className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-gray-light bg-white shadow-[0_4px_20px_rgb(0,0,0,0.01)] transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-brand-green/30">
       {/* Product Image Area */}
       <div className="relative aspect-[1.4] w-full overflow-hidden bg-neutral/30 border-b border-gray-light/35">
-        <Image
-          src={product.imageUrl}
-          alt={product.name}
-          fill
-          priority={priority}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
-        />
+        {product.imageUrl ? (
+          <Image
+            src={product.imageUrl}
+            alt={product.name}
+            fill
+            priority={priority}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-neutral/40 text-[11px] font-semibold uppercase tracking-wider text-navy/35">
+            Không có ảnh
+          </div>
+        )}
         <Link
           href={`/product/${product.id}`}
           className="absolute inset-0 z-10"

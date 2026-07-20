@@ -251,7 +251,8 @@ function ProductListContent() {
     };
   }, [page, filter, selectedBrand, debouncedSearch, minPrice, maxPrice, sortBy]);
 
-  const hasMore = products.length < total;
+  const remaining = Math.max(0, total - products.length);
+  const hasMore = remaining > 0;
 
   const handleLoadMore = () => {
     if (loading || loadingMore || !hasMore) return;
@@ -833,7 +834,7 @@ function ProductListContent() {
                   disabled={loading || loadingMore}
                   className="group flex min-h-14 w-full items-center justify-center rounded-2xl border border-brand-green/35 bg-brand-green/8 px-6 text-[15px] font-black tracking-wide text-lime-dark shadow-sm shadow-brand-green/5 transition-all hover:-translate-y-0.5 hover:border-brand-green/60 hover:bg-brand-green/12 hover:text-lime-dark hover:shadow-md hover:shadow-brand-green/10 disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  {loadingMore ? "Đang tải..." : "Xem thêm"}
+                  {loadingMore ? "Đang tải..." : `Xem thêm (${remaining})`}
                 </button>
               </div>
             )}

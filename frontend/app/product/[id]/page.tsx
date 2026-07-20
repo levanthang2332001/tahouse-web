@@ -110,13 +110,14 @@ function ProductDetailView({ id }: { id: string }) {
     );
   }
 
-  const galleryImages =
+  const galleryImages = (
     product.images && product.images.length > 0
       ? product.images
       : product.imageUrl
         ? [product.imageUrl]
-        : [];
-  const heroImage = selectedImage || product.imageUrl;
+        : []
+  ).filter(Boolean);
+  const heroImage = selectedImage || product.imageUrl || galleryImages[0] || "";
   const specs = product.specs ?? {};
   const features = product.features ?? [];
   const installSteps =
@@ -160,14 +161,20 @@ function ProductDetailView({ id }: { id: string }) {
                 animate={{ opacity: 1, scale: 1 }}
                 className="relative aspect-[4/3] max-h-[420px] overflow-hidden rounded-3xl border border-gray-light bg-cream shadow-inner mx-auto w-full"
               >
-                <Image
-                  src={heroImage}
-                  alt={product.name}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                />
+                {heroImage ? (
+                  <Image
+                    src={heroImage}
+                    alt={product.name}
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-[11px] font-semibold uppercase tracking-wider text-navy/35">
+                    Không có ảnh
+                  </div>
+                )}
               </motion.div>
               {galleryImages.length > 1 && (
                 <div className="grid grid-cols-3 gap-4">
@@ -324,7 +331,7 @@ function ProductDetailView({ id }: { id: string }) {
                   ))}
                   {product.installation_preview && product.installation_preview.length > 0 && (
                     <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-3">
-                      {product.installation_preview.map((image, index) => (
+                      {product.installation_preview.filter(Boolean).map((image, index) => (
                         <div key={image} className="relative aspect-square overflow-hidden rounded-xl border border-gray-light">
                           <Image
                             src={image}
