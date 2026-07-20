@@ -1,11 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ProductsService } from '../../products/products.service';
 import { IRetriever } from '../interfaces/retriever.interface';
 import { removeDiacritics } from '@/common/utils/string.util';
+import { resolveMediaUrl } from '@/common/utils/url.util';
+import { formatProductContext } from '../prompts';
 
 @Injectable()
 export class ProductRetrieverService implements IRetriever {
-  constructor(private readonly productsService: ProductsService) {}
+  private readonly imageBaseUrl: string;
+
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly configService: ConfigService,
+  ) {
+    this.imageBaseUrl = this.configService.get<string>('IMAGE_BASE_URL') || '';
+  }
 
   retrieve(query: string, limit = 5): Promise<string> {
     const rawProducts = this.productsService.getRawProducts();
@@ -19,6 +29,75 @@ export class ProductRetrieverService implements IRetriever {
     if (queryKeywords.length === 0) {
       return Promise.resolve('');
     }
+
+    // --- XỬ LÝ CÂU HỎI CHUNG VỀ HÃNG KHÓA / THƯƠNG HIỆU ---
+    const brands = [
+      'kassler',
+      'philips',
+      'hubert',
+      'hyundai',
+      'bosch',
+      'sharp',
+      'fanlight',
+      'hd-door',
+      'karofi',
+    ];
+    const matchedBrand = brands.find(
+      (b) =>
+        queryNorm.includes(b) ||
+        (b === 'philips' && queryNorm.includes('philip')) ||
+        (b === 'hd-door' &&
+          (queryNorm.includes('hd door') ||
+            queryNorm.includes('hddoor') ||
+            queryNorm.includes('cua hd'))),
+    );
+
+    const isGeneralWord = [
+      'loai nao',
+      'dong nao',
+      'san pham nao',
+      'co nhung',
+      'co gi',
+      'danh sach',
+      'gioi thieu',
+      'hang nao',
+    ].some((w) => queryNorm.includes(w));
+
+    if (matchedBrand && isGeneralWord) {
+      const brandProducts = rawProducts.filter((p) => {
+        const pBrand = removeDiacritics((p.brand || '').toLowerCase());
+        return (
+          pBrand.includes(matchedBrand) ||
+          (matchedBrand === 'philips' && pBrand.includes('philip'))
+        );
+      });
+
+      if (brandProducts.length > 0) {
+        const groups: Record<string, any[]> = {};
+        brandProducts.forEach((p) => {
+          const cat = p.categoryName || 'Khác';
+          if (!groups[cat]) {
+            groups[cat] = [];
+          }
+          groups[cat].push(p);
+        });
+
+        let context = `DANH SÁCH SẢN PHẨM NỔI BẬT CỦA HÃNG ${brandProducts[0].brand.toUpperCase()} (TỐI ĐA 3 MẪU MỖI DÒNG):\n\n`;
+        Object.entries(groups).forEach(([categoryName, products]) => {
+          context += `[Dòng sản phẩm: ${categoryName}]\n`;
+          // Giới hạn tối đa 3 sản phẩm tiêu biểu mỗi dòng cửa để tránh quá tải tin nhắn
+          const limitedProducts = products.slice(0, 3);
+          limitedProducts.forEach((p) => {
+            const imgUrl = resolveMediaUrl(p.imageUrl || '', this.imageBaseUrl);
+            context += `- ${p.name} (Mã: ${p.code} | Giá: ${p.priceRange || 'Liên hệ'} | Ảnh đại diện: ${imgUrl})\n`;
+          });
+          context += '\n';
+        });
+
+        return Promise.resolve(context);
+      }
+    }
+    // ----------------------------------------------------
 
     const scoredProducts = rawProducts.map((p) => {
       let score = 0;
@@ -34,14 +113,14 @@ export class ProductRetrieverService implements IRetriever {
       );
 
       queryKeywords.forEach((keyword) => {
-        // 1. Tên mã sản phẩm khớp chính xác tăng điểm cực cao
+        // Tên mã sản phẩm khớp chính xác tăng điểm cực cao
         if (codeNorm === keyword) {
           score += 50;
         } else if (codeNorm.includes(keyword)) {
           score += 15;
         }
 
-        // 2. Khớp trong tên, thương hiệu, danh mục
+        // Khớp trong tên, thương hiệu, danh mục
         if (nameNorm.includes(keyword)) {
           score += 12;
         }
@@ -52,25 +131,25 @@ export class ProductRetrieverService implements IRetriever {
           score += 6;
         }
 
-        // 3. Khớp trong tính năng nổi bật (Rất quan trọng khi hỏi đặc điểm như FaceID, vân tay, app wifi,...)
+        // Khớp trong tính năng nổi bật
         if (featuresNorm.includes(keyword)) {
-          score += 12; // Tăng mạnh trọng số cho tính năng đặc điểm
+          score += 12;
         }
 
-        // 4. Khớp trong mô tả chi tiết
+        // Khớp trong mô tả chi tiết
         if (descNorm.includes(keyword)) {
           score += 4;
         }
       });
 
-      // 5. Quét qua thông số kỹ thuật specs (Chất liệu, nguồn điện, độ dày cửa thích hợp...)
+      // Quét qua thông số kỹ thuật specs
       if (p.specs && typeof p.specs === 'object') {
         Object.entries(p.specs).forEach(([k, v]) => {
           const kNorm = removeDiacritics(String(k).toLowerCase());
           const vNorm = removeDiacritics(String(v).toLowerCase());
           queryKeywords.forEach((keyword) => {
             if (kNorm.includes(keyword) || vNorm.includes(keyword)) {
-              score += 8; // Điểm cộng thêm cho đặc điểm kỹ thuật
+              score += 8;
             }
           });
         });
@@ -86,42 +165,8 @@ export class ProductRetrieverService implements IRetriever {
       .slice(0, limit)
       .map((item) => item.product);
 
-    if (matches.length === 0) {
-      return Promise.resolve('');
-    }
-
-    // Định dạng danh sách sản phẩm thành Markdown Context
-    let context = 'DƯỚI ĐÂY LÀ DANH SÁCH SẢN PHẨM PHÙ HỢP:\n\n';
-    matches.forEach((p, index) => {
-      context += `[Sản phẩm ${index + 1}]\n`;
-      context += `- ID: ${p.id}\n`;
-      context += `- Mã sản phẩm (Code): ${p.code}\n`;
-      context += `- Tên sản phẩm: ${p.name}\n`;
-      context += `- Thương hiệu: ${p.brand}\n`;
-      context += `- Danh mục: ${p.categoryName}\n`;
-      context += `- Giá bán: ${p.priceRange || 'Liên hệ'}\n`;
-      context += `- Thời gian bảo hành: ${p.warrantyText || 'Theo tiêu chuẩn'}\n`;
-      if (p.colors && p.colors.length > 0) {
-        context += `- Màu sắc: ${p.colors.join(', ')}\n`;
-      }
-      if (p.features && p.features.length > 0) {
-        context += `- Các tính năng nổi bật:\n`;
-        p.features.forEach((f: string) => {
-          context += `  * ${f}\n`;
-        });
-      }
-      if (p.specs && typeof p.specs === 'object') {
-        context += `- Thông số kỹ thuật:\n`;
-        Object.entries(p.specs).forEach(([k, v]) => {
-          context += `  * ${k}: ${String(v)}\n`;
-        });
-      }
-      if (p.description) {
-        context += `- Mô tả chi tiết: ${p.description}\n`;
-      }
-      context += '\n';
-    });
-
+    // Sử dụng hàm format chung từ thư mục prompts, truyền kèm imageBaseUrl
+    const context = formatProductContext(matches, this.imageBaseUrl);
     return Promise.resolve(context);
   }
 }

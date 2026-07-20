@@ -52,4 +52,12 @@ export class ChatRequestDto {
   @ValidateNested({ each: true })
   @Type(() => ChatMessageDto)
   history?: ChatMessageDto[] = [];
+
+  @ApiPropertyOptional({
+    description: 'Vị trí hiện tại của người dùng',
+    example: 'Quận 1, Thành phố Hồ Chí Minh',
+  })
+  @IsOptional()
+  @IsString()
+  location?: string;
 }

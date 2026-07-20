@@ -104,6 +104,31 @@
         "slug": "cua-go",
         "name": "Khóa Cửa Gỗ",
         "subcategories": []
+      },
+      {
+        "slug": "bep-tu",
+        "name": "Bếp Từ",
+        "subcategories": []
+      },
+      {
+        "slug": "lo-nuong",
+        "name": "Lò Nướng",
+        "subcategories": []
+      },
+      {
+        "slug": "lo-vi-song",
+        "name": "Lò Vi Sóng",
+        "subcategories": []
+      },
+      {
+        "slug": "may-hut-mui",
+        "name": "Máy Hút Mùi",
+        "subcategories": []
+      },
+      {
+        "slug": "may-rua-chen",
+        "name": "Máy Rửa Chén",
+        "subcategories": []
       }
     ]
   },
@@ -170,6 +195,263 @@
       {
         "slug": "khach-san",
         "name": "Khóa Khách Sạn",
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Fanlight",
+    "slug": "fanlight",
+    "logo": "/brand/fanlight.png",
+    "logoHtml": "<span class=\"font-sans font-extrabold tracking-wide text-[#1a1a1a] text-[12px] select-none\">FANLIGHT</span>",
+    "categories": [
+      {
+        "slug": "quat-tran-den-giau-canh",
+        "name": "Quạt Trần Đèn Giấu Cánh",
+        "subcategories": []
+      },
+      {
+        "slug": "quat-tran-den-trang-tri",
+        "name": "Quạt Trần Đèn Trang Trí",
+        "subcategories": [
+          {
+            "slug": "5-canh",
+            "name": "Quạt Trần Trang Trí 5 Cánh"
+          },
+          {
+            "slug": "6-canh",
+            "name": "Quạt Trần Trang Trí 6 Cánh"
+          }
+        ]
+      },
+      {
+        "slug": "quat-tran-den-hien-dai",
+        "name": "Quạt Trần Đèn Hiện Đại",
+        "subcategories": [
+          {
+            "slug": "3-canh",
+            "name": "Quạt Trần Đèn Hiện Đại 3 Cánh"
+          },
+          {
+            "slug": "5-canh",
+            "name": "Quạt Trần Đèn Hiện Đại 5 Cánh"
+          },
+          {
+            "slug": "6-canh",
+            "name": "Quạt Trần Đèn Hiện Đại 6 Cánh"
+          },
+          {
+            "slug": "8-canh",
+            "name": "Quạt Trần Đèn Hiện Đại 8 Cánh"
+          }
+        ]
+      },
+      {
+        "slug": "den-op-quat-trang-tri",
+        "name": "Đèn Ốp Quạt Trang Trí",
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "HD Door",
+    "slug": "hd-door",
+    "logo": "/brand/hd-door.png",
+    "logoHtml": "<span class=\"font-sans font-extrabold tracking-wide text-[#002c5f] text-[12px] select-none\">HD DOOR</span>",
+    "categories": [
+      {
+        "slug": "cua-phang",
+        "name": "Cửa Phẳng",
+        "subcategories": []
+      },
+      {
+        "slug": "cua-nep-kim-loai",
+        "name": "Cửa Nẹp Kim Loại",
+        "subcategories": []
+      },
+      {
+        "slug": "cua-o-kinh",
+        "name": "Cửa Ô Kính",
+        "subcategories": []
+      },
+      {
+        "slug": "cua-chi-noi",
+        "name": "Cửa Chỉ Nổi",
+        "subcategories": []
+      },
+      {
+        "slug": "cua-hut-huynh",
+        "name": "Cửa Hút Huỳnh",
+        "subcategories": []
+      },
+      {
+        "slug": "cua-vom",
+        "name": "Cửa Vòm",
+        "subcategories": []
+      },
+      {
+        "slug": "cua-canh-lech",
+        "name": "Cửa Cánh Lệch",
+        "subcategories": []
+      },
+      {
+        "slug": "cua-son",
+        "name": "Cửa Sơn",
+        "subcategories": []
+      },
+      {
+        "slug": "cua-nhom-kinh",
+        "name": "Cửa Nhôm Kính",
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Karofi",
+    "slug": "karofi",
+    "logo": "/brand/karofi.png",
+    "logoHtml": "<span class=\"font-sans font-extrabold tracking-wide text-[#e31c23] text-[12px] select-none\">KAROFI</span>",
+    "categories": [
+      {
+        "slug": "may-dien-giai",
+        "name": "Máy Điện Giải Hydro-ion",
+        "subcategories": []
+      },
+      {
+        "slug": "may-nong-lanh",
+        "name": "Máy Lọc Nước Nóng Lạnh",
+        "subcategories": []
+      },
+      {
+        "slug": "may-nong-nguoi",
+        "name": "Máy Lọc Nước Nóng Nguội",
+        "subcategories": []
+      },
+      {
+        "slug": "may-ro-tu-dung",
+        "name": "Máy Lọc Nước RO",
+        "subcategories": []
+      },
+      {
+        "slug": "may-de-gam",
+        "name": "Máy Lọc Nước Để Gầm",
+        "subcategories": []
+      },
+      {
+        "slug": "cay-nuoc",
+        "name": "Cây Nước Nóng Lạnh",
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "name": "Malloca",
+    "slug": "malloca",
+    "logo": "/brand/malloca.png",
+    "logoHtml": "<span class=\"font-sans font-extrabold tracking-wide text-[#d4184f] text-[12px] select-none\">MALLOCA</span>",
+    "categories": [
+      {
+        "slug": "may-hut-am-tran",
+        "name": "Máy hút âm trần",
+        "subcategories": []
+      },
+      {
+        "slug": "may-hut-dao",
+        "name": "Máy hút đảo",
+        "subcategories": []
+      },
+      {
+        "slug": "may-hut-ap-tuong",
+        "name": "Máy hút áp tường",
+        "subcategories": []
+      },
+      {
+        "slug": "may-hut-am-tu",
+        "name": "Máy hút âm tủ",
+        "subcategories": []
+      },
+      {
+        "slug": "may-hut-classic",
+        "name": "Máy hút classic",
+        "subcategories": []
+      },
+      {
+        "slug": "may-hut-am-ban",
+        "name": "Máy hút âm bàn",
+        "subcategories": []
+      },
+      {
+        "slug": "bep-tu-ket-hop-may-hut",
+        "name": "Bếp từ kết hợp máy hút",
+        "subcategories": []
+      },
+      {
+        "slug": "bep-dien-tu",
+        "name": "Bếp điện - từ",
+        "subcategories": []
+      },
+      {
+        "slug": "bep-gas-am",
+        "name": "Bếp gas âm",
+        "subcategories": []
+      },
+      {
+        "slug": "combo-lo-nuong-lo-vi-song",
+        "name": "Combo lò nướng, lò vi sóng",
+        "subcategories": []
+      },
+      {
+        "slug": "tu-bao-quan-ruou",
+        "name": "Tủ bảo quản rượu",
+        "subcategories": []
+      },
+      {
+        "slug": "tu-lanh",
+        "name": "Tủ lạnh",
+        "subcategories": []
+      },
+      {
+        "slug": "may-rua-chen",
+        "name": "Máy rửa chén",
+        "subcategories": []
+      },
+      {
+        "slug": "chau-da",
+        "name": "Chậu đá",
+        "subcategories": []
+      },
+      {
+        "slug": "chau-rua-chen-inox",
+        "name": "Chậu rửa chén inox",
+        "subcategories": []
+      },
+      {
+        "slug": "voi-chau-rua-chen",
+        "name": "Vòi chậu rửa chén",
+        "subcategories": []
+      },
+      {
+        "slug": "may-giat-quan-ao",
+        "name": "Máy giặt quần áo",
+        "subcategories": []
+      },
+      {
+        "slug": "phu-kien-nha-bep",
+        "name": "Phụ kiện nhà bếp",
+        "subcategories": []
+      },
+      {
+        "slug": "dung-cu-loc-nuoc-duoi-chau-rua",
+        "name": "Dụng cụ lọc nước dưới chậu rửa",
+        "subcategories": []
+      },
+      {
+        "slug": "eco-kitchen",
+        "name": "EcoKitchen",
         "subcategories": []
       }
     ]
