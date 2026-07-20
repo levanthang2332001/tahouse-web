@@ -17,8 +17,14 @@ export async function GET() {
     });
   } catch (error) {
     console.error("[GET /api/brands]", error);
+    const missingBackend =
+      error instanceof Error && error.message.includes("BACKEND_API_URL");
     return NextResponse.json(
-      { message: "Không thể tải danh sách thương hiệu" },
+      {
+        message: missingBackend
+          ? "BACKEND_API_URL chưa được cấu hình trên môi trường deploy"
+          : "Không thể tải danh sách thương hiệu",
+      },
       { status: 502 },
     );
   }

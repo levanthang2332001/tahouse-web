@@ -22,8 +22,14 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     console.error("[GET /api/products]", error);
+    const missingBackend =
+      error instanceof Error && error.message.includes("BACKEND_API_URL");
     return NextResponse.json(
-      { message: "Không thể tải danh sách sản phẩm" },
+      {
+        message: missingBackend
+          ? "BACKEND_API_URL chưa được cấu hình trên môi trường deploy"
+          : "Không thể tải danh sách sản phẩm",
+      },
       { status: 502 },
     );
   }
