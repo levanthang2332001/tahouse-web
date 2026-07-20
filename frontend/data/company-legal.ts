@@ -38,9 +38,9 @@ export const COMPANY_LEGAL = {
   productCategories:
     "Thiết bị nhà bếp, khóa cửa thông minh, két sắt, phụ kiện tủ bếp và các giải pháp lắp đặt – tư vấn",
   ecommerceType:
-    "Website bán hàng trực tuyến của thương nhân (không phải sàn giao dịch thương mại điện tử)",
+    "Website thương mại điện tử kinh doanh trực tiếp của thương nhân (không phải nền tảng trung gian hoặc sàn giao dịch thương mại điện tử)",
   /** Cập nhật sau khi được cấp mã trên online.gov.vn */
   moitNotificationNumber: "[Cập nhật sau khi được thông báo / duyệt]",
-  policyEffectiveDate: "17/07/2026",
-  policyVersion: "2.0",
+  policyEffectiveDate: "19/07/2026",
+  policyVersion: "2.2",
 } as const;

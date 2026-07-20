@@ -22,6 +22,8 @@ const SERVICE_LINKS = [
 const ABOUT_LINKS = [
   { href: "/gioi-thieu", label: "Giới thiệu" },
   { href: "/huong-dan-dat-hang", label: "Hướng dẫn đặt hàng" },
+  { href: "/chinh-sach/chu-quan-tmdt", label: "Thông tin doanh nghiệp" },
+  { href: "/chinh-sach/quyen-va-nghia-vu", label: "Quyền và nghĩa vụ" },
   { href: "/chinh-sach/quy-che-hoat-dong", label: "Quy chế hoạt động" },
   { href: "/contact", label: "Liên hệ" },
 ];

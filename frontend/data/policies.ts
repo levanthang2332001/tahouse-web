@@ -138,6 +138,10 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
         text: `Việc khách hàng đặt hàng hoặc sử dụng dịch vụ đồng nghĩa với việc đã đọc, hiểu và đồng ý với các nội dung trong chính sách này.`,
       },
       {
+        type: "paragraph",
+        text: `Website hiện tiếp nhận yêu cầu tư vấn và đặt hàng để ${C.tradeName} xác nhận trực tiếp; việc gửi biểu mẫu hoặc liên hệ trên website chưa tự động làm phát sinh hợp đồng. Đơn hàng chỉ có hiệu lực sau khi hai bên xác nhận đầy đủ nội dung giao dịch.`,
+      },
+      {
         type: "heading",
         text: `2. Phạm vi áp dụng`,
       },
@@ -444,12 +448,11 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       },
       {
         type: "paragraph",
-        text: `Giá hiển thị trên website, nếu có, được áp dụng theo thông tin công bố tại từng thời điểm. Tùy từng sản phẩm hoặc đơn hàng, giá có thể:`,
+        text: `Giá hiển thị trên website được tính bằng Đồng Việt Nam (VND) và đã bao gồm thuế giá trị gia tăng (VAT). Tùy từng sản phẩm hoặc đơn hàng, giá có thể:`,
       },
       {
         type: "list",
         items: [
-          `Đã bao gồm hoặc chưa bao gồm thuế giá trị gia tăng.`,
           `Đã bao gồm hoặc chưa bao gồm chi phí giao hàng.`,
           `Đã bao gồm hoặc chưa bao gồm chi phí lắp đặt.`,
           `Chưa bao gồm phụ kiện, vật tư hoặc chi phí phát sinh theo hiện trạng công trình.`,
@@ -530,7 +533,7 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       },
       {
         type: "paragraph",
-        text: `Tùy từng sản phẩm hoặc chương trình bán hàng, giá có thể đã bao gồm hoặc chưa bao gồm thuế giá trị gia tăng (VAT). ${C.tradeName} sẽ thông báo rõ trong báo giá hoặc đơn hàng.`,
+        text: `Giá hiển thị trên website được tính bằng Đồng Việt Nam (VND) và đã bao gồm thuế giá trị gia tăng (VAT). ${C.tradeName} cung cấp hóa đơn điện tử hợp pháp theo quy định.`,
       },
       {
         type: "paragraph",
@@ -547,6 +550,43 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       {
         type: "paragraph",
         text: `${C.tradeName} sẽ thông báo rõ cho khách hàng các khoản chi phí trước khi xác nhận đơn hàng.`,
+      },
+      ...contactBlock,
+    ],
+  },
+  {
+    slug: "uu-tien-hien-thi",
+    title: `Chính sách ưu tiên hiển thị sản phẩm`,
+    shortTitle: `Ưu tiên hiển thị sản phẩm`,
+    description: `Công khai tiêu chí sắp xếp, tìm kiếm và hiển thị sản phẩm trên website TA HOUSE.`,
+    sections: [
+      {
+        type: "heading",
+        text: `1. Nguyên tắc hiển thị`,
+      },
+      {
+        type: "paragraph",
+        text: `${C.websiteDisplay} chỉ giới thiệu sản phẩm, dịch vụ do ${C.tradeName} trực tiếp cung cấp; không cho bên thứ ba mở gian hàng, trả phí để mua vị trí hoặc tự đăng bán sản phẩm.`,
+      },
+      {
+        type: "heading",
+        text: `2. Tiêu chí sắp xếp và tìm kiếm`,
+      },
+      {
+        type: "paragraph",
+        text: `Sản phẩm có thể được hiển thị hoặc sắp xếp dựa trên danh mục, thương hiệu, thời điểm cập nhật, mức giá, từ khóa tìm kiếm, tình trạng kinh doanh và lựa chọn lọc/sắp xếp do người dùng thực hiện.`,
+      },
+      {
+        type: "paragraph",
+        text: `Một số sản phẩm mới, sản phẩm nổi bật hoặc sản phẩm thuộc chương trình khuyến mại có thể được bố trí tại khu vực dễ thấy. Việc ưu tiên này nhằm hỗ trợ khách hàng tìm kiếm và không làm thay đổi giá, nguồn gốc, chất lượng hoặc quyền lợi đã công bố.`,
+      },
+      {
+        type: "heading",
+        text: `3. Minh bạch và cập nhật`,
+      },
+      {
+        type: "paragraph",
+        text: `${C.tradeName} không nhận thanh toán từ nhà bán hàng bên ngoài để thao túng kết quả hiển thị. Khi thay đổi tiêu chí chính có ảnh hưởng đáng kể đến cách hiển thị, nội dung chính sách này sẽ được cập nhật và công khai trên website.`,
       },
       ...contactBlock,
     ],
@@ -579,11 +619,11 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       },
       {
         type: "heading",
-        text: `3.1. Thanh toán bằng tiền mặt`,
+        text: `3.1. Thanh toán bằng tiền mặt tại showroom`,
       },
       {
         type: "paragraph",
-        text: `Khách hàng thanh toán trực tiếp tại showroom hoặc thanh toán cho nhân viên giao hàng theo thỏa thuận giữa hai bên.`,
+        text: `Khách hàng có thể thanh toán tiền mặt trực tiếp tại showroom sau khi kiểm tra thông tin đơn hàng và nhận chứng từ thanh toán. ${C.tradeName} hiện không áp dụng hình thức thu tiền khi giao hàng (COD).`,
       },
       {
         type: "heading",
@@ -603,31 +643,27 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       },
       {
         type: "heading",
-        text: `4. Thanh toán đặt cọc`,
+        text: `3.3. Cổng thanh toán trực tuyến`,
       },
       {
         type: "paragraph",
-        text: `Đối với hàng đặt theo yêu cầu, sản phẩm cần giữ hàng, đơn hàng có giá trị lớn hoặc công trình cần lắp đặt theo lịch hẹn, ${C.tradeName} có thể đề nghị khách hàng thanh toán một khoản đặt cọc trước khi thực hiện đơn hàng.`,
-      },
-      {
-        type: "paragraph",
-        text: `Mức đặt cọc sẽ được hai bên thống nhất và thể hiện trên báo giá hoặc xác nhận đơn hàng.`,
+        text: `Hiện tại website chưa tích hợp cổng thanh toán trực tuyến, thẻ hoặc ví điện tử. ${C.tradeName} chỉ áp dụng tiền mặt trực tiếp tại showroom và chuyển khoản qua thông tin tài khoản được cung cấp trên báo giá, đơn đặt hàng hoặc kênh chính thức.`,
       },
       {
         type: "heading",
-        text: `5. Thanh toán phần còn lại`,
+        text: `4. Thời điểm thanh toán`,
       },
       {
         type: "paragraph",
-        text: `Khách hàng thanh toán phần giá trị còn lại theo thỏa thuận sau khi nhận hàng, hoàn thành lắp đặt (nếu có), hoặc theo các điều kiện đã thống nhất giữa hai bên.`,
+        text: `${C.tradeName} không yêu cầu khách hàng đặt cọc. Khách hàng thanh toán theo thời điểm ghi trong báo giá hoặc xác nhận đơn hàng sau khi hai bên thống nhất đầy đủ sản phẩm, giá, thuế, chi phí và thời gian thực hiện.`,
       },
       {
         type: "heading",
-        text: `6. Giá thanh toán và xuất hóa đơn`,
+        text: `5. Giá thanh toán và xuất hóa đơn`,
       },
       {
         type: "paragraph",
-        text: `Giá thanh toán là giá đã được ${C.tradeName} xác nhận với khách hàng tại thời điểm đặt hàng. Tùy từng sản phẩm, giá có thể đã bao gồm hoặc chưa bao gồm VAT và sẽ được thông báo rõ trong báo giá hoặc đơn hàng.`,
+        text: `Giá thanh toán là giá đã được ${C.tradeName} xác nhận với khách hàng tại thời điểm đặt hàng. Giá hiển thị trên website đã bao gồm thuế giá trị gia tăng (VAT); chi phí giao hàng, lắp đặt, vật tư hoặc phát sinh theo hiện trạng sẽ được thông báo rõ trước khi xác nhận đơn hàng.`,
       },
       {
         type: "paragraph",
@@ -635,7 +671,7 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       },
       {
         type: "heading",
-        text: `7. An toàn thanh toán`,
+        text: `6. An toàn thanh toán`,
       },
       {
         type: "paragraph",
@@ -647,7 +683,7 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       },
       {
         type: "heading",
-        text: `8. Hiệu lực áp dụng`,
+        text: `7. Hiệu lực áp dụng`,
       },
       {
         type: "paragraph",
@@ -696,7 +732,7 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       },
       {
         type: "paragraph",
-        text: `Thời gian giao hàng được xác nhận khi ${C.tradeName} tiếp nhận và xử lý đơn hàng. Đơn hàng có sẵn được giao theo thỏa thuận; hàng đặt trước hoặc cần điều chuyển sẽ được thông báo cụ thể khi xác nhận đơn hàng.`,
+        text: `Thời gian giao hàng dự kiến đối với hàng có sẵn: nội thành Thành phố Hồ Chí Minh 01–02 ngày làm việc; ngoại thành Thành phố Hồ Chí Minh và các tỉnh lân cận 02–03 ngày làm việc; các tỉnh, thành phố khác 03–07 ngày làm việc; hải đảo, vùng sâu, vùng xa hoặc khu vực hạn chế vận chuyển 05–10 ngày làm việc. Hàng đặt trước, đặt theo yêu cầu, cần điều chuyển hoặc lắp đặt được thực hiện theo thời hạn ghi trong báo giá hoặc xác nhận đơn hàng.`,
       },
       {
         type: "paragraph",
@@ -717,7 +753,7 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       },
       {
         type: "paragraph",
-        text: `Nếu phát hiện hư hỏng, giao thiếu hoặc không đúng đơn hàng, vui lòng phản ánh ngay với nhân viên giao hàng hoặc liên hệ ${C.tradeName}.`,
+        text: `Khách hàng được đồng kiểm cùng nhân viên giao nhận trước khi ký nhận, gồm mẫu mã, số lượng, phụ kiện, tem nhãn, bao bì và tình trạng bên ngoài. Việc đồng kiểm không bao gồm tự ý cắm điện, vận hành hoặc lắp đặt thử khi chưa có nhân viên kỹ thuật. Nếu phát hiện hư hỏng, giao thiếu hoặc không đúng đơn hàng, khách hàng có quyền từ chối nhận và liên hệ ngay ${C.tradeName}.`,
       },
       {
         type: "heading",
@@ -788,7 +824,7 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       {
         type: "list",
         items: [
-          `Khách hàng thông báo trong thời gian hợp lý kể từ khi nhận hàng.`,
+          `Khách hàng thông báo yêu cầu đổi trả trong vòng 07 ngày kể từ ngày nhận hàng.`,
           `Sản phẩm chưa qua sử dụng, chưa bị tác động làm thay đổi hiện trạng (trừ lỗi từ nhà sản xuất).`,
           `Còn đầy đủ phụ kiện, tem, nhãn và tài liệu đi kèm (nếu có).`,
           `Có thông tin xác nhận mua hàng từ ${C.tradeName}.`,
@@ -814,7 +850,7 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       },
       {
         type: "paragraph",
-        text: `Hoàn tiền (nếu có) khi hai bên thống nhất hủy đơn; khi ${C.tradeName} không thể cung cấp sản phẩm đã xác nhận và khách hàng không chọn phương án thay thế; hoặc theo kết quả khiếu nại/thỏa thuận. Thời gian và hình thức hoàn tiền được trao đổi sau khi xác minh.`,
+        text: `Hoàn tiền (nếu có) khi hai bên thống nhất hủy đơn; khi ${C.tradeName} không thể cung cấp sản phẩm đã xác nhận và khách hàng không chọn phương án thay thế; hoặc theo kết quả khiếu nại/thỏa thuận. Sau khi xác nhận nghĩa vụ hoàn tiền và nhận đủ thông tin, ${C.tradeName} thực hiện hoàn tiền trong 03–05 ngày làm việc bằng phương thức thanh toán ban đầu hoặc chuyển khoản theo xác nhận của khách hàng.`,
       },
       {
         type: "paragraph",
@@ -878,7 +914,7 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       },
       {
         type: "paragraph",
-        text: `Thời gian và hình thức hoàn tiền sẽ được ${C.tradeName} trao đổi cụ thể với khách hàng.`,
+        text: `Sau khi xác nhận nghĩa vụ hoàn tiền và nhận đủ thông tin, ${C.tradeName} thực hiện hoàn tiền trong 03–05 ngày làm việc bằng phương thức thanh toán ban đầu hoặc chuyển khoản theo xác nhận của khách hàng.`,
       },
       {
         type: "heading",
@@ -908,6 +944,10 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       {
         type: "paragraph",
         text: `${C.tradeName} tôn trọng quyền riêng tư của khách hàng và cam kết sử dụng thông tin đúng mục đích, trong phạm vi cần thiết để phục vụ tư vấn, bán hàng, giao hàng, lắp đặt, bảo hành và chăm sóc khách hàng.`,
+      },
+      {
+        type: "paragraph",
+        text: `Chính sách này được xây dựng phù hợp với Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15, Nghị định số 356/2025/NĐ-CP và các quy định pháp luật có liên quan đang có hiệu lực.`,
       },
       {
         type: "heading",
@@ -1002,6 +1042,10 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
         text: `Khách hàng có quyền được biết về việc thu thập/sử dụng; yêu cầu kiểm tra, chỉnh sửa; đề nghị hạn chế sử dụng; ngừng nhận nội dung quảng bá (nếu đã đồng ý nhận); đề nghị xóa khi không còn cần thiết (trừ khi phải lưu theo pháp luật); và gửi phản ánh/khiếu nại liên quan.`,
       },
       {
+        type: "paragraph",
+        text: `${C.tradeName} phản hồi ban đầu trong 02 ngày làm việc kể từ khi nhận yêu cầu hợp lệ. Thời hạn thực hiện tối đa là 10 ngày đối với yêu cầu xem, chỉnh sửa hoặc cung cấp dữ liệu; 15 ngày đối với yêu cầu rút lại sự đồng ý, hạn chế hoặc phản đối xử lý; và 20 ngày đối với yêu cầu xóa dữ liệu. Trường hợp cần phối hợp với bên xử lý dữ liệu hoặc bên thứ ba, thời hạn tương ứng có thể là 15 ngày, 20 ngày hoặc 30 ngày theo Nghị định số 356/2025/NĐ-CP. Việc gia hạn chỉ thực hiện khi pháp luật cho phép và phải thông báo lý do.`,
+      },
+      {
         type: "heading",
         text: `7. Trách nhiệm của khách hàng`,
       },
@@ -1089,7 +1133,7 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
       },
       {
         type: "paragraph",
-        text: `Đối với trường hợp cần làm việc với nhà sản xuất, đơn vị vận chuyển hoặc bảo hành, thời gian xử lý có thể kéo dài hơn. ${C.tradeName} sẽ chủ động cập nhật tiến độ.`,
+        text: `${C.tradeName} giải quyết và phản hồi kết quả trong thời hạn tối đa 07 ngày làm việc kể từ khi nhận đủ thông tin, chứng từ hợp lệ. Trường hợp cần làm việc với nhà sản xuất, đơn vị vận chuyển hoặc bảo hành, ${C.tradeName} vẫn phải thông báo tiến độ, lý do và phương án xử lý trong thời hạn này.`,
       },
       {
         type: "heading",
@@ -1224,6 +1268,10 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
         text: `Website không phải là sàn giao dịch thương mại điện tử và không cho phép tổ chức, cá nhân khác mở gian hàng hoặc đăng bán sản phẩm.`,
       },
       {
+        type: "paragraph",
+        text: `Quy chế được xây dựng theo Luật Thương mại điện tử số 122/2025/QH15, Nghị định số 248/2026/NĐ-CP, Luật Bảo vệ quyền lợi người tiêu dùng số 19/2023/QH15 và các văn bản pháp luật có liên quan đang có hiệu lực.`,
+      },
+      {
         type: "heading",
         text: `2. Đối tượng phục vụ`,
       },
@@ -1273,6 +1321,10 @@ export const POLICY_DOCUMENTS: PolicyDocument[] = [
         text: `Việc thu thập, sử dụng và bảo vệ dữ liệu cá nhân thực hiện theo Chính sách bảo mật thông tin. Mọi phản ánh hoặc khiếu nại được xử lý theo Chính sách giải quyết khiếu nại.`,
       },
       {
+        type: "paragraph",
+        text: `${C.tradeName} bảo đảm khả năng truy cập thông tin, dữ liệu về hàng hóa và dịch vụ đã đăng tải trên website trong thời gian ít nhất 01 năm kể từ thời điểm đăng tải. Dữ liệu giao dịch và chứng từ được lưu theo thời hạn của pháp luật chuyên ngành và thỏa thuận với khách hàng.`,
+      },
+      {
         type: "heading",
         text: `6. Các chính sách liên quan`,
       },
@@ -1311,14 +1363,16 @@ export const POLICY_NAV_LINKS = POLICY_DOCUMENTS.map((doc) => ({
   label: doc.shortTitle,
 }));
 
-/** 6 chính sách mua hàng cốt lõi – hiển thị nổi bật ở footer/menu */
+/** Chính sách bắt buộc/cốt lõi – hiển thị trực tiếp ở footer */
 const CORE_POLICY_SLUGS = [
-  "phuong-thuc-cung-cap",
+  "bao-mat",
+  "khieu-nai",
+  "chinh-sach-ve-gia",
   "thanh-toan",
+  "dieu-kien-han-che",
   "giao-hang",
   "doi-tra-hoan-tien",
-  "bao-hanh",
-  "bao-mat",
+  "uu-tien-hien-thi",
 ] as const;
 
 export const POLICY_CORE_LINKS = CORE_POLICY_SLUGS.map((slug) => {
