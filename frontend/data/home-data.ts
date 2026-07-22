@@ -1,4 +1,4 @@
-import { Columns, DoorClosed, Lock, Shield, ShieldCheck, Utensils } from "lucide-react";
+import { CookingPot, DoorClosed, Droplets, Fan, Lock, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ export type Service = {
 export const SERVICES: Service[] = [
   {
     title: "Khóa điện tử - khóa vân tay",
-    desc: "252 sản phẩm đang có",
+    desc: "264 sản phẩm đang có",
     catId: "lock-parent",
     icon: Lock,
     img: "/pic/khoa.jpg",
@@ -24,26 +24,42 @@ export const SERVICES: Service[] = [
   },
   {
     title: "Két sắt thông minh",
-    desc: "12 sản phẩm đang có",
+    desc: "Kassler & Philips",
     catId: "Smart",
     icon: Shield,
     img: "/pic/ket.webp",
     imgClass: "object-contain bg-white p-3",
   },
   {
-    title: "Khóa cửa kính",
-    desc: "5 sản phẩm đang có",
-    catId: "cua-kinh",
-    icon: DoorClosed,
+    title: "Thiết bị bếp",
+    desc: "Bosch, Malloca và hơn thế",
+    catId: "kitchen-group",
+    icon: CookingPot,
+    img: "/pic/bep2.webp",
+    imgClass: "object-cover",
+  },
+  {
+    title: "Quạt trần đèn",
+    desc: "66 sản phẩm đang có",
+    catId: "fanlight-group",
+    icon: Fan,
     img: "/pic/khoa2.jpg",
     imgClass: "object-cover",
   },
   {
-    title: "Khóa nhôm kính",
-    desc: "47 sản phẩm đang có",
-    catId: "xingfa-sat",
-    icon: Columns,
+    title: "Máy lọc nước",
+    desc: "24 sản phẩm đang có",
+    catId: "water-group",
+    icon: Droplets,
     img: "/pic/khoa.jpg",
+    imgClass: "object-cover",
+  },
+  {
+    title: "Cửa",
+    desc: "9 sản phẩm đang có",
+    catId: "door-group",
+    icon: DoorClosed,
+    img: "/pic/khoa2.jpg",
     imgClass: "object-cover",
   },
 ];
@@ -74,8 +90,8 @@ export type SolutionMeta = {
 };
 
 export const SOLUTION_META: SolutionMeta[] = [
-  { img: "/pic/khoa2.jpg", icon: ShieldCheck },
-  { img: "/pic/bep2.webp", icon: Utensils },
+  { img: "/pic/khoa2.jpg", icon: Shield },
+  { img: "/pic/bep2.webp", icon: CookingPot },
 ];
 
 // ---------------------------------------------------------------------------

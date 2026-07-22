@@ -168,7 +168,7 @@ function ProductDetailView({ id }: { id: string }) {
                     fill
                     priority
                     sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover"
+                    className="object-contain p-4"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-[11px] font-semibold uppercase tracking-wider text-navy/35">
@@ -192,7 +192,7 @@ function ProductDetailView({ id }: { id: string }) {
                         alt={`${product.name} ${index + 1}`}
                         fill
                         sizes="20vw"
-                        className="object-cover"
+                        className="object-contain bg-cream p-1.5"
                       />
                     </button>
                   ))}
@@ -338,7 +338,7 @@ function ProductDetailView({ id }: { id: string }) {
                             alt={`Lắp đặt ${product.name} ${index + 1}`}
                             fill
                             sizes="33vw"
-                            className="object-cover"
+                            className="object-contain bg-cream p-2"
                           />
                         </div>
                       ))}

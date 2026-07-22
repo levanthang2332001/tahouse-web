@@ -60,6 +60,8 @@ export interface GetProductsParams {
   category?: string;
   subcategory?: string;
   brand?: string;
+  /** Multi-category merge handled by `/api/products` (e.g. kitchen). */
+  group?: string;
   search?: string;
   minPrice?: number;
   maxPrice?: number;

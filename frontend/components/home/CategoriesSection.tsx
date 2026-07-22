@@ -42,8 +42,8 @@ export default function CategoriesSection() {
           </Link>
         </motion.div>
 
-        {/* 4-column service cards */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+        {/* Service category cards */}
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((service) => {
             return (
               <motion.div

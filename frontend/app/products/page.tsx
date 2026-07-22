@@ -1,30 +1,19 @@
 "use client";
 
-import React, { Suspense, startTransition, useEffect, useRef, useState } from "react";
+import React, { Suspense, startTransition, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { 
-  ChevronDown, 
-  Search, 
-  Fingerprint, 
-  Vault, 
-  DoorClosed, 
-  Columns, 
-  Shield, 
-  Hotel, 
-  Crown, 
-  Box, 
-  Home, 
-  Briefcase,
-} from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import BrandLogo from "@/components/BrandLogo";
 import SocialFloating from "@/components/SocialFloating";
+import { SIDEBAR_SECTIONS } from "@/data/catalog-taxonomy";
+import { getProductListKey } from "@/lib/backend/map-product";
 import { fetchBrands, fetchProducts } from "@/lib/api/products";
-import { mapFilterToApiParams } from "@/lib/product-filters";
+import { filterBrandsForCategory, mapFilterToApiParams } from "@/lib/product-filters";
 import type { Brand, Product } from "@/lib/types/product";
 import { MAX_PRODUCT_PRICE } from "@/lib/types/product";
 
@@ -62,35 +51,6 @@ function isUnfilteredCatalogView(
     maxPrice === MAX_PRODUCT_PRICE
   );
 }
-
-// Define sections and categories structure exactly matching the user's design image
-const SIDEBAR_SECTIONS = [
-  {
-    id: "khoa-dien-tu",
-    title: "KHÓA ĐIỆN TỬ",
-    icon: Fingerprint,
-    categoryId: "lock-parent",
-    subcategories: [
-      { id: "cua-go", name: "Khóa cửa gỗ", icon: DoorClosed },
-      { id: "cua-kinh", name: "Khóa cửa kính", icon: DoorClosed },
-      { id: "xingfa-sat", name: "Khóa nhôm kính", icon: Columns },
-      { id: "cua-cong", name: "Khóa cửa cổng", icon: Shield },
-      { id: "khach-san", name: "Khóa khách sạn", icon: Hotel },
-      { id: "dai-sanh", name: "Khóa đại sảnh", icon: Crown },
-    ]
-  },
-  {
-    id: "ket-sat-thong-minh",
-    title: "KẾT SẮT THÔNG MINH",
-    icon: Vault,
-    categoryId: "Smart",
-    subcategories: [
-      { id: "ket-mini", name: "Két mini", icon: Box },
-      { id: "ket-gia-dinh", name: "Két gia đình", icon: Home },
-      { id: "ket-van-phong", name: "Két văn phòng", icon: Briefcase },
-    ]
-  }
-];
 
 function ProductListContent() {
   const searchParams = useSearchParams();
@@ -134,10 +94,9 @@ function ProductListContent() {
   const [isPriceDropdownOpen, setIsPriceDropdownOpen] = useState(false);
 
   // Keep track of which accordion section is expanded
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    "khoa-dien-tu": true,
-    "ket-sat-thong-minh": false,
-  });
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(SIDEBAR_SECTIONS.map((section, index) => [section.id, index === 0])),
+  );
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => ({
@@ -146,14 +105,46 @@ function ProductListContent() {
     }));
   };
 
+  const panelRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const lockedScrollYRef = useRef<number | null>(null);
+
+  const lockScrollPosition = () => {
+    const lenis = (window as Window & { __lenis?: { scroll?: number } }).__lenis;
+    lockedScrollYRef.current =
+      typeof lenis?.scroll === "number" ? lenis.scroll : window.scrollY;
+  };
+
   const handleSubcategoryClick = (subcatId: string) => {
+    lockScrollPosition();
     setFilter(subcatId);
     setSelectedBrand("all");
     setPage(1);
   };
 
-  const panelRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+  // Giữ nguyên vị trí scroll khi đổi menu — không giật lên đầu trang
+  useLayoutEffect(() => {
+    const y = lockedScrollYRef.current;
+    if (y === null) return;
+
+    const lenis = (window as Window & {
+      __lenis?: { scrollTo: (v: number, o?: { immediate?: boolean }) => void };
+    }).__lenis;
+
+    const restore = () => {
+      if (lenis) lenis.scrollTo(y, { immediate: true });
+      else window.scrollTo({ top: y, left: 0, behavior: "auto" });
+    };
+
+    restore();
+    const raf = requestAnimationFrame(restore);
+
+    if (!loading) {
+      lockedScrollYRef.current = null;
+    }
+
+    return () => cancelAnimationFrame(raf);
+  }, [filter, selectedBrand, products, loading]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -173,6 +164,16 @@ function ProductListContent() {
       .catch(() => setBrands([]));
   }, []);
 
+  const visibleBrands = filterBrandsForCategory(brands, filter);
+
+  // Đổi danh mục → bỏ brand không còn thuộc nhóm đó
+  useEffect(() => {
+    if (selectedBrand === "all") return;
+    const relevant = filterBrandsForCategory(brands, filter);
+    if (relevant.some((brand) => brand.slug === selectedBrand)) return;
+    setSelectedBrand("all");
+  }, [filter, selectedBrand, brands]);
+
   useEffect(() => {
     let cancelled = false;
     const apiFilter = mapFilterToApiParams(filter);
@@ -190,8 +191,10 @@ function ProductListContent() {
     fetchProducts({
       page,
       limit: PAGE_SIZE,
-      ...apiFilter,
-      brand: selectedBrand === "all" ? undefined : selectedBrand,
+      category: apiFilter.category,
+      subcategory: apiFilter.subcategory,
+      group: apiFilter.group,
+      brand: selectedBrand === "all" ? apiFilter.brand : selectedBrand,
       search: debouncedSearch.trim() || undefined,
       minPrice: minPrice > 0 ? minPrice : undefined,
       maxPrice: maxPrice < MAX_PRODUCT_PRICE ? maxPrice : undefined,
@@ -208,8 +211,11 @@ function ProductListContent() {
 
         setProducts((prev) => {
           if (page === 1) return data.items;
-          const existingIds = new Set(prev.map((item) => item.id));
-          return [...prev, ...data.items.filter((item) => !existingIds.has(item.id))];
+          const existingKeys = new Set(prev.map((item) => getProductListKey(item)));
+          return [
+            ...prev,
+            ...data.items.filter((item) => !existingKeys.has(getProductListKey(item))),
+          ];
         });
         setTotal(data.total);
 
@@ -264,53 +270,6 @@ function ProductListContent() {
       ? (GRID_COLUMNS - (products.length % GRID_COLUMNS)) % GRID_COLUMNS
       : 0;
 
-  useEffect(() => {
-    const panel = panelRef.current;
-    if (!panel) return;
-
-    let animationFrameId: number;
-    let targetScrollTop = panel.scrollTop;
-    let currentScrollTop = panel.scrollTop;
-    const speed = 0.14; // Smooth scrolling speed factor (higher is faster/snappier)
-
-    const handleWheel = (e: WheelEvent) => {
-      const maxScroll = panel.scrollHeight - panel.clientHeight;
-      if (maxScroll <= 0) return;
-
-      const isScrollingUp = e.deltaY < 0;
-      const isScrollingDown = e.deltaY > 0;
-
-      // Allow native page scrolling if we are at top/bottom limits
-      if ((isScrollingUp && panel.scrollTop === 0) || (isScrollingDown && Math.ceil(panel.scrollTop) >= maxScroll)) {
-        return;
-      }
-
-      e.preventDefault();
-      targetScrollTop = Math.max(0, Math.min(maxScroll, targetScrollTop + e.deltaY * 1.35));
-
-      const animate = () => {
-        const diff = targetScrollTop - currentScrollTop;
-        if (Math.abs(diff) > 0.5) {
-          currentScrollTop += diff * speed;
-          panel.scrollTop = currentScrollTop;
-          animationFrameId = requestAnimationFrame(animate);
-        } else {
-          currentScrollTop = targetScrollTop;
-          panel.scrollTop = targetScrollTop;
-        }
-      };
-
-      cancelAnimationFrame(animationFrameId);
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    panel.addEventListener("wheel", handleWheel, { passive: false });
-    return () => {
-      panel.removeEventListener("wheel", handleWheel);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
   return (
     <div className="min-h-screen bg-neutral pb-24 pt-10">
       <div className="mx-auto max-w-[1600px] px-6 lg:px-12">
@@ -336,14 +295,17 @@ function ProductListContent() {
               />
             </div>
 
-            {/* Brands Logo filter bar */}
+            {/* Brands filter — theo danh mục đang chọn (khóa / bếp / quạt / nước / cửa) */}
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-[10px] font-bold uppercase tracking-widest text-navy/40 mr-1 hidden sm:block">
                 Thương hiệu:
               </span>
               <div className="flex flex-wrap items-center gap-2">
                 <button
+                  type="button"
+                  onMouseDown={(event) => event.preventDefault()}
                   onClick={() => {
+                    lockScrollPosition();
                     setSelectedBrand("all");
                     setPage(1);
                   }}
@@ -355,14 +317,16 @@ function ProductListContent() {
                 >
                   Tất cả
                 </button>
-                {brands.map((brand) => {
+                {visibleBrands.map((brand) => {
                   const isActive = selectedBrand === brand.slug;
                   return (
                     <button
-                      key={brand.slug}
+                      key={brand.id ?? brand.slug}
+                      type="button"
+                      onMouseDown={(event) => event.preventDefault()}
                       onClick={() => {
+                        lockScrollPosition();
                         setSelectedBrand(brand.slug);
-                        setFilter("all");
                         setPage(1);
                       }}
                       className={`cursor-pointer flex items-center justify-center rounded-xl bg-white border px-4 py-2 transition-all duration-300 h-10 min-w-[95px] shadow-xs hover:scale-102 hover:shadow-sm ${
@@ -375,12 +339,17 @@ function ProductListContent() {
                     </button>
                   );
                 })}
+                {visibleBrands.length === 0 && (
+                  <span className="text-xs font-medium text-navy/45">
+                    Không có thương hiệu cho danh mục này
+                  </span>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+        <div className="flex min-h-[calc(100vh-8rem)] flex-col gap-8 lg:flex-row lg:items-start">
           {/* Left Sidebar Panel */}
           <aside className="w-full shrink-0 lg:w-80 lg:sticky lg:top-28">
             {/* Desktop Vertical Categories with Hierarchy (Unified Card) */}
@@ -391,7 +360,10 @@ function ProductListContent() {
             >
               {/* 1. Tất cả sản phẩm Row */}
               <button
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
                 onClick={() => {
+                  lockScrollPosition();
                   setFilter("all");
                   setSelectedBrand("all");
                   setPage(1);
@@ -432,7 +404,10 @@ function ProductListContent() {
                   <div key={section.id} className="flex flex-col">
                     {/* Accordion Header */}
                     <button
+                      type="button"
+                      onMouseDown={(event) => event.preventDefault()}
                       onClick={() => {
+                        lockScrollPosition();
                         toggleSection(section.id);
                         setFilter(section.categoryId);
                         setSelectedBrand("all");
@@ -479,6 +454,8 @@ function ProductListContent() {
                               
                               return (
                                 <button
+                                  type="button"
+                                  onMouseDown={(event) => event.preventDefault()}
                                   key={sub.id}
                                   onClick={() => handleSubcategoryClick(sub.id)}
                                   className={`group flex w-full items-center gap-3 rounded-xl px-4.5 py-3 text-left transition-all duration-200 cursor-pointer ${
@@ -506,7 +483,10 @@ function ProductListContent() {
               <div className="invisible-scrollbar flex gap-2.5 overflow-x-auto pb-3 p-1">
                 {/* 1. All Products */}
                 <button
+                  type="button"
+                  onMouseDown={(event) => event.preventDefault()}
                   onClick={() => {
+                    lockScrollPosition();
                     setFilter("all");
                     setSelectedBrand("all");
                     setPage(1);
@@ -529,8 +509,11 @@ function ProductListContent() {
                   
                   return (
                     <button
+                      type="button"
+                      onMouseDown={(event) => event.preventDefault()}
                       key={section.id}
                       onClick={() => {
+                        lockScrollPosition();
                         setFilter(section.categoryId);
                         setSelectedBrand("all");
                         setPage(1);
@@ -555,7 +538,7 @@ function ProductListContent() {
           </aside>
 
           {/* Right Product Grid */}
-          <div className="flex-1" ref={gridRef}>
+          <div className="flex-1 [overflow-anchor:none]" ref={gridRef}>
             {/* Grid Header with Counts and Dropdowns */}
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="text-[13px] font-semibold text-navy/75 leading-none">
@@ -810,7 +793,7 @@ function ProductListContent() {
                 <>
                   {products.map((product, index) => (
                     <ProductCard
-                      key={product.id}
+                      key={getProductListKey(product, index)}
                       product={product}
                       priority={index < GRID_COLUMNS}
                     />

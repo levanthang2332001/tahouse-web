@@ -23,6 +23,25 @@ export function mapProductListItem(product: Product): Product {
   };
 }
 
+/**
+ * BE sometimes reuses the same product `id`/`code` across variants
+ * (different category, price, or image). Use this for React list keys
+ * and load-more dedupe instead of `id` alone.
+ */
+export function getProductListKey(product: Product, index?: number): string {
+  const parts = [
+    product.id,
+    product.code,
+    product.category,
+    product.subcategory ?? "",
+    String(product.price ?? ""),
+    product.priceRange ?? "",
+    product.imageUrl ?? "",
+  ];
+  if (index !== undefined) parts.push(String(index));
+  return parts.join("::");
+}
+
 export function mapProductDetail(product: Product): Product {
   const normalized = normalizeProduct(product);
   return {

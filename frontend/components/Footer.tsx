@@ -13,10 +13,12 @@ const SOCIAL_LINKS = [
 ] as const;
 
 const SERVICE_LINKS = [
-  { href: "/products", label: "Thiết bị bếp" },
-  { href: "/products", label: "Phụ kiện tủ bếp" },
-  { href: "/products", label: "Khóa điện tử – khóa vân tay" },
-  { href: "/products", label: "Két sắt thông minh" },
+  { href: "/products?cat=lock-parent", label: "Khóa điện tử – khóa vân tay" },
+  { href: "/products?cat=Smart", label: "Két sắt thông minh" },
+  { href: "/products?cat=kitchen-group", label: "Thiết bị bếp" },
+  { href: "/products?cat=fanlight-group", label: "Quạt trần đèn" },
+  { href: "/products?cat=water-group", label: "Máy lọc nước" },
+  { href: "/products?cat=door-group", label: "Cửa" },
 ];
 
 const ABOUT_LINKS = [

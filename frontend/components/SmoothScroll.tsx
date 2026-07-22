@@ -21,6 +21,7 @@ export default function SmoothScroll() {
     });
 
     lenisRef.current = lenis;
+    (window as Window & { __lenis?: Lenis }).__lenis = lenis;
 
     let rafId: number;
     const raf = (time: number) => {
@@ -72,6 +73,8 @@ export default function SmoothScroll() {
       document.removeEventListener("click", handleAnchorClick);
       lenis.destroy();
       lenisRef.current = null;
+      const win = window as Window & { __lenis?: Lenis };
+      if (win.__lenis === lenis) delete win.__lenis;
     };
   }, []);
 

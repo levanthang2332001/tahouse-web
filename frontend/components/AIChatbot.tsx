@@ -25,16 +25,66 @@ const FALLBACK_REPLY = `Xin lỗi, hệ thống tư vấn đang bận. Quý khá
 // ---------------------------------------------------------------------------
 // Markdown-lite renderer for streamed AI replies
 // ---------------------------------------------------------------------------
-function formatInline(text: string): React.ReactNode[] {
+function formatBold(text: string, keyPrefix: string): React.ReactNode[] {
   return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
-        <strong key={index} className="font-bold text-navy">
+        <strong key={`${keyPrefix}-b-${index}`} className="font-bold text-navy">
           {part.slice(2, -2)}
         </strong>
       );
     }
-    return part;
+    return <React.Fragment key={`${keyPrefix}-t-${index}`}>{part}</React.Fragment>;
+  });
+}
+
+function formatInline(text: string, keyPrefix = "inline"): React.ReactNode[] {
+  // Images first: ![alt](url)
+  const withImages = text.split(/(!\[[^\]]*\]\([^)]+\))/g);
+
+  return withImages.flatMap((chunk, chunkIndex) => {
+    const imageMatch = chunk.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (imageMatch) {
+      const [, alt, src] = imageMatch;
+      return (
+        <a
+          key={`${keyPrefix}-img-${chunkIndex}`}
+          href={src}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="my-2 block overflow-hidden rounded-xl border border-gray-light bg-cream"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src}
+            alt={alt || "Hình sản phẩm"}
+            className="mx-auto max-h-52 w-full object-contain p-2"
+            loading="lazy"
+          />
+        </a>
+      );
+    }
+
+    // Links: [label](url) — skip already-consumed image syntax
+    const withLinks = chunk.split(/(\[[^\]]+\]\([^)]+\))/g);
+    return withLinks.flatMap((segment, segmentIndex) => {
+      const linkMatch = segment.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+      if (linkMatch) {
+        const [, label, href] = linkMatch;
+        return (
+          <a
+            key={`${keyPrefix}-a-${chunkIndex}-${segmentIndex}`}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="break-all font-semibold text-brand-green underline underline-offset-2 hover:text-lime-dark"
+          >
+            {label}
+          </a>
+        );
+      }
+      return formatBold(segment, `${keyPrefix}-${chunkIndex}-${segmentIndex}`);
+    });
   });
 }
 
@@ -42,10 +92,25 @@ function ChatMessageContent({ content }: { content: string }) {
   const blocks = content.split(/\n\n+/);
 
   return (
-    <div className="space-y-2 font-sans text-[13px] leading-relaxed text-navy text-left">
+    <div className="space-y-2 break-words font-sans text-[13px] leading-relaxed text-navy text-left [overflow-wrap:anywhere]">
       {blocks.map((block, blockIndex) => {
+        const trimmed = block.trim();
+        if (!trimmed) return null;
+
+        // Standalone markdown image block
+        const soloImage = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+        if (soloImage) {
+          return (
+            <div key={blockIndex} className="min-w-0">
+              {formatInline(trimmed, `block-${blockIndex}`)}
+            </div>
+          );
+        }
+
         const lines = block.split("\n");
-        const isList = lines.every((line) => /^\s*[-*]\s/.test(line) || line.trim() === "");
+        const isList = lines.every(
+          (line) => /^\s*[-*]\s/.test(line) || line.trim() === "",
+        );
 
         if (isList && lines.some((line) => /^\s*[-*]\s/.test(line))) {
           return (
@@ -53,16 +118,21 @@ function ChatMessageContent({ content }: { content: string }) {
               {lines
                 .filter((line) => /^\s*[-*]\s/.test(line))
                 .map((line, lineIndex) => (
-                  <li key={lineIndex}>{formatInline(line.replace(/^\s*[-*]\s+/, ""))}</li>
+                  <li key={lineIndex}>
+                    {formatInline(
+                      line.replace(/^\s*[-*]\s+/, ""),
+                      `list-${blockIndex}-${lineIndex}`,
+                    )}
+                  </li>
                 ))}
             </ul>
           );
         }
 
         return (
-          <p key={blockIndex} className="whitespace-pre-wrap">
-            {formatInline(block)}
-          </p>
+          <div key={blockIndex} className="whitespace-pre-wrap">
+            {formatInline(block, `p-${blockIndex}`)}
+          </div>
         );
       })}
     </div>
@@ -313,9 +383,9 @@ export default function AIChatbot() {
                 return (
                 <div key={msg.id} className="space-y-1">
                   {msg.sender === "ai" ? (
-                    <div className="flex gap-2.5 items-start">
+                    <div className="flex w-full min-w-0 gap-2.5 items-start">
                       <BotAvatar />
-                      <div className="max-w-[78%] rounded-2xl rounded-tl-sm border border-gray-light bg-white p-4 shadow-xs">
+                      <div className="min-w-0 max-w-[min(78%,calc(100%-2.75rem))] overflow-hidden rounded-2xl rounded-tl-sm border border-gray-light bg-white p-4 shadow-xs">
                         {msg.id === "welcome" ? (
                           <WelcomeContent />
                         ) : (
@@ -328,7 +398,7 @@ export default function AIChatbot() {
                     </div>
                   ) : (
                     <div className="flex justify-end">
-                      <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-brand-green p-4 font-sans text-[13px] font-semibold leading-relaxed text-white shadow-sm">
+                      <div className="min-w-0 max-w-[80%] overflow-hidden break-words rounded-2xl rounded-tr-sm bg-brand-green p-4 font-sans text-[13px] font-semibold leading-relaxed text-white shadow-sm [overflow-wrap:anywhere]">
                         <p className="text-left whitespace-pre-wrap">{msg.content}</p>
                         <span className="block mt-2 text-right text-[9px] font-semibold text-white/70">
                           {msg.time}

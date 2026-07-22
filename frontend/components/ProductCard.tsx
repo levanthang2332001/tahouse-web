@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { getCategoryLabel } from "@/data/catalog-taxonomy";
 import type { Product } from "@/lib/types/product";
 import { formatProductPrice } from "@/lib/format-price";
 
@@ -13,36 +14,6 @@ export default function ProductCard({
   product: Product;
   priority?: boolean;
 }) {
-  const getCategoryLabel = (category: string) => {
-    switch (category) {
-      case "dai-sanh":
-        return "Khóa đại sảnh";
-      case "cua-go":
-        return "Khóa cửa gỗ";
-      case "cua-kinh":
-        return "Khóa cửa kính";
-      case "xingfa-sat":
-        return "Khóa nhôm kính";
-      case "cua-cong":
-        return "Khóa cửa cổng";
-      case "khach-san":
-        return "Khóa khách sạn";
-      case "lock-parent":
-        return "Khóa thông minh";
-      case "Lock":
-        return "Khóa thông minh";
-      case "Kitchen":
-        return "Bếp từ";
-      case "Water":
-        return "Máy lọc nước";
-      case "Cabinet":
-        return "Phụ kiện tủ bếp";
-      case "Smart":
-        return "Két sắt thông minh";
-      default:
-        return "Phụ kiện";
-    }
-  };
 
   const getBadgeInfo = (id: string) => {
     const lowerId = id.toLowerCase();
@@ -72,7 +43,33 @@ export default function ProductCard({
   };
 
   const getSupportText = (category: string) => {
-    if (category === "Kitchen" || category === "Water" || category === "Cabinet") {
+    const installSupportCategories = new Set([
+      "Kitchen",
+      "Water",
+      "Cabinet",
+      "bep-tu",
+      "bep-dien-tu",
+      "bep-gas-am",
+      "bep-tu-ket-hop-may-hut",
+      "may-hut-mui",
+      "may-hut-ap-tuong",
+      "may-hut-dao",
+      "may-hut-am-tu",
+      "may-hut-am-tran",
+      "may-hut-classic",
+      "may-hut-am-ban",
+      "lo-nuong",
+      "lo-vi-song",
+      "combo-lo-nuong-lo-vi-song",
+      "may-rua-chen",
+      "may-dien-giai",
+      "may-nong-lanh",
+      "may-nong-nguoi",
+      "may-ro-tu-dung",
+      "may-de-gam",
+      "cay-nuoc",
+    ]);
+    if (installSupportCategories.has(category)) {
       return "Đã bao gồm tư vấn lắp đặt";
     }
     return "Hỗ trợ khảo sát thực tế";
@@ -81,11 +78,12 @@ export default function ProductCard({
   const badge = getBadgeInfo(product.id);
   const suitability = getSuitabilityText(product.id, product.category);
   const support = getSupportText(product.category);
+  const categoryLabel = getCategoryLabel(product.category);
 
   return (
     <div className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-gray-light bg-white shadow-[0_4px_20px_rgb(0,0,0,0.01)] transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-brand-green/30">
       {/* Product Image Area */}
-      <div className="relative aspect-[1.4] w-full overflow-hidden bg-neutral/30 border-b border-gray-light/35">
+      <div className="relative aspect-[1.4] w-full overflow-hidden bg-cream border-b border-gray-light/35">
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
@@ -93,7 +91,7 @@ export default function ProductCard({
             fill
             priority={priority}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            className="object-contain p-3 transition-transform duration-700 group-hover:scale-[1.02]"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-neutral/40 text-[11px] font-semibold uppercase tracking-wider text-navy/35">
@@ -116,7 +114,7 @@ export default function ProductCard({
       <div className="flex flex-grow flex-col p-4.5 text-left">
         {/* Category tag */}
         <span className="mb-1 text-[9px] font-bold uppercase tracking-wider text-navy/40">
-          {getCategoryLabel(product.category)}
+          {categoryLabel}
         </span>
 
         {/* Title */}

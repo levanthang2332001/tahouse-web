@@ -170,7 +170,7 @@ function HeaderContent() {
           </div>
 
           <Link
-            href="#contact"
+            href="/#contact"
             className="rounded-full bg-brand-green px-6 py-3 text-xs font-medium uppercase tracking-wider text-white transition-colors hover:bg-lime-dark"
           >
             Tư vấn ngay
