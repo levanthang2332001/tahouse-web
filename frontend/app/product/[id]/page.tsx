@@ -4,7 +4,7 @@ import React, { use, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Check, ChevronRight, MessageCircle, Phone, Sparkles } from "lucide-react";
+import { Check, ChevronRight, MessageCircle, Phone, Share2, Sparkles } from "lucide-react";
 import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -144,9 +144,9 @@ function ProductDetailView({ id }: { id: string }) {
   return (
     <div className="min-h-screen bg-neutral text-navy">
       <Header />
-      <div className="min-h-screen pb-24 pt-32">
+      <div className="pb-12 pt-8 md:pt-10">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <div className="mb-8 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-navy/55">
+          <div className="mb-5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-navy/55">
             <Link href="/" className="hover:text-brand-green">Trang chủ</Link>
             <ChevronRight size={12} />
             <Link href="/products" className="hover:text-brand-green">Sản phẩm</Link>
@@ -154,7 +154,7 @@ function ProductDetailView({ id }: { id: string }) {
             <span className="truncate text-navy font-bold">{product.name}</span>
           </div>
 
-          <div className="grid grid-cols-1 gap-16 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
             <div className="space-y-6">
               <motion.div
                 initial={{ opacity: 0, scale: 0.98 }}
@@ -206,9 +206,11 @@ function ProductDetailView({ id }: { id: string }) {
                   {product.categoryName}
                 </span>
                 <button
+                  type="button"
                   onClick={handleShare}
-                  className="flex items-center gap-1 rounded-lg bg-cream border border-gray-light px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-navy/60 hover:text-brand-green"
+                  className="flex items-center gap-1.5 rounded-full bg-brand-green px-4 py-2 text-[11px] font-black uppercase tracking-wider text-white shadow-md shadow-brand-green/25 transition-all hover:bg-lime-dark hover:shadow-lg hover:shadow-brand-green/30 active:scale-[0.98]"
                 >
+                  <Share2 size={13} className="shrink-0" strokeWidth={2.4} />
                   {copied ? content.detail.labels.shareCopied : content.detail.labels.share}
                 </button>
               </div>
@@ -287,8 +289,8 @@ function ProductDetailView({ id }: { id: string }) {
             </div>
           </div>
 
-          <div className="mt-28 border-t border-gray-light pt-12">
-            <div className="invisible-scrollbar mb-10 flex gap-8 overflow-x-auto border-b border-gray-light">
+          <div className="mt-12 border-t border-gray-light pt-8">
+            <div className="invisible-scrollbar mb-6 flex gap-8 overflow-x-auto border-b border-gray-light">
               {["specs", "install", "warranty"].map((tab) => (
                 <button
                   key={tab}

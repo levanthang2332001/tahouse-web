@@ -3,14 +3,14 @@
 import React, { Suspense, startTransition, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Search } from "lucide-react";
+import { ChevronDown, ListFilter, Search, X } from "lucide-react";
 import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import BrandLogo from "@/components/BrandLogo";
 import SocialFloating from "@/components/SocialFloating";
-import { SIDEBAR_SECTIONS } from "@/data/catalog-taxonomy";
+import { getCategoryLabel, SIDEBAR_SECTIONS } from "@/data/catalog-taxonomy";
 import { getProductListKey } from "@/lib/backend/map-product";
 import { fetchBrands, fetchProducts } from "@/lib/api/products";
 import { filterBrandsForCategory, mapFilterToApiParams } from "@/lib/product-filters";
@@ -19,6 +19,16 @@ import { MAX_PRODUCT_PRICE } from "@/lib/types/product";
 
 const GRID_COLUMNS = 3;
 const PAGE_SIZE = GRID_COLUMNS * 7; // 21 sản phẩm = 7 hàng × 3 cột
+
+function getActiveCatalogLabel(filter: string): string {
+  if (filter === "all") return "Tất cả sản phẩm";
+  for (const section of SIDEBAR_SECTIONS) {
+    if (section.categoryId === filter) return section.title;
+    const sub = section.subcategories.find((item) => item.id === filter);
+    if (sub) return sub.name;
+  }
+  return getCategoryLabel(filter);
+}
 
 function ProductCardSkeleton() {
   return (
@@ -97,6 +107,7 @@ function ProductListContent() {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(SIDEBAR_SECTIONS.map((section, index) => [section.id, index === 0])),
   );
+  const [isCategorySheetOpen, setIsCategorySheetOpen] = useState(false);
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => ({
@@ -270,6 +281,144 @@ function ProductListContent() {
       ? (GRID_COLUMNS - (products.length % GRID_COLUMNS)) % GRID_COLUMNS
       : 0;
 
+  useEffect(() => {
+    if (!isCategorySheetOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isCategorySheetOpen]);
+
+  const applyCategoryFilter = (nextFilter: string) => {
+    lockScrollPosition();
+    setFilter(nextFilter);
+    setSelectedBrand("all");
+    setPage(1);
+  };
+
+  const renderCategoryNav = () => (
+    <>
+      <button
+        type="button"
+        onMouseDown={(event) => event.preventDefault()}
+        onClick={() => {
+          applyCategoryFilter("all");
+          setIsCategorySheetOpen(false);
+        }}
+        className={`flex w-full items-center justify-between px-4 py-4 text-left transition-colors cursor-pointer select-none ${
+          filter === "all"
+            ? "bg-brand-green/[0.02] text-brand-green font-bold"
+            : "hover:bg-neutral/20 text-navy"
+        }`}
+      >
+        <span className="flex items-center gap-3">
+          <Search className="text-brand-green shrink-0" size={18} />
+          <span
+            className={`text-[11px] font-extrabold tracking-wider uppercase transition-colors ${
+              filter === "all" ? "text-brand-green" : "text-navy"
+            }`}
+          >
+            Tất cả sản phẩm
+          </span>
+        </span>
+        <span
+          className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${
+            filter === "all"
+              ? "bg-brand-green text-white"
+              : "bg-neutral text-navy/40"
+          }`}
+        >
+          {catalogTotal || total}
+        </span>
+      </button>
+
+      {SIDEBAR_SECTIONS.map((section) => {
+        const SectionIcon = section.icon;
+        const isExpanded = expandedSections[section.id];
+        const isParentActive =
+          filter === section.categoryId ||
+          section.subcategories.some((sub) => filter === sub.id);
+
+        return (
+          <div key={section.id} className="flex flex-col">
+            <button
+              type="button"
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                toggleSection(section.id);
+                applyCategoryFilter(section.categoryId);
+              }}
+              className={`flex w-full items-center justify-between px-4 py-4 text-left transition-colors cursor-pointer select-none ${
+                isParentActive ? "bg-brand-green/[0.02]" : "hover:bg-neutral/20"
+              }`}
+            >
+              <span className="flex min-w-0 items-center gap-3">
+                <SectionIcon className="text-brand-green shrink-0" size={18} />
+                <span
+                  className={`truncate text-[11px] font-extrabold tracking-wider text-navy uppercase transition-colors ${
+                    isParentActive ? "text-brand-green" : "text-navy"
+                  }`}
+                >
+                  {section.title}
+                </span>
+              </span>
+              <ChevronDown
+                size={15}
+                className={`shrink-0 text-navy/45 transition-transform duration-300 ${
+                  isExpanded ? "rotate-180" : "rotate-0"
+                }`}
+              />
+            </button>
+
+            <AnimatePresence initial={false}>
+              {isExpanded && (
+                <motion.div
+                  initial="collapsed"
+                  animate="open"
+                  exit="collapsed"
+                  variants={{
+                    open: { opacity: 1, height: "auto" },
+                    collapsed: { opacity: 0, height: 0 },
+                  }}
+                  transition={{ duration: 0.25, ease: [0.04, 0.62, 0.23, 0.98] }}
+                  className="overflow-hidden border-t border-gray-light/20 bg-cream/35"
+                >
+                  <div className="flex flex-col gap-1 p-2">
+                    {section.subcategories.map((sub) => {
+                      const SubIcon = sub.icon;
+                      const isActive = filter === sub.id;
+
+                      return (
+                        <button
+                          type="button"
+                          onMouseDown={(event) => event.preventDefault()}
+                          key={sub.id}
+                          onClick={() => {
+                            handleSubcategoryClick(sub.id);
+                            setIsCategorySheetOpen(false);
+                          }}
+                          className={`group flex w-full cursor-pointer items-center gap-3 rounded-xl px-4.5 py-3 text-left transition-all duration-200 ${
+                            isActive
+                              ? "bg-brand-green/10 font-bold text-brand-green shadow-xs"
+                              : "font-medium text-navy/75 hover:bg-neutral/40 hover:text-brand-green"
+                          }`}
+                        >
+                          <SubIcon className="shrink-0 text-brand-green" size={14} />
+                          <span className="text-[13px] tracking-wide">{sub.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        );
+      })}
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-neutral pb-24 pt-10">
       <div className="mx-auto max-w-[1600px] px-6 lg:px-12">
@@ -349,196 +498,92 @@ function ProductListContent() {
           </div>
         </div>
 
-        <div className="flex min-h-[calc(100vh-8rem)] flex-col gap-8 lg:flex-row lg:items-start">
-          {/* Left Sidebar Panel */}
+        <div className="flex min-h-[calc(100vh-8rem)] flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
           <aside className="w-full shrink-0 lg:w-80 lg:sticky lg:top-28">
-            {/* Desktop Vertical Categories with Hierarchy (Unified Card) */}
-            <div 
-              ref={panelRef}
-              data-lenis-prevent
-              className="hidden lg:block border border-gray-light/35 rounded-3xl bg-white lg:max-h-[calc(100vh-9.5rem)] lg:overflow-y-auto invisible-scrollbar divide-y divide-gray-light/35 shadow-[0_8px_30px_rgb(0,0,0,0.02)]"
-            >
-              {/* 1. Tất cả sản phẩm Row */}
+            {/* Mobile: compact trigger + bottom sheet */}
+            <div className="lg:hidden">
               <button
                 type="button"
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => {
-                  lockScrollPosition();
-                  setFilter("all");
-                  setSelectedBrand("all");
-                  setPage(1);
-                }}
-                className={`flex w-full items-center justify-between px-4 py-4 text-left transition-colors cursor-pointer select-none ${
-                  filter === "all"
-                    ? "bg-brand-green/[0.02] text-brand-green font-bold"
-                    : "hover:bg-neutral/20 text-navy"
-                }`}
+                onClick={() => setIsCategorySheetOpen(true)}
+                className="flex w-full items-center justify-between gap-3 rounded-2xl border border-gray-light/60 bg-white px-4 py-3.5 text-left shadow-xs"
               >
-                <span className="flex items-center gap-3">
-                  <Search className="text-brand-green shrink-0" size={18} />
-                  <span className={`text-[11px] font-extrabold tracking-wider uppercase transition-colors ${
-                    filter === "all" ? "text-brand-green" : "text-navy"
-                  }`}>
-                    Tất cả sản phẩm
+                <span className="flex min-w-0 items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-green/10 text-brand-green">
+                    <ListFilter size={18} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-navy/40">
+                      Danh mục
+                    </span>
+                    <span className="block truncate text-sm font-extrabold text-navy">
+                      {getActiveCatalogLabel(filter)}
+                    </span>
                   </span>
                 </span>
-                <span
-                  className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${
-                    filter === "all"
-                      ? "bg-brand-green text-white"
-                      : "bg-neutral text-navy/40"
-                  }`}
-                >
-                  {catalogTotal || total}
-                </span>
+                <ChevronDown size={16} className="shrink-0 text-navy/40" />
               </button>
 
-              {/* 2. Accordions */}
-              {SIDEBAR_SECTIONS.map((section) => {
-                const SectionIcon = section.icon;
-                const isExpanded = expandedSections[section.id];
-                const isParentActive = filter === section.categoryId || 
-                  section.subcategories.some(sub => filter === sub.id);
-                
-                return (
-                  <div key={section.id} className="flex flex-col">
-                    {/* Accordion Header */}
-                    <button
+              <AnimatePresence>
+                {isCategorySheetOpen && (
+                  <>
+                    <motion.button
                       type="button"
-                      onMouseDown={(event) => event.preventDefault()}
-                      onClick={() => {
-                        lockScrollPosition();
-                        toggleSection(section.id);
-                        setFilter(section.categoryId);
-                        setSelectedBrand("all");
-                        setPage(1);
-                      }}
-                      className={`flex w-full items-center justify-between px-4 py-4 text-left transition-colors cursor-pointer select-none ${
-                        isParentActive ? "bg-brand-green/[0.02]" : "hover:bg-neutral/20"
-                      }`}
+                      aria-label="Đóng danh mục"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 z-[60] bg-navy/40"
+                      onClick={() => setIsCategorySheetOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ y: "100%" }}
+                      animate={{ y: 0 }}
+                      exit={{ y: "100%" }}
+                      transition={{ type: "spring", damping: 28, stiffness: 320 }}
+                      className="fixed inset-x-0 bottom-0 z-[70] flex max-h-[85vh] flex-col rounded-t-[28px] bg-cream shadow-2xl"
                     >
-                      <span className="flex items-center gap-3">
-                        <SectionIcon className="text-brand-green shrink-0" size={18} />
-                        <span className={`text-[11px] font-extrabold tracking-wider text-navy uppercase transition-colors ${
-                          isParentActive ? "text-brand-green" : "text-navy"
-                        }`}>
-                          {section.title}
-                        </span>
-                      </span>
-                      <ChevronDown
-                        size={15}
-                        className={`text-navy/45 transition-transform duration-300 ${
-                          isExpanded ? "rotate-180" : "rotate-0"
-                        }`}
-                      />
-                    </button>
-
-                    {/* Accordion Content */}
-                    <AnimatePresence initial={false}>
-                      {isExpanded && (
-                        <motion.div
-                          initial="collapsed"
-                          animate="open"
-                          exit="collapsed"
-                          variants={{
-                            open: { opacity: 1, height: "auto" },
-                            collapsed: { opacity: 0, height: 0 }
-                          }}
-                          transition={{ duration: 0.25, ease: [0.04, 0.62, 0.23, 0.98] }}
-                          className="overflow-hidden bg-cream/35 border-t border-gray-light/20"
+                      <div className="flex shrink-0 items-center justify-between border-b border-gray-light/40 px-5 py-4">
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-navy/40">
+                            Chọn danh mục
+                          </p>
+                          <p className="text-sm font-extrabold text-navy">
+                            {getActiveCatalogLabel(filter)}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setIsCategorySheetOpen(false)}
+                          className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-navy/70 shadow-xs"
+                          aria-label="Đóng"
                         >
-                          <div className="p-2 flex flex-col gap-1">
-                            {section.subcategories.map((sub) => {
-                              const SubIcon = sub.icon;
-                              const isActive = filter === sub.id;
-                              
-                              return (
-                                <button
-                                  type="button"
-                                  onMouseDown={(event) => event.preventDefault()}
-                                  key={sub.id}
-                                  onClick={() => handleSubcategoryClick(sub.id)}
-                                  className={`group flex w-full items-center gap-3 rounded-xl px-4.5 py-3 text-left transition-all duration-200 cursor-pointer ${
-                                    isActive
-                                      ? "bg-brand-green/10 text-brand-green font-bold shadow-xs"
-                                      : "text-navy/75 hover:bg-neutral/40 hover:text-brand-green font-medium"
-                                  }`}
-                                >
-                                  <SubIcon className="text-brand-green shrink-0" size={14} />
-                                  <span className="text-[13px] tracking-wide truncate">{sub.name}</span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                );
-              })}
+                          <X size={18} />
+                        </button>
+                      </div>
+                      <div
+                        data-lenis-prevent
+                        className="min-h-0 flex-1 overflow-y-auto divide-y divide-gray-light/35 bg-white"
+                      >
+                        {renderCategoryNav()}
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Mobile Horizontal Scrollable Categories with Matching Icons */}
-            <div className="lg:hidden w-full overflow-hidden mb-4">
-              <div className="invisible-scrollbar flex gap-2.5 overflow-x-auto pb-3 p-1">
-                {/* 1. All Products */}
-                <button
-                  type="button"
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => {
-                    lockScrollPosition();
-                    setFilter("all");
-                    setSelectedBrand("all");
-                    setPage(1);
-                  }}
-                  className={`flex items-center gap-2 whitespace-nowrap rounded-2xl px-5 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 border cursor-pointer ${
-                    filter === "all"
-                      ? "bg-brand-green text-white border-brand-green shadow-md shadow-brand-green/20"
-                      : "bg-white border-gray-light/50 text-navy/70"
-                  }`}
-                >
-                  <Search size={14} className={filter === "all" ? "text-white" : "text-brand-green"} />
-                  <span>Tất cả</span>
-                </button>
-
-                {/* 2. Main Sections */}
-                {SIDEBAR_SECTIONS.map((section) => {
-                  const SectionIcon = section.icon;
-                  const isActive = filter === section.categoryId || 
-                    section.subcategories.some(sub => filter === sub.id);
-                  
-                  return (
-                    <button
-                      type="button"
-                      onMouseDown={(event) => event.preventDefault()}
-                      key={section.id}
-                      onClick={() => {
-                        lockScrollPosition();
-                        setFilter(section.categoryId);
-                        setSelectedBrand("all");
-                        setPage(1);
-                        setExpandedSections(prev => ({
-                          ...prev,
-                          [section.id]: true
-                        }));
-                      }}
-                      className={`flex items-center gap-2 whitespace-nowrap rounded-2xl px-5 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 border cursor-pointer ${
-                        isActive
-                          ? "bg-brand-green text-white border-brand-green shadow-md shadow-brand-green/20"
-                          : "bg-white border-gray-light/50 text-navy/70"
-                      }`}
-                    >
-                      <SectionIcon size={14} className={isActive ? "text-white" : "text-brand-green"} />
-                      <span>{section.title}</span>
-                    </button>
-                  );
-                })}
-              </div>
+            {/* Desktop: sticky accordion */}
+            <div
+              ref={panelRef}
+              data-lenis-prevent
+              className="hidden divide-y divide-gray-light/35 overflow-y-auto rounded-3xl border border-gray-light/35 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.02)] invisible-scrollbar lg:block lg:max-h-[calc(100vh-9.5rem)]"
+            >
+              {renderCategoryNav()}
             </div>
           </aside>
 
           {/* Right Product Grid */}
-          <div className="flex-1 [overflow-anchor:none]" ref={gridRef}>
+          <div className="min-w-0 flex-1 [overflow-anchor:none]" ref={gridRef}>
             {/* Grid Header with Counts and Dropdowns */}
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="text-[13px] font-semibold text-navy/75 leading-none">
