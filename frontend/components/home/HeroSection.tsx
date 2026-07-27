@@ -22,7 +22,7 @@ export default function HeroSection() {
       <div className="absolute top-0 right-0 h-full w-full lg:w-1/2 z-0">
         <div className="relative h-full w-full">
           <Image
-            src="/parner.png"
+            src="/parner.jpg"
             alt="TA HOUSE Smart Kitchen Solutions"
             fill
             priority
