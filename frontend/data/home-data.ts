@@ -58,21 +58,65 @@ export const SERVICES: Service[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Brand marquee (partners section)
+// Brand partners grid (home brands section)
 // ---------------------------------------------------------------------------
+export type PartnerBrand = {
+  name: string;
+  logo?: string;
+  className: string;
+};
+
+export const PARTNER_BRANDS: PartnerBrand[] = [
+  {
+    name: "BOSCH",
+    logo: "/brands/bosch.svg",
+    className: "font-sans font-bold tracking-tighter text-[#E31C23]",
+  },
+  {
+    name: "HÄFELE",
+    logo: "/brands/hafele.png",
+    className: "font-sans font-extrabold tracking-[0.18em] text-navy/55",
+  },
+  {
+    name: "KASSLER",
+    logo: "/brands/kassler.png",
+    className: "font-sans font-bold tracking-wide text-[#2E7D32]",
+  },
+  {
+    name: "KAFF",
+    logo: "/brands/kaff.jpg",
+    className: "font-sans font-black tracking-tight text-[#C41230]",
+  },
+  {
+    name: "MALLOCA",
+    className: "font-sans font-bold tracking-wide text-[#C9A227]",
+  },
+  {
+    name: "eurosun",
+    logo: "/brands/eurosun.png",
+    className: "font-serif italic font-semibold tracking-wide text-[#2E7D32]",
+  },
+  {
+    name: "EUROGOLD",
+    className: "font-sans font-extrabold tracking-wide text-[#1E3A8A]",
+  },
+  {
+    name: "GRÖB",
+    logo: "/brands/grob.png",
+    className: "font-sans font-black tracking-tight text-[#15803D]",
+  },
+];
+
+/** @deprecated kept for any leftover imports */
 export type Brand = {
   name: string;
   style: string;
 };
 
-export const BRANDS: Brand[] = [
-  { name: "BOSCH",   style: "font-sans font-bold tracking-tighter" },
-  { name: "YALE",    style: "font-serif italic tracking-wider" },
-  { name: "HAFELE",  style: "font-sans font-extrabold tracking-widest" },
-  { name: "SAMSUNG", style: "font-sans font-semibold tracking-normal" },
-  { name: "KAADAS",  style: "font-sans font-black tracking-tight" },
-  { name: "PHILIPS", style: "font-sans font-black tracking-wide" },
-];
+export const BRANDS: Brand[] = PARTNER_BRANDS.map((brand) => ({
+  name: brand.name,
+  style: brand.className,
+}));
 
 // ---------------------------------------------------------------------------
 // Solutions section — static image + icon, titles/desc come from content.json

@@ -478,13 +478,16 @@ function ProductListContent() {
                         setSelectedBrand(brand.slug);
                         setPage(1);
                       }}
-                      className={`cursor-pointer flex items-center justify-center rounded-xl bg-white border px-4 py-2 transition-all duration-300 h-10 min-w-[95px] shadow-xs hover:scale-102 hover:shadow-sm ${
+                      className={`cursor-pointer flex items-center justify-center rounded-xl bg-white border px-4 py-2.5 transition-all duration-300 h-12 min-w-[110px] shadow-xs hover:scale-102 hover:shadow-sm ${
                         isActive
                           ? "border-brand-green ring-2 ring-brand-green/10 shadow-sm"
                           : "border-gray-light/60 hover:border-brand-green/30"
                       }`}
                     >
-                      <BrandLogo brand={brand} />
+                      <BrandLogo
+                        brand={brand}
+                        className="h-7 w-auto max-w-[110px] object-contain"
+                      />
                     </button>
                   );
                 })}

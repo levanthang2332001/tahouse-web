@@ -71,8 +71,11 @@
       ]
     },
     "partners": {
-      "prefix": "Thương hiệu chính hãng",
-      "title": "Đối tác tin cậy"
+      "title": "CHỌN ĐÚNG GIẢI PHÁP",
+      "subtitle": "Từ những thương hiệu chính hãng.",
+      "descBefore": "",
+      "descBrand": "TA HOUSE",
+      "descAfter": " lựa chọn thiết bị phù hợp với nhu cầu thực tế của từng gia đình."
     },
     "solutions": {
       "prefix": "Giải pháp & Dự án",
