@@ -6,7 +6,6 @@ import type { LucideIcon } from "lucide-react";
 // ---------------------------------------------------------------------------
 export type Service = {
   title: string;
-  desc: string;
   catId: string;
   icon: LucideIcon;
   img: string;
@@ -16,7 +15,6 @@ export type Service = {
 export const SERVICES: Service[] = [
   {
     title: "Khóa điện tử - khóa vân tay",
-    desc: "264 sản phẩm đang có",
     catId: "lock-parent",
     icon: Lock,
     img: "/pic/khoa.jpg",
@@ -24,7 +22,6 @@ export const SERVICES: Service[] = [
   },
   {
     title: "Két sắt thông minh",
-    desc: "Kassler & Philips",
     catId: "Smart",
     icon: Shield,
     img: "/pic/ket.webp",
@@ -32,7 +29,6 @@ export const SERVICES: Service[] = [
   },
   {
     title: "Thiết bị bếp",
-    desc: "Bosch, Malloca và hơn thế",
     catId: "kitchen-group",
     icon: CookingPot,
     img: "/pic/bep2.webp",
@@ -40,23 +36,20 @@ export const SERVICES: Service[] = [
   },
   {
     title: "Quạt trần đèn",
-    desc: "66 sản phẩm đang có",
     catId: "fanlight-group",
     icon: Fan,
-    img: "/pic/khoa2.jpg",
-    imgClass: "object-cover",
+    img: "/pic/quat.jpg",
+    imgClass: "object-contain bg-white p-3",
   },
   {
     title: "Máy lọc nước",
-    desc: "24 sản phẩm đang có",
     catId: "water-group",
     icon: Droplets,
-    img: "/pic/khoa.jpg",
-    imgClass: "object-cover",
+    img: "/pic/maylocnuoc.webp",
+    imgClass: "object-contain bg-white p-3",
   },
   {
     title: "Cửa",
-    desc: "9 sản phẩm đang có",
     catId: "door-group",
     icon: DoorClosed,
     img: "/pic/khoa2.jpg",

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -8,8 +8,55 @@ import { ArrowRight } from "lucide-react";
 import { staggerContainer, fadeUp, fadeUpSlow } from "@/lib/motion-variants";
 import { SERVICES } from "@/data/home-data";
 import content from "@/data/content.json";
+import { fetchProducts } from "@/lib/api/products";
+import { mapFilterToApiParams } from "@/lib/product-filters";
+
+async function fetchCategoryTotal(catId: string): Promise<number> {
+  // Két: gộp Kassler (Smart) + Philips (ket-sat)
+  if (catId === "Smart") {
+    const [smart, ketSat] = await Promise.all([
+      fetchProducts({ page: 1, limit: 1, category: "Smart" }),
+      fetchProducts({ page: 1, limit: 1, category: "ket-sat" }),
+    ]);
+    return smart.total + ketSat.total;
+  }
+
+  const api = mapFilterToApiParams(catId);
+  const data = await fetchProducts({
+    page: 1,
+    limit: 1,
+    category: api.category,
+    subcategory: api.subcategory,
+    group: api.group,
+    brand: api.brand,
+  });
+  return data.total;
+}
 
 export default function CategoriesSection() {
+  const [totals, setTotals] = useState<Record<string, number | null>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+
+    for (const service of SERVICES) {
+      void (async () => {
+        try {
+          const total = await fetchCategoryTotal(service.catId);
+          if (cancelled) return;
+          setTotals((prev) => ({ ...prev, [service.catId]: total }));
+        } catch {
+          if (cancelled) return;
+          setTotals((prev) => ({ ...prev, [service.catId]: null }));
+        }
+      })();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section id="categories" className="w-full bg-white py-12 lg:py-16">
       <motion.div
@@ -45,6 +92,14 @@ export default function CategoriesSection() {
         {/* Service category cards */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((service) => {
+            const total = totals[service.catId];
+            const countLabel =
+              typeof total === "number"
+                ? `${total.toLocaleString("vi-VN")} sản phẩm đang có`
+                : total === null
+                  ? "Xem danh sách sản phẩm"
+                  : "Đang tải số lượng...";
+
             return (
               <motion.div
                 key={service.title}
@@ -72,8 +127,14 @@ export default function CategoriesSection() {
                         <h4 className="text-base lg:text-lg font-bold uppercase tracking-wide text-navy group-hover:text-brand-green transition-colors leading-tight min-h-[3rem] lg:min-h-[3.5rem] flex items-center">
                           {service.title}
                         </h4>
-                        <p className="text-xs font-semibold text-navy/60 mt-2 leading-relaxed">
-                          {service.desc}
+                        <p
+                          className={`mt-2 text-sm font-bold leading-relaxed ${
+                            typeof total === "number"
+                              ? "text-brand-green"
+                              : "text-navy/45"
+                          }`}
+                        >
+                          {countLabel}
                         </p>
                       </div>
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-green/20 bg-brand-green/5 text-brand-green group-hover:bg-brand-green group-hover:text-white transition-all duration-300">
