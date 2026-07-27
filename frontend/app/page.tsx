@@ -10,7 +10,7 @@ import StatsSection from "@/components/home/StatsSection";
 import CategoriesSection from "@/components/home/CategoriesSection";
 import BrandsSection from "@/components/home/BrandsSection";
 import SolutionsSection from "@/components/home/SolutionsSection";
-import NewsSection from "@/components/home/NewsSection";
+import StoreSection from "@/components/home/StoreSection";
 import CtaBanner from "@/components/home/CtaBanner";
 
 export default function Home() {
@@ -22,7 +22,7 @@ export default function Home() {
       <CategoriesSection />
       <BrandsSection />
       <SolutionsSection />
-      <NewsSection />
+      <StoreSection />
       <CtaBanner />
       <Footer />
       <SocialFloating />

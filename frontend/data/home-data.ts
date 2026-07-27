@@ -132,10 +132,11 @@ export const SOLUTION_META: SolutionMeta[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// News article images (indexed in the same order as content.json articles)
+// Showroom / store photos (frontend/public/store)
 // ---------------------------------------------------------------------------
-export const NEWS_IMAGES: string[] = [
-  "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&q=80",
+export const STORE_IMAGES: string[] = [
+  "/store/2.jpg",
+  "/store/1.jpg",
+  "/store/3.jpg",
+  "/store/4.jpg",
 ];

@@ -92,23 +92,14 @@
         }
       ]
     },
-    "news": {
-      "prefix": "Tin tức & Cẩm nang",
-      "viewAll": "Xem tất cả bài viết",
-      "articles": [
-        {
-          "date": "20/05/2024",
-          "title": "5 tiêu chí chọn khóa thông minh cho gia đình hiện đại"
-        },
-        {
-          "date": "15/05/2024",
-          "title": "Xu hướng khóa cửa thông minh 2024: An toàn và tiện nghi"
-        },
-        {
-          "date": "10/05/2024",
-          "title": "Hướng dẫn bảo dưỡng khóa thông minh đúng cách tại nhà"
-        }
-      ]
+    "store": {
+      "prefix": "Showroom",
+      "title": "Ghé thăm cửa hàng TA HOUSE",
+      "desc": "Trải nghiệm khóa thông minh, két sắt và thiết bị bếp trực tiếp tại showroom — tư vấn tận nơi, xem mẫu thật trước khi quyết định.",
+      "showroomName": "Showroom Linh Xuân",
+      "ctaDirections": "Chỉ đường",
+      "ctaCall": "Gọi ngay",
+      "ctaZalo": "Chat Zalo"
     }
   },
   "detail": {

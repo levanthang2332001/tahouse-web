@@ -103,7 +103,7 @@ function HeaderContent() {
     { name: "Trang chủ", path: "/" },
     { name: "Sản phẩm", path: "/products" },
     { name: "Giải pháp", path: "/#solutions" },
-    { name: "Tin tức", path: "/#news" },
+    { name: "Cửa hàng", path: "/#store" },
     { name: "Liên hệ", path: "/#contact" },
   ];
 
