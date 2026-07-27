@@ -27,28 +27,20 @@
     ],
     "stats": [
       {
-        "value": "10",
-        "suffix": "+",
-        "label": "Năm kinh nghiệm",
-        "sublabel": "trong ngành"
+        "title": "Tư vấn đúng nhu cầu",
+        "desc": "Không bán theo giá cao nhất."
       },
       {
-        "value": "5000",
-        "suffix": "+",
-        "label": "Khách hàng",
-        "sublabel": "đã tin tưởng"
+        "title": "Khảo sát trước khi lắp",
+        "desc": "Hạn chế phát sinh sau này."
       },
       {
-        "value": "100",
-        "suffix": "+",
-        "label": "Thương hiệu",
-        "sublabel": "phân phối chính hãng"
+        "title": "Hàng chính hãng",
+        "desc": "Từ các thương hiệu uy tín."
       },
       {
-        "value": "50",
-        "suffix": "+",
-        "label": "Dự án & công trình",
-        "sublabel": "đã thực hiện"
+        "title": "Lắp đặt & bảo hành",
+        "desc": "Đồng hành sau bán hàng."
       }
     ],
     "categories": {
@@ -56,11 +48,26 @@
       "title": "Giải pháp toàn diện\ncho ngôi nhà của bạn",
       "viewAll": "Xem tất cả sản phẩm",
       "items": [
-        { "title": "Khóa cửa vân tay", "count": "200+ sản phẩm" },
-        { "title": "Khóa khuôn mặt", "count": "150+ sản phẩm" },
-        { "title": "Khóa cửa nhôm", "count": "80+ sản phẩm" },
-        { "title": "Khóa khách sạn", "count": "120+ sản phẩm" },
-        { "title": "Phụ kiện cửa", "count": "60+ sản phẩm" }
+        {
+          "title": "Khóa cửa vân tay",
+          "count": "200+ sản phẩm"
+        },
+        {
+          "title": "Khóa khuôn mặt",
+          "count": "150+ sản phẩm"
+        },
+        {
+          "title": "Khóa cửa nhôm",
+          "count": "80+ sản phẩm"
+        },
+        {
+          "title": "Khóa khách sạn",
+          "count": "120+ sản phẩm"
+        },
+        {
+          "title": "Phụ kiện cửa",
+          "count": "60+ sản phẩm"
+        }
       ]
     },
     "partners": {

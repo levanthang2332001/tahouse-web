@@ -2,33 +2,57 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import {
+  ClipboardCheck,
+  MessagesSquare,
+  ShieldCheck,
+  Wrench,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { staggerContainer, fadeUp } from "@/lib/motion-variants";
 import content from "@/data/content.json";
 
+const STAT_ICONS: LucideIcon[] = [
+  MessagesSquare,
+  ClipboardCheck,
+  ShieldCheck,
+  Wrench,
+];
+
 export default function StatsSection() {
   return (
-    <section className="w-full bg-cream py-16 border-y border-gray-light/35">
+    <section className="w-full bg-cream py-10 lg:py-12 border-y border-gray-light/35">
       <motion.div
         variants={staggerContainer}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        className="mx-auto grid max-w-[1200px] grid-cols-2 gap-8 px-6 md:grid-cols-4 md:gap-0"
+        viewport={{ once: true, margin: "-80px" }}
+        className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 px-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:px-12"
       >
-        {content.home.stats.map((stat) => (
-          <motion.div
-            key={stat.label}
-            variants={fadeUp}
-            className="flex flex-col items-center px-4 text-center md:border-r border-gray-light/40 last:border-r-0"
-          >
-            <span className="mb-2 font-serif text-6xl md:text-7xl tracking-normal text-brand-green">
-              {stat.value}
-              <span className="text-4xl">{stat.suffix}</span>
-            </span>
-            <span className="mb-1 text-sm font-semibold text-navy">{stat.label}</span>
-            <span className="text-xs text-navy/60">{stat.sublabel}</span>
-          </motion.div>
-        ))}
+        {content.home.stats.map((stat, index) => {
+          const Icon = STAT_ICONS[index] ?? MessagesSquare;
+
+          return (
+            <motion.div
+              key={stat.title}
+              variants={fadeUp}
+              className="flex items-start gap-4 lg:px-6 lg:border-r lg:border-gray-light/50 last:lg:border-r-0"
+            >
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-green/12 text-brand-green">
+                <Icon size={24} strokeWidth={1.8} />
+              </div>
+              <div className="min-w-0 pt-0.5">
+                <h3 className="font-sans text-base font-bold leading-snug text-navy md:text-lg">
+                  {stat.title}
+                </h3>
+                <div className="mt-2.5 mb-2.5 h-[3px] w-9 rounded-full bg-brand-green" />
+                <p className="text-sm font-medium leading-relaxed text-navy/55 md:text-[15px]">
+                  {stat.desc}
+                </p>
+              </div>
+            </motion.div>
+          );
+        })}
       </motion.div>
     </section>
   );
