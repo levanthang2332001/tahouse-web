@@ -28,8 +28,7 @@ export const COMPANY_LEGAL = {
   email: "info@takit.vn",
   website: "https://www.tahouse.net",
   websiteDisplay: "www.tahouse.net",
-  workingHours:
-    "Thứ Hai – Thứ Bảy: 08:00 – 17:30; Chủ Nhật và ngày lễ: hỗ trợ theo lịch hẹn hoặc qua hotline",
+  workingHours: "Thứ Hai – Chủ Nhật: 08:00 – 17:30",
   /** Phạm vi giao hàng thực tế */
   deliveryScope:
     "Giao hàng trên phạm vi toàn quốc. Đối với khảo sát, lắp đặt và bảo hành tận nơi, phạm vi phục vụ phụ thuộc khu vực và điều kiện thực tế.",
