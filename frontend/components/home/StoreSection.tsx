@@ -6,9 +6,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Clock, MapPin, Phone } from "lucide-react";
 import { staggerContainer, fadeUp, fadeUpSlow } from "@/lib/motion-variants";
-import { STORE_IMAGES } from "@/data/home-data";
+import { STORE_COPY, STORE_IMAGES } from "@/data/home-data";
 import { COMPANY_LEGAL } from "@/data/company-legal";
-import content from "@/data/content.json";
 
 const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
   COMPANY_LEGAL.address,
@@ -32,13 +31,13 @@ export default function StoreSection() {
       >
         <motion.div variants={fadeUpSlow} className="mb-12 text-left">
           <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-green">
-            {content.home.store.prefix}
+            {STORE_COPY.prefix}
           </h3>
           <h2 className="mb-4 whitespace-normal font-serif text-3xl leading-tight text-navy sm:whitespace-nowrap sm:text-4xl lg:text-[2.75rem]">
-            {content.home.store.title}
+            {STORE_COPY.title}
           </h2>
           <p className="max-w-2xl text-base leading-relaxed text-navy/70">
-            {content.home.store.desc}
+            {STORE_COPY.desc}
           </p>
         </motion.div>
 
@@ -90,7 +89,7 @@ export default function StoreSection() {
                 {COMPANY_LEGAL.tradeName}
               </p>
               <h3 className="font-serif text-2xl text-navy sm:text-3xl">
-                {content.home.store.showroomName}
+                {STORE_COPY.showroomName}
               </h3>
             </div>
 
@@ -129,14 +128,14 @@ export default function StoreSection() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-3 bg-brand-green px-7 py-3.5 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
               >
-                {content.home.store.ctaDirections}
+                {STORE_COPY.ctaDirections}
                 <ArrowRight className="h-4 w-4" />
               </a>
               <a
                 href={`tel:${COMPANY_LEGAL.phoneTel}`}
                 className="inline-flex items-center justify-center gap-3 border border-navy px-7 py-3.5 text-xs font-semibold uppercase tracking-wider text-navy transition-all hover:bg-navy hover:text-cream"
               >
-                {content.home.store.ctaCall}
+                {STORE_COPY.ctaCall}
               </a>
               <Link
                 href={COMPANY_LEGAL.zaloUrl}
@@ -144,7 +143,7 @@ export default function StoreSection() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-3 border border-navy/25 px-7 py-3.5 text-xs font-semibold uppercase tracking-wider text-navy/80 transition-colors hover:border-brand-green hover:text-brand-green"
               >
-                {content.home.store.ctaZalo}
+                {STORE_COPY.ctaZalo}
               </Link>
             </div>
           </motion.div>

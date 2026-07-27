@@ -140,3 +140,13 @@ export const STORE_IMAGES: string[] = [
   "/store/3.jpg",
   "/store/4.jpg",
 ];
+
+export const STORE_COPY = {
+  prefix: "Showroom",
+  title: "Ghé thăm cửa hàng TA HOUSE",
+  desc: "Trải nghiệm khóa thông minh, két sắt và thiết bị bếp trực tiếp tại showroom — tư vấn tận nơi, xem mẫu thật trước khi quyết định.",
+  showroomName: "Showroom Linh Xuân",
+  ctaDirections: "Chỉ đường",
+  ctaCall: "Gọi ngay",
+  ctaZalo: "Chat Zalo",
+} as const;
