@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, startTransition, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { Suspense, startTransition, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ListFilter, Search, X } from "lucide-react";
@@ -118,44 +118,52 @@ function ProductListContent() {
 
   const panelRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const lockedScrollYRef = useRef<number | null>(null);
+  const pendingScrollToGridRef = useRef(false);
 
-  const lockScrollPosition = () => {
-    const lenis = (window as Window & { __lenis?: { scroll?: number } }).__lenis;
-    lockedScrollYRef.current =
-      typeof lenis?.scroll === "number" ? lenis.scroll : window.scrollY;
+  const scrollToProductGrid = (immediate = false) => {
+    const el = gridRef.current;
+    if (!el) return;
+
+    const headerOffset = 112;
+    const lenis = (
+      window as Window & {
+        __lenis?: {
+          scrollTo: (
+            target: HTMLElement | number,
+            options?: { offset?: number; immediate?: boolean },
+          ) => void;
+        };
+      }
+    ).__lenis;
+
+    if (lenis) {
+      lenis.scrollTo(el, { offset: -headerOffset, immediate });
+      return;
+    }
+
+    const top = window.scrollY + el.getBoundingClientRect().top - headerOffset;
+    window.scrollTo({
+      top: Math.max(0, top),
+      left: 0,
+      behavior: immediate ? "auto" : "smooth",
+    });
   };
 
   const handleSubcategoryClick = (subcatId: string) => {
-    lockScrollPosition();
+    pendingScrollToGridRef.current = true;
     setFilter(subcatId);
     setSelectedBrand("all");
     setPage(1);
+    scrollToProductGrid(false);
   };
 
-  // Giữ nguyên vị trí scroll khi đổi menu — không giật lên đầu trang
-  useLayoutEffect(() => {
-    const y = lockedScrollYRef.current;
-    if (y === null) return;
-
-    const lenis = (window as Window & {
-      __lenis?: { scrollTo: (v: number, o?: { immediate?: boolean }) => void };
-    }).__lenis;
-
-    const restore = () => {
-      if (lenis) lenis.scrollTo(y, { immediate: true });
-      else window.scrollTo({ top: y, left: 0, behavior: "auto" });
-    };
-
-    restore();
-    const raf = requestAnimationFrame(restore);
-
-    if (!loading) {
-      lockedScrollYRef.current = null;
-    }
-
+  // Sau khi danh mục đổi và sản phẩm render xong → căn lại vị trí lưới (tránh rơi xuống footer)
+  useEffect(() => {
+    if (!pendingScrollToGridRef.current || loading) return;
+    pendingScrollToGridRef.current = false;
+    const raf = requestAnimationFrame(() => scrollToProductGrid(true));
     return () => cancelAnimationFrame(raf);
-  }, [filter, selectedBrand, products, loading]);
+  }, [filter, loading, products]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -291,10 +299,11 @@ function ProductListContent() {
   }, [isCategorySheetOpen]);
 
   const applyCategoryFilter = (nextFilter: string) => {
-    lockScrollPosition();
+    pendingScrollToGridRef.current = true;
     setFilter(nextFilter);
     setSelectedBrand("all");
     setPage(1);
+    scrollToProductGrid(false);
   };
 
   const renderCategoryNav = () => (
@@ -454,7 +463,6 @@ function ProductListContent() {
                   type="button"
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => {
-                    lockScrollPosition();
                     setSelectedBrand("all");
                     setPage(1);
                   }}
@@ -474,7 +482,6 @@ function ProductListContent() {
                       type="button"
                       onMouseDown={(event) => event.preventDefault()}
                       onClick={() => {
-                        lockScrollPosition();
                         setSelectedBrand(brand.slug);
                         setPage(1);
                       }}
