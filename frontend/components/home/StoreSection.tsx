@@ -9,9 +9,7 @@ import { staggerContainer, fadeUp, fadeUpSlow } from "@/lib/motion-variants";
 import { STORE_COPY, STORE_IMAGES } from "@/data/home-data";
 import { COMPANY_LEGAL } from "@/data/company-legal";
 
-const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-  COMPANY_LEGAL.address,
-)}`;
+const MAPS_URL = "https://maps.app.goo.gl/igZiLjUh7upisCRM8";
 
 export default function StoreSection() {
   const [active, setActive] = useState(0);
