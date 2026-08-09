@@ -25,14 +25,14 @@ export class GetProductsDto {
     description: 'Số lượng sản phẩm trên mỗi trang',
     default: 10,
     minimum: 1,
-    maximum: 500,
+    maximum: 3000,
     type: Number,
   })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(500)
+  @Max(3000)
   limit?: number = 10;
 
   @ApiPropertyOptional({

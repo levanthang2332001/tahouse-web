@@ -455,5 +455,61 @@
         "subcategories": []
       }
     ]
+  },
+  {
+    "name": "Eurogold",
+    "slug": "eurogold",
+    "logo": "/brand/eurogold.png",
+    "logoHtml": "<span class=\"font-sans font-bold text-[#e31c23] text-[14px] select-none\">EUROGOLD</span>",
+    "categories": [
+      {
+        "slug": "phu-kien-nha-bep",
+        "name": "Phụ Kiện Nhà Bếp",
+        "subcategories": []
+      }
+    ],
+    "id": 11
+  },
+  {
+    "name": "Nobinox",
+    "slug": "nobinox",
+    "logo": "/brand/nobinox.png",
+    "logoHtml": "<span class=\"font-sans font-bold text-[#0066a1] text-[14px] select-none\">NOBINOX</span>",
+    "categories": [
+      {
+        "slug": "chau-voi-bep",
+        "name": "Chậu Vòi Bếp",
+        "subcategories": []
+      }
+    ],
+    "id": 12
+  },
+  {
+    "name": "Eurosun",
+    "slug": "eurosun",
+    "logo": "/brand/eurosun.png",
+    "logoHtml": "<span class=\"font-sans font-bold text-[#d4184f] text-[14px] select-none\">EUROSUN</span>",
+    "categories": [
+      {
+        "slug": "thiet-bi-nha-bep",
+        "name": "Thiết Bị Nhà Bếp",
+        "subcategories": []
+      }
+    ],
+    "id": 13
+  },
+  {
+    "name": "GrandX",
+    "slug": "grandx",
+    "logo": "/brand/grandx.png",
+    "logoHtml": "<span class=\"font-sans font-bold text-[#1a1a1a] text-[14px] select-none\">GRANDX</span>",
+    "categories": [
+      {
+        "slug": "thiet-bi-nha-bep",
+        "name": "Thiết Bị Nhà Bếp",
+        "subcategories": []
+      }
+    ],
+    "id": 14
   }
 ]
