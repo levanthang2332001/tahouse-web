@@ -14,6 +14,7 @@ import { COMPANY_LEGAL } from "@/data/company-legal";
 import content from "@/data/content.json";
 import { formatCurrency, formatProductPrice } from "@/data/products";
 import { fetchProduct } from "@/lib/api/products";
+import { formatProductName } from "@/lib/format-product-name";
 import type { Product } from "@/lib/types/product";
 
 type ProductDetailPageProps = {
@@ -141,6 +142,8 @@ function ProductDetailView({ id }: { id: string }) {
     window.setTimeout(() => setCopied(false), 2000);
   };
 
+  const displayName = formatProductName(product.name);
+
   return (
     <div className="min-h-screen bg-neutral text-navy">
       <Header />
@@ -151,7 +154,7 @@ function ProductDetailView({ id }: { id: string }) {
             <ChevronRight size={12} />
             <Link href="/products" className="hover:text-brand-green">Sản phẩm</Link>
             <ChevronRight size={12} />
-            <span className="truncate text-navy font-bold">{product.name}</span>
+            <span className="truncate text-navy font-bold">{displayName}</span>
           </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
@@ -164,7 +167,7 @@ function ProductDetailView({ id }: { id: string }) {
                 {heroImage ? (
                   <Image
                     src={heroImage}
-                    alt={product.name}
+                    alt={displayName}
                     fill
                     priority
                     sizes="(max-width: 1024px) 100vw, 50vw"
@@ -216,7 +219,7 @@ function ProductDetailView({ id }: { id: string }) {
               </div>
 
               <h1 className="mb-2 font-serif text-3xl font-bold leading-tight tracking-tight text-navy md:text-5xl">
-                {product.name}
+                {displayName}
               </h1>
               <p className="mb-6 text-xs uppercase tracking-widest text-navy/60">
                 {content.detail.labels.modelCodePrefix} {product.code}

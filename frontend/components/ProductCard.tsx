@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getCategoryLabel } from "@/data/catalog-taxonomy";
 import type { Product } from "@/lib/types/product";
 import { formatProductPrice } from "@/lib/format-price";
+import { formatProductName } from "@/lib/format-product-name";
 
 export default function ProductCard({
   product,
@@ -79,6 +80,7 @@ export default function ProductCard({
   const suitability = getSuitabilityText(product.id, product.category);
   const support = getSupportText(product.category);
   const categoryLabel = getCategoryLabel(product.category);
+  const displayName = formatProductName(product.name);
 
   return (
     <div className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-gray-light bg-white shadow-[0_4px_20px_rgb(0,0,0,0.01)] transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-brand-green/30">
@@ -87,7 +89,7 @@ export default function ProductCard({
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
-            alt={product.name}
+            alt={displayName}
             fill
             priority={priority}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
@@ -101,7 +103,7 @@ export default function ProductCard({
         <Link
           href={`/product/${product.id}`}
           className="absolute inset-0 z-10"
-          aria-label={`Xem chi tiết ${product.name}`}
+          aria-label={`Xem chi tiết ${displayName}`}
         />
 
         {/* Dynamic status badge */}
@@ -120,7 +122,7 @@ export default function ProductCard({
         {/* Title */}
         <Link href={`/product/${product.id}`} className="block mb-2">
           <h3 className="font-sans text-[17px] font-extrabold leading-snug text-navy hover:text-brand-green transition-colors">
-            {product.name}
+            {displayName}
           </h3>
         </Link>
 
