@@ -65,6 +65,12 @@ export const CATEGORY_LABELS: Record<string, string> = {
   "lo-vi-song": "Lò vi sóng",
   "combo-lo-nuong-lo-vi-song": "Combo lò nướng, lò vi sóng",
   "may-rua-chen": "Máy rửa chén",
+  "thiet-bi-nha-bep": "Thiết bị nhà bếp",
+  "phu-kien-nha-bep": "Phụ kiện nhà bếp",
+  "chau-voi-bep": "Chậu vòi bếp",
+  "chau-da": "Chậu đá",
+  "chau-rua-chen-inox": "Chậu rửa chén inox",
+  "voi-chau-rua-chen": "Vòi chậu rửa chén",
   "quat-tran-den-giau-canh": "Quạt trần đèn giấu cánh",
   "quat-tran-den-trang-tri": "Quạt trần đèn trang trí",
   "quat-tran-den-hien-dai": "Quạt trần đèn hiện đại",
@@ -138,6 +144,9 @@ export const SIDEBAR_SECTIONS: CatalogSection[] = [
       { id: "lo-vi-song", name: "Lò vi sóng", icon: Microwave },
       { id: "combo-lo-nuong-lo-vi-song", name: "Combo lò nướng / vi sóng", icon: Microwave },
       { id: "may-rua-chen", name: "Máy rửa chén", icon: Soup },
+      { id: "thiet-bi-nha-bep", name: "Thiết bị nhà bếp", icon: CookingPot },
+      { id: "chau-voi-bep", name: "Chậu vòi bếp", icon: Droplets },
+      { id: "phu-kien-nha-bep", name: "Phụ kiện nhà bếp", icon: Box },
     ],
   },
   {
@@ -209,4 +218,70 @@ export const SMART_SUBCATEGORY_SLUGS = new Set([
 
 export function getCategoryLabel(category: string): string {
   return CATEGORY_LABELS[category] ?? category;
+}
+
+/** Every curated sidebar slug (section parents + leaves). */
+export function collectKnownSidebarSlugs(
+  sections: CatalogSection[] = SIDEBAR_SECTIONS,
+): Set<string> {
+  const known = new Set<string>();
+  for (const section of sections) {
+    known.add(section.categoryId);
+    known.add(section.id);
+    for (const sub of section.subcategories) {
+      known.add(sub.id);
+    }
+  }
+  for (const slug of Object.keys(GROUP_BRAND_FILTERS)) {
+    known.add(slug);
+  }
+  known.add("lock-parent");
+  known.add("Lock");
+  known.add("Kitchen");
+  known.add("Water");
+  known.add("Cabinet");
+  return known;
+}
+
+type BrandCategorySource = {
+  categories?: { slug: string; name: string }[];
+};
+
+/**
+ * Keep curated menu order, then append any BE categories not yet in the sidebar
+ * so new catalog data shows up without a code deploy.
+ */
+export function buildSidebarSectionsFromBrands(
+  brands: BrandCategorySource[],
+  baseSections: CatalogSection[] = SIDEBAR_SECTIONS,
+): CatalogSection[] {
+  const known = collectKnownSidebarSlugs(baseSections);
+  const extras: CatalogSubcategory[] = [];
+  const seen = new Set<string>();
+
+  for (const brand of brands) {
+    for (const category of brand.categories ?? []) {
+      const slug = category.slug?.trim();
+      if (!slug || known.has(slug) || seen.has(slug)) continue;
+      seen.add(slug);
+      extras.push({
+        id: slug,
+        name: category.name?.trim() || getCategoryLabel(slug),
+        icon: Box,
+      });
+    }
+  }
+
+  if (extras.length === 0) return baseSections;
+
+  return [
+    ...baseSections,
+    {
+      id: "danh-muc-moi",
+      title: "DANH MỤC MỚI",
+      icon: Box,
+      categoryId: "extras-group",
+      subcategories: extras,
+    },
+  ];
 }

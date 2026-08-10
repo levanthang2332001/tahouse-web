@@ -19,7 +19,9 @@ export async function fetchProducts(
   params: GetProductsParams = {},
 ): Promise<ProductsListResponse> {
   const query = buildSearchParams(params);
-  const res = await fetch(`/api/products${query ? `?${query}` : ""}`);
+  const res = await fetch(`/api/products${query ? `?${query}` : ""}`, {
+    cache: "no-store",
+  });
   if (!res.ok) {
     throw new Error("Không thể tải danh sách sản phẩm");
   }
@@ -27,7 +29,9 @@ export async function fetchProducts(
 }
 
 export async function fetchProduct(idOrCode: string): Promise<Product> {
-  const res = await fetch(`/api/products/${encodeURIComponent(idOrCode)}`);
+  const res = await fetch(`/api/products/${encodeURIComponent(idOrCode)}`, {
+    cache: "no-store",
+  });
   if (res.status === 404) {
     throw new Error("NOT_FOUND");
   }
@@ -38,7 +42,7 @@ export async function fetchProduct(idOrCode: string): Promise<Product> {
 }
 
 export async function fetchBrands(): Promise<Brand[]> {
-  const res = await fetch("/api/brands");
+  const res = await fetch("/api/brands", { cache: "no-store" });
   if (!res.ok) {
     throw new Error("Không thể tải danh sách thương hiệu");
   }

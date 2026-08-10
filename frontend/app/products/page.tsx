@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, startTransition, useEffect, useRef, useState } from "react";
+import React, { Suspense, startTransition, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ListFilter, Search, X } from "lucide-react";
@@ -10,19 +10,23 @@ import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import BrandLogo from "@/components/BrandLogo";
 import SocialFloating from "@/components/SocialFloating";
-import { getCategoryLabel, SIDEBAR_SECTIONS } from "@/data/catalog-taxonomy";
+import { getCategoryLabel, SIDEBAR_SECTIONS, buildSidebarSectionsFromBrands } from "@/data/catalog-taxonomy";
 import { getProductListKey } from "@/lib/backend/map-product";
 import { fetchBrands, fetchProducts } from "@/lib/api/products";
 import { filterBrandsForCategory, mapFilterToApiParams } from "@/lib/product-filters";
 import type { Brand, Product } from "@/lib/types/product";
 import { MAX_PRODUCT_PRICE } from "@/lib/types/product";
+import type { CatalogSection } from "@/data/catalog-taxonomy";
 
 const GRID_COLUMNS = 3;
 const PAGE_SIZE = GRID_COLUMNS * 7; // 21 sản phẩm = 7 hàng × 3 cột
 
-function getActiveCatalogLabel(filter: string): string {
+function getActiveCatalogLabel(
+  filter: string,
+  sections: CatalogSection[] = SIDEBAR_SECTIONS,
+): string {
   if (filter === "all") return "Tất cả sản phẩm";
-  for (const section of SIDEBAR_SECTIONS) {
+  for (const section of sections) {
     if (section.categoryId === filter) return section.title;
     const sub = section.subcategories.find((item) => item.id === filter);
     if (sub) return sub.name;
@@ -108,6 +112,25 @@ function ProductListContent() {
     Object.fromEntries(SIDEBAR_SECTIONS.map((section, index) => [section.id, index === 0])),
   );
   const [isCategorySheetOpen, setIsCategorySheetOpen] = useState(false);
+
+  const sidebarSections = useMemo(
+    () => buildSidebarSectionsFromBrands(brands),
+    [brands],
+  );
+
+  useEffect(() => {
+    setExpandedSections((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      sidebarSections.forEach((section, index) => {
+        if (next[section.id] === undefined) {
+          next[section.id] = index === 0 && Object.keys(prev).length === 0;
+          changed = true;
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, [sidebarSections]);
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => ({
@@ -342,7 +365,7 @@ function ProductListContent() {
         </span>
       </button>
 
-      {SIDEBAR_SECTIONS.map((section) => {
+      {sidebarSections.map((section) => {
         const SectionIcon = section.icon;
         const isExpanded = expandedSections[section.id];
         const isParentActive =
@@ -526,7 +549,7 @@ function ProductListContent() {
                       Danh mục
                     </span>
                     <span className="block truncate text-sm font-extrabold text-navy">
-                      {getActiveCatalogLabel(filter)}
+                      {getActiveCatalogLabel(filter, sidebarSections)}
                     </span>
                   </span>
                 </span>
@@ -558,7 +581,7 @@ function ProductListContent() {
                             Chọn danh mục
                           </p>
                           <p className="text-sm font-extrabold text-navy">
-                            {getActiveCatalogLabel(filter)}
+                            {getActiveCatalogLabel(filter, sidebarSections)}
                           </p>
                         </div>
                         <button

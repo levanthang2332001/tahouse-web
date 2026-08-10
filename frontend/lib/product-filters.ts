@@ -1,8 +1,8 @@
 import {
   GROUP_BRAND_FILTERS,
   LOCK_CATEGORY_SLUGS,
-  SIDEBAR_SECTIONS,
   SMART_SUBCATEGORY_SLUGS,
+  buildSidebarSectionsFromBrands,
 } from "@/data/catalog-taxonomy";
 import type { Brand } from "@/lib/types/product";
 
@@ -23,14 +23,82 @@ export const KITCHEN_CATEGORY_SLUGS = [
   "lo-vi-song",
   "combo-lo-nuong-lo-vi-song",
   "may-rua-chen",
+  "thiet-bi-nha-bep",
+  "chau-voi-bep",
+  "phu-kien-nha-bep",
 ] as const;
+
+const NON_KITCHEN_CATEGORY_SLUGS = new Set([
+  "lock-parent",
+  "Lock",
+  "dai-sanh",
+  "cua-go",
+  "cua-kinh",
+  "xingfa-sat",
+  "cua-cong",
+  "khach-san",
+  "Smart",
+  "ket-sat",
+  "ket-mini",
+  "ket-gia-dinh",
+  "ket-van-phong",
+  "quat-tran-den-hien-dai",
+  "quat-tran-den-giau-canh",
+  "quat-tran-den-trang-tri",
+  "den-op-quat-trang-tri",
+  "may-dien-giai",
+  "may-nong-lanh",
+  "may-nong-nguoi",
+  "may-ro-tu-dung",
+  "may-de-gam",
+  "cay-nuoc",
+  "cua-phang",
+  "cua-nep-kim-loai",
+  "cua-o-kinh",
+  "cua-chi-noi",
+  "cua-hut-huynh",
+  "cua-vom",
+  "cua-canh-lech",
+  "cua-son",
+  "cua-nhom-kinh",
+]);
+
+type BrandCategorySource = {
+  categories?: { slug: string; name?: string }[];
+};
+
+/**
+ * Expand kitchen merge list with any new BE categories that belong to
+ * brands already selling kitchen items (auto-picks up new catalog data).
+ */
+export function resolveKitchenCategorySlugs(
+  brands: BrandCategorySource[] = [],
+): string[] {
+  const slugs = new Set<string>(KITCHEN_CATEGORY_SLUGS);
+  if (brands.length === 0) return [...slugs];
+
+  for (const brand of brands) {
+    const categories = brand.categories ?? [];
+    const sellsKitchen = categories.some((category) =>
+      slugs.has(category.slug),
+    );
+    if (!sellsKitchen) continue;
+    for (const category of categories) {
+      const slug = category.slug?.trim();
+      if (!slug || NON_KITCHEN_CATEGORY_SLUGS.has(slug)) continue;
+      slugs.add(slug);
+    }
+  }
+
+  return [...slugs];
+}
 
 export type ApiFilterParams = {
   category?: string;
   subcategory?: string;
   brand?: string;
   /** Expands to multiple BE category queries and merges results. */
-  group?: "kitchen";
+  group?: "kitchen" | "extras";
 };
 
 /** Map FE sidebar filter slug to backend query params. */
@@ -39,6 +107,10 @@ export function mapFilterToApiParams(filter: string): ApiFilterParams {
 
   if (filter === "kitchen-group") {
     return { group: "kitchen" };
+  }
+
+  if (filter === "extras-group") {
+    return { group: "extras" };
   }
 
   const groupBrand = GROUP_BRAND_FILTERS[filter];
@@ -67,7 +139,10 @@ export function mapFilterToApiParams(filter: string): ApiFilterParams {
 }
 
 /** Category slugs used to decide which brands appear for the current menu filter. */
-export function getBrandMatchCategorySlugs(filter: string): string[] | null {
+export function getBrandMatchCategorySlugs(
+  filter: string,
+  brands: Brand[] = [],
+): string[] | null {
   if (!filter || filter === "all") return null;
 
   if (filter === "lock-parent" || filter === "Lock") {
@@ -83,10 +158,18 @@ export function getBrandMatchCategorySlugs(filter: string): string[] | null {
   }
 
   if (filter === "kitchen-group") {
-    return [...KITCHEN_CATEGORY_SLUGS];
+    return resolveKitchenCategorySlugs(brands);
   }
 
-  const section = SIDEBAR_SECTIONS.find(
+  if (filter === "extras-group") {
+    const extras = buildSidebarSectionsFromBrands(brands).find(
+      (section) => section.id === "danh-muc-moi",
+    );
+    return extras?.subcategories.map((sub) => sub.id) ?? [];
+  }
+
+  const sections = buildSidebarSectionsFromBrands(brands);
+  const section = sections.find(
     (item) =>
       item.categoryId === filter ||
       item.subcategories.some((sub) => sub.id === filter),
@@ -104,7 +187,7 @@ export function filterBrandsForCategory(
   brands: Brand[],
   filter: string,
 ): Brand[] {
-  const slugs = getBrandMatchCategorySlugs(filter);
+  const slugs = getBrandMatchCategorySlugs(filter, brands);
   if (!slugs) return brands;
 
   const slugSet = new Set(slugs);
