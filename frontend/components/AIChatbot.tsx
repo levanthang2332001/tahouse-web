@@ -178,7 +178,7 @@ function WelcomeContent() {
 // ---------------------------------------------------------------------------
 function BotAvatar() {
   return (
-    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full overflow-hidden border border-brand-green/15 shadow-sm">
+    <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full overflow-hidden border border-brand-green/15 shadow-sm">
       <img src="/logoTAicon.svg" alt="TA House Icon" className="h-full w-full object-contain" />
     </div>
   );
@@ -309,54 +309,75 @@ export default function AIChatbot() {
     <>
       {/* Floating trigger button */}
       {!isChatbotOpen && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2">
+        <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 flex items-center gap-2">
           <button
             onClick={() => setIsChatbotOpen(true)}
-            className="flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-brand-green text-white shadow-[0_10px_30px_rgba(121,193,67,0.4)] transition-all hover:bg-lime-dark hover:scale-105"
+            className="flex h-14 w-14 sm:h-16 sm:w-16 cursor-pointer items-center justify-center rounded-full bg-brand-green text-white shadow-[0_10px_30px_rgba(121,193,67,0.4)] transition-all hover:bg-lime-dark hover:scale-105 active:scale-95"
             aria-label="Mở khung tư vấn trực tuyến"
           >
-            <MessageCircle className="h-8 w-8 stroke-[2.2]" />
+            <MessageCircle className="h-7 w-7 sm:h-8 sm:w-8 stroke-[2.2]" />
           </button>
         </div>
       )}
 
-      {/* Chat window */}
+      {/* Backdrop overlay on mobile */}
       <AnimatePresence>
         {isChatbotOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsChatbotOpen(false)}
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs sm:hidden"
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Chat window - Responsive: Bottom sheet on mobile (<640px), Floating card on desktop (>=640px) */}
+      <AnimatePresence>
+        {isChatbotOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: "100%", scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 40, scale: 0.95 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed bottom-6 right-6 z-50 flex h-[640px] w-[94vw] max-w-[400px] flex-col overflow-hidden rounded-[28px] bg-cream shadow-2xl"
+            exit={{ opacity: 0, y: "100%", scale: 0.96 }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-x-0 bottom-0 z-50 flex h-[86dvh] max-h-[86dvh] w-full flex-col overflow-hidden rounded-t-[28px] bg-cream shadow-2xl sm:inset-auto sm:bottom-6 sm:right-6 sm:h-[620px] sm:max-h-[640px] sm:w-[400px] sm:max-w-[400px] sm:rounded-[28px]"
           >
-            {/* Header */}
-            <div className="flex h-[72px] shrink-0 items-center justify-between bg-[#092f3a] px-5 text-white shadow-md">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl overflow-hidden shadow-xs">
-                  <img src="/logoTAicon.svg" alt="TA House Icon" className="h-full w-full object-contain" />
-                </div>
-                <div>
-                  <h3 className="font-sans text-[15px] font-black uppercase tracking-wider text-white">
-                    TA HOUSE
-                  </h3>
-                  <span className="text-[11px] font-medium text-brand-green">
-                    Trợ lý tư vấn giải pháp
-                  </span>
-                </div>
+            {/* Header with mobile drag indicator */}
+            <div className="flex flex-col shrink-0 bg-[#092f3a] text-white shadow-md">
+              {/* Mobile grab handle */}
+              <div className="flex justify-center pt-2 pb-1 sm:hidden">
+                <div className="h-1 w-10 rounded-full bg-white/30" />
               </div>
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1.5 text-[11px] font-medium text-cream/90 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/25">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-                  Đang online
-                </span>
-                <button
-                  onClick={() => setIsChatbotOpen(false)}
-                  className="cursor-pointer rounded-lg p-1 text-cream/80 transition-colors hover:bg-white/10 hover:text-white"
-                  aria-label="Đóng chat"
-                >
-                  <X className="h-5 w-5 stroke-[2.2]" />
-                </button>
+
+              <div className="flex h-15 sm:h-16 items-center justify-between px-4 sm:px-5">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl overflow-hidden shadow-xs">
+                    <img src="/logoTAicon.svg" alt="TA House Icon" className="h-full w-full object-contain" />
+                  </div>
+                  <div>
+                    <h3 className="font-sans text-[14px] sm:text-[15px] font-black uppercase tracking-wider text-white leading-tight">
+                      TA HOUSE
+                    </h3>
+                    <span className="text-[10px] sm:text-[11px] font-medium text-brand-green">
+                      Trợ lý tư vấn giải pháp
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-medium text-cream/90 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/25">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+                    Online
+                  </span>
+                  <button
+                    onClick={() => setIsChatbotOpen(false)}
+                    className="cursor-pointer rounded-lg p-1.5 text-cream/80 transition-colors hover:bg-white/10 hover:text-white"
+                    aria-label="Đóng chat"
+                  >
+                    <X className="h-5 w-5 stroke-[2.2]" />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -369,11 +390,11 @@ export default function AIChatbot() {
               className="hidden"
             />
 
-            {/* Message list */}
+            {/* Message list - dynamically scrolls without breaking layout */}
             <div
               ref={messagesContainerRef}
               data-lenis-prevent
-              className="flex-1 min-h-0 overflow-y-auto overscroll-contain bg-warm-cream/50 px-4 py-5 space-y-6 invisible-scrollbar"
+              className="flex-1 min-h-0 overflow-y-auto overscroll-contain bg-warm-cream/50 px-3.5 sm:px-4 py-4 sm:py-5 space-y-5 invisible-scrollbar"
             >
               {messages.map((msg) => {
                 if (msg.sender === "ai" && msg.streaming && !msg.content) {
@@ -383,9 +404,9 @@ export default function AIChatbot() {
                 return (
                 <div key={msg.id} className="space-y-1">
                   {msg.sender === "ai" ? (
-                    <div className="flex w-full min-w-0 gap-2.5 items-start">
+                    <div className="flex w-full min-w-0 gap-2 sm:gap-2.5 items-start">
                       <BotAvatar />
-                      <div className="min-w-0 max-w-[min(78%,calc(100%-2.75rem))] overflow-hidden rounded-2xl rounded-tl-sm border border-gray-light bg-white p-4 shadow-xs">
+                      <div className="min-w-0 max-w-[min(82%,calc(100%-2.5rem))] overflow-hidden rounded-2xl rounded-tl-sm border border-gray-light bg-white p-3.5 sm:p-4 shadow-xs">
                         {msg.id === "welcome" ? (
                           <WelcomeContent />
                         ) : (
@@ -398,7 +419,7 @@ export default function AIChatbot() {
                     </div>
                   ) : (
                     <div className="flex justify-end">
-                      <div className="min-w-0 max-w-[80%] overflow-hidden break-words rounded-2xl rounded-tr-sm bg-brand-green p-4 font-sans text-[13px] font-semibold leading-relaxed text-white shadow-sm [overflow-wrap:anywhere]">
+                      <div className="min-w-0 max-w-[82%] overflow-hidden break-words rounded-2xl rounded-tr-sm bg-brand-green p-3.5 sm:p-4 font-sans text-[13px] font-semibold leading-relaxed text-white shadow-sm [overflow-wrap:anywhere]">
                         <p className="text-left whitespace-pre-wrap">{msg.content}</p>
                         <span className="block mt-2 text-right text-[9px] font-semibold text-white/70">
                           {msg.time}
@@ -410,7 +431,7 @@ export default function AIChatbot() {
                 );
               })}
 
-              {/* Typing indicator while waiting for first stream chunk */}
+              {/* Typing indicator */}
               {isTyping && !messages.some((msg) => msg.streaming && msg.content) && (
                 <div className="flex gap-2.5 items-start">
                   <BotAvatar />
@@ -424,18 +445,18 @@ export default function AIChatbot() {
             </div>
 
             {/* Input bar */}
-            <div className="shrink-0 bg-white px-4 pb-2 pt-1">
+            <div className="shrink-0 bg-white px-3.5 sm:px-4 pb-2 pt-1.5 border-t border-gray-light/40">
               <form
                 onSubmit={handleSubmit}
-                className="flex items-center gap-2 rounded-full border border-gray-light bg-cream/45 px-4.5 py-1.5 focus-within:border-brand-green/60"
+                className="flex items-center gap-2 rounded-full border border-gray-light bg-cream/45 px-3.5 sm:px-4.5 py-1.5 focus-within:border-brand-green/60"
               >
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Nhập tin nhắn của bạn..."
+                  placeholder="Nhập tin nhắn..."
                   disabled={isTyping}
-                  className="flex-1 border-none bg-transparent py-1.5 text-[12px] font-semibold text-navy placeholder-navy/35 focus:outline-none disabled:opacity-50"
+                  className="flex-1 min-w-0 border-none bg-transparent py-1 text-[13px] font-semibold text-navy placeholder-navy/35 focus:outline-none disabled:opacity-50"
                 />
                 <button
                   type="button"
@@ -457,18 +478,18 @@ export default function AIChatbot() {
               </form>
             </div>
 
-            {/* Guarantee banner */}
-            <div className="flex h-11 shrink-0 items-center justify-around bg-[#F5F1EA]/70 px-2 text-[10px] font-bold text-navy/80">
+            {/* Guarantee banner with safe-area padding for mobile */}
+            <div className="flex h-10 sm:h-11 shrink-0 items-center justify-around bg-[#F5F1EA]/80 px-2 pb-[env(safe-area-inset-bottom,0px)] text-[9px] sm:text-[10px] font-bold text-navy/80 border-t border-gray-light/30">
               <div className="flex items-center gap-1">
-                <Smartphone className="h-3.5 w-3.5 text-brand-green" />
+                <Smartphone className="h-3.5 w-3.5 text-brand-green shrink-0" />
                 <span>Tư vấn miễn phí</span>
               </div>
               <div className="flex items-center gap-1">
-                <HouseIcon className="h-3.5 w-3.5 text-brand-green" />
+                <HouseIcon className="h-3.5 w-3.5 text-brand-green shrink-0" />
                 <span>Khảo sát tận nơi</span>
               </div>
               <div className="flex items-center gap-1">
-                <ShieldCheck className="h-3.5 w-3.5 text-brand-green" />
+                <ShieldCheck className="h-3.5 w-3.5 text-brand-green shrink-0" />
                 <span>Bảo hành chính hãng</span>
               </div>
             </div>

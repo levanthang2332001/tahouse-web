@@ -13,9 +13,17 @@ export function formatProductPrice(
   priceRange?: string | null,
 ): string {
   const numeric = parseProductPrice(price);
-  if (numeric !== null) {
-    return `${numeric.toLocaleString("vi-VN")}đ`;
+  if (numeric !== null && numeric > 0) {
+    return `${numeric.toLocaleString("vi-VN")} đ`;
   }
-  if (priceRange?.trim()) return priceRange;
+  if (
+    priceRange?.trim() &&
+    priceRange.trim() !== "0" &&
+    priceRange.trim() !== "0 VNĐ" &&
+    priceRange.trim() !== "0đ"
+  ) {
+    return priceRange.trim();
+  }
   return "Liên hệ";
 }
+

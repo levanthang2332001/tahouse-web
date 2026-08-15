@@ -8,8 +8,34 @@ import { COMPANY_LEGAL } from "@/data/company-legal";
 import { POLICY_CORE_LINKS } from "@/data/policies";
 
 const SOCIAL_LINKS = [
-  { href: COMPANY_LEGAL.facebookUrl, icon: Facebook, label: "Facebook", iconClass: "h-3.5 w-3.5" },
-  { href: COMPANY_LEGAL.zaloUrl, icon: ZaloIcon, label: "Zalo", iconClass: undefined },
+  {
+    href: COMPANY_LEGAL.facebookUrl,
+    icon: Facebook,
+    label: "Facebook Fanpage",
+    bgColor: "bg-[#1877F2] hover:bg-[#166fe5]",
+    iconClass: "h-4.5 w-4.5 text-white",
+  },
+  {
+    href: COMPANY_LEGAL.zaloUrl,
+    icon: ZaloIcon,
+    label: "Zalo OA",
+    bgColor: "bg-[#0068FF] hover:bg-[#0056d6]",
+    iconClass: "h-4.5 w-4.5 text-white",
+  },
+  {
+    href: `tel:${COMPANY_LEGAL.phoneTel}`,
+    icon: Phone,
+    label: `Hotline ${COMPANY_LEGAL.phone}`,
+    bgColor: "bg-rose-600 hover:bg-rose-700",
+    iconClass: "h-4.5 w-4.5 text-white",
+  },
+  {
+    href: `mailto:${COMPANY_LEGAL.email}`,
+    icon: Mail,
+    label: `Email ${COMPANY_LEGAL.email}`,
+    bgColor: "bg-teal-600 hover:bg-teal-700",
+    iconClass: "h-4.5 w-4.5 text-white",
+  },
 ] as const;
 
 const SERVICE_LINKS = [
@@ -54,17 +80,18 @@ export default function Footer() {
               Tư vấn giải pháp thiết bị bếp, phụ kiện tủ bếp, khóa điện tử và két sắt thông minh phù
               hợp từng gia đình.
             </p>
-            <div className="flex gap-2.5">
-              {SOCIAL_LINKS.map(({ href, icon: Icon, label, iconClass }) => (
+            <div className="flex flex-wrap items-center gap-2.5">
+              {SOCIAL_LINKS.map(({ href, icon: Icon, label, bgColor, iconClass }) => (
                 <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-cream transition-all hover:scale-105 hover:bg-brand-green"
+                  className={`flex h-9 w-9 items-center justify-center rounded-xl ${bgColor} shadow-sm transition-all duration-200 hover:scale-110 hover:shadow-md active:scale-95`}
+                  title={label}
                   aria-label={label}
                 >
-                  <Icon {...(iconClass ? { className: iconClass } : {})} />
+                  <Icon className={iconClass} />
                 </a>
               ))}
             </div>

@@ -9,14 +9,19 @@ export default function SmoothScroll() {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
+    // Không can thiệp scroll trên màn hình cảm ứng để giữ 120Hz native scrolling
+    const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    if (isTouch) {
+      return;
+    }
+
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 0.7,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 1.5,
+      wheelMultiplier: 0.9,
       infinite: false,
     });
 
@@ -59,15 +64,6 @@ export default function SmoothScroll() {
 
     document.addEventListener("click", handleAnchorClick);
 
-    if (window.location.hash) {
-      setTimeout(() => {
-        const targetElement = document.querySelector(window.location.hash);
-        if (targetElement instanceof HTMLElement) {
-          lenis.scrollTo(targetElement, { immediate: false, offset: -20 });
-        }
-      }, 300);
-    }
-
     return () => {
       cancelAnimationFrame(rafId);
       document.removeEventListener("click", handleAnchorClick);
@@ -78,15 +74,7 @@ export default function SmoothScroll() {
     };
   }, []);
 
-  // Mỗi lần đổi route → về đầu trang (tránh giật vị trí cũ / sticky nhảy)
-  useEffect(() => {
-    const lenis = lenisRef.current;
-    if (lenis) {
-      lenis.scrollTo(0, { immediate: true });
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" in window ? "instant" : "auto" });
-    }
-  }, [pathname]);
-
   return null;
 }
+
+

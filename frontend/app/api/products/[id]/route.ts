@@ -13,6 +13,23 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     const data = await backendFetch<Product>(
       `/products/locks/${encodeURIComponent(id)}`,
     );
+
+    // If installation_preview is empty, check /installation sub-endpoint for real jobsite photos
+    if (!data.installation_preview || data.installation_preview.length === 0) {
+      try {
+        const installData = await backendFetch<{
+          items?: Array<{ url: string; type: string }>;
+        }>(`/products/locks/${encodeURIComponent(id)}/installation`);
+        if (installData?.items && installData.items.length > 0) {
+          data.installation_preview = installData.items
+            .filter((item) => item.type === "image" && Boolean(item.url))
+            .map((item) => item.url);
+        }
+      } catch {
+        // Soft-fail: product might not have an installation record
+      }
+    }
+
     return NextResponse.json(mapProductDetail(data));
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
@@ -35,3 +52,4 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     );
   }
 }
+
