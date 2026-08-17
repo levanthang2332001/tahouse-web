@@ -37,14 +37,21 @@ function getActiveCatalogLabel(
 function ProductCardSkeleton() {
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-[24px] border border-gray-light bg-white animate-pulse">
-      <div className="aspect-[1.4] w-full bg-neutral/45" />
-      <div className="flex flex-col gap-3 p-4.5">
-        <div className="h-2 w-16 rounded bg-neutral/40" />
-        <div className="h-4 w-full rounded bg-neutral/45" />
-        <div className="h-3 w-4/5 rounded bg-neutral/35" />
-        <div className="h-3 w-3/5 rounded bg-neutral/35" />
-        <div className="mt-2 h-5 w-24 rounded bg-neutral/45" />
-        <div className="mt-4 h-10 w-full rounded-xl bg-neutral/40" />
+      <div className="aspect-[1.35] w-full bg-neutral/45" />
+      <div className="flex flex-col gap-2.5 p-4 sm:p-4.5">
+        <div className="flex justify-between items-center">
+          <div className="h-2.5 w-16 rounded bg-neutral/40" />
+          <div className="h-2.5 w-12 rounded bg-neutral/35" />
+        </div>
+        <div className="h-4.5 w-full rounded bg-neutral/45" />
+        <div className="h-4 w-3/4 rounded bg-neutral/45" />
+        <div className="space-y-1.5 my-1">
+          <div className="h-3 w-4/5 rounded bg-neutral/35" />
+          <div className="h-3 w-3/5 rounded bg-neutral/35" />
+        </div>
+        <div className="h-16 w-full rounded-2xl bg-neutral/30" />
+        <div className="h-7 w-full rounded-xl bg-neutral/30" />
+        <div className="mt-2 h-10 w-full rounded-xl bg-neutral/40" />
       </div>
     </div>
   );

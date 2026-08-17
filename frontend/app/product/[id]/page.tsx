@@ -30,6 +30,8 @@ import {
   ZoomIn,
   ZoomOut,
   X,
+  Flame,
+  Gift,
 } from "lucide-react";
 import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
@@ -40,6 +42,7 @@ import { useApp } from "@/context/AppContext";
 import { COMPANY_LEGAL } from "@/data/company-legal";
 import content from "@/data/content.json";
 import { formatCurrency, formatProductPrice } from "@/data/products";
+import { calculateProductDiscount } from "@/lib/format-price";
 import { fetchProduct } from "@/lib/api/products";
 import { formatProductName } from "@/lib/format-product-name";
 import type { Product } from "@/lib/types/product";
@@ -352,14 +355,15 @@ function ProductDetailView({ id }: { id: string }) {
       : installWorkflow.steps;
   const warrantyNote = installWorkflow.warrantyNote;
 
+  const discountInfo = calculateProductDiscount(
+    product.price,
+    product.originalPrice,
+    product.priceRange,
+    product.id,
+  );
   const hasNumericPrice = typeof product.price === "number" && product.price > 0;
-  const showDiscount =
-    hasNumericPrice &&
-    typeof product.originalPrice === "number" &&
-    product.originalPrice > product.price!;
-  const discountPercent = showDiscount
-    ? Math.round(((product.originalPrice! - product.price!) / product.originalPrice!) * 100)
-    : 0;
+  const showDiscount = discountInfo.hasDiscount;
+  const discountPercent = discountInfo.discountPercent;
 
   // Genuine blueprint / dimension diagram detection
   const dimensionImage = galleryImages.find((img) => {
@@ -609,26 +613,41 @@ function ProductDetailView({ id }: { id: string }) {
                 </div>
 
                 {/* Price Box */}
-                <div className="rounded-2xl bg-rose-50/50 border border-rose-100 p-4 mb-4">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-navy/60 mb-0.5">
-                    {hasNumericPrice ? "Giá Khuyến Mãi" : "Giá Tham Khảo"}
-                  </div>
-                  <div className="flex flex-wrap items-baseline gap-2.5">
-                    <span className="text-2xl font-black text-rose-600 sm:text-3xl">
-                      {hasNumericPrice
-                        ? formatCurrency(product.price!)
-                        : formatProductPrice(product.price, product.priceRange)}
+                <div className="rounded-2xl bg-[#FAF9F5] border border-gray-light/70 p-4 mb-4">
+                  <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-navy/60 mb-1.5">
+                    <span className="flex items-center gap-1.5 text-navy/70">
+                      <Flame size={14} className="text-rose-600 fill-rose-600" />
+                      <span>{hasNumericPrice ? (showDiscount ? "Giá Ưu Đãi Hôm Nay" : "Giá Niêm Yết") : "Báo Giá Ưu Đãi"}</span>
                     </span>
-                    {showDiscount && (
-                      <span className="text-sm font-semibold text-zinc-400 line-through">
-                        {formatCurrency(product.originalPrice!)}
+                    {showDiscount && discountInfo.formattedSavedAmount && (
+                      <span className="rounded-md bg-rose-50 border border-rose-200/60 px-2 py-0.5 text-[10px] font-bold text-rose-700">
+                        Tiết kiệm {discountInfo.formattedSavedAmount}
                       </span>
                     )}
+                  </div>
+                  <div className="flex flex-wrap items-baseline gap-3">
+                    <span className="text-2xl font-black text-rose-600 sm:text-3xl tracking-tight leading-none">
+                      {discountInfo.formattedCurrentPrice}
+                    </span>
                     {showDiscount && (
-                      <span className="rounded bg-rose-600 px-2 py-0.5 text-[11px] font-extrabold text-white">
+                      <span className="rounded-md bg-rose-600 px-2 py-0.5 text-[11px] font-black text-white">
                         -{discountPercent}%
                       </span>
                     )}
+                  </div>
+                  {showDiscount && discountInfo.formattedOriginalPrice && (
+                    <div className="mt-2 flex items-center gap-2 text-xs font-medium text-navy/55 border-t border-gray-light/50 pt-2">
+                      <span>Giá gốc niêm yết:</span>
+                      <span className="text-sm font-bold text-zinc-400 line-through">
+                        {discountInfo.formattedOriginalPrice}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* PROMO GIFT / PERK STRIP (Tông cam ấm áp) */}
+                  <div className="mt-3 flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/25 px-3 py-2 text-xs font-bold text-amber-800">
+                    <Gift size={14} className="text-amber-600 shrink-0" />
+                    <span>Tặng gói tư vấn, khảo sát đố cửa & công lắp đặt tận nơi</span>
                   </div>
                 </div>
 
