@@ -3,11 +3,11 @@
 import React, { Suspense, startTransition, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, ListFilter, Search, X } from "lucide-react";
+import { ChevronDown, ListFilter, Search, X, Grid3X3, LayoutGrid, List } from "lucide-react";
 import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import ProductCard from "@/components/ProductCard";
+import ProductCard, { type ProductViewMode } from "@/components/ProductCard";
 import BrandLogo from "@/components/BrandLogo";
 import SocialFloating from "@/components/SocialFloating";
 import { getCategoryLabel, SIDEBAR_SECTIONS, buildSidebarSectionsFromBrands } from "@/data/catalog-taxonomy";
@@ -106,6 +106,7 @@ function ProductListContent() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [debouncedSearch, setDebouncedSearch] = useState(qParam);
+  const [viewMode, setViewMode] = useState<ProductViewMode>("grid");
 
   // Dual-range price filter states
   const [minPrice, setMinPrice] = useState(0);
@@ -856,6 +857,49 @@ function ProductListContent() {
                     )}
                   </AnimatePresence>
                 </div>
+
+                {/* 3. View Mode Switcher (Lưới lớn 2 cột / Lưới vừa 3 cột / Danh sách hàng ngang) */}
+                <div className="flex items-center rounded-xl bg-white border border-gray-light/60 p-0.5 shadow-xs">
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("grid-large")}
+                    className={`p-2 rounded-lg transition-all cursor-pointer ${
+                      viewMode === "grid-large"
+                        ? "bg-brand-green text-white shadow-xs"
+                        : "text-navy/60 hover:text-navy hover:bg-neutral"
+                    }`}
+                    title="Hiển thị thẻ to (2 cột)"
+                    aria-label="Hiển thị thẻ to (2 cột)"
+                  >
+                    <LayoutGrid size={15} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("grid")}
+                    className={`p-2 rounded-lg transition-all cursor-pointer ${
+                      viewMode === "grid"
+                        ? "bg-brand-green text-white shadow-xs"
+                        : "text-navy/60 hover:text-navy hover:bg-neutral"
+                    }`}
+                    title="Hiển thị lưới vừa (3 cột)"
+                    aria-label="Hiển thị lưới vừa (3 cột)"
+                  >
+                    <Grid3X3 size={15} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("list")}
+                    className={`p-2 rounded-lg transition-all cursor-pointer ${
+                      viewMode === "list"
+                        ? "bg-brand-green text-white shadow-xs"
+                        : "text-navy/60 hover:text-navy hover:bg-neutral"
+                    }`}
+                    title="Hiển thị dạng danh sách (Hàng ngang)"
+                    aria-label="Hiển thị dạng danh sách (Hàng ngang)"
+                  >
+                    <List size={15} />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -866,9 +910,13 @@ function ProductListContent() {
             )}
 
             <div
-              className={`grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8 md:items-stretch ${
-                loading && products.length > 0 ? "opacity-60 pointer-events-none" : ""
-              }`}
+              className={`${
+                viewMode === "list"
+                  ? "flex flex-col gap-4.5 w-full"
+                  : viewMode === "grid-large"
+                    ? "grid grid-cols-1 md:grid-cols-2 gap-7 md:items-stretch"
+                    : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:items-stretch"
+              } ${loading && products.length > 0 ? "opacity-60 pointer-events-none" : ""}`}
             >
               {loading && products.length === 0 ? (
                 Array.from({ length: PAGE_SIZE }).map((_, index) => (
@@ -881,15 +929,17 @@ function ProductListContent() {
                       key={getProductListKey(product, index)}
                       product={product}
                       priority={index < GRID_COLUMNS}
+                      viewMode={viewMode}
                     />
                   ))}
-                  {Array.from({ length: gridPlaceholders }).map((_, index) => (
-                    <div
-                      key={`grid-placeholder-${index}`}
-                      className="hidden md:block"
-                      aria-hidden="true"
-                    />
-                  ))}
+                  {viewMode === "grid" &&
+                    Array.from({ length: gridPlaceholders }).map((_, index) => (
+                      <div
+                        key={`grid-placeholder-${index}`}
+                        className="hidden md:block"
+                        aria-hidden="true"
+                      />
+                    ))}
                 </>
               )}
             </div>
