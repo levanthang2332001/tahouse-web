@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getProductById } from "@/lib/admin/product-store";
 import { backendFetch } from "@/lib/backend/client";
 import { mapProductDetail } from "@/lib/backend/map-product";
 import type { Product } from "@/lib/types/product";
@@ -10,6 +11,13 @@ type RouteContext = {
 export async function GET(_request: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
+
+    // Check local product store first
+    const local = await getProductById(id);
+    if (local) {
+      return NextResponse.json(mapProductDetail(local));
+    }
+
     const data = await backendFetch<Product>(
       `/products/locks/${encodeURIComponent(id)}`,
     );
@@ -52,4 +60,3 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     );
   }
 }
-
