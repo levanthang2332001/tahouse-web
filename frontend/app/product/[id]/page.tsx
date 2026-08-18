@@ -9,7 +9,6 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  MessageCircle,
   Phone,
   Share2,
   Sparkles,
@@ -41,7 +40,6 @@ import { SiZalo } from "react-icons/si";
 import { useApp } from "@/context/AppContext";
 import { COMPANY_LEGAL } from "@/data/company-legal";
 import content from "@/data/content.json";
-import { formatCurrency, formatProductPrice } from "@/data/products";
 import { calculateProductDiscount } from "@/lib/format-price";
 import { fetchProduct } from "@/lib/api/products";
 import { formatProductName } from "@/lib/format-product-name";
@@ -216,13 +214,13 @@ function ProductDetailView({ id }: { id: string }) {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
   const [isZoomedIn, setIsZoomedIn] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const { addToRecentlyViewed, setIsChatbotOpen } = useApp();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;

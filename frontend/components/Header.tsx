@@ -70,10 +70,12 @@ function HeaderContent() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setIsOpen(false);
     setSearchOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     if (!searchOpen) return;
@@ -121,6 +123,7 @@ function HeaderContent() {
           onClick={() => handleNavClick("/")}
           className="group flex items-center gap-2"
         >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logoTA2.svg"
             alt="TA House Logo"
@@ -228,6 +231,7 @@ export default function Header() {
           <header className="fixed left-0 top-0 z-50 h-24 w-full border-b border-gray-light bg-cream">
             <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 lg:px-12">
               <div className="flex items-center gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/logoTA2.svg"
                   alt="TA House Logo"

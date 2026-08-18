@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, startTransition, useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ListFilter, Search, X, Grid3X3, LayoutGrid, List } from "lucide-react";
@@ -126,25 +126,16 @@ function ProductListContent() {
     [brands],
   );
 
-  useEffect(() => {
-    setExpandedSections((prev) => {
-      const next = { ...prev };
-      let changed = false;
-      sidebarSections.forEach((section, index) => {
-        if (next[section.id] === undefined) {
-          next[section.id] = index === 0 && Object.keys(prev).length === 0;
-          changed = true;
-        }
-      });
-      return changed ? next : prev;
-    });
-  }, [sidebarSections]);
-
   const toggleSection = (sectionId: string) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [sectionId]: !prev[sectionId]
-    }));
+    setExpandedSections((prev) => {
+      const isCurrentlyExpanded =
+        prev[sectionId] ??
+        sidebarSections.findIndex((s) => s.id === sectionId) === 0;
+      return {
+        ...prev,
+        [sectionId]: !isCurrentlyExpanded,
+      };
+    });
   };
 
   const panelRef = useRef<HTMLDivElement>(null);
@@ -215,42 +206,38 @@ function ProductListContent() {
   }, []);
 
   const visibleBrands = filterBrandsForCategory(brands, filter);
-
-  // Đổi danh mục → bỏ brand không còn thuộc nhóm đó
-  useEffect(() => {
-    if (selectedBrand === "all") return;
-    const relevant = filterBrandsForCategory(brands, filter);
-    if (relevant.some((brand) => brand.slug === selectedBrand)) return;
-    setSelectedBrand("all");
-  }, [filter, selectedBrand, brands]);
+  const activeBrandSlug =
+    selectedBrand === "all" || visibleBrands.some((brand) => brand.slug === selectedBrand)
+      ? selectedBrand
+      : "all";
 
   useEffect(() => {
     let cancelled = false;
-    const apiFilter = mapFilterToApiParams(filter);
-    const isLoadMore = page > 1;
+    async function load() {
+      const apiFilter = mapFilterToApiParams(filter);
+      const isLoadMore = page > 1;
 
-    if (isLoadMore) {
-      setLoadingMore(true);
-    } else {
-      startTransition(() => {
+      if (isLoadMore) {
+        setLoadingMore(true);
+      } else {
         setLoading(true);
         setFetchError(null);
-      });
-    }
+      }
 
-    fetchProducts({
-      page,
-      limit: PAGE_SIZE,
-      category: apiFilter.category,
-      subcategory: apiFilter.subcategory,
-      group: apiFilter.group,
-      brand: selectedBrand === "all" ? apiFilter.brand : selectedBrand,
-      search: debouncedSearch.trim() || undefined,
-      minPrice: minPrice > 0 ? minPrice : undefined,
-      maxPrice: maxPrice < MAX_PRODUCT_PRICE ? maxPrice : undefined,
-      sortBy,
-    })
-      .then((data) => {
+      try {
+        const data = await fetchProducts({
+          page,
+          limit: PAGE_SIZE,
+          category: apiFilter.category,
+          subcategory: apiFilter.subcategory,
+          group: apiFilter.group,
+          brand: activeBrandSlug === "all" ? apiFilter.brand : activeBrandSlug,
+          search: debouncedSearch.trim() || undefined,
+          minPrice: minPrice > 0 ? minPrice : undefined,
+          maxPrice: maxPrice < MAX_PRODUCT_PRICE ? maxPrice : undefined,
+          sortBy,
+        });
+
         if (cancelled) return;
 
         const maxPage = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
@@ -272,40 +259,45 @@ function ProductListContent() {
         if (
           isUnfilteredCatalogView(
             filter,
-            selectedBrand,
+            activeBrandSlug,
             debouncedSearch,
             minPrice,
             maxPrice,
           )
         ) {
           setCatalogTotal(data.total);
-        } else if (catalogTotal === 0) {
-          fetchProducts({ page: 1, limit: 1 })
-            .then((catalog) => {
-              if (!cancelled) setCatalogTotal(catalog.total);
-            })
-            .catch(() => {});
+        } else {
+          setCatalogTotal((prev) => {
+            if (prev === 0) {
+              fetchProducts({ page: 1, limit: 1 })
+                .then((catalog) => {
+                  if (!cancelled) setCatalogTotal(catalog.total);
+                })
+                .catch(() => {});
+            }
+            return prev;
+          });
         }
-      })
-      .catch(() => {
+      } catch {
         if (cancelled) return;
         if (page === 1) {
           setProducts([]);
           setTotal(0);
         }
         setFetchError("Không thể tải danh sách sản phẩm. Vui lòng thử lại.");
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) {
           setLoading(false);
           setLoadingMore(false);
         }
-      });
+      }
+    }
 
+    void load();
     return () => {
       cancelled = true;
     };
-  }, [page, filter, selectedBrand, debouncedSearch, minPrice, maxPrice, sortBy]);
+  }, [page, filter, activeBrandSlug, debouncedSearch, minPrice, maxPrice, sortBy]);
 
   const remaining = Math.max(0, total - products.length);
   const hasMore = remaining > 0;

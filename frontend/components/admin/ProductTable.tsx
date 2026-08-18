@@ -11,9 +11,6 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
-  Filter,
-  Flame,
-  Tag,
   Copy,
   Check,
   RefreshCw,
@@ -45,7 +42,6 @@ export function ProductTable() {
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
-  const [brand, setBrand] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<AdminProductViewMode>("table");
@@ -64,21 +60,20 @@ export function ProductTable() {
   // Copied product ID feedback
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Fetch error & status handling
+  // Fetch error handling
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [fetchStatusCode, setFetchStatusCode] = useState<number | null>(null);
+  const [refreshIndex, setRefreshIndex] = useState(0);
 
   const fetchProducts = useCallback(async (isRefresh = false) => {
     setLoading(true);
     setFetchError(null);
-    setFetchStatusCode(null);
     try {
       const params = new URLSearchParams({
         page: String(page),
         limit: String(limit),
         search: search.trim(),
         category,
-        brand,
+        brand: "all",
         sortBy,
       });
       if (isRefresh) {
@@ -86,7 +81,6 @@ export function ProductTable() {
       }
 
       const res = await fetch(`/api/admin/products?${params.toString()}`);
-      setFetchStatusCode(res.status);
       const data = await res.json();
 
       if (!res.ok) {
@@ -105,23 +99,66 @@ export function ProductTable() {
       if (isRefresh) {
         toast.success(`Đã làm mới dữ liệu (${data.total} sản phẩm)`);
       }
-    } catch (err: any) {
-      const errMsg = err?.message || "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng.";
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng.";
       setFetchError(errMsg);
       toast.error(errMsg);
     } finally {
       setLoading(false);
     }
-  }, [page, limit, search, category, brand, sortBy]);
+  }, [page, limit, search, category, sortBy]);
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    let ignore = false;
+    async function load() {
+      setLoading(true);
+      setFetchError(null);
+      try {
+        const params = new URLSearchParams({
+          page: String(page),
+          limit: String(limit),
+          search: search.trim(),
+          category,
+          brand: "all",
+          sortBy,
+        });
+
+        const res = await fetch(`/api/admin/products?${params.toString()}`);
+        const data = await res.json();
+
+        if (ignore) return;
+        if (!res.ok) {
+          const errMsg = data.message || `Lỗi tải danh sách sản phẩm (${res.status})`;
+          setFetchError(errMsg);
+          toast.error(errMsg);
+          return;
+        }
+
+        setProducts(data.items || []);
+        setTotal(data.total || 0);
+        setTotalPages(data.totalPages || 1);
+        if (data.stats) {
+          setStats(data.stats);
+        }
+      } catch (err: unknown) {
+        if (ignore) return;
+        const errMsg = err instanceof Error ? err.message : "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng.";
+        setFetchError(errMsg);
+        toast.error(errMsg);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+    void load();
+    return () => {
+      ignore = true;
+    };
+  }, [page, limit, search, category, sortBy, refreshIndex]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    fetchProducts();
+    setRefreshIndex((prev) => prev + 1);
   };
 
   const handleCopyId = (id: string) => {

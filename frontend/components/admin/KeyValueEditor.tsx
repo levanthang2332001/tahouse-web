@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Plus, Trash2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,9 +44,12 @@ function SpecRow({
 }) {
   const [keyInput, setKeyInput] = useState(specKey);
 
-  useEffect(() => {
+  // Sync state if specKey changes without remount
+  const [prevSpecKey, setPrevSpecKey] = useState(specKey);
+  if (specKey !== prevSpecKey) {
+    setPrevSpecKey(specKey);
     setKeyInput(specKey);
-  }, [specKey]);
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center rounded-xl bg-white border border-gray-light/60 p-2 text-xs">

@@ -67,6 +67,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="flex flex-col items-start lg:col-span-3">
             <Link href="/" className="mb-5 block group">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logoTA2.svg"
                 alt="TA House Logo"

@@ -9,9 +9,7 @@ import {
   PlusCircle,
   ExternalLink,
   LogOut,
-  ShieldCheck,
   Tag,
-  Layers,
   ChevronRight,
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";

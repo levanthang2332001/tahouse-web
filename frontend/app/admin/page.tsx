@@ -10,7 +10,6 @@ import {
   ExternalLink,
   Edit,
   Sparkles,
-  Flame,
   Layers,
   ChevronRight,
   Fingerprint,

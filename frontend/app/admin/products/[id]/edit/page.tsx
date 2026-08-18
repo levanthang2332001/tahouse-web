@@ -20,31 +20,37 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [statusCode, setStatusCode] = useState<number | null>(null);
 
-  const loadProduct = () => {
-    setLoading(true);
-    setError(null);
-    setStatusCode(null);
-
-    fetch(`/api/admin/products/${encodeURIComponent(id)}`)
-      .then(async (res) => {
-        setStatusCode(res.status);
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.message || `Lỗi tải sản phẩm (${res.status})`);
-        }
-        setProduct(data);
-      })
-      .catch((err) => {
-        setError(err.message || "Lỗi tải sản phẩm");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+  const [retryIndex, setRetryIndex] = useState(0);
 
   useEffect(() => {
-    loadProduct();
-  }, [id]);
+    let ignore = false;
+    async function load() {
+      setLoading(true);
+      setError(null);
+      setStatusCode(null);
+
+      try {
+        const res = await fetch(`/api/admin/products/${encodeURIComponent(id)}`);
+        const status = res.status;
+        const data = await res.json();
+        if (ignore) return;
+        setStatusCode(status);
+        if (!res.ok) {
+          throw new Error(data.message || `Lỗi tải sản phẩm (${status})`);
+        }
+        setProduct(data);
+      } catch (err: unknown) {
+        if (ignore) return;
+        setError(err instanceof Error ? err.message : "Lỗi tải sản phẩm");
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+    void load();
+    return () => {
+      ignore = true;
+    };
+  }, [id, retryIndex]);
 
   if (loading) {
     return (
@@ -82,7 +88,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
               type="button"
               variant="outline"
               size="sm"
-              onClick={loadProduct}
+              onClick={() => setRetryIndex((prev) => prev + 1)}
               className="text-xs font-bold"
             >
               Thử lại

@@ -3,10 +3,10 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Flame, Sparkles, Tag, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Flame, Sparkles, Tag } from "lucide-react";
 import { getCategoryLabel } from "@/data/catalog-taxonomy";
 import type { Product } from "@/lib/types/product";
-import { calculateProductDiscount, formatProductPrice } from "@/lib/format-price";
+import { calculateProductDiscount } from "@/lib/format-price";
 import { formatProductName } from "@/lib/format-product-name";
 
 export type ProductViewMode = "grid" | "grid-large" | "list";

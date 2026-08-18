@@ -6,7 +6,7 @@ import { CATEGORY_LABELS } from "@/data/catalog-taxonomy";
 import { calculateProductDiscount, parseProductPrice } from "@/lib/format-price";
 import { formatProductName } from "@/lib/format-product-name";
 import { slugify } from "@/lib/utils";
-import type { Product, ProductsListResponse, Brand } from "@/lib/types/product";
+import type { Product, ProductsListResponse } from "@/lib/types/product";
 
 interface LocalStoreData {
   created: Record<string, Product>;
@@ -182,9 +182,9 @@ export async function createProduct(data: Partial<Product>): Promise<Product> {
         }))
     : [];
 
-  const cleanStringArray = (arr: any) =>
+  const cleanStringArray = (arr: unknown): string[] =>
     Array.isArray(arr)
-      ? arr.filter((x) => typeof x === "string" && x.trim()).map((x) => x.trim())
+      ? arr.filter((x): x is string => typeof x === "string" && Boolean(x.trim())).map((x) => x.trim())
       : [];
 
   const newProduct: Product = {
@@ -255,9 +255,9 @@ export async function updateProduct(id: string, data: Partial<Product>): Promise
     priceRange = `${new Intl.NumberFormat("vi-VN").format(price)} đ`;
   }
 
-  const cleanStringArray = (arr: any, fallback: string[] = []) =>
+  const cleanStringArray = (arr: unknown, fallback: string[] = []): string[] =>
     Array.isArray(arr)
-      ? arr.filter((x) => typeof x === "string" && x.trim()).map((x) => x.trim())
+      ? arr.filter((x): x is string => typeof x === "string" && Boolean(x.trim())).map((x) => x.trim())
       : fallback;
 
   const specs =
@@ -395,7 +395,6 @@ export async function getAdminStats() {
 
   const totalProducts = products.length;
   const brands = new Set(products.map((p) => p.brand).filter(Boolean));
-  const categories = new Set(products.map((p) => p.category).filter(Boolean));
   const onSale = products.filter((p) => {
     const discount = calculateProductDiscount(
       p.price,

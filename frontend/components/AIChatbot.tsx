@@ -179,6 +179,7 @@ function WelcomeContent() {
 function BotAvatar() {
   return (
     <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full overflow-hidden border border-brand-green/15 shadow-sm">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/logoTAicon.svg" alt="TA House Icon" className="h-full w-full object-contain" />
     </div>
   );
@@ -354,6 +355,7 @@ export default function AIChatbot() {
               <div className="flex h-15 sm:h-16 items-center justify-between px-4 sm:px-5">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl overflow-hidden shadow-xs">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/logoTAicon.svg" alt="TA House Icon" className="h-full w-full object-contain" />
                   </div>
                   <div>

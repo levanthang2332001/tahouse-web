@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Package, Flame, Tag, Layers, ArrowUpRight } from "lucide-react";
+import { Package, Flame, Tag, Layers } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface StatsOverviewProps {

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   Tag,
@@ -10,11 +9,8 @@ import {
   Trash2,
   Search,
   RefreshCw,
-  ExternalLink,
   Package,
-  Globe,
   Sparkles,
-  CheckCircle2,
   AlertCircle,
   X,
 } from "lucide-react";
@@ -58,6 +54,7 @@ export default function AdminBrandsPage() {
   const [brands, setBrands] = useState<BrandItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [refreshIndex, setRefreshIndex] = useState(0);
 
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
@@ -92,8 +89,8 @@ export default function AdminBrandsPage() {
       if (isRefresh) {
         toast.success(`Đã làm mới danh sách (${data.items?.length || 0} thương hiệu)`);
       }
-    } catch (err: any) {
-      const errMsg = err?.message || "Lỗi khi tải danh sách thương hiệu";
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : "Lỗi khi tải danh sách thương hiệu";
       setFetchError(errMsg);
       toast.error(errMsg);
     } finally {
@@ -102,8 +99,35 @@ export default function AdminBrandsPage() {
   }, []);
 
   useEffect(() => {
-    fetchBrands();
-  }, [fetchBrands]);
+    let ignore = false;
+    async function load() {
+      setLoading(true);
+      setFetchError(null);
+      try {
+        const res = await fetch("/api/admin/brands");
+        const data = await res.json();
+        if (ignore) return;
+        if (!res.ok) {
+          const errMsg = data.message || `Không thể tải danh sách thương hiệu (${res.status})`;
+          setFetchError(errMsg);
+          toast.error(errMsg);
+          return;
+        }
+        setBrands(data.items || []);
+      } catch (err: unknown) {
+        if (ignore) return;
+        const errMsg = err instanceof Error ? err.message : "Lỗi khi tải danh sách thương hiệu";
+        setFetchError(errMsg);
+        toast.error(errMsg);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+    void load();
+    return () => {
+      ignore = true;
+    };
+  }, [refreshIndex]);
 
   const openCreateModal = () => {
     setEditingBrand(null);
@@ -167,7 +191,7 @@ export default function AdminBrandsPage() {
           : `Đã thêm thương hiệu "${formName}" thành công`,
       );
       setModalOpen(false);
-      fetchBrands();
+      setRefreshIndex((prev) => prev + 1);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Lỗi khi lưu thương hiệu");
     } finally {

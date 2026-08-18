@@ -15,8 +15,6 @@ import {
   HelpCircle,
   Sparkles,
   DollarSign,
-  Palette,
-  ShieldCheck,
   Plus,
   Trash2,
   ExternalLink,
@@ -39,19 +37,6 @@ interface ProductFormProps {
   initialData?: Product;
   isEditing?: boolean;
 }
-
-const BRAND_OPTIONS = [
-  { value: "Kassler", label: "Kassler" },
-  { value: "Philips", label: "Philips" },
-  { value: "Bosch", label: "Bosch" },
-  { value: "Kaadas", label: "Kaadas" },
-  { value: "Hafele", label: "Hafele" },
-  { value: "Yale", label: "Yale" },
-  { value: "Samsung", label: "Samsung" },
-  { value: "Demax", label: "Demax" },
-  { value: "Hubert", label: "Hubert" },
-  { value: "TA HOUSE", label: "TA HOUSE" },
-];
 
 export function ProductForm({ initialData, isEditing = false }: ProductFormProps) {
   const router = useRouter();
@@ -88,9 +73,9 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
   useEffect(() => {
     fetch("/api/brands")
       .then((res) => res.json())
-      .then((data) => {
+      .then((data: Array<{ name: string }>) => {
         if (Array.isArray(data) && data.length > 0) {
-          const mapped = data.map((b: any) => ({
+          const mapped = data.map((b) => ({
             value: b.name,
             label: b.name,
           }));
@@ -145,63 +130,48 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
     initialData?.faq || [],
   );
 
-  // Synchronize state if initialData is loaded/updated
-  useEffect(() => {
-    if (initialData) {
-      setName(formatProductName(initialData.name || ""));
-      setId(initialData.id || "");
-      setCode(formatProductName(initialData.code || ""));
-      setBrand(initialData.brand || "Kassler");
-      setCategory(initialData.category || "dai-sanh");
-      setCategoryName(
-        initialData.categoryName ||
-          CATEGORY_LABELS[initialData.category || "dai-sanh"] ||
-          "Khóa đại sảnh",
-      );
-      setSubcategory(initialData.subcategory || "");
-      setSubcategoryName(initialData.subcategoryName || "");
-      setPrice(
-        initialData.price !== undefined && initialData.price !== null
-          ? String(initialData.price)
-          : "",
-      );
-      setOriginalPrice(
-        initialData.originalPrice !== undefined &&
-          initialData.originalPrice !== null
-          ? String(initialData.originalPrice)
-          : "",
-      );
-      setPriceRange(initialData.priceRange || "");
-      setImageUrl(initialData.imageUrl || "");
-      setImages(initialData.images || []);
-      setInstallationPreview(initialData.installation_preview || []);
-      setShortDescription(initialData.shortDescription || "");
-      setDescription(initialData.description || "");
-      setFeatures(initialData.features || []);
-      setSpecs(initialData.specs || {});
-      setTechnologies(initialData.technologies || []);
-      setColors(initialData.colors || []);
-      setWarranty(initialData.warranty ?? 24);
-      setWarrantyText(initialData.warrantyText || "Chính hãng 24 tháng");
-      setInstallationManual(initialData.installationManual || []);
-      setFaq(initialData.faq || []);
-    }
-  }, [initialData]);
-
-  // Auto-generate ID/Slug on name change for new products
-  useEffect(() => {
-    if (!isEditing && name.trim()) {
-      const generated = slugify(name);
-      setId(generated);
-    }
-  }, [name, isEditing]);
-
-  // Update categoryName when category select changes
-  useEffect(() => {
-    if (CATEGORY_LABELS[category]) {
-      setCategoryName(CATEGORY_LABELS[category]);
-    }
-  }, [category]);
+  // Synchronize state if initialData changes during prop update
+  const [prevInitialData, setPrevInitialData] = useState(initialData);
+  if (initialData && initialData !== prevInitialData) {
+    setPrevInitialData(initialData);
+    setName(formatProductName(initialData.name || ""));
+    setId(initialData.id || "");
+    setCode(formatProductName(initialData.code || ""));
+    setBrand(initialData.brand || "Kassler");
+    setCategory(initialData.category || "dai-sanh");
+    setCategoryName(
+      initialData.categoryName ||
+        CATEGORY_LABELS[initialData.category || "dai-sanh"] ||
+        "Khóa đại sảnh",
+    );
+    setSubcategory(initialData.subcategory || "");
+    setSubcategoryName(initialData.subcategoryName || "");
+    setPrice(
+      initialData.price !== undefined && initialData.price !== null
+        ? String(initialData.price)
+        : "",
+    );
+    setOriginalPrice(
+      initialData.originalPrice !== undefined &&
+        initialData.originalPrice !== null
+        ? String(initialData.originalPrice)
+        : "",
+    );
+    setPriceRange(initialData.priceRange || "");
+    setImageUrl(initialData.imageUrl || "");
+    setImages(initialData.images || []);
+    setInstallationPreview(initialData.installation_preview || []);
+    setShortDescription(initialData.shortDescription || "");
+    setDescription(initialData.description || "");
+    setFeatures(initialData.features || []);
+    setSpecs(initialData.specs || {});
+    setTechnologies(initialData.technologies || []);
+    setColors(initialData.colors || []);
+    setWarranty(initialData.warranty ?? 24);
+    setWarrantyText(initialData.warrantyText || "Chính hãng 24 tháng");
+    setInstallationManual(initialData.installationManual || []);
+    setFaq(initialData.faq || []);
+  }
 
   // Calculations for live discount feedback
   const numPrice = Number(price) || 0;
@@ -458,7 +428,13 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                     type="text"
                     placeholder="VD: Khóa Điện Tử Kassler KL-600 Face ID Cao Cấp"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      const newName = e.target.value;
+                      setName(newName);
+                      if (!isEditing && newName.trim()) {
+                        setId(slugify(newName));
+                      }
+                    }}
                     required
                   />
                 </div>
@@ -562,7 +538,13 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                   <label className="text-xs font-bold text-navy">Danh mục chính (Category)</label>
                   <Select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    onChange={(e) => {
+                      const newCat = e.target.value;
+                      setCategory(newCat);
+                      if (CATEGORY_LABELS[newCat]) {
+                        setCategoryName(CATEGORY_LABELS[newCat]);
+                      }
+                    }}
                     options={categorySelectOptions}
                   />
                 </div>

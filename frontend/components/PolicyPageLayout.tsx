@@ -10,7 +10,6 @@ import {
   Building2,
   Receipt,
   Truck,
-  CheckCircle2,
   Calendar,
   Layers,
 } from "lucide-react";
