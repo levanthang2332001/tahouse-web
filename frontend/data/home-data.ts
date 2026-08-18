@@ -17,14 +17,14 @@ export const SERVICES: Service[] = [
     title: "Khóa điện tử - khóa vân tay",
     catId: "lock-parent",
     icon: Lock,
-    img: "/pic/khoa.jpg",
+    img: "/pic/khoa-kassler.jpg",
     imgClass: "object-contain bg-white p-3",
   },
   {
     title: "Két sắt thông minh",
     catId: "Smart",
     icon: Shield,
-    img: "/pic/ket.webp",
+    img: "/pic/ket.jpg",
     imgClass: "object-contain bg-white p-3",
   },
   {
@@ -52,7 +52,7 @@ export const SERVICES: Service[] = [
     title: "Cửa",
     catId: "door-group",
     icon: DoorClosed,
-    img: "/pic/khoa2.jpg",
+    img: "/pic/cua.jpg",
     imgClass: "object-cover",
   },
 ];

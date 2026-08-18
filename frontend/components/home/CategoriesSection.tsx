@@ -116,6 +116,7 @@ export default function CategoriesSection() {
                       src={service.img}
                       alt={service.title}
                       fill
+                      unoptimized
                       sizes="(max-width: 1024px) 100vw, 25vw"
                       className={`${service.imgClass} transition-transform duration-750 group-hover:scale-105`}
                     />
