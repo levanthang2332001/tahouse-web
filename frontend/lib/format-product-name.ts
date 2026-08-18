@@ -1,26 +1,21 @@
 /**
  * Compact ASCII model codes like "KL - 989 F" → "KL-989F".
- * Leaves descriptive Vietnamese / multi-word titles unchanged.
+ * Cleans up loose spacing around model identifiers while preserving Vietnamese product titles.
  */
 export function formatProductName(name: string): string {
-  const trimmed = name.trim();
-  if (!trimmed) return trimmed;
+  if (!name) return "";
+  let result = name.trim();
 
-  // Only touch plain model-code style names (no Vietnamese / punctuation-heavy titles).
-  if (!/^[A-Za-z0-9][A-Za-z0-9\s\-./+]*$/.test(trimmed)) {
-    return trimmed;
-  }
+  // 1. Collapse spaces around dashes: "KL - 989" -> "KL-989"
+  result = result.replace(/([A-Za-z0-9])\s*-\s*([A-Za-z0-9])/g, "$1-$2");
 
-  const withTightDashes = trimmed.replace(/\s*-\s*/g, "-");
-  const tokens = withTightDashes.split(/\s+/).filter(Boolean);
+  // 2. Collapse trailing suffix letters separated by space: "KL-989 F" -> "KL-989F", "KL-989 FP" -> "KL-989FP"
+  result = result.replace(/([A-Za-z0-9]+-\d+)\s+([A-Za-z0-9]{1,3})\b/g, "$1$2");
 
-  // Short fragments (KL, 989, F) → stick together; keep spaced brand words (PHILIPS VALIS…).
-  if (
-    tokens.length > 1 &&
-    tokens.every((token) => token.replace(/-/g, "").length <= 5)
-  ) {
-    return tokens.join("");
-  }
+  // 3. Collapse space between letter prefix and number if separated by space: "KL 989 F" -> "KL-989F"
+  result = result.replace(/\b([A-Za-z]{2,4})\s+(\d{3,4})\s*([A-Za-z]{1,3})?\b/g, (_match, p1, p2, p3) => {
+    return `${p1}-${p2}${p3 || ""}`;
+  });
 
-  return withTightDashes;
+  return result;
 }
