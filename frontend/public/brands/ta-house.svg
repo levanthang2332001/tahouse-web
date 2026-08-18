@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 45" width="200" height="45">
+  <rect x="15" y="8" width="30" height="30" rx="6" fill="#88D436"/>
+  <text x="30" y="29" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="900" fill="#0A2540" text-anchor="middle">TA</text>
+  <text x="56" y="30" font-family="'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="900" letter-spacing="1" fill="#0A2540">TA HOUSE</text>
+</svg>

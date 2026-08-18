@@ -1,7 +1,10 @@
 /** Local brand logo assets under `/public/brands`. */
 export const LOCAL_BRAND_LOGOS: Record<string, string> = {
   bosch: "/brands/bosch.svg",
+  philips: "/brands/philips.svg",
   kassler: "/brands/kassler.png",
+  eurogold: "/brands/eurogold.svg",
+  malloca: "/brands/malloca.svg",
   hafele: "/brands/hafele.png",
   kaff: "/brands/kaff.jpg",
   eurosun: "/brands/eurosun.png",
@@ -10,6 +13,13 @@ export const LOCAL_BRAND_LOGOS: Record<string, string> = {
   sharp: "/brands/sharp.png",
   hyundai: "/brands/hyundai.png",
   fanlight: "/brands/fanlight.png",
+  hubert: "/brands/hubert.svg",
+  kaadas: "/brands/kaadas.svg",
+  demax: "/brands/demax.svg",
+  panasonic: "/brands/panasonic.svg",
+  "hd-door": "/brands/hd-door.svg",
+  grandx: "/brands/grandx.svg",
+  nobinox: "/brands/nobinox.svg",
 };
 
 /** Text-only brand marks when no image logo is provided. */
