@@ -171,3 +171,209 @@ html.lenis body {
   scrollbar-width: none !important;  /* Firefox */
 }
 
+/* Quill Full WYSIWYG Editor Styles */
+.quill-editor-wrapper .ql-toolbar.ql-snow {
+  background: linear-gradient(135deg, rgba(121, 193, 67, 0.09) 0%, #FAF9F5 100%);
+  border: none;
+  border-bottom: 1px solid rgba(121, 193, 67, 0.3);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  padding: 0.65rem 0.85rem;
+  font-family: inherit;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow button {
+  border-radius: 0.5rem;
+  margin: 1px;
+  transition: all 0.15s ease;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker {
+  border-radius: 0.5rem;
+  font-family: inherit;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-label {
+  color: #062B3D;
+  font-weight: 700;
+  font-size: 12px;
+  border-radius: 0.5rem;
+  padding: 2px 8px;
+  border: 1px solid rgba(121, 193, 67, 0.2);
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-options {
+  border-radius: 0.75rem !important;
+  border: 1px solid rgba(121, 193, 67, 0.3) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+  padding: 6px !important;
+  background-color: #FFFFFF !important;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow button:hover,
+.quill-editor-wrapper .ql-toolbar.ql-snow button:focus,
+.quill-editor-wrapper .ql-toolbar.ql-snow button.ql-active,
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-label:hover,
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-label.ql-active,
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-item:hover,
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-item.ql-selected {
+  color: #2d5a15 !important;
+  background-color: rgba(121, 193, 67, 0.2) !important;
+  border-radius: 0.5rem !important;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow button:hover .ql-stroke,
+.quill-editor-wrapper .ql-toolbar.ql-snow button.ql-active .ql-stroke,
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-label:hover .ql-stroke,
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-stroke {
+  stroke: #79C143 !important;
+  stroke-width: 2.2 !important;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow button:hover .ql-fill,
+.quill-editor-wrapper .ql-toolbar.ql-snow button.ql-active .ql-fill {
+  fill: #79C143 !important;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-formats {
+  margin-right: 10px;
+}
+.quill-editor-wrapper .ql-container.ql-snow {
+  border: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: #062B3D;
+}
+
+.quill-editor-wrapper .ql-editor {
+  min-height: 200px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding: 1rem;
+  line-height: 1.75;
+}
+
+.quill-editor-wrapper .ql-editor.ql-blank::before {
+  color: rgba(6, 43, 61, 0.35);
+  font-style: normal;
+  left: 1rem;
+  right: 1rem;
+}
+
+.quill-editor-wrapper .ql-editor strong,
+.quill-editor-wrapper .ql-editor b {
+  font-weight: 800 !important;
+  color: #062B3D !important;
+}
+
+.quill-editor-wrapper .ql-editor h2 {
+  font-size: 1.25rem !important;
+  font-weight: 900 !important;
+  color: #062B3D !important;
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.quill-editor-wrapper .ql-editor h3 {
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  color: #062B3D !important;
+  margin-top: 0.85rem !important;
+  margin-bottom: 0.4rem !important;
+}
+
+.quill-editor-wrapper .ql-editor blockquote {
+  border-left: 4px solid #79C143 !important;
+  background-color: rgba(121, 193, 67, 0.08) !important;
+  padding: 0.5rem 1rem !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+  border-radius: 0 0.5rem 0.5rem 0 !important;
+  color: #062B3D !important;
+}
+
+.quill-editor-wrapper .ql-editor ul,
+.quill-editor-wrapper .ql-editor ol {
+  padding-left: 1.5rem !important;
+}
+
+/* Quill Tooltip Fixes & Styling */
+.quill-editor-wrapper .ql-container {
+  position: relative !important;
+}
+
+.quill-editor-wrapper .ql-tooltip.ql-hidden,
+.ql-tooltip.ql-hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.quill-editor-wrapper .ql-tooltip,
+.ql-tooltip {
+  position: absolute !important;
+  z-index: 50 !important;
+  background-color: #062B3D !important;
+  color: #FFFFFF !important;
+  border-radius: 0.75rem !important;
+  padding: 8px 14px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  font-size: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  white-space: nowrap !important;
+}
+
+.quill-editor-wrapper .ql-tooltip input[type="text"],
+.ql-tooltip input[type="text"] {
+  background-color: #FFFFFF !important;
+  color: #062B3D !important;
+  border-radius: 0.5rem !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  border: 1px solid #D9DDE1 !important;
+  outline: none !important;
+  min-width: 180px !important;
+}
+
+.quill-editor-wrapper .ql-tooltip a.ql-action,
+.ql-tooltip a.ql-action {
+  color: #79C143 !important;
+  font-weight: 800 !important;
+  text-decoration: none !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+}
+
+.quill-editor-wrapper .ql-tooltip a.ql-action:hover,
+.ql-tooltip a.ql-action:hover {
+  text-decoration: underline !important;
+}
+
+.quill-editor-wrapper .ql-tooltip a.ql-remove,
+.ql-tooltip a.ql-remove {
+  color: #f87171 !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  padding: 2px 6px !important;
+  cursor: pointer !important;
+}
+
+.quill-editor-wrapper .ql-tooltip a.ql-remove:hover,
+.ql-tooltip a.ql-remove:hover {
+  text-decoration: underline !important;
+}
+
+.quill-editor-wrapper .ql-tooltip::before,
+.ql-tooltip::before {
+  content: "Liên kết:" !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  margin-right: 2px !important;
+}

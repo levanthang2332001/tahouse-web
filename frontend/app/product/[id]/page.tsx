@@ -36,6 +36,7 @@ import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import SocialFloating from "@/components/SocialFloating";
+import { FormattedText } from "@/components/ui/FormattedText";
 import { SiZalo } from "react-icons/si";
 import { useApp } from "@/context/AppContext";
 import { COMPANY_LEGAL } from "@/data/company-legal";
@@ -794,9 +795,10 @@ function ProductDetailView({ id }: { id: string }) {
                 {/* Article Intro */}
                 <div className="prose max-w-none text-sm leading-relaxed text-navy/90 space-y-4">
                   {product.description ? (
-                    <p className="font-medium text-base text-navy leading-relaxed">
-                      {product.description}
-                    </p>
+                    <FormattedText
+                      content={product.description}
+                      className="text-base text-navy leading-relaxed"
+                    />
                   ) : (
                     <p className="font-medium">
                       <strong>{displayName}</strong> là dòng sản phẩm cao cấp phân phối chính hãng bởi {COMPANY_LEGAL.tradeName}. 
@@ -819,7 +821,9 @@ function ProductDetailView({ id }: { id: string }) {
                             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-green/15 text-brand-green">
                               <Check size={14} strokeWidth={2.6} />
                             </div>
-                            <span className="text-xs font-bold leading-snug text-navy/90">{feature}</span>
+                            <div className="flex-1">
+                              <FormattedText content={feature} className="text-xs font-bold leading-snug text-navy/90" />
+                            </div>
                           </div>
                         ))}
                       </div>

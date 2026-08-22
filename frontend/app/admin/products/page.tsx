@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { Package, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,11 @@ export default function AdminProductsListPage() {
       </div>
 
       {/* Main Table */}
-      <ProductTable />
+      <Suspense fallback={
+        <div className="py-20 text-center text-xs text-navy/50">Đang tải...</div>
+      }>
+        <ProductTable />
+      </Suspense>
     </div>
   );
 }

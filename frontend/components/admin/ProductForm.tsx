@@ -18,6 +18,14 @@ import {
   Plus,
   Trash2,
   ExternalLink,
+  Percent,
+  Calculator,
+  Lock,
+  Unlock,
+  ChevronRight,
+  ChevronLeft,
+  CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +35,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { DynamicListInput } from "@/components/admin/DynamicListInput";
 import { KeyValueEditor } from "@/components/admin/KeyValueEditor";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import { toast } from "@/components/ui/toast";
 import { CATEGORY_LABELS } from "@/data/catalog-taxonomy";
 import { formatProductName } from "@/lib/format-product-name";
@@ -46,6 +55,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
   // Form Fields State
   const [name, setName] = useState(formatProductName(initialData?.name || ""));
   const [id, setId] = useState(initialData?.id || "");
+  const [autoSlugSync, setAutoSlugSync] = useState(!isEditing && !initialData?.id);
   const [code, setCode] = useState(formatProductName(initialData?.code || ""));
   const [brand, setBrand] = useState(initialData?.brand || "Kassler");
   const [availableBrands, setAvailableBrands] = useState<Array<{ value: string; label: string }>>([
@@ -103,6 +113,13 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
   );
   const [priceRange, setPriceRange] = useState(initialData?.priceRange || "");
 
+  // Auto-calculated discount percent state
+  const initialDiscountPct =
+    initialData?.originalPrice && initialData?.price && initialData.originalPrice > initialData.price
+      ? String(Math.round(((initialData.originalPrice - initialData.price) / initialData.originalPrice) * 100))
+      : "";
+  const [discountPercentInput, setDiscountPercentInput] = useState<string>(initialDiscountPct);
+
   // Media
   const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || "");
   const [images, setImages] = useState<string[]>(initialData?.images || []);
@@ -157,6 +174,11 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
         ? String(initialData.originalPrice)
         : "",
     );
+    if (initialData.originalPrice && initialData.price && initialData.originalPrice > initialData.price) {
+      setDiscountPercentInput(
+        String(Math.round(((initialData.originalPrice - initialData.price) / initialData.originalPrice) * 100)),
+      );
+    }
     setPriceRange(initialData.priceRange || "");
     setImageUrl(initialData.imageUrl || "");
     setImages(initialData.images || []);
@@ -173,14 +195,128 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
     setFaq(initialData.faq || []);
   }
 
-  // Calculations for live discount feedback
-  const numPrice = Number(price) || 0;
-  const numOrigPrice = Number(originalPrice) || 0;
+  // Live numerical values for discount calculations
+  const numPrice = Number(price.replace(/\D/g, "")) || 0;
+  const numOrigPrice = Number(originalPrice.replace(/\D/g, "")) || 0;
+  const numDiscountPct = Number(discountPercentInput.replace(/\D/g, "")) || 0;
   const hasDiscount = numOrigPrice > numPrice && numPrice > 0;
   const discountPercent = hasDiscount
     ? Math.round(((numOrigPrice - numPrice) / numOrigPrice) * 100)
     : 0;
   const savedAmount = hasDiscount ? numOrigPrice - numPrice : 0;
+
+  // 1. Handle Original Price Change
+  const handleOriginalPriceChange = (val: string) => {
+    const raw = val.replace(/\D/g, "");
+    setOriginalPrice(raw);
+    const orig = Number(raw) || 0;
+
+    // If discount % is already set, auto-calculate sale price
+    if (numDiscountPct > 0 && orig > 0) {
+      const calcSale = Math.round((orig * (1 - numDiscountPct / 100)) / 10000) * 10000;
+      setPrice(String(calcSale));
+      if (!priceRange || priceRange.includes("đ")) {
+        setPriceRange(`${new Intl.NumberFormat("vi-VN").format(calcSale)} đ`);
+      }
+    } else if (orig > 0 && numPrice > 0 && orig > numPrice) {
+      const calcPct = Math.round(((orig - numPrice) / orig) * 100);
+      setDiscountPercentInput(String(calcPct));
+    }
+  };
+
+  // 2. Handle Discount % Input Change
+  const handleDiscountPercentChange = (val: string) => {
+    let clean = val.replace(/\D/g, "");
+    if (Number(clean) > 99) clean = "99";
+    setDiscountPercentInput(clean);
+
+    const pct = Number(clean) || 0;
+    if (numOrigPrice > 0) {
+      if (pct > 0) {
+        const calcSale = Math.round((numOrigPrice * (1 - pct / 100)) / 10000) * 10000;
+        setPrice(String(calcSale));
+        if (!priceRange || priceRange.includes("đ")) {
+          setPriceRange(`${new Intl.NumberFormat("vi-VN").format(calcSale)} đ`);
+        }
+      } else {
+        setPrice(String(numOrigPrice));
+        if (!priceRange || priceRange.includes("đ")) {
+          setPriceRange(`${new Intl.NumberFormat("vi-VN").format(numOrigPrice)} đ`);
+        }
+      }
+    }
+  };
+
+  // 3. Handle Quick Discount Chip Click
+  const handleApplyQuickDiscount = (pct: number) => {
+    setDiscountPercentInput(String(pct));
+    if (numOrigPrice > 0) {
+      const calcSale = Math.round((numOrigPrice * (1 - pct / 100)) / 10000) * 10000;
+      setPrice(String(calcSale));
+      if (!priceRange || priceRange.includes("đ")) {
+        setPriceRange(`${new Intl.NumberFormat("vi-VN").format(calcSale)} đ`);
+      }
+      toast.info(`Đã tự động tính giá sale giảm ${pct}%: ${new Intl.NumberFormat("vi-VN").format(calcSale)} đ`);
+    } else {
+      toast.warning("Vui lòng nhập Giá gốc trước để hệ thống tự động tính giá sale");
+    }
+  };
+
+  // 4. Handle Direct Sale Price Change
+  const handlePriceChange = (val: string) => {
+    const raw = val.replace(/\D/g, "");
+    setPrice(raw);
+    const sale = Number(raw) || 0;
+
+    if (!priceRange || priceRange.includes("đ")) {
+      setPriceRange(sale > 0 ? `${new Intl.NumberFormat("vi-VN").format(sale)} đ` : "");
+    }
+
+    if (numOrigPrice > 0 && sale > 0 && numOrigPrice > sale) {
+      const calcPct = Math.round(((numOrigPrice - sale) / numOrigPrice) * 100);
+      setDiscountPercentInput(String(calcPct));
+    } else if (sale >= numOrigPrice && numOrigPrice > 0) {
+      setDiscountPercentInput("");
+    }
+  };
+
+  // 5. Handle Quick Markup Click (From Sale Price -> Calculate Original Price)
+  const handleApplyQuickMarkup = (pct: number) => {
+    if (numPrice > 0) {
+      const calcOrig = Math.round((numPrice * (1 + pct / 100)) / 10000) * 10000;
+      setOriginalPrice(String(calcOrig));
+      const calcPct = Math.round(((calcOrig - numPrice) / calcOrig) * 100);
+      setDiscountPercentInput(String(calcPct));
+      toast.info(`Đã tính giá gốc (+${pct}%): ${new Intl.NumberFormat("vi-VN").format(calcOrig)} đ`);
+    } else {
+      toast.warning("Vui lòng nhập Giá bán trước để tạo giá gốc");
+    }
+  };
+
+  // Form Completeness Calculation
+  const completenessItems = [
+    { label: "Thông tin cơ bản", done: Boolean(name.trim() && id.trim()) },
+    { label: "Giá & Khuyến mãi", done: Boolean(numPrice > 0 || priceRange.trim()) },
+    { label: "Ảnh sản phẩm", done: Boolean(imageUrl.trim()) },
+    { label: "Mô tả nội dung", done: Boolean(shortDescription.trim() || description.trim()) },
+    { label: "Thông số kỹ thuật", done: Boolean(Object.keys(specs).length > 0 || features.length > 0) },
+  ];
+  const completedCount = completenessItems.filter((item) => item.done).length;
+  const completionPercentage = Math.round((completedCount / completenessItems.length) * 100);
+
+  // Tab steps array
+  const TAB_STEPS = [
+    { id: "general", label: "Thông tin chung", icon: Layers },
+    { id: "pricing", label: "Giá & Khuyến mãi", icon: DollarSign },
+    { id: "media", label: "Hình ảnh & Media", icon: ImageIcon },
+    { id: "content", label: "Mô tả & Tính năng", icon: FileText },
+    { id: "specs", label: "Thông số kỹ thuật", icon: Wrench },
+    { id: "extra", label: "Lắp đặt & FAQ", icon: HelpCircle },
+  ];
+
+  const currentTabIndex = TAB_STEPS.findIndex((t) => t.id === activeTab);
+  const prevTab = currentTabIndex > 0 ? TAB_STEPS[currentTabIndex - 1] : null;
+  const nextTab = currentTabIndex < TAB_STEPS.length - 1 ? TAB_STEPS[currentTabIndex + 1] : null;
 
   // FAQ Handlers
   const handleAddFaq = () => {
@@ -227,7 +363,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
     // Price validation
     let parsedPrice: number | null = null;
     if (price.trim()) {
-      const p = Number(price);
+      const p = Number(price.replace(/\D/g, ""));
       if (isNaN(p) || p < 0) {
         toast.error("Giá bán phải là số hợp lệ không âm");
         setActiveTab("pricing");
@@ -238,7 +374,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
 
     let parsedOrigPrice: number | undefined = undefined;
     if (originalPrice.trim()) {
-      const op = Number(originalPrice);
+      const op = Number(originalPrice.replace(/\D/g, ""));
       if (isNaN(op) || op < 0) {
         toast.error("Giá gốc phải là số hợp lệ không âm");
         setActiveTab("pricing");
@@ -335,37 +471,38 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Top action header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-4 rounded-2xl border border-gray-light/70 shadow-xs">
+      {/* 1. Top Action Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-gray-light/80 shadow-xs">
         <div className="flex items-center gap-3">
           <Link href="/admin/products">
             <Button
               type="button"
               variant="outline"
               size="icon"
-              className="h-10 w-10 text-navy"
+              className="h-10 w-10 text-navy hover:bg-black/5"
             >
               <ArrowLeft size={16} />
             </Button>
           </Link>
           <div>
-            <h1 className="text-xl font-black text-navy tracking-tight">
+            <h1 className="text-lg sm:text-xl font-black text-navy tracking-tight">
               {isEditing ? `Chỉnh sửa: ${initialData?.name || name}` : "Thêm Sản Phẩm Mới"}
             </h1>
             <p className="text-xs text-navy/50 font-mono">
-              {id ? `ID: ${id}` : "Nhập tên để tự tạo ID"}
+              {id ? `ID: ${id}` : "Nhập tên sản phẩm để tự động tạo ID chuẩn SEO"}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+
           {isEditing && (
             <Link href={`/product/${id}`} target="_blank">
               <Button
                 type="button"
                 variant="outline"
                 size="default"
-                className="text-xs font-semibold text-navy"
+                className="text-xs font-semibold text-navy h-10"
               >
                 <ExternalLink size={14} />
                 <span>Xem trên web</span>
@@ -378,7 +515,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
             variant="brand"
             size="default"
             disabled={submitting}
-            className="text-xs font-bold gap-1.5 shadow-xs"
+            className="text-xs font-bold gap-1.5 shadow-xs h-10 px-5"
           >
             <Save size={15} />
             <span>{submitting ? "Đang lưu..." : isEditing ? "Lưu thay đổi" : "Tạo sản phẩm"}</span>
@@ -386,31 +523,80 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
         </div>
       </div>
 
-      {/* Main Tabs Form Structure */}
+      {/* 2. Form Completeness Bar */}
+      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-gray-light/80 shadow-xs space-y-2.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-navy">Độ hoàn thiện thông tin sản phẩm:</span>
+            <span
+              className={`text-xs font-black px-2 py-0.5 rounded-full ${
+                completionPercentage === 100
+                  ? "bg-brand-green/20 text-[#2d5a15]"
+                  : completionPercentage >= 60
+                  ? "bg-amber-100 text-amber-800"
+                  : "bg-gray-100 text-gray-700"
+              }`}
+            >
+              {completionPercentage}%
+            </span>
+          </div>
+          <span className="text-[11px] text-navy/50 font-medium">
+            {completedCount}/{completenessItems.length} mục đã hoàn tất
+          </span>
+        </div>
+
+        {/* Progress bar */}
+        <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+          <div
+            className={`h-full transition-all duration-500 rounded-full ${
+              completionPercentage === 100
+                ? "bg-brand-green"
+                : completionPercentage >= 60
+                ? "bg-amber-500"
+                : "bg-blue-500"
+            }`}
+            style={{ width: `${Math.max(completionPercentage, 5)}%` }}
+          />
+        </div>
+
+        {/* Checklist chips */}
+        <div className="flex flex-wrap gap-2 pt-0.5">
+          {completenessItems.map((item) => (
+            <div
+              key={item.label}
+              className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md font-semibold transition-colors ${
+                item.done
+                  ? "bg-brand-green/10 text-[#2d5a15] border border-brand-green/20"
+                  : "bg-gray-50 text-navy/40 border border-gray-200/60"
+              }`}
+            >
+              <CheckCircle2 size={12} className={item.done ? "text-brand-green" : "text-gray-300"} />
+              <span>{item.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. Main Tabs Navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="w-full justify-start overflow-x-auto">
-          <TabsTrigger value="general" className="gap-1.5">
-            <Layers size={14} /> Thông tin chung
-          </TabsTrigger>
-          <TabsTrigger value="pricing" className="gap-1.5">
-            <DollarSign size={14} /> Giá & Khuyến mãi
-          </TabsTrigger>
-          <TabsTrigger value="media" className="gap-1.5">
-            <ImageIcon size={14} /> Hình ảnh & Media
-          </TabsTrigger>
-          <TabsTrigger value="content" className="gap-1.5">
-            <FileText size={14} /> Mô tả & Điểm nổi bật
-          </TabsTrigger>
-          <TabsTrigger value="specs" className="gap-1.5">
-            <Wrench size={14} /> Thông số & Kỹ thuật
-          </TabsTrigger>
-          <TabsTrigger value="extra" className="gap-1.5">
-            <HelpCircle size={14} /> Lắp đặt & FAQ
-          </TabsTrigger>
+        <TabsList className="w-full justify-start overflow-x-auto p-1 bg-white border border-gray-light/80 rounded-2xl">
+          {TAB_STEPS.map((step) => {
+            const Icon = step.icon;
+            return (
+              <TabsTrigger
+                key={step.id}
+                value={step.id}
+                className="gap-1.5 text-xs font-bold data-[state=active]:bg-brand-green data-[state=active]:text-navy rounded-xl py-2 px-3.5"
+              >
+                <Icon size={14} />
+                <span>{step.label}</span>
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
 
         {/* TAB 1: THÔNG TIN CHUNG */}
-        <TabsContent value="general">
+        <TabsContent value="general" className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>Thông tin cơ bản</CardTitle>
@@ -418,12 +604,15 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                 Tên hiển thị, mã model, phân loại danh mục và thương hiệu sản phẩm.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-xs font-bold text-navy">
-                    Tên sản phẩm <span className="text-rose-600">*</span>
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-navy">
+                      Tên sản phẩm <span className="text-rose-600">*</span>
+                    </label>
+                    <span className="text-[11px] text-navy/40">{name.length} ký tự</span>
+                  </div>
                   <Input
                     type="text"
                     placeholder="VD: Khóa Điện Tử Kassler KL-600 Face ID Cao Cấp"
@@ -431,11 +620,12 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                     onChange={(e) => {
                       const newName = e.target.value;
                       setName(newName);
-                      if (!isEditing && newName.trim()) {
+                      if (autoSlugSync && !isEditing && newName.trim()) {
                         setId(slugify(newName));
                       }
                     }}
                     required
+                    className="font-semibold"
                   />
                 </div>
 
@@ -448,23 +638,52 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                     placeholder="VD: KL-600"
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
+                    className="font-mono text-xs"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-navy">
-                    ID / Slug đường dẫn URL <span className="text-rose-600">*</span>
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="VD: khoa-kassler-kl-600"
-                    value={id}
-                    onChange={(e) => setId(e.target.value)}
-                    disabled={isEditing}
-                    className={isEditing ? "bg-gray-100 font-mono text-xs cursor-not-allowed" : "font-mono text-xs"}
-                  />
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-navy">
+                      ID / Slug đường dẫn URL <span className="text-rose-600">*</span>
+                    </label>
+                    {!isEditing && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAutoSlugSync(!autoSlugSync);
+                          if (!autoSlugSync && name.trim()) {
+                            setId(slugify(name));
+                          }
+                        }}
+                        className="text-[10.5px] font-bold text-brand-green hover:underline inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        {autoSlugSync ? <Lock size={11} /> : <Unlock size={11} />}
+                        <span>{autoSlugSync ? "Đang đồng bộ tự động" : "Tự do chỉnh sửa"}</span>
+                      </button>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      placeholder="VD: khoa-kassler-kl-600"
+                      value={id}
+                      onChange={(e) => {
+                        setId(e.target.value);
+                        setAutoSlugSync(false);
+                      }}
+                      disabled={isEditing}
+                      className={
+                        isEditing
+                          ? "bg-gray-100 font-mono text-xs cursor-not-allowed"
+                          : "font-mono text-xs"
+                      }
+                    />
+                  </div>
                   {isEditing && (
-                    <span className="text-[10px] text-navy/40">ID cố định khi chỉnh sửa để bảo toàn liên kết SEO.</span>
+                    <span className="text-[10px] text-navy/40">
+                      ID cố định khi chỉnh sửa để bảo toàn liên kết SEO website.
+                    </span>
                   )}
                 </div>
 
@@ -477,7 +696,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                       className="text-[11px] text-brand-green font-bold hover:underline inline-flex items-center gap-1"
                       title="Mở trang Quản lý thương hiệu để xem hoặc đổi logo"
                     >
-                      <span>Quản lý logo</span>
+                      <span>Quản lý logo hãng</span>
                       <ExternalLink size={11} />
                     </Link>
                   </div>
@@ -569,166 +788,275 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                   />
                 </div>
               </div>
+
+              {/* Step Navigation Footer */}
+              <div className="pt-4 border-t border-gray-light/60 flex items-center justify-between">
+                <span className="text-xs text-navy/40 font-medium">Bước 1 / 6: Thông tin cơ bản</span>
+                <Button
+                  type="button"
+                  variant="brand"
+                  size="sm"
+                  onClick={() => setActiveTab("pricing")}
+                  className="text-xs font-bold gap-1.5"
+                >
+                  <span>Tiếp tục: Cấu hình giá & Khuyến mãi</span>
+                  <ChevronRight size={14} />
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* TAB 2: GIÁ & KHUYẾN MÃI */}
-        <TabsContent value="pricing">
+        {/* TAB 2: GIÁ & KHUYẾN MÃI (SMART AUTO CALCULATION) */}
+        <TabsContent value="pricing" className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle>Cấu hình Giá & Khuyến mãi</CardTitle>
+              <div className="flex items-center gap-2">
+                <Calculator size={20} className="text-brand-green" />
+                <CardTitle>Cấu hình Giá & Tính toán Khuyến mãi Tự động</CardTitle>
+              </div>
               <CardDescription>
-                Thiết lập giá bán ưu đãi và giá gốc niêm yết. Hệ thống sẽ tự động tính phần trăm giảm giá và hiển thị số tiền tiết kiệm trên giao diện.
+                Nhập giá gốc và % khuyến mãi để hệ thống <strong>tự động tính giá bán ưu đãi</strong>, hoặc nhập giá bán ưu đãi để tự động tính % giảm giá.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
+              
+              {/* 3-Column Pricing Smart Inputs */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#FAF9F5] p-4 sm:p-5 rounded-2xl border border-gray-light/80">
+                
+                {/* 1. Original Price Input */}
+                <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-navy flex items-center gap-1.5">
-                      <Flame size={14} className="text-rose-600" /> Giá bán ưu đãi (VND)
+                    <label className="text-xs font-extrabold text-navy flex items-center gap-1.5">
+                      <DollarSign size={14} className="text-navy/60" /> 1. Giá gốc niêm yết (VND)
                     </label>
-                    {numPrice > 0 && (
-                      <span className="text-xs font-black text-rose-600">
-                        {new Intl.NumberFormat("vi-VN").format(numPrice)} đ
-                      </span>
-                    )}
-                  </div>
-                  <div className="relative">
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="VD: 14.500.000"
-                      value={price ? new Intl.NumberFormat("vi-VN").format(Number(price.replace(/\D/g, ""))) : ""}
-                      onChange={(e) => {
-                        const raw = e.target.value.replace(/\D/g, "");
-                        setPrice(raw);
-                      }}
-                      className="pr-12 text-sm font-bold text-navy"
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-navy/40">
-                      VNĐ
-                    </span>
-                  </div>
-                  {numPrice > 0 ? (
-                    <div className="rounded-lg bg-rose-50 border border-rose-200/60 px-2.5 py-1.5 text-xs font-bold text-rose-700 flex items-center justify-between">
-                      <span>Số tiền hiển thị:</span>
-                      <span className="text-sm font-black">{new Intl.NumberFormat("vi-VN").format(numPrice)} đ</span>
-                    </div>
-                  ) : (
-                    <span className="text-[11px] text-navy/50">
-                      Giá thực tế bán cho khách hàng (VD: 14.500.000 đ).
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-navy">
-                      Giá gốc niêm yết (VND)
-                    </label>
-                    {numOrigPrice > 0 && (
-                      <span className="text-xs font-bold text-zinc-500 line-through">
-                        {new Intl.NumberFormat("vi-VN").format(numOrigPrice)} đ
-                      </span>
-                    )}
                   </div>
                   <div className="relative">
                     <Input
                       type="text"
                       inputMode="numeric"
                       placeholder="VD: 18.000.000"
-                      value={originalPrice ? new Intl.NumberFormat("vi-VN").format(Number(originalPrice.replace(/\D/g, ""))) : ""}
-                      onChange={(e) => {
-                        const raw = e.target.value.replace(/\D/g, "");
-                        setOriginalPrice(raw);
-                      }}
-                      className="pr-12 text-sm font-bold text-navy"
+                      value={
+                        originalPrice
+                          ? new Intl.NumberFormat("vi-VN").format(Number(originalPrice.replace(/\D/g, "")))
+                          : ""
+                      }
+                      onChange={(e) => handleOriginalPriceChange(e.target.value)}
+                      className="pr-12 text-sm font-bold text-navy bg-white"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-navy/40">
                       VNĐ
                     </span>
                   </div>
 
-                  {numPrice > 0 && (
-                    <div className="flex items-center gap-1.5 pt-0.5">
-                      <span className="text-[10px] font-bold text-navy/50 uppercase">Gợi ý giá gốc:</span>
-                      {[10, 15, 20, 25, 30].map((pct) => {
-                        const calcOrig = Math.round((numPrice * (1 + pct / 100)) / 10000) * 10000;
-                        return (
-                          <button
-                            key={pct}
-                            type="button"
-                            onClick={() => setOriginalPrice(String(calcOrig))}
-                            className="rounded px-1.5 py-0.5 text-[10px] font-bold bg-[#FAF9F5] hover:bg-brand-green/15 hover:text-brand-green border border-gray-light text-navy/70 transition-colors cursor-pointer"
-                            title={`Đặt giá gốc cao hơn ${pct}%: ${new Intl.NumberFormat("vi-VN").format(calcOrig)} đ`}
-                          >
-                            +{pct}%
-                          </button>
-                        );
-                      })}
+                  {/* Quick markup buttons (if sale price already entered) */}
+                  {numPrice > 0 && numOrigPrice === 0 && (
+                    <div className="flex items-center gap-1 pt-1 flex-wrap">
+                      <span className="text-[10px] font-bold text-navy/50">Tạo giá gốc:</span>
+                      {[10, 15, 20, 25, 30].map((pct) => (
+                        <button
+                          key={pct}
+                          type="button"
+                          onClick={() => handleApplyQuickMarkup(pct)}
+                          className="rounded px-1.5 py-0.5 text-[10.5px] font-bold bg-white hover:bg-brand-green/20 hover:text-[#2d5a15] border border-gray-200 text-navy/70 transition-colors cursor-pointer"
+                          title={`Tính giá gốc cao hơn ${pct}%`}
+                        >
+                          +{pct}%
+                        </button>
+                      ))}
                     </div>
                   )}
 
-                  {numOrigPrice > 0 ? (
-                    <div className="rounded-lg bg-gray-50 border border-gray-200 px-2.5 py-1.5 text-xs font-semibold text-navy/70 flex items-center justify-between">
-                      <span>Giá niêm yết:</span>
-                      <span className="text-xs font-bold text-zinc-500 line-through">{new Intl.NumberFormat("vi-VN").format(numOrigPrice)} đ</span>
-                    </div>
-                  ) : (
-                    <span className="text-[11px] text-navy/50">
-                      Giá niêm yết gạch ngang để hiển thị ưu đãi giảm giá (VD: 18.000.000 đ).
-                    </span>
-                  )}
+                  <span className="text-[10.5px] text-navy/50 block">
+                    Giá niêm yết ban đầu trước khi áp dụng khuyến mãi.
+                  </span>
                 </div>
 
-                <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-xs font-bold text-navy">
-                    Text khoảng giá hiển thị (Price Range)
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="VD: 14.500.000 đ hoặc Liên hệ báo giá"
-                    value={priceRange}
-                    onChange={(e) => setPriceRange(e.target.value)}
-                  />
-                  <span className="text-[11px] text-navy/50">
-                    Nếu để trống, hệ thống sẽ tự động định dạng từ giá bán ưu đãi.
+                {/* 2. Discount Percentage Input */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-extrabold text-brand-green flex items-center gap-1.5">
+                      <Percent size={14} /> 2. % Khuyến mãi / Giảm giá
+                    </label>
+                    {discountPercent > 0 && (
+                      <span className="text-xs font-black text-rose-600 bg-rose-50 border border-rose-200 px-1.5 py-0.2 rounded">
+                        -{discountPercent}%
+                      </span>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="VD: 20"
+                      value={discountPercentInput}
+                      onChange={(e) => handleDiscountPercentChange(e.target.value)}
+                      className="pr-8 text-sm font-bold text-brand-green bg-white"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-navy/40">
+                      %
+                    </span>
+                  </div>
+
+                  {/* Quick discount chips */}
+                  <div className="flex items-center gap-1 pt-1 flex-wrap">
+                    {[5, 10, 15, 20, 25, 30, 40, 50].map((pct) => (
+                      <button
+                        key={pct}
+                        type="button"
+                        onClick={() => handleApplyQuickDiscount(pct)}
+                        className={`rounded px-1.5 py-0.5 text-[10px] font-bold transition-colors cursor-pointer border ${
+                          numDiscountPct === pct
+                            ? "bg-brand-green text-navy border-brand-green font-extrabold"
+                            : "bg-white hover:bg-brand-green/15 hover:text-brand-green border-gray-200 text-navy/70"
+                        }`}
+                      >
+                        -{pct}%
+                      </button>
+                    ))}
+                  </div>
+                  <span className="text-[10.5px] text-navy/50 block">
+                    Nhập % hoặc bấm nút trên để <strong>auto tính giá sale</strong>.
+                  </span>
+                </div>
+
+                {/* 3. Result Sale Price Input */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-extrabold text-rose-600 flex items-center gap-1.5">
+                      <Flame size={14} /> 3. Giá bán ưu đãi (Giá Sale)
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="VD: 14.500.000"
+                      value={
+                        price
+                          ? new Intl.NumberFormat("vi-VN").format(Number(price.replace(/\D/g, "")))
+                          : ""
+                      }
+                      onChange={(e) => handlePriceChange(e.target.value)}
+                      className="pr-12 text-sm font-black text-rose-600 bg-white border-rose-200 focus:border-rose-400 focus:ring-rose-200"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-rose-600/60">
+                      VNĐ
+                    </span>
+                  </div>
+
+                  {hasDiscount && (
+                    <div className="rounded-lg bg-rose-50 border border-rose-200 px-2.5 py-1 text-[11px] font-bold text-rose-700 flex items-center justify-between">
+                      <span>Tiết kiệm:</span>
+                      <span className="font-extrabold">
+                        {new Intl.NumberFormat("vi-VN").format(savedAmount)} đ
+                      </span>
+                    </div>
+                  )}
+
+                  <span className="text-[10.5px] text-navy/50 block">
+                    Giá thực tế khách hàng thanh toán trên website.
                   </span>
                 </div>
               </div>
 
-              {/* Live Preview Box */}
-              <div className="rounded-2xl bg-[#FAF9F5] border border-gray-light/80 p-4 space-y-2">
-                <div className="text-xs font-bold uppercase tracking-wider text-navy/60 flex items-center gap-1.5">
-                  <Sparkles size={13} className="text-brand-green" /> Xem trước hiển thị giá trên website:
+              {/* Warnings if pricing is inverted */}
+              {numOrigPrice > 0 && numPrice > 0 && numPrice > numOrigPrice && (
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2.5 text-xs text-amber-800 font-medium">
+                  <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong>Cảnh báo:</strong> Giá bán ưu đãi ({new Intl.NumberFormat("vi-VN").format(numPrice)} đ) đang cao hơn Giá gốc niêm yết ({new Intl.NumberFormat("vi-VN").format(numOrigPrice)} đ). Vui lòng kiểm tra lại.
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-baseline gap-3 pt-1">
-                  <span className="text-2xl font-black text-rose-600">
-                    {numPrice > 0 ? `${new Intl.NumberFormat("vi-VN").format(numPrice)} đ` : (priceRange || "Liên hệ")}
+              )}
+
+              {/* Price Range Field */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-navy">
+                    Chuỗi khoảng giá hiển thị (Price Range Text)
+                  </label>
+                  {numPrice > 0 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPriceRange(`${new Intl.NumberFormat("vi-VN").format(numPrice)} đ`)
+                      }
+                      className="text-[10.5px] font-bold text-brand-green hover:underline cursor-pointer"
+                    >
+                      Đồng bộ theo Giá sale
+                    </button>
+                  )}
+                </div>
+                <Input
+                  type="text"
+                  placeholder="VD: 14.500.000 đ hoặc Liên hệ báo giá"
+                  value={priceRange}
+                  onChange={(e) => setPriceRange(e.target.value)}
+                />
+                <span className="text-[11px] text-navy/50">
+                  Chuỗi văn bản hiển thị trên danh sách sản phẩm (VD: 14.500.000 đ).
+                </span>
+              </div>
+
+              {/* Live Preview Box */}
+              <div className="rounded-2xl bg-gradient-to-r from-[#FAF9F5] to-white border border-gray-light/90 p-4 sm:p-5 space-y-2 shadow-xs">
+                <div className="text-xs font-extrabold uppercase tracking-wider text-navy/60 flex items-center gap-1.5">
+                  <Sparkles size={14} className="text-brand-green" /> Xem trước hiển thị giá trên Website:
+                </div>
+                <div className="flex flex-wrap items-baseline gap-3 pt-2">
+                  <span className="text-2xl sm:text-3xl font-black text-rose-600 tracking-tight">
+                    {numPrice > 0
+                      ? `${new Intl.NumberFormat("vi-VN").format(numPrice)} đ`
+                      : priceRange || "Liên hệ"}
                   </span>
+
                   {hasDiscount && (
                     <>
-                      <span className="rounded-md bg-rose-600 px-2 py-0.5 text-xs font-black text-white">
+                      <span className="rounded-lg bg-rose-600 px-2.5 py-1 text-xs font-black text-white shadow-xs">
                         -{discountPercent}%
                       </span>
-                      <span className="text-xs text-zinc-400 line-through font-semibold">
+                      <span className="text-sm sm:text-base text-zinc-400 line-through font-bold">
                         {new Intl.NumberFormat("vi-VN").format(numOrigPrice)} đ
                       </span>
-                      <span className="rounded-md bg-rose-50 border border-rose-200 px-2 py-0.5 text-xs font-bold text-rose-700">
+                      <span className="rounded-lg bg-rose-100/70 border border-rose-300/60 px-2.5 py-1 text-xs font-bold text-rose-800">
                         Tiết kiệm {new Intl.NumberFormat("vi-VN").format(savedAmount)} đ
                       </span>
                     </>
                   )}
                 </div>
               </div>
+
+              {/* Step Navigation Footer */}
+              <div className="pt-4 border-t border-gray-light/60 flex items-center justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setActiveTab("general")}
+                  className="text-xs font-semibold gap-1.5 text-navy"
+                >
+                  <ChevronLeft size={14} />
+                  <span>Quay lại: Thông tin chung</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="brand"
+                  size="sm"
+                  onClick={() => setActiveTab("media")}
+                  className="text-xs font-bold gap-1.5"
+                >
+                  <span>Tiếp tục: Hình ảnh & Album</span>
+                  <ChevronRight size={14} />
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* TAB 3: HÌNH ẢNH & MEDIA */}
-        <TabsContent value="media">
+        <TabsContent value="media" className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>Hình ảnh & Album sản phẩm</CardTitle>
@@ -750,7 +1078,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                     onChange={(e) => setImageUrl(e.target.value)}
                     className="flex-1 text-xs"
                   />
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-gray-light bg-[#FAF9F5] flex items-center justify-center">
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-gray-light bg-[#FAF9F5] flex items-center justify-center shadow-xs">
                     {imageUrl ? (
                       <Image
                         src={imageUrl}
@@ -773,7 +1101,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                 placeholder="https://... hoặc /images/products/kl-600-angle.png"
                 items={images}
                 onChange={setImages}
-                addButtonText="Thêm ảnh"
+                addButtonText="Thêm ảnh chi tiết"
               />
 
               {/* Gallery Preview Strip */}
@@ -786,7 +1114,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                     {images.map((img, idx) => (
                       <div
                         key={idx}
-                        className="relative h-16 w-16 overflow-hidden rounded-xl border border-gray-light bg-[#FAF9F5]"
+                        className="relative h-16 w-16 overflow-hidden rounded-xl border border-gray-light bg-[#FAF9F5] shadow-xs"
                       >
                         <Image
                           src={img}
@@ -812,12 +1140,37 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                   addButtonText="Thêm ảnh thi công"
                 />
               </div>
+
+              {/* Step Navigation Footer */}
+              <div className="pt-4 border-t border-gray-light/60 flex items-center justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setActiveTab("pricing")}
+                  className="text-xs font-semibold gap-1.5 text-navy"
+                >
+                  <ChevronLeft size={14} />
+                  <span>Quay lại: Giá & Khuyến mãi</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="brand"
+                  size="sm"
+                  onClick={() => setActiveTab("content")}
+                  className="text-xs font-bold gap-1.5"
+                >
+                  <span>Tiếp tục: Mô tả & Tính năng</span>
+                  <ChevronRight size={14} />
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* TAB 4: MÔ TẢ & ĐIỂM NỔI BẬT */}
-        <TabsContent value="content">
+        <TabsContent value="content" className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>Nội dung & Điểm nổi bật</CardTitle>
@@ -826,26 +1179,26 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
+              {/* Short Description */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-navy">Mô tả ngắn (Short Description)</label>
                 <Textarea
-                  placeholder="Tóm tắt ngắn gọn 1-2 câu về sản phẩm..."
+                  placeholder="Tóm tắt ngắn gọn 1-2 câu về sản phẩm (hiển thị trên thẻ chia sẻ & tóm tắt đầu trang)..."
                   value={shortDescription}
                   onChange={(e) => setShortDescription(e.target.value)}
-                  className="min-h-[70px]"
+                  className="min-h-[70px] text-xs"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-navy">Bài viết mô tả chi tiết (Description)</label>
-                <Textarea
-                  placeholder="Nội dung giới thiệu chi tiết, công năng, vật liệu và trải nghiệm sản phẩm..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="min-h-[140px]"
-                />
-              </div>
-
+              {/* Rich Text Editor for Detailed Description */}
+              <RichTextEditor
+                label="Bài viết mô tả chi tiết sản phẩm (Detailed Description)"
+                description="Sử dụng thanh công cụ để định dạng in đậm, in nghiêng, chia đoạn, thêm gạch đầu dòng và tiêu đề phụ."
+                placeholder=""
+                value={description}
+                onChange={setDescription}
+                minHeight="min-h-[180px]"
+              />
               <DynamicListInput
                 label="Danh sách điểm nổi bật (Features Bullets)"
                 description="Các gạch đầu dòng tính năng then chốt (hiển thị trên thẻ sản phẩm và chi tiết)."
@@ -854,12 +1207,37 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                 onChange={setFeatures}
                 addButtonText="Thêm đặc điểm"
               />
+
+              {/* Step Navigation Footer */}
+              <div className="pt-4 border-t border-gray-light/60 flex items-center justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setActiveTab("media")}
+                  className="text-xs font-semibold gap-1.5 text-navy"
+                >
+                  <ChevronLeft size={14} />
+                  <span>Quay lại: Hình ảnh & Album</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="brand"
+                  size="sm"
+                  onClick={() => setActiveTab("specs")}
+                  className="text-xs font-bold gap-1.5"
+                >
+                  <span>Tiếp tục: Thông số kỹ thuật</span>
+                  <ChevronRight size={14} />
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* TAB 5: THÔNG SỐ & KỸ THUẬT */}
-        <TabsContent value="specs">
+        <TabsContent value="specs" className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>Thông số kỹ thuật & Công nghệ</CardTitle>
@@ -915,12 +1293,37 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                   addButtonText="Thêm màu"
                 />
               </div>
+
+              {/* Step Navigation Footer */}
+              <div className="pt-4 border-t border-gray-light/60 flex items-center justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setActiveTab("content")}
+                  className="text-xs font-semibold gap-1.5 text-navy"
+                >
+                  <ChevronLeft size={14} />
+                  <span>Quay lại: Mô tả & Tính năng</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="brand"
+                  size="sm"
+                  onClick={() => setActiveTab("extra")}
+                  className="text-xs font-bold gap-1.5"
+                >
+                  <span>Tiếp tục: Lắp đặt & FAQ</span>
+                  <ChevronRight size={14} />
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* TAB 6: LẮP ĐẶT & FAQ */}
-        <TabsContent value="extra">
+        <TabsContent value="extra" className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>Quy trình Lắp đặt & Câu hỏi thường gặp</CardTitle>
@@ -1003,6 +1406,31 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Step Navigation Footer */}
+              <div className="pt-4 border-t border-gray-light/60 flex items-center justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setActiveTab("specs")}
+                  className="text-xs font-semibold gap-1.5 text-navy"
+                >
+                  <ChevronLeft size={14} />
+                  <span>Quay lại: Thông số kỹ thuật</span>
+                </Button>
+
+                <Button
+                  type="submit"
+                  variant="brand"
+                  size="default"
+                  disabled={submitting}
+                  className="text-xs font-bold gap-1.5 shadow-sm px-6 h-10"
+                >
+                  <Save size={15} />
+                  <span>{submitting ? "Đang lưu..." : isEditing ? "Hoàn tất & Lưu thay đổi" : "Hoàn tất & Tạo sản phẩm"}</span>
+                </Button>
               </div>
             </CardContent>
           </Card>

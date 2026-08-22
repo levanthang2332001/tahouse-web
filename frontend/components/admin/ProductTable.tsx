@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -35,14 +36,24 @@ import type { Product } from "@/lib/types/product";
 type AdminProductViewMode = "table" | "grid" | "list";
 
 export function ProductTable() {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(16);
   const [totalPages, setTotalPages] = useState(1);
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
+  const [search, setSearch] = useState(() => searchParams.get("search") ?? "");
+  const [category, setCategory] = useState(() => searchParams.get("category") ?? "all");
   const [sortBy, setSortBy] = useState("newest");
+
+  // Sync state khi URL params thay đổi (navigate từ trang khác, component không unmount)
+  useEffect(() => {
+    const urlCategory = searchParams.get("category") ?? "all";
+    const urlSearch = searchParams.get("search") ?? "";
+    setCategory(urlCategory);
+    setSearch(urlSearch);
+    setPage(1);
+  }, [searchParams]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<AdminProductViewMode>("table");
   const [stats, setStats] = useState<{

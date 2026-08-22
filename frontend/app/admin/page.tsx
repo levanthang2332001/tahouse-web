@@ -277,7 +277,7 @@ export default function AdminDashboardPage() {
                   {/* Card Bottom CTA */}
                   <div className="pt-3.5 mt-3.5 border-t border-gray-light/40 flex items-center justify-between">
                     <Link
-                      href={`/admin/products?category=${sector.slugs[0]}`}
+                      href={`/admin/products?category=${sector.id}`}
                       className="text-xs font-bold text-brand-green hover:underline flex items-center gap-1"
                     >
                       <span>Xem toàn bộ ngành hàng</span>

@@ -5,10 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Flame, Sparkles, Tag } from "lucide-react";
 import { getCategoryLabel } from "@/data/catalog-taxonomy";
+import { FormattedText } from "@/components/ui/FormattedText";
 import type { Product } from "@/lib/types/product";
 import { calculateProductDiscount } from "@/lib/format-price";
 import { formatProductName } from "@/lib/format-product-name";
-
 export type ProductViewMode = "grid" | "grid-large" | "list";
 
 export default function ProductCard({
@@ -150,7 +150,7 @@ export default function ProductCard({
               {product.features?.slice(0, 3).map((feat, index) => (
                 <li key={index} className="text-xs text-navy/75 flex items-start gap-2 leading-relaxed">
                   <span className="h-1.5 w-1.5 rounded-full bg-brand-green mt-1.5 shrink-0" />
-                  <span className="line-clamp-2">{feat}</span>
+                  <span className="line-clamp-2"><FormattedText content={feat} /></span>
                 </li>
               ))}
             </ul>
@@ -291,7 +291,7 @@ export default function ProductCard({
           {product.features?.slice(0, isLarge ? 3 : 2).map((feat, index) => (
             <li key={index} className="text-[11px] text-navy/70 flex items-start gap-1.5 leading-tight">
               <span className="text-[12px] text-zinc-400 select-none leading-none mt-0.5">•</span>
-              <span className="line-clamp-1">{feat}</span>
+            <span className="line-clamp-1"><FormattedText content={feat} /></span>
             </li>
           ))}
         </ul>
