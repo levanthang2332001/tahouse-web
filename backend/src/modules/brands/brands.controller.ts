@@ -17,7 +17,7 @@ export class BrandsController {
     status: 200,
     description: 'Danh sách thương hiệu và danh mục được lấy thành công.',
   })
-  findAll(): IBrand[] {
+  async findAll(): Promise<IBrand[]> {
     return this.brandsService.findAll();
   }
 }

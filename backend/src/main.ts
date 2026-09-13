@@ -5,7 +5,7 @@ import * as os from 'os';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { config } from '@/common/config';
-import { ExternalApiExceptionFilter } from '@/common/filters/external-api-exception.filter';
+import { GlobalExceptionFilter } from '@/common/filters';
 import { LoggingInterceptor } from '@/common/logger/logging.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor';
@@ -28,20 +28,26 @@ function getLocalIP(): string {
  * Thực hiện cấu hình các thành phần hệ thống:
  * 1. Khởi tạo ứng dụng NestJS từ AppModule.
  * 2. Thiết lập ValidationPipe toàn cục để kiểm tra dữ liệu đầu vào.
- * 3. Đăng ký Global Filter (ExternalApiExceptionFilter) để xử lý lỗi API bên ngoài.
+ * 3. Đăng ký Global Filter để chuẩn hóa mã lỗi.
  * 4. Đăng ký Global Interceptor (LoggingInterceptor, TransformInterceptor).
- * 5. Cấu hình CORS cho phép truy cập từ mọi nguồn (origin: '*').
- * 6. Cấu hình Swagger để tự động tạo tài liệu API tại đường dẫn /api/docs.
- * 7. Lắng nghe trên cổng được cấu hình trong file môi trường.
+ * 5. Cấu hình CORS cho phép truy cập từ mọi nguồn.
+ * 6. Cấu hình Static Assets cho /public và /uploads.
+ * 7. Cấu hình Swagger API Docs tại /api/docs.
+ * 8. Lắng nghe trên cổng được cấu hình trong file môi trường.
  */
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // Ảnh catalogue local (fallback khi R2 public URL 403)
+  // Ảnh catalogue local và static assets
   app.useStaticAssets(join(__dirname, '..', 'public'), {
     prefix: '/',
+  });
+
+  // Đường dẫn static phục vụ file/ảnh/video upload
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',
   });
 
   app.useGlobalPipes(
@@ -51,7 +57,7 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalFilters(new ExternalApiExceptionFilter());
+  app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalInterceptors(
     new LoggingInterceptor(),
     new TransformInterceptor(),
@@ -68,7 +74,13 @@ async function bootstrap() {
     .setTitle('TA House API')
     .setDescription('Tài liệu API cho hệ thống TA House Web')
     .setVersion('1.0')
+    .addBearerAuth()
     .addTag(SwaggerTag.PRODUCTS, 'API quản lý sản phẩm khóa cửa')
+    .addTag(SwaggerTag.BRANDS, 'API thương hiệu')
+    .addTag(SwaggerTag.AUTH, 'API xác thực và quản lý phiên đăng nhập')
+    .addTag(SwaggerTag.ADMIN_PRODUCTS, 'API quản trị sản phẩm')
+    .addTag(SwaggerTag.ADMIN_BRANDS, 'API quản trị thương hiệu')
+    .addTag(SwaggerTag.ADMIN_UPLOAD, 'API tải lên và quản lý tệp tin (Ảnh, Video, Tài liệu)')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);

@@ -1,9 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { removeDiacritics } from '@/common/utils/string.util';
 import { resolveMediaUrl, resolveMediaUrls } from '@/common/utils/url.util';
-import { JsonDbService } from '../database/json-db.service';
+import { Product, ProductDocument } from './schemas/product.schema';
+import { Brand, BrandDocument } from '@/modules/brands/schemas/brand.schema';
 import { GetProductsDto, ProductSortBy } from './dto/get-products.dto';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import {
   GetInstallationMediaDto,
   MediaType,
@@ -13,22 +22,23 @@ import type { IProduct, IProductsListResponse } from './types/product.types';
 
 @Injectable()
 export class ProductsService {
-  private getProducts: () => any[];
   private readonly imageBaseUrl: string;
 
   constructor(
-    private readonly jsonDb: JsonDbService,
+    @InjectModel(Product.name)
+    private readonly productModel: Model<ProductDocument>,
+    @InjectModel(Brand.name)
+    private readonly brandModel: Model<BrandDocument>,
     private readonly configService: ConfigService,
   ) {
-    this.getProducts = this.jsonDb.register('products.json', []);
     this.imageBaseUrl = this.configService.get<string>('IMAGE_BASE_URL') || '';
   }
 
-  getRawProducts(): any[] {
-    return this.getProducts();
+  async getRawProducts(): Promise<any[]> {
+    return this.productModel.find().lean().exec();
   }
 
-  /** Giá hiệu dụng: dùng root price nếu có, nếu không lấy giá thấp nhất trong variants. */
+  /** Effective price calculation */
   private resolvePrice(product: any): number | null {
     if (product.price !== null && product.price !== undefined) {
       return product.price;
@@ -44,10 +54,187 @@ export class ProductsService {
     return null;
   }
 
-  findAll(query: GetProductsDto): IProductsListResponse {
+  /**
+   * Lấy bản đồ thương hiệu & danh mục để map thông tin trả về cho client
+   */
+  private async getBrandMap(): Promise<Map<number, any>> {
+    const brands = await this.brandModel.find().lean().exec();
+    const map = new Map<number, any>();
+    for (const b of brands) {
+      map.set(b.id, b);
+    }
+    return map;
+  }
+
+  /**
+   * Tự động tra cứu và bổ sung tên thương hiệu, brandSlug, categoryName, subcategoryName
+   */
+  private resolveBrandAndCategoryInfo(
+    item: { brandId?: number | null; category?: string; subcategory?: string },
+    brandMap: Map<number, any>,
+  ) {
+    let brand = '';
+    let brandSlug = '';
+    let categoryName = '';
+    let subcategoryName = '';
+
+    if (item.brandId && brandMap.has(item.brandId)) {
+      const b = brandMap.get(item.brandId);
+      brand = b.name || '';
+      brandSlug = b.slug || '';
+
+      if (item.category && Array.isArray(b.categories)) {
+        const cSlug = item.category.toLowerCase().trim();
+        const matchedCat = b.categories.find(
+          (c: any) =>
+            c.slug?.toLowerCase() === cSlug || c.name?.toLowerCase() === cSlug,
+        );
+        if (matchedCat) {
+          categoryName = matchedCat.name || '';
+          if (item.subcategory) {
+            const sSlug = item.subcategory.toLowerCase().trim();
+            const matchedSub = (matchedCat.subcategories || []).find(
+              (s: any) =>
+                s.slug?.toLowerCase() === sSlug ||
+                s.name?.toLowerCase() === sSlug,
+            );
+            if (matchedSub) {
+              subcategoryName = matchedSub.name || '';
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      brand,
+      brandSlug,
+      categoryName,
+      subcategoryName,
+    };
+  }
+
+  /**
+   * Tính toán giá gốc (originalPrice), % giảm (discountPercent) và giá bán sau cùng (price)
+   */
+  private computePricing(input: {
+    price?: number | null;
+    originalPrice?: number | null;
+    discountPercent?: number | null;
+    priceRange?: string;
+  }) {
+    let originalPrice =
+      typeof input.originalPrice === 'number' && !isNaN(input.originalPrice)
+        ? input.originalPrice
+        : null;
+    let discountPercent =
+      typeof input.discountPercent === 'number' && !isNaN(input.discountPercent)
+        ? input.discountPercent
+        : null;
+    let price =
+      typeof input.price === 'number' && !isNaN(input.price)
+        ? input.price
+        : null;
+
+    // Nếu có giá gốc và % giảm -> tự tính giá bán (price) nếu chưa có
+    if (originalPrice !== null && discountPercent !== null && discountPercent > 0) {
+      if (price === null) {
+        price = Math.round(originalPrice * (1 - discountPercent / 100));
+      }
+    } else if (
+      originalPrice !== null &&
+      price !== null &&
+      originalPrice > price &&
+      (discountPercent === null || discountPercent === 0)
+    ) {
+      // Tự suy ra % giảm nếu có giá gốc và giá bán
+      discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
+    }
+
+    let priceRange = input.priceRange || '';
+    if (!priceRange && price !== null) {
+      priceRange = price.toLocaleString('vi-VN') + ' VNĐ';
+    }
+
+    return {
+      price,
+      originalPrice,
+      discountPercent,
+      priceRange,
+    };
+  }
+
+  private async enrichRelations(dto: CreateProductDto | UpdateProductDto) {
+    const data: any = { ...dto };
+
+    // Tính toán bảng giá & % giảm cho sản phẩm chính
+    const pricing = this.computePricing(data);
+    data.price = pricing.price;
+    data.originalPrice = pricing.originalPrice;
+    data.discountPercent = pricing.discountPercent;
+    data.priceRange = pricing.priceRange;
+
+    // Tính toán bảng giá cho từng biến thể (nếu có)
+    if (Array.isArray(data.variants)) {
+      data.variants = data.variants.map((v: any) => {
+        const vPricing = this.computePricing(v);
+        return {
+          ...v,
+          price: vPricing.price,
+          originalPrice: vPricing.originalPrice,
+          discountPercent: vPricing.discountPercent,
+          priceRange: vPricing.priceRange,
+        };
+      });
+    }
+
+    // Resolve Brand & its nested Categories
+    if (dto.brandId !== undefined && dto.brandId !== null) {
+      data.brandId = dto.brandId;
+    } else if ((dto as any).brandSlug || (dto as any).brand) {
+      const bSlug = (
+        (dto as any).brandSlug ||
+        (dto as any).brand ||
+        ''
+      )
+        .toLowerCase()
+        .trim();
+      const brandDoc = await this.brandModel
+        .findOne({
+          $or: [
+            { slug: bSlug },
+            { name: { $regex: new RegExp(`^${bSlug}$`, 'i') } },
+          ],
+        })
+        .lean()
+        .exec();
+      if (brandDoc) {
+        data.brandId = brandDoc.id;
+      }
+    }
+
+    // Xóa các trường tên tĩnh để đảm bảo DB chỉ lưu brandId, category, subcategory
+    delete (data as any).brand;
+    delete (data as any).brandSlug;
+    delete (data as any).categoryName;
+    delete (data as any).subcategoryName;
+
+    // Auto-generate clean id if missing
+    if (!data.id && data.code) {
+      data.id = data.code
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-');
+    }
+
+    return data;
+  }
+
+  async findAll(query: GetProductsDto): Promise<IProductsListResponse> {
     const {
       page = PRODUCT_DEFAULTS.PAGINATION.DEFAULT_PAGE,
       limit = PRODUCT_DEFAULTS.PAGINATION.DEFAULT_LIMIT,
+      brandId,
       category,
       subcategory,
       brand,
@@ -57,9 +244,26 @@ export class ProductsService {
       sortBy = ProductSortBy.NEWEST,
     } = query;
 
-    let products = [...this.getProducts()];
+    const filter: any = {};
 
-    // 1. Lọc theo category slug
+    if (brandId !== undefined && brandId !== null) {
+      filter.brandId = brandId;
+    } else if (brand && brand.trim()) {
+      const bSlug = brand.trim().toLowerCase();
+      const brandDoc = await this.brandModel
+        .findOne({
+          $or: [
+            { slug: bSlug },
+            { name: { $regex: new RegExp(`^${bSlug}$`, 'i') } },
+          ],
+        })
+        .lean()
+        .exec();
+      if (brandDoc) {
+        filter.brandId = brandDoc.id;
+      }
+    }
+
     if (category && category.trim()) {
       const queryCat = category.trim().toLowerCase();
       if (queryCat === 'lock-parent') {
@@ -71,42 +275,26 @@ export class ProductsService {
           'cua-cong',
           'khach-san',
         ];
-        products = products.filter((p) =>
-          lockSlugs.includes(p.category?.toLowerCase()),
-        );
+        filter.category = { $in: lockSlugs };
       } else {
-        products = products.filter(
-          (p) => p.category?.toLowerCase() === queryCat,
-        );
+        filter.category = { $regex: new RegExp(`^${queryCat}$`, 'i') };
       }
     }
 
-    // 2. Lọc theo subcategory slug
     if (subcategory && subcategory.trim()) {
-      const querySub = subcategory.trim().toLowerCase();
-      products = products.filter(
-        (p) => p.subcategory?.toLowerCase() === querySub,
-      );
+      filter.subcategory = {
+        $regex: new RegExp(`^${subcategory.trim()}$`, 'i'),
+      };
     }
 
-    // 3. Lọc theo brand slug hoặc tên brand
-    if (brand && brand.trim()) {
-      const queryBrand = brand.trim().toLowerCase();
-      products = products.filter(
-        (p) =>
-          p.brandSlug === queryBrand ||
-          (p.brand && p.brand.toLowerCase() === queryBrand),
-      );
-    }
+    let products = await this.productModel.find(filter).lean().exec();
 
-    // 4. Lọc theo giá tối thiểu
     if (minPrice !== undefined && minPrice !== null && !isNaN(minPrice)) {
       products = products.filter(
         (p) => (this.resolvePrice(p) ?? 0) >= minPrice,
       );
     }
 
-    // 5. Lọc theo giá tối đa
     if (maxPrice !== undefined && maxPrice !== null && !isNaN(maxPrice)) {
       products = products.filter((p) => {
         const ep = this.resolvePrice(p);
@@ -114,8 +302,8 @@ export class ProductsService {
       });
     }
 
-    // 6. Tìm kiếm thông minh
     if (search && search.trim()) {
+      const brandMap = await this.getBrandMap();
       const searchNorm = removeDiacritics(search.trim().toLowerCase());
       const searchKeywords = searchNorm
         .split(PRODUCT_DEFAULTS.SEARCH.SPLIT_REGEX)
@@ -124,13 +312,13 @@ export class ProductsService {
       products = products.filter((p) => {
         const name = p.name || '';
         const code = p.code || '';
-        const catName = p.categoryName || '';
+        const meta = this.resolveBrandAndCategoryInfo(p, brandMap);
         const catSlug = p.category || '';
         const desc = p.description || '';
         const features = Array.isArray(p.features) ? p.features.join(' ') : '';
 
         const searchableText = removeDiacritics(
-          `${name} ${code} ${catName} ${catSlug} ${desc} ${features}`.toLowerCase(),
+          `${name} ${code} ${meta.brand} ${meta.categoryName} ${catSlug} ${desc} ${features}`.toLowerCase(),
         );
         return searchKeywords.every((keyword) =>
           searchableText.includes(keyword),
@@ -138,7 +326,6 @@ export class ProductsService {
       });
     }
 
-    // 7. Sắp xếp sản phẩm
     if (sortBy === ProductSortBy.PRICE_ASC) {
       products.sort((a, b) => {
         const valA = this.resolvePrice(a);
@@ -164,7 +351,6 @@ export class ProductsService {
         return valB - valA;
       });
     } else {
-      // Mặc định (Newest/Priority): sắp xếp theo priority, null/undefined luôn ở cuối
       products.sort((a, b) => {
         const pA = a.priority;
         const pB = b.priority;
@@ -179,24 +365,32 @@ export class ProductsService {
       });
     }
 
-    // 8. Phân trang và Mapping Response List (tinh gọn)
     const pageNum = Math.max(1, page);
     const limitNum = Math.max(1, limit);
     const startIndex = (pageNum - 1) * limitNum;
     const paginatedProducts = products.slice(startIndex, startIndex + limitNum);
+
+    const brandMap = await this.getBrandMap();
+
     const items = paginatedProducts.map((p) => {
+      const pricing = this.computePricing(p);
+      const meta = this.resolveBrandAndCategoryInfo(p, brandMap);
       return {
         id: p.id,
         code: p.code,
         name: p.name,
-        brand: p.brand || '',
-        brandSlug: p.brandSlug || '',
-        category: p.category,
-        categoryName: p.categoryName || '',
+        brandId: p.brandId ?? null,
+        brand: meta.brand,
+        brandSlug: meta.brandSlug,
+        category: p.category || '',
+        categoryName: meta.categoryName,
+        subcategory: p.subcategory || '',
+        subcategoryName: meta.subcategoryName,
         imageUrl: resolveMediaUrl(p.imageUrl || '', this.imageBaseUrl),
-        price: this.resolvePrice(p),
-        originalPrice: p.originalPrice,
-        priceRange: p.priceRange || '',
+        price: this.resolvePrice(p) ?? pricing.price,
+        originalPrice: pricing.originalPrice,
+        discountPercent: pricing.discountPercent,
+        priceRange: pricing.priceRange,
         features: Array.isArray(p.features) ? p.features.slice(0, 2) : [],
         has_variants: p.has_variants || false,
       };
@@ -210,24 +404,41 @@ export class ProductsService {
     };
   }
 
-  findOne(idOrCode: string): IProduct {
-    const products = this.getProducts();
-    const cleanQuery = idOrCode.trim().toLowerCase().replace(/\s+/g, '');
-    const product = products.find(
-      (p) =>
-        p.code?.toLowerCase().replace(/\s+/g, '') === cleanQuery ||
-        p.id?.toLowerCase().replace(/\s+/g, '') === cleanQuery,
-    );
+  async findOne(idOrCode: string): Promise<IProduct> {
+    const cleanQuery = idOrCode.trim();
+    const compactQuery = cleanQuery.toLowerCase().replace(/\s+/g, '');
+
+    let product: any = await this.productModel
+      .findOne({
+        $or: [
+          { code: cleanQuery },
+          { id: cleanQuery },
+          { code: { $regex: new RegExp(`^${cleanQuery}$`, 'i') } },
+          { id: { $regex: new RegExp(`^${cleanQuery}$`, 'i') } },
+        ],
+      })
+      .lean()
+      .exec();
 
     if (!product) {
-      throw new NotFoundException(
-        `Không tìm thấy sản phẩm với ID hoặc mã: ${idOrCode}`,
+      const allProducts = await this.productModel.find().lean().exec();
+      product = allProducts.find(
+        (p) =>
+          p.code?.toLowerCase().replace(/\s+/g, '') === compactQuery ||
+          p.id?.toLowerCase().replace(/\s+/g, '') === compactQuery,
       );
     }
 
-    const effectivePrice = this.resolvePrice(product);
+    if (!product) {
+      throw new NotFoundException(`Product not found: ${idOrCode}`);
+    }
 
-    // Tính toán installation_preview (tối đa 3 ảnh)
+    const pricing = this.computePricing(product);
+    const effectivePrice = this.resolvePrice(product) ?? pricing.price;
+
+    const brandMap = await this.getBrandMap();
+    const meta = this.resolveBrandAndCategoryInfo(product, brandMap);
+
     const installationPreview = product.installation?.images
       ? resolveMediaUrls(
           product.installation.images.slice(
@@ -241,20 +452,23 @@ export class ProductsService {
     const productResponse: IProduct = {
       id: product.id,
       code: product.code,
-      brand: product.brand,
-      brandSlug: product.brandSlug,
-      category: product.category,
-      categoryName: product.categoryName,
-      subcategory: product.subcategory,
-      subcategoryName: product.subcategoryName,
+      brandId: product.brandId ?? null,
+      brand: meta.brand,
+      brandSlug: meta.brandSlug,
+      category: product.category || '',
+      categoryName: meta.categoryName,
+      subcategory: product.subcategory || '',
+      subcategoryName: meta.subcategoryName,
       name: product.name,
       description: product.description || '',
       shortDescription: product.shortDescription || '',
+      content: product.content || '',
       imageUrl: resolveMediaUrl(product.imageUrl || '', this.imageBaseUrl),
       images: resolveMediaUrls(product.images || [], this.imageBaseUrl),
       price: effectivePrice,
-      originalPrice: product.originalPrice,
-      priceRange: product.priceRange || '',
+      originalPrice: pricing.originalPrice,
+      discountPercent: pricing.discountPercent,
+      priceRange: pricing.priceRange,
       features: product.features || [],
       specs: product.specs || {},
       technologies: product.technologies || [],
@@ -266,18 +480,19 @@ export class ProductsService {
       has_variants: product.has_variants || false,
       options: product.options || [],
       variants: Array.isArray(product.variants)
-        ? product.variants.map((v: any) => ({
-            id: v.id,
-            label: v.label,
-            attributes: v.attributes || {},
-            price: v.price,
-            priceRange:
-              v.priceRange ||
-              (typeof v.price === 'number'
-                ? v.price.toLocaleString('vi-VN') + ' VNĐ'
-                : ''),
-            is_default: !!v.is_default,
-          }))
+        ? product.variants.map((v: any) => {
+            const vPricing = this.computePricing(v);
+            return {
+              id: v.id,
+              label: v.label,
+              attributes: v.attributes || {},
+              price: vPricing.price,
+              originalPrice: vPricing.originalPrice,
+              discountPercent: vPricing.discountPercent,
+              priceRange: vPricing.priceRange,
+              is_default: !!v.is_default,
+            };
+          })
         : [],
       installation_preview: installationPreview,
     };
@@ -285,21 +500,38 @@ export class ProductsService {
     return productResponse;
   }
 
-  getInstallationMedia(idOrCode: string, query: GetInstallationMediaDto) {
+  async getInstallationMedia(
+    idOrCode: string,
+    query: GetInstallationMediaDto,
+  ) {
     const { page = 1, limit = 12, type = MediaType.ALL } = query;
 
-    const products = this.getProducts();
-    const cleanQuery = idOrCode.trim().toLowerCase().replace(/\s+/g, '');
-    const product = products.find(
-      (p) =>
-        p.code?.toLowerCase().replace(/\s+/g, '') === cleanQuery ||
-        p.id?.toLowerCase().replace(/\s+/g, '') === cleanQuery,
-    );
+    const cleanQuery = idOrCode.trim();
+    const compactQuery = cleanQuery.toLowerCase().replace(/\s+/g, '');
+
+    let product: any = await this.productModel
+      .findOne({
+        $or: [
+          { code: cleanQuery },
+          { id: cleanQuery },
+          { code: { $regex: new RegExp(`^${cleanQuery}$`, 'i') } },
+          { id: { $regex: new RegExp(`^${cleanQuery}$`, 'i') } },
+        ],
+      })
+      .lean()
+      .exec();
 
     if (!product) {
-      throw new NotFoundException(
-        `Không tìm thấy sản phẩm với ID hoặc mã: ${idOrCode}`,
+      const allProducts = await this.productModel.find().lean().exec();
+      product = allProducts.find(
+        (p) =>
+          p.code?.toLowerCase().replace(/\s+/g, '') === compactQuery ||
+          p.id?.toLowerCase().replace(/\s+/g, '') === compactQuery,
       );
+    }
+
+    if (!product) {
+      throw new NotFoundException(`Product not found: ${idOrCode}`);
     }
 
     const installation = product.installation ?? PRODUCT_DEFAULTS.INSTALLATION;
@@ -345,6 +577,45 @@ export class ProductsService {
         : 0,
       page: pageNum,
       limit: limitNum,
+    };
+  }
+
+  async create(createProductDto: CreateProductDto): Promise<any> {
+    const payload = await this.enrichRelations(createProductDto);
+    const existing = await this.productModel.findOne({
+      $or: [{ id: payload.id }, { code: payload.code }],
+    });
+    if (existing) {
+      throw new ConflictException(
+        `Product with ID "${payload.id}" or code "${payload.code}" already exists`,
+      );
+    }
+    const newProduct = new this.productModel(payload);
+    return newProduct.save();
+  }
+
+  async update(idOrCode: string, updateProductDto: UpdateProductDto): Promise<any> {
+    const payload = await this.enrichRelations(updateProductDto as any);
+    const product = await this.productModel.findOneAndUpdate(
+      { $or: [{ id: idOrCode }, { code: idOrCode }] },
+      { $set: payload },
+      { new: true },
+    );
+    if (!product) {
+      throw new NotFoundException(`Product not found: ${idOrCode}`);
+    }
+    return product;
+  }
+
+  async remove(idOrCode: string): Promise<{ message: string }> {
+    const result = await this.productModel.findOneAndDelete({
+      $or: [{ id: idOrCode }, { code: idOrCode }],
+    });
+    if (!result) {
+      throw new NotFoundException(`Product not found: ${idOrCode}`);
+    }
+    return {
+      message: `Product "${result.name}" (${result.code}) deleted successfully`,
     };
   }
 }

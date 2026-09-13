@@ -36,6 +36,15 @@ export class GetProductsDto {
   limit?: number = 10;
 
   @ApiPropertyOptional({
+    description: 'ID thương hiệu để lọc sản phẩm (ví dụ: 1 cho Kassler)',
+    type: Number,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  brandId?: number;
+
+  @ApiPropertyOptional({
     description:
       'Slug danh mục chính để lọc sản phẩm:\n' +
       '* lock-parent (toàn bộ khóa)\n' +
@@ -45,7 +54,7 @@ export class GetProductsDto {
       '* xingfa-sat\n' +
       '* cua-cong\n' +
       '* khach-san\n' +
-      '* Smart',
+      '* ket-sat',
     type: String,
   })
   @IsOptional()
@@ -53,11 +62,7 @@ export class GetProductsDto {
   category?: string;
 
   @ApiPropertyOptional({
-    description:
-      'Slug danh mục con để lọc sản phẩm:\n' +
-      '* ket-mini\n' +
-      '* ket-gia-dinh\n' +
-      '* ket-van-phong',
+    description: 'Slug danh mục con để lọc sản phẩm',
     type: String,
   })
   @IsOptional()

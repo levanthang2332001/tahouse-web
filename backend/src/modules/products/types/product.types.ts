@@ -7,7 +7,9 @@ export interface IProductVariant {
   id: string;
   label: string;
   attributes: Record<string, string>;
-  price: number;
+  price: number | null;
+  originalPrice?: number | null;
+  discountPercent?: number | null;
   priceRange: string;
   is_default: boolean;
 }
@@ -20,19 +22,22 @@ export interface IProductOption {
 export interface IProduct {
   id: string;
   code: string;
+  brandId?: number | null;
   brand?: string;
   brandSlug?: string;
   category: string;
-  categoryName: string;
+  categoryName?: string;
   subcategory?: string;
   subcategoryName?: string;
   name: string;
   description: string;
   shortDescription: string;
+  content?: string;
   imageUrl: string;
   images: string[];
   price: number | null;
-  originalPrice?: number;
+  originalPrice?: number | null;
+  discountPercent?: number | null;
   priceRange: string;
   features: string[];
   specs: Record<string, string>;
@@ -52,13 +57,17 @@ export interface IProductListItem {
   id: string;
   code: string;
   name: string;
+  brandId?: number | null;
   brand: string;
   brandSlug: string;
   category: string;
   categoryName: string;
+  subcategory?: string;
+  subcategoryName?: string;
   imageUrl: string;
   price: number | null;
-  originalPrice?: number;
+  originalPrice?: number | null;
+  discountPercent?: number | null;
   priceRange: string;
   features: string[];
   has_variants: boolean;

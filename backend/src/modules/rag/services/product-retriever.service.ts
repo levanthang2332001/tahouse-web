@@ -17,10 +17,10 @@ export class ProductRetrieverService implements IRetriever {
     this.imageBaseUrl = this.configService.get<string>('IMAGE_BASE_URL') || '';
   }
 
-  retrieve(query: string, limit = 5): Promise<string> {
-    const rawProducts = this.productsService.getRawProducts();
+  async retrieve(query: string, limit = 5): Promise<string> {
+    const rawProducts = await this.productsService.getRawProducts();
     if (!rawProducts || rawProducts.length === 0) {
-      return Promise.resolve('Không có sản phẩm nào trong cửa hàng.');
+      return 'Không có sản phẩm nào trong cửa hàng.';
     }
 
     const queryNorm = removeDiacritics(query.toLowerCase().trim());

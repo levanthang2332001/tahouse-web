@@ -4,7 +4,9 @@ import { LoggerModule } from '@/common/logger/logger.module';
 import { DatabaseModule } from './modules/database/database.module';
 import { ProductsModule } from './modules/products/products.module';
 import { BrandsModule } from './modules/brands/brands.module';
+import { UploadModule } from './modules/upload/upload.module';
 import { RagModule } from './modules/rag/rag.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 /**
  * Module gốc (Root Module) của toàn bộ ứng dụng.
@@ -18,8 +20,10 @@ import { RagModule } from './modules/rag/rag.module';
     }),
     LoggerModule,
     DatabaseModule,
+    AuthModule,
     ProductsModule,
     BrandsModule,
+    UploadModule,
     RagModule,
   ],
   controllers: [],
