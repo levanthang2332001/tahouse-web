@@ -1,22 +1,24 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from '../schemas/user.schema';
+import { eq } from 'drizzle-orm';
+import { D1_DATABASE } from '@/database';
+import type { D1Database } from '@/database';
+import { users } from '../schemas/user.schema';
 
 export interface JwtPayload {
   sub: string;
-  username: string;
+  username?: string;
+  email?: string;
 }
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,
-    @InjectModel(User.name)
-    private readonly userModel: Model<UserDocument>,
+    @Inject(D1_DATABASE)
+    private readonly db: D1Database,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -26,12 +28,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
-    const user = await this.userModel.findById(payload.sub).exec();
+    const result = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.id, payload.sub));
+
+    const user = result[0];
     if (!user) {
       throw new UnauthorizedException('User not found');
-    }
-    if (user.isActive === false) {
-      throw new UnauthorizedException('Account has been deactivated');
     }
     return user;
   }

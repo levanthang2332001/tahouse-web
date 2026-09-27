@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from '@/common/logger/logger.module';
-import { DatabaseModule } from './modules/database/database.module';
 import { D1DatabaseModule } from './database/d1.module';
 import { ProductsModule } from './modules/products/products.module';
 import { BrandsModule } from './modules/brands/brands.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { RagModule } from './modules/rag/rag.module';
 import { AuthModule } from './modules/auth/auth.module';
-
 import { StatsModule } from './modules/stats/stats.module';
 
 /**
@@ -22,7 +20,6 @@ import { StatsModule } from './modules/stats/stats.module';
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
     LoggerModule,
-    DatabaseModule,
     D1DatabaseModule.forRootAsync(),
     AuthModule,
     ProductsModule,

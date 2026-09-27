@@ -1,11 +1,14 @@
 import {
   Injectable,
+  Inject,
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Brand, BrandDocument } from './schemas/brand.schema';
+import { randomUUID } from 'crypto';
+import { eq, or } from 'drizzle-orm';
+import { D1_DATABASE } from '../../database/d1.constants';
+import type { D1Database } from '../../database/d1.client';
+import { brands, categories, subcategories } from './schemas/brand.schema';
 import {
   CreateBrandDto,
   CategoryDto,
@@ -19,37 +22,83 @@ import type { IBrand } from './types/brand.types';
 @Injectable()
 export class BrandsService {
   constructor(
-    @InjectModel(Brand.name) private readonly brandModel: Model<BrandDocument>,
+    @Inject(D1_DATABASE) private readonly db: D1Database,
   ) {}
 
-  async findAll(): Promise<IBrand[]> {
-    const brands = await this.brandModel.find().sort({ id: 1 }).lean().exec();
-    return brands.map((b: any) => ({
+  async findAll(): Promise<any[]> {
+    const brandRows = await this.db.query.brands.findMany({
+      orderBy: (brands, { asc }) => [asc(brands.orderIndex), asc(brands.name)],
+      with: {
+        categories: {
+          with: {
+            subcategories: true,
+          },
+        },
+      },
+    });
+
+    return brandRows.map((b) => ({
       id: b.id,
       name: b.name,
       slug: b.slug,
       logo: b.logo,
-      logoHtml: b.logoHtml,
-      categories: b.categories || [],
+      logoHtml: b.logoHtml || undefined,
+      orderIndex: b.orderIndex ?? 0,
+      categories: (b.categories || []).map((c) => ({
+        id: c.id,
+        slug: c.slug,
+        name: c.name,
+        subcategories: (c.subcategories || []).map((s) => ({
+          id: s.id,
+          slug: s.slug,
+          name: s.name,
+        })),
+      })),
     }));
   }
 
   async findOne(idOrSlug: string | number): Promise<any> {
-    const isNum = !isNaN(Number(idOrSlug));
-    const brand = await this.brandModel
-      .findOne({
-        $or: [
-          ...(isNum ? [{ id: Number(idOrSlug) }] : []),
-          { slug: String(idOrSlug).toLowerCase().trim() },
-        ],
-      })
-      .lean()
-      .exec();
+    const rawVal = String(idOrSlug).trim();
+    const cleanSlug = rawVal.toLowerCase();
+
+    const brand = await this.db.query.brands.findFirst({
+      where: or(eq(brands.id, rawVal), eq(brands.slug, cleanSlug)),
+      with: {
+        categories: {
+          with: {
+            subcategories: true,
+          },
+        },
+      },
+    });
 
     if (!brand) {
       throw new NotFoundException(`Brand not found: ${idOrSlug}`);
     }
-    return brand;
+
+    return {
+      id: brand.id,
+      _id: brand.id,
+      name: brand.name,
+      slug: brand.slug,
+      logo: brand.logo,
+      logoHtml: brand.logoHtml,
+      orderIndex: brand.orderIndex,
+      categories: (brand.categories || []).map((c) => ({
+        id: c.id,
+        _id: c.id,
+        name: c.name,
+        slug: c.slug,
+        subcategories: (c.subcategories || []).map((s) => ({
+          id: s.id,
+          _id: s.id,
+          name: s.name,
+          slug: s.slug,
+        })),
+      })),
+      createdAt: brand.createdAt,
+      updatedAt: brand.updatedAt,
+    };
   }
 
   async create(createBrandDto: CreateBrandDto): Promise<any> {
@@ -60,74 +109,134 @@ export class BrandsService {
         .replace(/[^a-z0-9]+/g, '-')
     ).trim();
 
-    let brandId = createBrandDto.id;
-    if (!brandId) {
-      const maxBrand = await this.brandModel
-        .findOne()
-        .sort({ id: -1 })
-        .lean()
-        .exec();
-      brandId = (maxBrand?.id ?? 0) + 1;
-    }
-
-    const existing = await this.brandModel.findOne({
-      $or: [{ id: brandId }, { slug: cleanSlug }],
+    const existing = await this.db.query.brands.findFirst({
+      where: eq(brands.slug, cleanSlug),
     });
+
     if (existing) {
       throw new ConflictException(
-        `Brand with ID "${brandId}" or slug "${cleanSlug}" already exists`,
+        `Brand with slug "${cleanSlug}" already exists`,
       );
     }
 
-    const newBrand = new this.brandModel({
-      ...createBrandDto,
+    const brandId = randomUUID();
+    await this.db.insert(brands).values({
       id: brandId,
+      name: createBrandDto.name.trim(),
       slug: cleanSlug,
-      categories: createBrandDto.categories || [],
+      logo: createBrandDto.logo || '',
+      logoHtml: createBrandDto.logoHtml || null,
+      orderIndex: typeof createBrandDto.id === 'number' ? createBrandDto.id : 0,
     });
-    return newBrand.save();
+
+    if (createBrandDto.categories && createBrandDto.categories.length > 0) {
+      for (const catDto of createBrandDto.categories) {
+        const catSlug = (
+          catDto.slug ||
+          removeDiacritics(catDto.name)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+        ).trim();
+
+        const catId = randomUUID();
+        await this.db.insert(categories).values({
+          id: catId,
+          brandId,
+          name: catDto.name.trim(),
+          slug: catSlug,
+        });
+
+        if (catDto.subcategories && catDto.subcategories.length > 0) {
+          for (const subDto of catDto.subcategories) {
+            const subSlug = (
+              subDto.slug ||
+              removeDiacritics(subDto.name)
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+            ).trim();
+
+            const subId = randomUUID();
+            await this.db.insert(subcategories).values({
+              id: subId,
+              categoryId: catId,
+              name: subDto.name.trim(),
+              slug: subSlug,
+            });
+          }
+        }
+      }
+    }
+
+    return this.findOne(brandId);
   }
 
   async update(
     idOrSlug: string | number,
     updateBrandDto: UpdateBrandDto,
   ): Promise<any> {
-    const isNum = !isNaN(Number(idOrSlug));
-    const payload = { ...updateBrandDto };
-    if (payload.slug) {
-      payload.slug = payload.slug.toLowerCase().trim();
+    const current = await this.findOne(idOrSlug);
+    const updateData: Partial<typeof brands.$inferInsert> = {
+      updatedAt: new Date(),
+    };
+
+    if (updateBrandDto.name) updateData.name = updateBrandDto.name.trim();
+    if (updateBrandDto.slug) updateData.slug = updateBrandDto.slug.toLowerCase().trim();
+    if (updateBrandDto.logo !== undefined) updateData.logo = updateBrandDto.logo;
+    if (updateBrandDto.logoHtml !== undefined) updateData.logoHtml = updateBrandDto.logoHtml;
+
+    await this.db
+      .update(brands)
+      .set(updateData)
+      .where(eq(brands.id, current.id));
+
+    if (updateBrandDto.categories) {
+      // Delete old categories (cascade deletes subcategories in SQLite)
+      await this.db.delete(categories).where(eq(categories.brandId, current.id));
+
+      for (const catDto of updateBrandDto.categories) {
+        const catSlug = (
+          catDto.slug ||
+          removeDiacritics(catDto.name)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+        ).trim();
+
+        const catId = randomUUID();
+        await this.db.insert(categories).values({
+          id: catId,
+          brandId: current.id,
+          name: catDto.name.trim(),
+          slug: catSlug,
+        });
+
+        if (catDto.subcategories && catDto.subcategories.length > 0) {
+          for (const subDto of catDto.subcategories) {
+            const subSlug = (
+              subDto.slug ||
+              removeDiacritics(subDto.name)
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+            ).trim();
+
+            const subId = randomUUID();
+            await this.db.insert(subcategories).values({
+              id: subId,
+              categoryId: catId,
+              name: subDto.name.trim(),
+              slug: subSlug,
+            });
+          }
+        }
+      }
     }
 
-    const brand = await this.brandModel.findOneAndUpdate(
-      {
-        $or: [
-          ...(isNum ? [{ id: Number(idOrSlug) }] : []),
-          { slug: String(idOrSlug).toLowerCase().trim() },
-        ],
-      },
-      { $set: payload },
-      { new: true },
-    );
-
-    if (!brand) {
-      throw new NotFoundException(`Brand not found: ${idOrSlug}`);
-    }
-    return brand;
+    return this.findOne(current.id);
   }
 
   async remove(idOrSlug: string | number): Promise<{ message: string }> {
-    const isNum = !isNaN(Number(idOrSlug));
-    const result = await this.brandModel.findOneAndDelete({
-      $or: [
-        ...(isNum ? [{ id: Number(idOrSlug) }] : []),
-        { slug: String(idOrSlug).toLowerCase().trim() },
-      ],
-    });
-
-    if (!result) {
-      throw new NotFoundException(`Brand not found: ${idOrSlug}`);
-    }
-    return { message: `Brand "${result.name}" deleted successfully` };
+    const current = await this.findOne(idOrSlug);
+    await this.db.delete(brands).where(eq(brands.id, current.id));
+    return { message: `Brand "${current.name}" deleted successfully` };
   }
 
   // --- Sub-resource: Category CRUD inside Brand ---
@@ -153,17 +262,34 @@ export class BrandsService {
       );
     }
 
-    const newCat = {
-      name: categoryDto.name,
+    const catId = randomUUID();
+    await this.db.insert(categories).values({
+      id: catId,
+      brandId: brand.id,
+      name: categoryDto.name.trim(),
       slug: cSlug,
-      subcategories: categoryDto.subcategories || [],
-    };
+    });
 
-    return this.brandModel.findByIdAndUpdate(
-      brand._id,
-      { $push: { categories: newCat } },
-      { new: true },
-    );
+    if (categoryDto.subcategories && categoryDto.subcategories.length > 0) {
+      for (const subDto of categoryDto.subcategories) {
+        const subSlug = (
+          subDto.slug ||
+          removeDiacritics(subDto.name)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+        ).trim();
+
+        const subId = randomUUID();
+        await this.db.insert(subcategories).values({
+          id: subId,
+          categoryId: catId,
+          name: subDto.name.trim(),
+          slug: subSlug,
+        });
+      }
+    }
+
+    return this.findOne(brand.id);
   }
 
   async updateCategory(
@@ -174,28 +300,50 @@ export class BrandsService {
     const brand = await this.findOne(idOrSlug);
     const cleanCatSlug = categorySlug.toLowerCase().trim();
 
-    const catIndex = (brand.categories || []).findIndex(
+    const targetCat = (brand.categories || []).find(
       (c: any) => c.slug?.toLowerCase() === cleanCatSlug,
     );
-    if (catIndex === -1) {
+    if (!targetCat) {
       throw new NotFoundException(
         `Category "${categorySlug}" not found in brand "${brand.name}"`,
       );
     }
 
-    const categories = [...brand.categories];
-    categories[catIndex] = {
-      ...categories[catIndex],
-      ...(dto.name ? { name: dto.name } : {}),
-      ...(dto.slug ? { slug: dto.slug.toLowerCase().trim() } : {}),
-      ...(dto.subcategories ? { subcategories: dto.subcategories } : {}),
+    const updateData: Partial<typeof categories.$inferInsert> = {
+      updatedAt: new Date(),
     };
+    if (dto.name) updateData.name = dto.name.trim();
+    if (dto.slug) updateData.slug = dto.slug.toLowerCase().trim();
 
-    return this.brandModel.findByIdAndUpdate(
-      brand._id,
-      { $set: { categories } },
-      { new: true },
-    );
+    await this.db
+      .update(categories)
+      .set(updateData)
+      .where(eq(categories.id, targetCat.id));
+
+    if (dto.subcategories) {
+      await this.db
+        .delete(subcategories)
+        .where(eq(subcategories.categoryId, targetCat.id));
+
+      for (const subDto of dto.subcategories) {
+        const subSlug = (
+          subDto.slug ||
+          removeDiacritics(subDto.name)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+        ).trim();
+
+        const subId = randomUUID();
+        await this.db.insert(subcategories).values({
+          id: subId,
+          categoryId: targetCat.id,
+          name: subDto.name.trim(),
+          slug: subSlug,
+        });
+      }
+    }
+
+    return this.findOne(brand.id);
   }
 
   async removeCategory(
@@ -205,15 +353,16 @@ export class BrandsService {
     const brand = await this.findOne(idOrSlug);
     const cleanCatSlug = categorySlug.toLowerCase().trim();
 
-    const updated = await this.brandModel.findByIdAndUpdate(
-      brand._id,
-      {
-        $pull: {
-          categories: { slug: cleanCatSlug },
-        },
-      },
-      { new: true },
+    const targetCat = (brand.categories || []).find(
+      (c: any) => c.slug?.toLowerCase() === cleanCatSlug,
     );
+    if (!targetCat) {
+      throw new NotFoundException(
+        `Category "${categorySlug}" not found in brand "${brand.name}"`,
+      );
+    }
+
+    await this.db.delete(categories).where(eq(categories.id, targetCat.id));
 
     return {
       message: `Category "${categorySlug}" removed from brand "${brand.name}" successfully`,
@@ -236,38 +385,33 @@ export class BrandsService {
         .replace(/[^a-z0-9]+/g, '-')
     ).trim();
 
-    const catIndex = (brand.categories || []).findIndex(
+    const targetCat = (brand.categories || []).find(
       (c: any) => c.slug?.toLowerCase() === cleanCatSlug,
     );
-    if (catIndex === -1) {
+    if (!targetCat) {
       throw new NotFoundException(
         `Category "${categorySlug}" not found in brand "${brand.name}"`,
       );
     }
 
-    const category = brand.categories[catIndex];
-    const existingSub = (category.subcategories || []).find(
+    const existingSub = (targetCat.subcategories || []).find(
       (s: any) => s.slug === cleanSubSlug,
     );
     if (existingSub) {
       throw new ConflictException(
-        `Subcategory "${cleanSubSlug}" already exists in category "${category.name}"`,
+        `Subcategory "${cleanSubSlug}" already exists in category "${targetCat.name}"`,
       );
     }
 
-    const updatedSubcategories = [
-      ...(category.subcategories || []),
-      { name: subDto.name, slug: cleanSubSlug },
-    ];
+    const subId = randomUUID();
+    await this.db.insert(subcategories).values({
+      id: subId,
+      categoryId: targetCat.id,
+      name: subDto.name.trim(),
+      slug: cleanSubSlug,
+    });
 
-    const categories = [...brand.categories];
-    categories[catIndex].subcategories = updatedSubcategories;
-
-    return this.brandModel.findByIdAndUpdate(
-      brand._id,
-      { $set: { categories } },
-      { new: true },
-    );
+    return this.findOne(brand.id);
   }
 
   async removeSubcategory(
@@ -279,25 +423,25 @@ export class BrandsService {
     const cleanCatSlug = categorySlug.toLowerCase().trim();
     const cleanSubSlug = subcategorySlug.toLowerCase().trim();
 
-    const catIndex = (brand.categories || []).findIndex(
+    const targetCat = (brand.categories || []).find(
       (c: any) => c.slug?.toLowerCase() === cleanCatSlug,
     );
-    if (catIndex === -1) {
+    if (!targetCat) {
       throw new NotFoundException(
         `Category "${categorySlug}" not found in brand "${brand.name}"`,
       );
     }
 
-    const categories = [...brand.categories];
-    categories[catIndex].subcategories = (
-      categories[catIndex].subcategories || []
-    ).filter((s: any) => s.slug?.toLowerCase() !== cleanSubSlug);
-
-    await this.brandModel.findByIdAndUpdate(
-      brand._id,
-      { $set: { categories } },
-      { new: true },
+    const targetSub = (targetCat.subcategories || []).find(
+      (s: any) => s.slug?.toLowerCase() === cleanSubSlug,
     );
+    if (!targetSub) {
+      throw new NotFoundException(
+        `Subcategory "${subcategorySlug}" not found in category "${targetCat.name}"`,
+      );
+    }
+
+    await this.db.delete(subcategories).where(eq(subcategories.id, targetSub.id));
 
     return {
       message: `Subcategory "${subcategorySlug}" removed from category "${categorySlug}" successfully`,

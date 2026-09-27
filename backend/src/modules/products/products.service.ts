@@ -1,15 +1,18 @@
 import {
   Injectable,
+  Inject,
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { randomUUID } from 'crypto';
+import { eq, or, asc, desc, sql, inArray, like, and } from 'drizzle-orm';
+import { D1_DATABASE } from '../../database/d1.constants';
+import type { D1Database } from '../../database/d1.client';
+import { products, Product } from './schemas/product.schema';
+import { brands, categories, subcategories } from '../brands/schemas/brand.schema';
 import { removeDiacritics } from '@/common/utils/string.util';
 import { resolveMediaUrl, resolveMediaUrls } from '@/common/utils/url.util';
-import { Product, ProductDocument } from './schemas/product.schema';
-import { Brand, BrandDocument } from '@/modules/brands/schemas/brand.schema';
 import { GetProductsDto, ProductSortBy } from './dto/get-products.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -20,22 +23,31 @@ import {
 import { PRODUCT_DEFAULTS } from './constants/product.constants';
 import type { IProduct, IProductsListResponse } from './types/product.types';
 
+function parseJsonField<T>(field: any, defaultValue: T): T {
+  if (field === null || field === undefined) return defaultValue;
+  if (typeof field === 'string') {
+    try {
+      return JSON.parse(field);
+    } catch {
+      return defaultValue;
+    }
+  }
+  return field;
+}
+
 @Injectable()
 export class ProductsService {
   private readonly imageBaseUrl: string;
 
   constructor(
-    @InjectModel(Product.name)
-    private readonly productModel: Model<ProductDocument>,
-    @InjectModel(Brand.name)
-    private readonly brandModel: Model<BrandDocument>,
+    @Inject(D1_DATABASE) private readonly db: D1Database,
     private readonly configService: ConfigService,
   ) {
     this.imageBaseUrl = this.configService.get<string>('IMAGE_BASE_URL') || '';
   }
 
   async getRawProducts(): Promise<any[]> {
-    return this.productModel.find().lean().exec();
+    return this.db.select().from(products);
   }
 
   /** Effective price calculation */
@@ -43,8 +55,9 @@ export class ProductsService {
     if (product.price !== null && product.price !== undefined) {
       return product.price;
     }
-    if (Array.isArray(product.variants) && product.variants.length > 0) {
-      const prices = product.variants
+    const variants = parseJsonField(product.variants, []);
+    if (Array.isArray(variants) && variants.length > 0) {
+      const prices = variants
         .map((v: any) => v.price)
         .filter((p: any) => p !== null && p !== undefined) as number[];
       if (prices.length > 0) {
@@ -57,11 +70,46 @@ export class ProductsService {
   /**
    * Lấy bản đồ thương hiệu & danh mục để map thông tin trả về cho client
    */
-  private async getBrandMap(): Promise<Map<number, any>> {
-    const brands = await this.brandModel.find().lean().exec();
-    const map = new Map<number, any>();
-    for (const b of brands) {
-      map.set(b.id, b);
+  private async getBrandMap(): Promise<Map<string, any>> {
+    const [brandRows, catRows, subRows] = await Promise.all([
+      this.db.select().from(brands),
+      this.db.select().from(categories),
+      this.db.select().from(subcategories),
+    ]);
+
+    const subMap = new Map<string, Array<{ slug: string; name: string }>>();
+    for (const sub of subRows) {
+      if (!subMap.has(sub.categoryId)) {
+        subMap.set(sub.categoryId, []);
+      }
+      subMap.get(sub.categoryId)!.push({
+        slug: sub.slug,
+        name: sub.name,
+      });
+    }
+
+    const catMap = new Map<string, Array<any>>();
+    for (const cat of catRows) {
+      if (!catMap.has(cat.brandId)) {
+        catMap.set(cat.brandId, []);
+      }
+      catMap.get(cat.brandId)!.push({
+        slug: cat.slug,
+        name: cat.name,
+        subcategories: subMap.get(cat.id) || [],
+      });
+    }
+
+    const map = new Map<string, any>();
+    for (const b of brandRows) {
+      map.set(b.id, {
+        ...b,
+        categories: catMap.get(b.id) || [],
+      });
+      map.set(b.slug.toLowerCase(), {
+        ...b,
+        categories: catMap.get(b.id) || [],
+      });
     }
     return map;
   }
@@ -70,33 +118,42 @@ export class ProductsService {
    * Tự động tra cứu và bổ sung tên thương hiệu, brandSlug, categoryName, subcategoryName
    */
   private resolveBrandAndCategoryInfo(
-    item: { brandId?: number | null; category?: string; subcategory?: string },
-    brandMap: Map<number, any>,
+    item: {
+      brandId?: string | number | null;
+      categorySlug?: string | null;
+      subcategorySlug?: string | null;
+      category?: string | null;
+      subcategory?: string | null;
+    },
+    brandMap: Map<string, any>,
   ) {
     let brand = '';
     let brandSlug = '';
     let categoryName = '';
     let subcategoryName = '';
 
-    if (item.brandId && brandMap.has(item.brandId)) {
-      const b = brandMap.get(item.brandId);
+    const brandKey = item.brandId ? String(item.brandId) : '';
+    const b = brandMap.get(brandKey);
+
+    if (b) {
       brand = b.name || '';
       brandSlug = b.slug || '';
 
-      if (item.category && Array.isArray(b.categories)) {
-        const cSlug = item.category.toLowerCase().trim();
+      const targetCatSlug = (item.categorySlug || item.category || '').toLowerCase().trim();
+      if (targetCatSlug && Array.isArray(b.categories)) {
         const matchedCat = b.categories.find(
           (c: any) =>
-            c.slug?.toLowerCase() === cSlug || c.name?.toLowerCase() === cSlug,
+            c.slug?.toLowerCase() === targetCatSlug ||
+            c.name?.toLowerCase() === targetCatSlug,
         );
         if (matchedCat) {
           categoryName = matchedCat.name || '';
-          if (item.subcategory) {
-            const sSlug = item.subcategory.toLowerCase().trim();
+          const targetSubSlug = (item.subcategorySlug || item.subcategory || '').toLowerCase().trim();
+          if (targetSubSlug) {
             const matchedSub = (matchedCat.subcategories || []).find(
               (s: any) =>
-                s.slug?.toLowerCase() === sSlug ||
-                s.name?.toLowerCase() === sSlug,
+                s.slug?.toLowerCase() === targetSubSlug ||
+                s.name?.toLowerCase() === targetSubSlug,
             );
             if (matchedSub) {
               subcategoryName = matchedSub.name || '';
@@ -121,7 +178,7 @@ export class ProductsService {
     price?: number | null;
     originalPrice?: number | null;
     discountPercent?: number | null;
-    priceRange?: string;
+    priceRange?: string | null;
   }) {
     const originalPrice =
       typeof input.originalPrice === 'number' && !isNaN(input.originalPrice)
@@ -175,7 +232,7 @@ export class ProductsService {
 
     // Tính toán bảng giá & % giảm cho sản phẩm chính
     const pricing = this.computePricing(data);
-    data.price = pricing.price;
+    data.price = pricing.price ?? 0;
     data.originalPrice = pricing.originalPrice;
     data.discountPercent = pricing.discountPercent;
     data.priceRange = pricing.priceRange;
@@ -194,36 +251,34 @@ export class ProductsService {
       });
     }
 
-    // Resolve Brand & its nested Categories
+    // Resolve Brand
     if (dto.brandId !== undefined && dto.brandId !== null) {
-      data.brandId = dto.brandId;
+      data.brandId = String(dto.brandId);
     } else if ((dto as any).brandSlug || (dto as any).brand) {
       const bSlug = ((dto as any).brandSlug || (dto as any).brand || '')
         .toLowerCase()
         .trim();
-      const brandDoc = await this.brandModel
-        .findOne({
-          $or: [
-            { slug: bSlug },
-            { name: { $regex: new RegExp(`^${bSlug}$`, 'i') } },
-          ],
-        })
-        .lean()
-        .exec();
-      if (brandDoc) {
-        data.brandId = brandDoc.id;
+      const brandRows = await this.db
+        .select()
+        .from(brands)
+        .where(or(eq(brands.slug, bSlug), eq(brands.name, bSlug)))
+        .limit(1);
+      if (brandRows[0]) {
+        data.brandId = brandRows[0].id;
       }
     }
 
-    // Xóa các trường tên tĩnh để đảm bảo DB chỉ lưu brandId, category, subcategory
-    delete data.brand;
-    delete data.brandSlug;
-    delete data.categoryName;
-    delete data.subcategoryName;
+    // Category / Subcategory slugs
+    if ((dto as any).category) {
+      data.categorySlug = (dto as any).category;
+    }
+    if ((dto as any).subcategory) {
+      data.subcategorySlug = (dto as any).subcategory;
+    }
 
-    // Auto-generate clean id if missing
-    if (!data.id && data.code) {
-      data.id = data.code
+    // Slug calculation
+    if (!data.slug && data.code) {
+      data.slug = data.code
         .toLowerCase()
         .trim()
         .replace(/[^a-z0-9]+/g, '-');
@@ -246,24 +301,26 @@ export class ProductsService {
       sortBy = ProductSortBy.NEWEST,
     } = query;
 
-    const filter: any = {};
-
+    let targetBrandId: string | undefined = undefined;
     if (brandId !== undefined && brandId !== null) {
-      filter.brandId = brandId;
+      targetBrandId = String(brandId);
     } else if (brand && brand.trim()) {
       const bSlug = brand.trim().toLowerCase();
-      const brandDoc = await this.brandModel
-        .findOne({
-          $or: [
-            { slug: bSlug },
-            { name: { $regex: new RegExp(`^${bSlug}$`, 'i') } },
-          ],
-        })
-        .lean()
-        .exec();
-      if (brandDoc) {
-        filter.brandId = brandDoc.id;
+      const brandRows = await this.db
+        .select()
+        .from(brands)
+        .where(or(eq(brands.slug, bSlug), eq(brands.name, bSlug)))
+        .limit(1);
+      if (brandRows[0]) {
+        targetBrandId = brandRows[0].id;
       }
+    }
+
+    let productsList = await this.db.select().from(products);
+
+    // Apply In-Memory Filters
+    if (targetBrandId) {
+      productsList = productsList.filter((p) => p.brandId === targetBrandId);
     }
 
     if (category && category.trim()) {
@@ -277,50 +334,55 @@ export class ProductsService {
           'cua-cong',
           'khach-san',
         ];
-        filter.category = { $in: lockSlugs };
+        productsList = productsList.filter((p) =>
+          lockSlugs.includes(p.categorySlug.toLowerCase()),
+        );
       } else {
-        filter.category = { $regex: new RegExp(`^${queryCat}$`, 'i') };
+        productsList = productsList.filter(
+          (p) => p.categorySlug.toLowerCase() === queryCat,
+        );
       }
     }
 
     if (subcategory && subcategory.trim()) {
-      filter.subcategory = {
-        $regex: new RegExp(`^${subcategory.trim()}$`, 'i'),
-      };
+      const querySub = subcategory.trim().toLowerCase();
+      productsList = productsList.filter(
+        (p) => (p.subcategorySlug || '').toLowerCase() === querySub,
+      );
     }
 
-    let products = await this.productModel.find(filter).lean().exec();
-
     if (minPrice !== undefined && minPrice !== null && !isNaN(minPrice)) {
-      products = products.filter(
+      productsList = productsList.filter(
         (p) => (this.resolvePrice(p) ?? 0) >= minPrice,
       );
     }
 
     if (maxPrice !== undefined && maxPrice !== null && !isNaN(maxPrice)) {
-      products = products.filter((p) => {
+      productsList = productsList.filter((p) => {
         const ep = this.resolvePrice(p);
         return ep !== null && ep <= maxPrice;
       });
     }
 
+    const brandMap = await this.getBrandMap();
+
     if (search && search.trim()) {
-      const brandMap = await this.getBrandMap();
       const searchNorm = removeDiacritics(search.trim().toLowerCase());
       const searchKeywords = searchNorm
         .split(PRODUCT_DEFAULTS.SEARCH.SPLIT_REGEX)
         .filter(Boolean);
 
-      products = products.filter((p) => {
+      productsList = productsList.filter((p) => {
         const name = p.name || '';
         const code = p.code || '';
         const meta = this.resolveBrandAndCategoryInfo(p, brandMap);
-        const catSlug = p.category || '';
+        const catSlug = p.categorySlug || '';
         const desc = p.description || '';
-        const features = Array.isArray(p.features) ? p.features.join(' ') : '';
+        const features = parseJsonField(p.features, []);
+        const featuresStr = Array.isArray(features) ? features.join(' ') : '';
 
         const searchableText = removeDiacritics(
-          `${name} ${code} ${meta.brand} ${meta.categoryName} ${catSlug} ${desc} ${features}`.toLowerCase(),
+          `${name} ${code} ${meta.brand} ${meta.categoryName} ${catSlug} ${desc} ${featuresStr}`.toLowerCase(),
         );
         return searchKeywords.every((keyword) =>
           searchableText.includes(keyword),
@@ -329,7 +391,7 @@ export class ProductsService {
     }
 
     if (sortBy === ProductSortBy.PRICE_ASC) {
-      products.sort((a, b) => {
+      productsList.sort((a, b) => {
         const valA = this.resolvePrice(a);
         const valB = this.resolvePrice(b);
         const isNullA = valA === null || valA === undefined;
@@ -341,7 +403,7 @@ export class ProductsService {
         return valA - valB;
       });
     } else if (sortBy === ProductSortBy.PRICE_DESC) {
-      products.sort((a, b) => {
+      productsList.sort((a, b) => {
         const valA = this.resolvePrice(a);
         const valB = this.resolvePrice(b);
         const isNullA = valA === null || valA === undefined;
@@ -353,7 +415,7 @@ export class ProductsService {
         return valB - valA;
       });
     } else {
-      products.sort((a, b) => {
+      productsList.sort((a, b) => {
         const pA = a.priority;
         const pB = b.priority;
         const isNullA = pA === null || pA === undefined;
@@ -370,13 +432,16 @@ export class ProductsService {
     const pageNum = Math.max(1, page);
     const limitNum = Math.max(1, limit);
     const startIndex = (pageNum - 1) * limitNum;
-    const paginatedProducts = products.slice(startIndex, startIndex + limitNum);
-
-    const brandMap = await this.getBrandMap();
+    const paginatedProducts = productsList.slice(
+      startIndex,
+      startIndex + limitNum,
+    );
 
     const items = paginatedProducts.map((p) => {
       const pricing = this.computePricing(p);
       const meta = this.resolveBrandAndCategoryInfo(p, brandMap);
+      const features = parseJsonField(p.features, []);
+
       return {
         id: p.id,
         code: p.code,
@@ -384,23 +449,23 @@ export class ProductsService {
         brandId: p.brandId ?? null,
         brand: meta.brand,
         brandSlug: meta.brandSlug,
-        category: p.category || '',
+        category: p.categorySlug || '',
         categoryName: meta.categoryName,
-        subcategory: p.subcategory || '',
+        subcategory: p.subcategorySlug || '',
         subcategoryName: meta.subcategoryName,
         imageUrl: resolveMediaUrl(p.imageUrl || '', this.imageBaseUrl),
         price: this.resolvePrice(p) ?? pricing.price,
         originalPrice: pricing.originalPrice,
         discountPercent: pricing.discountPercent,
         priceRange: pricing.priceRange,
-        features: Array.isArray(p.features) ? p.features.slice(0, 2) : [],
-        has_variants: p.has_variants || false,
+        features: Array.isArray(features) ? features.slice(0, 2) : [],
+        has_variants: !!p.hasVariants,
       };
     });
 
     return {
       items,
-      total: products.length,
+      total: productsList.length,
       page: pageNum,
       limit: limitNum,
     };
@@ -410,26 +475,19 @@ export class ProductsService {
     const cleanQuery = idOrCode.trim();
     const compactQuery = cleanQuery.toLowerCase().replace(/\s+/g, '');
 
-    let product: any = await this.productModel
-      .findOne({
-        $or: [
-          { code: cleanQuery },
-          { id: cleanQuery },
-          { code: { $regex: new RegExp(`^${cleanQuery}$`, 'i') } },
-          { id: { $regex: new RegExp(`^${cleanQuery}$`, 'i') } },
-        ],
-      })
-      .lean()
-      .exec();
+    const allProducts = await this.db.select().from(products);
 
-    if (!product) {
-      const allProducts = await this.productModel.find().lean().exec();
-      product = allProducts.find(
-        (p) =>
-          p.code?.toLowerCase().replace(/\s+/g, '') === compactQuery ||
-          p.id?.toLowerCase().replace(/\s+/g, '') === compactQuery,
-      );
-    }
+    let product = allProducts.find(
+      (p) =>
+        p.id === cleanQuery ||
+        p.code === cleanQuery ||
+        p.slug === cleanQuery ||
+        p.code.toLowerCase() === cleanQuery.toLowerCase() ||
+        p.id.toLowerCase() === cleanQuery.toLowerCase() ||
+        p.slug.toLowerCase() === cleanQuery.toLowerCase() ||
+        p.code.toLowerCase().replace(/\s+/g, '') === compactQuery ||
+        p.slug.toLowerCase().replace(/\s+/g, '') === compactQuery,
+    );
 
     if (!product) {
       throw new NotFoundException(`Product not found: ${idOrCode}`);
@@ -441,9 +499,13 @@ export class ProductsService {
     const brandMap = await this.getBrandMap();
     const meta = this.resolveBrandAndCategoryInfo(product, brandMap);
 
-    const installationPreview = product.installation?.images
+    const installationObj = parseJsonField(product.installation, {
+      images: [],
+      videos: [],
+    });
+    const installationPreview = installationObj?.images
       ? resolveMediaUrls(
-          product.installation.images.slice(
+          installationObj.images.slice(
             0,
             PRODUCT_DEFAULTS.INSTALLATION_PREVIEW_LIMIT,
           ),
@@ -451,38 +513,48 @@ export class ProductsService {
         )
       : [];
 
+    const imagesArr = parseJsonField(product.images, []);
+    const featuresArr = parseJsonField(product.features, []);
+    const specsObj = parseJsonField(product.specs, {});
+    const technologiesArr = parseJsonField(product.technologies, []);
+    const colorsArr = parseJsonField(product.colors, []);
+    const installationManualArr = parseJsonField(product.installationManual, []);
+    const faqArr = parseJsonField(product.faq, []);
+    const optionsArr = parseJsonField(product.options, []);
+    const rawVariants = parseJsonField(product.variants, []);
+
     const productResponse: IProduct = {
       id: product.id,
       code: product.code,
       brandId: product.brandId ?? null,
       brand: meta.brand,
       brandSlug: meta.brandSlug,
-      category: product.category || '',
+      category: product.categorySlug || '',
       categoryName: meta.categoryName,
-      subcategory: product.subcategory || '',
+      subcategory: product.subcategorySlug || '',
       subcategoryName: meta.subcategoryName,
       name: product.name,
       description: product.description || '',
       shortDescription: product.shortDescription || '',
       content: product.content || '',
       imageUrl: resolveMediaUrl(product.imageUrl || '', this.imageBaseUrl),
-      images: resolveMediaUrls(product.images || [], this.imageBaseUrl),
+      images: resolveMediaUrls(imagesArr, this.imageBaseUrl),
       price: effectivePrice,
       originalPrice: pricing.originalPrice,
       discountPercent: pricing.discountPercent,
       priceRange: pricing.priceRange,
-      features: product.features || [],
-      specs: product.specs || {},
-      technologies: product.technologies || [],
+      features: featuresArr,
+      specs: specsObj,
+      technologies: technologiesArr,
       warranty: typeof product.warranty === 'number' ? product.warranty : 36,
       warrantyText: product.warrantyText || '',
-      colors: product.colors || [],
-      installationManual: product.installationManual,
-      faq: product.faq,
-      has_variants: product.has_variants || false,
-      options: product.options || [],
-      variants: Array.isArray(product.variants)
-        ? product.variants.map((v: any) => {
+      colors: colorsArr,
+      installationManual: installationManualArr,
+      faq: faqArr,
+      has_variants: !!product.hasVariants,
+      options: optionsArr,
+      variants: Array.isArray(rawVariants)
+        ? rawVariants.map((v: any) => {
             const vPricing = this.computePricing(v);
             return {
               id: v.id,
@@ -508,32 +580,25 @@ export class ProductsService {
     const cleanQuery = idOrCode.trim();
     const compactQuery = cleanQuery.toLowerCase().replace(/\s+/g, '');
 
-    let product: any = await this.productModel
-      .findOne({
-        $or: [
-          { code: cleanQuery },
-          { id: cleanQuery },
-          { code: { $regex: new RegExp(`^${cleanQuery}$`, 'i') } },
-          { id: { $regex: new RegExp(`^${cleanQuery}$`, 'i') } },
-        ],
-      })
-      .lean()
-      .exec();
-
-    if (!product) {
-      const allProducts = await this.productModel.find().lean().exec();
-      product = allProducts.find(
-        (p) =>
-          p.code?.toLowerCase().replace(/\s+/g, '') === compactQuery ||
-          p.id?.toLowerCase().replace(/\s+/g, '') === compactQuery,
-      );
-    }
+    const allProducts = await this.db.select().from(products);
+    const product = allProducts.find(
+      (p) =>
+        p.id === cleanQuery ||
+        p.code === cleanQuery ||
+        p.slug === cleanQuery ||
+        p.code.toLowerCase() === cleanQuery.toLowerCase() ||
+        p.id.toLowerCase() === cleanQuery.toLowerCase() ||
+        p.code.toLowerCase().replace(/\s+/g, '') === compactQuery,
+    );
 
     if (!product) {
       throw new NotFoundException(`Product not found: ${idOrCode}`);
     }
 
-    const installation = product.installation ?? PRODUCT_DEFAULTS.INSTALLATION;
+    const installation = parseJsonField(
+      product.installation,
+      PRODUCT_DEFAULTS.INSTALLATION,
+    );
     const mediaItems: Array<{ url: string; type: 'image' | 'video' }> = [];
 
     if (type === MediaType.IMAGES || type === MediaType.ALL) {
@@ -581,43 +646,114 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto): Promise<any> {
     const payload = await this.enrichRelations(createProductDto);
-    const existing = await this.productModel.findOne({
-      $or: [{ id: payload.id }, { code: payload.code }],
-    });
-    if (existing) {
+
+    const existing = await this.db
+      .select()
+      .from(products)
+      .where(or(eq(products.code, payload.code), eq(products.slug, payload.slug)))
+      .limit(1);
+
+    if (existing.length > 0) {
       throw new ConflictException(
-        `Product with ID "${payload.id}" or code "${payload.code}" already exists`,
+        `Product with code "${payload.code}" or slug "${payload.slug}" already exists`,
       );
     }
-    const newProduct = new this.productModel(payload);
-    return newProduct.save();
+
+    const newId = randomUUID();
+    await this.db.insert(products).values({
+      id: newId,
+      code: payload.code.trim(),
+      slug: payload.slug.trim(),
+      name: payload.name.trim(),
+      description: payload.description || '',
+      shortDescription: payload.shortDescription || '',
+      content: payload.content || '',
+      brandId: payload.brandId,
+      categorySlug: payload.categorySlug,
+      subcategorySlug: payload.subcategorySlug || null,
+      price: payload.price,
+      originalPrice: payload.originalPrice || null,
+      discountPercent: payload.discountPercent || null,
+      priceRange: payload.priceRange || null,
+      imageUrl: payload.imageUrl || '',
+      images: JSON.stringify(payload.images || []),
+      features: JSON.stringify(payload.features || []),
+      specs: JSON.stringify(payload.specs || {}),
+      technologies: JSON.stringify(payload.technologies || []),
+      warranty: payload.warranty || 36,
+      warrantyText: payload.warrantyText || '',
+      colors: JSON.stringify(payload.colors || []),
+      installation: JSON.stringify(payload.installation || { images: [], videos: [] }),
+      installationManual: JSON.stringify(payload.installationManual || []),
+      faq: JSON.stringify(payload.faq || []),
+      hasVariants: payload.has_variants || payload.hasVariants || false,
+      options: JSON.stringify(payload.options || []),
+      variants: JSON.stringify(payload.variants || []),
+      installationPreview: JSON.stringify(payload.installation_preview || []),
+      priority: payload.priority ?? 9999,
+      status: payload.status || 'ACTIVE',
+      views: 0,
+    });
+
+    return this.findOne(newId);
   }
 
   async update(
     idOrCode: string,
     updateProductDto: UpdateProductDto,
   ): Promise<any> {
+    const product = await this.findOne(idOrCode);
     const payload = await this.enrichRelations(updateProductDto);
-    const product = await this.productModel.findOneAndUpdate(
-      { $or: [{ id: idOrCode }, { code: idOrCode }] },
-      { $set: payload },
-      { new: true },
-    );
-    if (!product) {
-      throw new NotFoundException(`Product not found: ${idOrCode}`);
+
+    const updateData: Partial<typeof products.$inferInsert> = {
+      updatedAt: new Date(),
+    };
+
+    if (payload.name !== undefined) updateData.name = payload.name;
+    if (payload.code !== undefined) updateData.code = payload.code;
+    if (payload.slug !== undefined) updateData.slug = payload.slug;
+    if (payload.description !== undefined) updateData.description = payload.description;
+    if (payload.shortDescription !== undefined) updateData.shortDescription = payload.shortDescription;
+    if (payload.content !== undefined) updateData.content = payload.content;
+    if (payload.brandId !== undefined) updateData.brandId = payload.brandId;
+    if (payload.categorySlug !== undefined) updateData.categorySlug = payload.categorySlug;
+    if (payload.subcategorySlug !== undefined) updateData.subcategorySlug = payload.subcategorySlug;
+    if (payload.price !== undefined) updateData.price = payload.price;
+    if (payload.originalPrice !== undefined) updateData.originalPrice = payload.originalPrice;
+    if (payload.discountPercent !== undefined) updateData.discountPercent = payload.discountPercent;
+    if (payload.priceRange !== undefined) updateData.priceRange = payload.priceRange;
+    if (payload.imageUrl !== undefined) updateData.imageUrl = payload.imageUrl;
+    if (payload.images !== undefined) updateData.images = JSON.stringify(payload.images);
+    if (payload.features !== undefined) updateData.features = JSON.stringify(payload.features);
+    if (payload.specs !== undefined) updateData.specs = JSON.stringify(payload.specs);
+    if (payload.technologies !== undefined) updateData.technologies = JSON.stringify(payload.technologies);
+    if (payload.warranty !== undefined) updateData.warranty = payload.warranty;
+    if (payload.warrantyText !== undefined) updateData.warrantyText = payload.warrantyText;
+    if (payload.colors !== undefined) updateData.colors = JSON.stringify(payload.colors);
+    if (payload.installation !== undefined) updateData.installation = JSON.stringify(payload.installation);
+    if (payload.installationManual !== undefined) updateData.installationManual = JSON.stringify(payload.installationManual);
+    if (payload.faq !== undefined) updateData.faq = JSON.stringify(payload.faq);
+    if (payload.has_variants !== undefined || payload.hasVariants !== undefined) {
+      updateData.hasVariants = payload.has_variants ?? payload.hasVariants;
     }
-    return product;
+    if (payload.options !== undefined) updateData.options = JSON.stringify(payload.options);
+    if (payload.variants !== undefined) updateData.variants = JSON.stringify(payload.variants);
+    if (payload.priority !== undefined) updateData.priority = payload.priority;
+    if (payload.status !== undefined) updateData.status = payload.status;
+
+    await this.db
+      .update(products)
+      .set(updateData)
+      .where(eq(products.id, product.id));
+
+    return this.findOne(product.id);
   }
 
   async remove(idOrCode: string): Promise<{ message: string }> {
-    const result = await this.productModel.findOneAndDelete({
-      $or: [{ id: idOrCode }, { code: idOrCode }],
-    });
-    if (!result) {
-      throw new NotFoundException(`Product not found: ${idOrCode}`);
-    }
+    const product = await this.findOne(idOrCode);
+    await this.db.delete(products).where(eq(products.id, product.id));
     return {
-      message: `Product "${result.name}" (${result.code}) deleted successfully`,
+      message: `Product "${product.name}" (${product.code}) deleted successfully`,
     };
   }
 }

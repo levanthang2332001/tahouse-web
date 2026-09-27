@@ -1,75 +1,29 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sql, relations } from 'drizzle-orm';
+import { randomUUID } from 'crypto';
+import { refreshTokens } from './refresh-token.schema';
 
-export type UserDocument = User & Document;
+export const users = sqliteTable('users', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
+  email: text('email').notNull().unique(),
+  password: text('password').notNull(),
+  name: text('name').notNull(),
+  role: text('role').notNull().default('ADMIN'),
+  avatar: text('avatar'),
+  phone: text('phone'),
+  createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
 
-@Schema({
-  collection: 'users',
-  timestamps: true,
-  toJSON: {
-    virtuals: true,
-    transform: (_, ret: any) => {
-      if (!ret.id && ret._id) {
-        ret.id = ret._id.toString();
-      }
-      delete ret.password;
-      delete ret._id;
-      delete ret.__v;
-      return ret;
-    },
-  },
-  toObject: {
-    virtuals: true,
-    transform: (_, ret: any) => {
-      if (!ret.id && ret._id) {
-        ret.id = ret._id.toString();
-      }
-      delete ret.password;
-      delete ret._id;
-      delete ret.__v;
-      return ret;
-    },
-  },
-})
-export class User {
-  @Prop({
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true,
-  })
-  username: string;
+export const usersRelations = relations(users, ({ many }) => ({
+  refreshTokens: many(refreshTokens),
+}));
 
-  @Prop({
-    type: String,
-    unique: true,
-    lowercase: true,
-    trim: true,
-    sparse: true,
-  })
-  email?: string;
-
-  @Prop({ type: String, default: 'Admin TA House' })
-  fullName?: string;
-
-  @Prop({ type: String, select: false })
-  password?: string;
-
-  @Prop({ type: String, default: '' })
-  avatarUrl?: string;
-
-  @Prop({ type: String, default: 'ADMIN' })
-  role?: string;
-
-  @Prop({ type: [String], default: ['*'] })
-  permissions?: string[];
-
-  @Prop({ type: Boolean, default: true })
-  isActive?: boolean;
-
-  @Prop({ type: Date, default: null })
-  lastLoginAt?: Date;
-}
-
-export const UserSchema = SchemaFactory.createForClass(User);
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;

@@ -1,372 +1,181 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, PipelineStage } from 'mongoose';
-import {
-  Product,
-  ProductDocument,
-} from '@/modules/products/schemas/product.schema';
-import { Brand, BrandDocument } from '@/modules/brands/schemas/brand.schema';
-import { IAdminDashboardStatsResponse } from './types/stats.types';
+import { Injectable, Inject } from '@nestjs/common';
+import { D1_DATABASE } from '../../database/d1.constants';
+import type { D1Database } from '../../database/d1.client';
+import { products } from '../products/schemas/product.schema';
+import { brands, categories, subcategories } from '../brands/schemas/brand.schema';
+import { IAdminDashboardStatsResponse, IBrandStat } from './types/stats.types';
+
+function parseJsonField<T>(field: any, defaultValue: T): T {
+  if (field === null || field === undefined) return defaultValue;
+  if (typeof field === 'string') {
+    try {
+      return JSON.parse(field);
+    } catch {
+      return defaultValue;
+    }
+  }
+  return field;
+}
 
 @Injectable()
 export class StatsService {
   constructor(
-    @InjectModel(Product.name)
-    private readonly productModel: Model<ProductDocument>,
-    @InjectModel(Brand.name)
-    private readonly brandModel: Model<BrandDocument>,
+    @Inject(D1_DATABASE) private readonly db: D1Database,
   ) {}
 
   async getDashboardStats(): Promise<IAdminDashboardStatsResponse> {
-    // Pipeline thống kê cấu trúc phân cấp (Brand -> Category -> Subcategory)
-    const pipeline: PipelineStage[] = [
-      {
-        $lookup: {
-          from: 'products',
-          let: { bId: '$id', bName: '$name', bSlug: '$slug' },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $or: [
-                    { $eq: ['$brandId', '$$bId'] },
-                    {
-                      $eq: [
-                        { $toLower: { $ifNull: ['$brand', ''] } },
-                        { $toLower: '$$bName' },
-                      ],
-                    },
-                    {
-                      $eq: [
-                        { $toLower: { $ifNull: ['$brand', ''] } },
-                        { $toLower: '$$bSlug' },
-                      ],
-                    },
-                  ],
-                },
-              },
-            },
-            {
-              $project: {
-                _id: 0,
-                category: { $toLower: { $ifNull: ['$category', ''] } },
-                subcategory: { $toLower: { $ifNull: ['$subcategory', ''] } },
-                isDiscounted: {
-                  $cond: [
-                    {
-                      $or: [
-                        { $gt: ['$discountPercent', 0] },
-                        {
-                          $and: [
-                            { $ne: ['$originalPrice', null] },
-                            { $ne: ['$price', null] },
-                            { $gt: ['$originalPrice', '$price'] },
-                          ],
-                        },
-                        {
-                          $gt: [
-                            {
-                              $size: {
-                                $filter: {
-                                  input: { $ifNull: ['$variants', []] },
-                                  as: 'v',
-                                  cond: {
-                                    $or: [
-                                      { $gt: ['$$v.discountPercent', 0] },
-                                      {
-                                        $and: [
-                                          { $ne: ['$$v.originalPrice', null] },
-                                          { $ne: ['$$v.price', null] },
-                                          {
-                                            $gt: [
-                                              '$$v.originalPrice',
-                                              '$$v.price',
-                                            ],
-                                          },
-                                        ],
-                                      },
-                                    ],
-                                  },
-                                },
-                              },
-                            },
-                            0,
-                          ],
-                        },
-                      ],
-                    },
-                    1,
-                    0,
-                  ],
-                },
-              },
-            },
-          ],
-          as: 'products',
-        },
-      },
-      {
-        $match: {
-          $expr: { $gt: [{ $size: '$products' }, 0] },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          id: 1,
-          name: 1,
-          slug: 1,
-          logo: { $ifNull: ['$logo', ''] },
-          totalProducts: { $size: '$products' },
-          discountedProducts: {
-            $sum: '$products.isDiscounted',
-          },
-          categories: {
-            $map: {
-              input: { $ifNull: ['$categories', []] },
-              as: 'cat',
-              in: {
-                slug: '$$cat.slug',
-                name: '$$cat.name',
-                totalProducts: {
-                  $size: {
-                    $filter: {
-                      input: '$products',
-                      as: 'p',
-                      cond: {
-                        $eq: [
-                          '$$p.category',
-                          { $toLower: { $ifNull: ['$$cat.slug', ''] } },
-                        ],
-                      },
-                    },
-                  },
-                },
-                subcategories: {
-                  $map: {
-                    input: { $ifNull: ['$$cat.subcategories', []] },
-                    as: 'sub',
-                    in: {
-                      slug: '$$sub.slug',
-                      name: '$$sub.name',
-                      totalProducts: {
-                        $size: {
-                          $filter: {
-                            input: '$products',
-                            as: 'p',
-                            cond: {
-                              $and: [
-                                {
-                                  $eq: [
-                                    '$$p.category',
-                                    {
-                                      $toLower: {
-                                        $ifNull: ['$$cat.slug', ''],
-                                      },
-                                    },
-                                  ],
-                                },
-                                {
-                                  $eq: [
-                                    '$$p.subcategory',
-                                    {
-                                      $toLower: {
-                                        $ifNull: ['$$sub.slug', ''],
-                                      },
-                                    },
-                                  ],
-                                },
-                              ],
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          totalProducts: { $sum: '$totalProducts' },
-          totalBrands: { $sum: 1 },
-          discountedProducts: { $sum: '$discountedProducts' },
-          brandsList: { $push: '$$ROOT' },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          totalProducts: 1,
-          totalBrands: 1,
-          discountedProducts: 1,
-          totalCategories: {
-            $sum: {
-              $map: {
-                input: '$brandsList',
-                as: 'b',
-                in: { $size: '$$b.categories' },
-              },
-            },
-          },
-          totalSubcategories: {
-            $sum: {
-              $map: {
-                input: '$brandsList',
-                as: 'b',
-                in: {
-                  $sum: {
-                    $map: {
-                      input: '$$b.categories',
-                      as: 'c',
-                      in: { $size: '$$c.subcategories' },
-                    },
-                  },
-                },
-              },
-            },
-          },
-          brandsList: 1,
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          summary: {
-            totalProducts: '$totalProducts',
-            totalBrands: '$totalBrands',
-            totalCategories: '$totalCategories',
-            totalSubcategories: '$totalSubcategories',
-            discountedProducts: '$discountedProducts',
-          },
-          brands: {
-            $map: {
-              input: '$brandsList',
-              as: 'b',
-              in: {
-                id: '$$b.id',
-                name: '$$b.name',
-                slug: '$$b.slug',
-                logo: '$$b.logo',
-                totalProducts: '$$b.totalProducts',
-                percentage: {
-                  $cond: [
-                    { $gt: ['$totalProducts', 0] },
-                    {
-                      $round: [
-                        {
-                          $multiply: [
-                            {
-                              $divide: ['$$b.totalProducts', '$totalProducts'],
-                            },
-                            100,
-                          ],
-                        },
-                        2,
-                      ],
-                    },
-                    0,
-                  ],
-                },
-                categories: {
-                  $map: {
-                    input: '$$b.categories',
-                    as: 'cat',
-                    in: {
-                      slug: '$$cat.slug',
-                      name: '$$cat.name',
-                      totalProducts: '$$cat.totalProducts',
-                      percentage: {
-                        $cond: [
-                          { $gt: ['$$b.totalProducts', 0] },
-                          {
-                            $round: [
-                              {
-                                $multiply: [
-                                  {
-                                    $divide: [
-                                      '$$cat.totalProducts',
-                                      '$$b.totalProducts',
-                                    ],
-                                  },
-                                  100,
-                                ],
-                              },
-                              2,
-                            ],
-                          },
-                          0,
-                        ],
-                      },
-                      subcategories: {
-                        $map: {
-                          input: '$$cat.subcategories',
-                          as: 'sub',
-                          in: {
-                            slug: '$$sub.slug',
-                            name: '$$sub.name',
-                            totalProducts: '$$sub.totalProducts',
-                            percentage: {
-                              $cond: [
-                                { $gt: ['$$cat.totalProducts', 0] },
-                                {
-                                  $round: [
-                                    {
-                                      $multiply: [
-                                        {
-                                          $divide: [
-                                            '$$sub.totalProducts',
-                                            '$$cat.totalProducts',
-                                          ],
-                                        },
-                                        100,
-                                      ],
-                                    },
-                                    2,
-                                  ],
-                                },
-                                0,
-                              ],
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      {
-        $project: {
-          summary: 1,
-          brands: {
-            $sortArray: { input: '$brands', sortBy: { totalProducts: -1 } },
-          },
-        },
-      },
-    ];
+    const [productRows, brandRows, catRows, subRows] = await Promise.all([
+      this.db.select().from(products),
+      this.db.select().from(brands),
+      this.db.select().from(categories),
+      this.db.select().from(subcategories),
+    ]);
 
-    const [result] =
-      await this.brandModel.aggregate<IAdminDashboardStatsResponse>(pipeline);
+    const totalProducts = productRows.length;
 
-    return (
-      result || {
-        summary: {
-          totalProducts: 0,
-          totalBrands: 0,
-          totalCategories: 0,
-          totalSubcategories: 0,
-          discountedProducts: 0,
-        },
-        brands: [],
+    // Check discount logic
+    let discountedProducts = 0;
+    for (const p of productRows) {
+      let isDiscounted = false;
+      if (
+        (p.discountPercent !== null && p.discountPercent > 0) ||
+        (p.originalPrice !== null && p.price !== null && p.originalPrice > p.price)
+      ) {
+        isDiscounted = true;
+      } else {
+        const variants = parseJsonField<any[]>(p.variants, []);
+        if (Array.isArray(variants)) {
+          for (const v of variants) {
+            if (
+              (typeof v?.discountPercent === 'number' && v.discountPercent > 0) ||
+              (v?.originalPrice != null && v?.price != null && v.originalPrice > v.price)
+            ) {
+              isDiscounted = true;
+              break;
+            }
+          }
+        }
       }
-    );
+      if (isDiscounted) {
+        discountedProducts++;
+      }
+    }
+
+    // Subcategories map by categoryId
+    const subMap = new Map<string, Array<{ id: string; slug: string; name: string }>>();
+    for (const s of subRows) {
+      if (!subMap.has(s.categoryId)) {
+        subMap.set(s.categoryId, []);
+      }
+      subMap.get(s.categoryId)!.push({
+        id: s.id,
+        slug: s.slug,
+        name: s.name,
+      });
+    }
+
+    // Categories map by brandId
+    const catMap = new Map<string, Array<any>>();
+    for (const c of catRows) {
+      if (!catMap.has(c.brandId)) {
+        catMap.set(c.brandId, []);
+      }
+      catMap.get(c.brandId)!.push({
+        id: c.id,
+        slug: c.slug,
+        name: c.name,
+        subcategories: subMap.get(c.id) || [],
+      });
+    }
+
+    // Map products to brandId
+    const brandProductsMap = new Map<string, any[]>();
+    for (const p of productRows) {
+      const bId = p.brandId;
+      if (!brandProductsMap.has(bId)) {
+        brandProductsMap.set(bId, []);
+      }
+      brandProductsMap.get(bId)!.push(p);
+    }
+
+    const brandStatsList: IBrandStat[] = [];
+    let totalCategoriesCount = 0;
+    let totalSubcategoriesCount = 0;
+
+    for (const b of brandRows) {
+      const bProducts = brandProductsMap.get(b.id) || [];
+      if (bProducts.length === 0) continue;
+
+      const bTotal = bProducts.length;
+      const bPercentage =
+        totalProducts > 0
+          ? Number(((bTotal / totalProducts) * 100).toFixed(2))
+          : 0;
+
+      const bCats = catMap.get(b.id) || [];
+      totalCategoriesCount += bCats.length;
+
+      const categoryStats = bCats.map((c) => {
+        const cSlugLower = c.slug.toLowerCase();
+        const cProducts = bProducts.filter(
+          (p) => (p.categorySlug || '').toLowerCase() === cSlugLower,
+        );
+        const cTotal = cProducts.length;
+        const cPercentage =
+          bTotal > 0 ? Number(((cTotal / bTotal) * 100).toFixed(2)) : 0;
+
+        const subCats = c.subcategories || [];
+        totalSubcategoriesCount += subCats.length;
+
+        const subcategoryStats = subCats.map((s: any) => {
+          const sSlugLower = s.slug.toLowerCase();
+          const sProducts = cProducts.filter(
+            (p) => (p.subcategorySlug || '').toLowerCase() === sSlugLower,
+          );
+          const sTotal = sProducts.length;
+          const sPercentage =
+            cTotal > 0 ? Number(((sTotal / cTotal) * 100).toFixed(2)) : 0;
+
+          return {
+            slug: s.slug,
+            name: s.name,
+            totalProducts: sTotal,
+            percentage: sPercentage,
+          };
+        });
+
+        return {
+          slug: c.slug,
+          name: c.name,
+          totalProducts: cTotal,
+          percentage: cPercentage,
+          subcategories: subcategoryStats,
+        };
+      });
+
+      brandStatsList.push({
+        id: b.id as any,
+        name: b.name,
+        slug: b.slug,
+        logo: b.logo || undefined,
+        totalProducts: bTotal,
+        percentage: bPercentage,
+        categories: categoryStats,
+      });
+    }
+
+    // Sort brands by totalProducts DESC
+    brandStatsList.sort((a, b) => b.totalProducts - a.totalProducts);
+
+    return {
+      summary: {
+        totalProducts,
+        totalBrands: brandStatsList.length,
+        totalCategories: totalCategoriesCount,
+        totalSubcategories: totalSubcategoriesCount,
+        discountedProducts,
+      },
+      brands: brandStatsList,
+    };
   }
 }

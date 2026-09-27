@@ -4,18 +4,17 @@ import {
   BadRequestException,
   NotFoundException,
   Logger,
+  Inject,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { eq, and, ne } from 'drizzle-orm';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
-import { User, UserDocument } from './schemas/user.schema';
-import {
-  RefreshToken,
-  RefreshTokenDocument,
-} from './schemas/refresh-token.schema';
+import { D1_DATABASE } from '@/database';
+import type { D1Database } from '@/database';
+import { users, User } from './schemas/user.schema';
+import { refreshTokens } from './schemas/refresh-token.schema';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -26,10 +25,8 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    @InjectModel(User.name)
-    private readonly userModel: Model<UserDocument>,
-    @InjectModel(RefreshToken.name)
-    private readonly refreshTokenModel: Model<RefreshTokenDocument>,
+    @Inject(D1_DATABASE)
+    private readonly db: D1Database,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
@@ -55,12 +52,11 @@ export class AuthService {
     }
   }
 
-  private async generateTokens(user: any) {
+  private async generateTokens(user: User) {
     const payload = {
-      sub: user._id ? user._id.toString() : user.id,
-      username: user.username,
+      sub: user.id,
       email: user.email,
-      fullName: user.fullName,
+      name: user.name,
       role: user.role,
     };
 
@@ -100,22 +96,13 @@ export class AuthService {
 
   async login(loginDto: LoginDto, userAgent?: string, ipAddress?: string) {
     const identifier = loginDto.username.trim().toLowerCase();
-    const user = await this.userModel
-      .findOne({
-        $or: [{ username: identifier }, { email: identifier }],
-      })
-      .select('+password')
-      .exec();
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid username or password');
-    }
+    // Query user by email using Drizzle query API
+    const user = await this.db.query.users.findFirst({
+      where: eq(users.email, identifier),
+    });
 
-    if (user.isActive === false) {
-      throw new UnauthorizedException('Account has been deactivated');
-    }
-
-    if (!user.password) {
+    if (!user || !user.password) {
       throw new UnauthorizedException('Invalid username or password');
     }
 
@@ -130,17 +117,13 @@ export class AuthService {
     const { accessToken, refreshToken, expiresAt } =
       await this.generateTokens(user);
 
-    await this.refreshTokenModel.create({
-      userId: new Types.ObjectId(user._id.toString()),
+    await this.db.insert(refreshTokens).values({
+      userId: user.id,
       hashedToken: this.hashToken(refreshToken),
       userAgent: userAgent || '',
       ipAddress: ipAddress || '',
       isRevoked: false,
       expiresAt,
-    });
-
-    await this.userModel.findByIdAndUpdate(user._id, {
-      $set: { lastLoginAt: new Date() },
     });
 
     return {
@@ -167,34 +150,35 @@ export class AuthService {
     }
 
     const hashedToken = this.hashToken(refreshToken);
-    const tokenRecord = await this.refreshTokenModel.findOne({
-      hashedToken,
-      isRevoked: false,
-      expiresAt: { $gt: new Date() },
+
+    const tokenRecord = await this.db.query.refreshTokens.findFirst({
+      where: and(
+        eq(refreshTokens.hashedToken, hashedToken),
+        eq(refreshTokens.isRevoked, false),
+      ),
+      with: {
+        user: true,
+      },
     });
 
-    if (!tokenRecord) {
+    if (!tokenRecord || !tokenRecord.user) {
       throw new UnauthorizedException(
-        'Refresh token has been revoked or expired',
+        'Refresh token has been revoked, expired or user not found',
       );
     }
 
-    const user = await this.userModel.findById(tokenRecord.userId).exec();
-    if (!user) {
-      throw new UnauthorizedException('User not found');
-    }
+    const user = tokenRecord.user;
 
-    if (user.isActive === false) {
-      throw new UnauthorizedException('Account has been deactivated');
-    }
-
-    tokenRecord.isRevoked = true;
-    await tokenRecord.save();
+    // Revoke old token
+    await this.db
+      .update(refreshTokens)
+      .set({ isRevoked: true })
+      .where(eq(refreshTokens.id, tokenRecord.id));
 
     const tokens = await this.generateTokens(user);
 
-    await this.refreshTokenModel.create({
-      userId: new Types.ObjectId(user._id.toString()),
+    await this.db.insert(refreshTokens).values({
+      userId: user.id,
       hashedToken: this.hashToken(tokens.refreshToken),
       userAgent: userAgent || tokenRecord.userAgent,
       ipAddress: ipAddress || tokenRecord.ipAddress,
@@ -211,58 +195,69 @@ export class AuthService {
   async logout(refreshToken?: string): Promise<{ message: string }> {
     if (refreshToken) {
       const hashedToken = this.hashToken(refreshToken);
-      await this.refreshTokenModel.updateMany(
-        { hashedToken },
-        { $set: { isRevoked: true } },
-      );
+      await this.db
+        .update(refreshTokens)
+        .set({ isRevoked: true })
+        .where(eq(refreshTokens.hashedToken, hashedToken));
     }
     return { message: 'Logged out successfully' };
   }
 
   async logoutAll(userId: string): Promise<{ message: string }> {
-    await this.refreshTokenModel.updateMany(
-      { userId: new Types.ObjectId(userId), isRevoked: false },
-      { $set: { isRevoked: true } },
-    );
+    await this.db
+      .update(refreshTokens)
+      .set({ isRevoked: true })
+      .where(
+        and(
+          eq(refreshTokens.userId, userId),
+          eq(refreshTokens.isRevoked, false),
+        ),
+      );
     return { message: 'All sessions have been revoked' };
   }
 
   async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
-    const user = await this.userModel.findById(userId).exec();
+    const user = await this.db.query.users.findFirst({
+      where: eq(users.id, userId),
+    });
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
+    const updates: Partial<User> = {
+      updatedAt: new Date(),
+    };
+
     if (updateProfileDto.email) {
       const email = updateProfileDto.email.trim().toLowerCase();
-      const existingEmail = await this.userModel.findOne({
-        email,
-        _id: { $ne: user._id },
+      const existingEmail = await this.db.query.users.findFirst({
+        where: and(eq(users.email, email), ne(users.id, user.id)),
       });
+
       if (existingEmail) {
         throw new BadRequestException(
           'Email is already in use by another account',
         );
       }
-      user.email = email;
+      updates.email = email;
     }
 
     if (updateProfileDto.fullName !== undefined) {
-      user.fullName = updateProfileDto.fullName.trim();
+      updates.name = updateProfileDto.fullName.trim();
     }
 
     if (updateProfileDto.avatarUrl !== undefined) {
-      user.avatarUrl = updateProfileDto.avatarUrl.trim();
+      updates.avatar = updateProfileDto.avatarUrl.trim();
     }
 
-    await user.save();
+    await this.db.update(users).set(updates).where(eq(users.id, userId));
 
     return {
-      username: user.username,
-      email: user.email,
-      fullName: user.fullName || '',
-      avatarUrl: user.avatarUrl || '',
-      lastLoginAt: user.lastLoginAt,
+      username: updates.email || user.email,
+      email: updates.email || user.email,
+      fullName: updates.name || user.name || '',
+      avatarUrl: updates.avatar || user.avatar || '',
     };
   }
 
@@ -270,10 +265,9 @@ export class AuthService {
     userId: string,
     changePasswordDto: ChangePasswordDto,
   ): Promise<{ message: string }> {
-    const user = await this.userModel
-      .findById(userId)
-      .select('+password')
-      .exec();
+    const user = await this.db.query.users.findFirst({
+      where: eq(users.id, userId),
+    });
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -292,8 +286,15 @@ export class AuthService {
     }
 
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(changePasswordDto.newPassword, salt);
-    await user.save();
+    const newHashedPassword = await bcrypt.hash(
+      changePasswordDto.newPassword,
+      salt,
+    );
+
+    await this.db
+      .update(users)
+      .set({ password: newHashedPassword, updatedAt: new Date() })
+      .where(eq(users.id, userId));
 
     await this.logoutAll(userId);
 

@@ -8,7 +8,7 @@ export interface ICategory {
 }
 
 export interface IBrand {
-  id: number;
+  id: string | number;
   name: string;
   slug: string;
   logo: string;

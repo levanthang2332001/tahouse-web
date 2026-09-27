@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Inject,
   BadRequestException,
   NotFoundException,
   InternalServerErrorException,
@@ -7,16 +8,18 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import * as path from 'path';
+import { randomUUID } from 'crypto';
 import { imageSize } from 'image-size';
-import { Media, MediaDocument, MediaType } from './schemas/media.schema';
+import { eq, desc, and, like, or, sql } from 'drizzle-orm';
+import { D1_DATABASE } from '../../database/d1.constants';
+import type { D1Database } from '../../database/d1.client';
+import { media, MediaType, Media } from './schemas/media.schema';
 import { UploadMediaDto } from './dto/upload-media.dto';
 import { QueryMediaDto } from './dto/query-media.dto';
 
@@ -151,7 +154,7 @@ export class UploadService implements OnModuleInit {
 
   constructor(
     private readonly configService: ConfigService,
-    @InjectModel(Media.name) private readonly mediaModel: Model<MediaDocument>,
+    @Inject(D1_DATABASE) private readonly db: D1Database,
   ) {}
 
   onModuleInit() {
@@ -201,40 +204,48 @@ export class UploadService implements OnModuleInit {
   /**
    * Định dạng trả về: Ghép động R2_PUBLIC_URL từ biến môi trường với key
    */
-  formatMediaResponse(doc: any) {
-    if (!doc) return null;
-    const raw = doc.toObject ? doc.toObject() : { ...doc };
-    const id = raw._id ? raw._id.toString() : raw.id;
+  formatMediaResponse(raw: any) {
+    if (!raw) return null;
+    const id = raw.id || (raw._id ? raw._id.toString() : '');
     const key = raw.key || '';
-    const url = this.publicUrl ? `${this.publicUrl}/${key}` : `/${key}`;
+    const url = raw.url || (this.publicUrl ? `${this.publicUrl}/${key}` : `/${key}`);
+    const metadata =
+      typeof raw.metadata === 'string'
+        ? JSON.parse(raw.metadata || '{}')
+        : typeof raw.metadata_json === 'string'
+          ? JSON.parse(raw.metadata_json || '{}')
+          : raw.metadata || {};
+
+    const mime = raw.mimeType || raw.mime_type || '';
+    const filename = raw.filename || '';
 
     return {
       id,
       url,
       key,
-      filename: raw.filename,
-      originalName: raw.originalName,
-      mimeType: raw.mimeType,
-      fileType: raw.fileType,
+      filename,
+      originalName: raw.originalName || filename,
+      mimeType: mime,
+      fileType: raw.fileType || this.determineFileType(mime, filename),
       size: raw.size || 0,
-      width: raw.width ?? null,
-      height: raw.height ?? null,
-      aspectRatio: raw.aspectRatio ?? null,
-      duration: raw.duration ?? null,
+      width: raw.width ?? metadata?.width ?? null,
+      height: raw.height ?? metadata?.height ?? null,
+      aspectRatio: raw.aspectRatio ?? metadata?.aspectRatio ?? null,
+      duration: raw.duration ?? metadata?.duration ?? null,
       storage: raw.storage || 'r2',
-      bucket: raw.bucket,
-      folder: raw.folder,
-      brand: raw.brand,
-      category: raw.category,
-      subcategory: raw.subcategory,
-      productCode: raw.productCode,
-      title: raw.title,
-      altText: raw.altText,
-      description: raw.description,
-      uploadedBy: raw.uploadedBy,
-      metadata: raw.metadata,
-      createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt,
+      bucket: raw.bucket || this.bucketName,
+      folder: raw.folder || '',
+      brand: raw.brand || null,
+      category: raw.category || null,
+      subcategory: raw.subcategory || null,
+      productCode: raw.productCode || raw.product_code || null,
+      title: raw.title || filename,
+      altText: raw.altText || (raw.productCode || raw.product_code ? `${raw.productCode || raw.product_code} ${filename}` : filename),
+      description: raw.description || '',
+      uploadedBy: raw.uploadedBy || 'admin',
+      metadata,
+      createdAt: raw.createdAt || raw.created_at,
+      updatedAt: raw.updatedAt || raw.updated_at,
     };
   }
 
@@ -316,7 +327,7 @@ export class UploadService implements OnModuleInit {
   }
 
   /**
-   * Tải 1 file trực tiếp lên Cloudflare R2 và server tự động trích xuất kích thước, thời lượng, dung lượng để lưu vào MongoDB
+   * Tải 1 file trực tiếp lên Cloudflare R2 và server tự động trích xuất kích thước, thời lượng, dung lượng để lưu vào D1
    */
   async uploadSingle(
     file: Express.Multer.File,
@@ -396,37 +407,52 @@ export class UploadService implements OnModuleInit {
         `Uploaded to Cloudflare R2: [${key}] (${file.size} bytes, ${width || '?'}x${height || '?'}, duration: ${duration || 'N/A'})`,
       );
 
-      // 2. Lưu document metadata đầy đủ vào MongoDB
-      const mediaDoc = await this.mediaModel.create({
-        key,
-        filename,
-        originalName: file.originalname,
-        mimeType: file.mimetype,
-        fileType,
-        size: file.size || file.buffer.length,
+      const metadataObj = {
+        extension: path.extname(file.originalname).toLowerCase(),
         width,
         height,
         aspectRatio,
         duration,
-        storage: 'r2',
-        bucket: this.bucketName,
+      };
+
+      const newId = randomUUID();
+      const brandVal = dto?.brand ? slugify(dto.brand) : null;
+      const categoryVal = dto?.category ? slugify(dto.category) : null;
+      const subcategoryVal = dto?.subcategory ? slugify(dto.subcategory) : null;
+      const productCodeVal = dto?.productCode ? dto.productCode.trim() : null;
+
+      // 2. Lưu document metadata đầy đủ vào D1
+      await this.db.insert(media).values({
+        id: newId,
+        filename,
+        url: this.publicUrl ? `${this.publicUrl}/${key}` : `/${key}`,
+        key,
+        mimeType: file.mimetype,
+        size: file.size || file.buffer.length,
         folder: subFolder,
-        brand: dto?.brand ? slugify(dto.brand) : '',
-        category: dto?.category ? slugify(dto.category) : '',
-        subcategory: dto?.subcategory ? slugify(dto.subcategory) : '',
-        productCode: dto?.productCode ? dto.productCode.trim() : '',
-        title: file.originalname,
-        altText: dto?.productCode
-          ? `${dto.productCode} ${file.originalname}`
-          : file.originalname,
-        description: '',
-        uploadedBy: username,
-        metadata: {
-          extension: path.extname(file.originalname).toLowerCase(),
-        },
+        brand: brandVal,
+        category: categoryVal,
+        subcategory: subcategoryVal,
+        productCode: productCodeVal,
+        metadata: JSON.stringify(metadataObj),
       });
 
-      return this.formatMediaResponse(mediaDoc);
+      return this.formatMediaResponse({
+        id: newId,
+        filename,
+        url: this.publicUrl ? `${this.publicUrl}/${key}` : `/${key}`,
+        key,
+        mimeType: file.mimetype,
+        size: file.size || file.buffer.length,
+        folder: subFolder,
+        brand: brandVal,
+        category: categoryVal,
+        subcategory: subcategoryVal,
+        productCode: productCodeVal,
+        metadata: metadataObj,
+        originalName: file.originalname,
+        uploadedBy: username,
+      });
     } catch (error) {
       this.logger.error(
         `Failed to upload to Cloudflare R2: ${error.message}`,
@@ -474,52 +500,75 @@ export class UploadService implements OnModuleInit {
       search,
     } = query;
 
-    const filter: Record<string, any> = {};
-
-    if (fileType) {
-      filter.fileType = fileType;
-    }
+    const conditions: any[] = [];
 
     if (brand) {
-      filter.brand = slugify(brand);
+      conditions.push(eq(media.brand, slugify(brand)));
     }
 
     if (category) {
-      filter.category = slugify(category);
+      conditions.push(eq(media.category, slugify(category)));
     }
 
     if (subcategory) {
-      filter.subcategory = slugify(subcategory);
+      conditions.push(eq(media.subcategory, slugify(subcategory)));
     }
 
     if (productCode) {
-      filter.productCode = { $regex: productCode, $options: 'i' };
+      conditions.push(like(media.productCode, `%${productCode.trim()}%`));
+    }
+
+    if (fileType) {
+      if (fileType === MediaType.IMAGE) {
+        conditions.push(like(media.mimeType, 'image/%'));
+      } else if (fileType === MediaType.VIDEO) {
+        conditions.push(like(media.mimeType, 'video/%'));
+      } else if (fileType === MediaType.AUDIO) {
+        conditions.push(like(media.mimeType, 'audio/%'));
+      } else if (fileType === MediaType.DOCUMENT) {
+        conditions.push(
+          or(
+            like(media.mimeType, '%pdf%'),
+            like(media.mimeType, '%document%'),
+            like(media.mimeType, '%sheet%'),
+            like(media.mimeType, '%zip%'),
+          ),
+        );
+      }
     }
 
     if (search && search.trim()) {
-      const term = search.trim();
-      filter.$or = [
-        { originalName: { $regex: term, $options: 'i' } },
-        { title: { $regex: term, $options: 'i' } },
-        { description: { $regex: term, $options: 'i' } },
-        { key: { $regex: term, $options: 'i' } },
-      ];
+      const term = `%${search.trim()}%`;
+      conditions.push(
+        or(
+          like(media.filename, term),
+          like(media.key, term),
+          like(media.productCode, term),
+        ),
+      );
     }
 
-    const skip = (page - 1) * limit;
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const offset = (page - 1) * limit;
 
-    const [items, total] = await Promise.all([
-      this.mediaModel
-        .find(filter)
-        .sort({ createdAt: -1 })
-        .skip(skip)
+    const [itemsResult, countResult] = await Promise.all([
+      this.db
+        .select()
+        .from(media)
+        .where(whereClause)
+        .orderBy(desc(media.createdAt))
         .limit(limit)
-        .lean(),
-      this.mediaModel.countDocuments(filter),
+        .offset(offset),
+      this.db
+        .select({ count: sql<number>`count(*)` })
+        .from(media)
+        .where(whereClause),
     ]);
 
+    const total = Number(countResult[0]?.count || 0);
+
     return {
-      items: items.map((item) => this.formatMediaResponse(item)),
+      items: itemsResult.map((item) => this.formatMediaResponse(item)),
       pagination: {
         total,
         page,
@@ -533,15 +582,16 @@ export class UploadService implements OnModuleInit {
    * Lấy chi tiết 1 Media document theo ID
    */
   async findById(id: string) {
-    const media = await this.mediaModel.findById(id);
-    if (!media) {
+    const records = await this.db.select().from(media).where(eq(media.id, id)).limit(1);
+    const item = records[0];
+    if (!item) {
       throw new NotFoundException(`Media document not found with ID [${id}]`);
     }
-    return this.formatMediaResponse(media);
+    return this.formatMediaResponse(item);
   }
 
   /**
-   * Xóa file khỏi Cloudflare R2 và xóa document khỏi MongoDB
+   * Xóa file khỏi Cloudflare R2 và xóa document khỏi D1
    */
   async deleteMedia(
     idOrKeyOrUrl: string,
@@ -551,21 +601,17 @@ export class UploadService implements OnModuleInit {
     }
 
     const client = this.getClient();
+    const cleanKey = this.extractKeyFromUrl(idOrKeyOrUrl);
 
-    // 1. Tìm media document trong MongoDB
-    let mediaDoc: MediaDocument | null = null;
-    if (idOrKeyOrUrl.match(/^[0-9a-fA-F]{24}$/)) {
-      mediaDoc = await this.mediaModel.findById(idOrKeyOrUrl);
-    }
+    // 1. Tìm media record trong D1
+    const records = await this.db
+      .select()
+      .from(media)
+      .where(or(eq(media.id, idOrKeyOrUrl), eq(media.key, idOrKeyOrUrl), eq(media.key, cleanKey)))
+      .limit(1);
 
-    if (!mediaDoc) {
-      const cleanKey = this.extractKeyFromUrl(idOrKeyOrUrl);
-      mediaDoc = await this.mediaModel.findOne({
-        $or: [{ key: idOrKeyOrUrl }, { key: cleanKey }],
-      });
-    }
-
-    const key = mediaDoc ? mediaDoc.key : this.extractKeyFromUrl(idOrKeyOrUrl);
+    const mediaDoc = records[0];
+    const key = mediaDoc ? mediaDoc.key : cleanKey;
 
     // 2. Xóa khỏi Cloudflare R2
     try {
@@ -582,14 +628,14 @@ export class UploadService implements OnModuleInit {
       );
     }
 
-    // 3. Xóa document khỏi MongoDB
+    // 3. Xóa document khỏi D1
     if (mediaDoc) {
-      await this.mediaModel.findByIdAndDelete(mediaDoc._id);
+      await this.db.delete(media).where(eq(media.id, mediaDoc.id));
     }
 
     return {
       message: 'Media deleted successfully from Cloudflare R2 and database',
-      deletedId: mediaDoc?._id?.toString(),
+      deletedId: mediaDoc?.id,
       key,
     };
   }
@@ -597,10 +643,14 @@ export class UploadService implements OnModuleInit {
   private extractKeyFromUrl(fileUrlOrKey: string): string {
     let key = fileUrlOrKey;
     if (fileUrlOrKey.startsWith('http')) {
-      const urlObj = new URL(fileUrlOrKey);
-      key = urlObj.pathname.replace(/^\/+/, '');
-      if (key.startsWith('uploads/')) {
-        key = key.replace(/^uploads\//, '');
+      try {
+        const urlObj = new URL(fileUrlOrKey);
+        key = urlObj.pathname.replace(/^\/+/, '');
+        if (key.startsWith('uploads/')) {
+          key = key.replace(/^uploads\//, '');
+        }
+      } catch {
+        // fallback
       }
     }
     return key;
