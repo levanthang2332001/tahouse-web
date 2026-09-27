@@ -1,16 +1,20 @@
 import { sqliteTable, text, integer, real, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
+import { randomUUID } from 'crypto';
 import { brands } from './brands.schema';
 
 export const products = sqliteTable(
   'products',
   {
-    id: text('id').primaryKey(), // Slug id (e.g. "ta-9800")
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => randomUUID()),
     code: text('code').notNull().unique(), // Code (e.g. "TA-9800 PREMIUM")
+    slug: text('slug').notNull(), // Slug ID for SEO URL (e.g. "ta-9800")
     name: text('name').notNull(),
     description: text('description'),
     shortDescription: text('short_description'),
-    brandId: integer('brand_id')
+    brandId: text('brand_id')
       .notNull()
       .references(() => brands.id),
     categorySlug: text('category_slug').notNull(),
@@ -43,6 +47,7 @@ export const products = sqliteTable(
   },
   (table) => [
     uniqueIndex('products_code_idx').on(table.code),
+    index('products_slug_idx').on(table.slug),
     index('products_brand_idx').on(table.brandId),
     index('products_category_idx').on(table.categorySlug),
     index('products_subcategory_idx').on(table.subcategorySlug),

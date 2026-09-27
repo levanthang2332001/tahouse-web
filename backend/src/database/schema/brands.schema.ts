@@ -1,14 +1,18 @@
 import { sqliteTable, text, integer, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
+import { randomUUID } from 'crypto';
 
 export const brands = sqliteTable(
   'brands',
   {
-    id: integer('id').primaryKey({ autoIncrement: true }),
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => randomUUID()),
     name: text('name').notNull(),
     slug: text('slug').notNull().unique(),
     logo: text('logo').notNull(),
     logoHtml: text('logo_html'),
+    orderIndex: integer('order_index').default(0),
     createdAt: integer('created_at', { mode: 'timestamp' })
       .notNull()
       .default(sql`(unixepoch())`),
@@ -22,8 +26,10 @@ export const brands = sqliteTable(
 export const categories = sqliteTable(
   'categories',
   {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    brandId: integer('brand_id')
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => randomUUID()),
+    brandId: text('brand_id')
       .notNull()
       .references(() => brands.id, { onDelete: 'cascade' }),
     name: text('name').notNull(),
@@ -43,8 +49,10 @@ export const categories = sqliteTable(
 export const subcategories = sqliteTable(
   'subcategories',
   {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    categoryId: integer('category_id')
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => randomUUID()),
+    categoryId: text('category_id')
       .notNull()
       .references(() => categories.id, { onDelete: 'cascade' }),
     name: text('name').notNull(),

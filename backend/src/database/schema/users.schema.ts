@@ -1,8 +1,11 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
+import { randomUUID } from 'crypto';
 
 export const users = sqliteTable('users', {
-  id: text('id').primaryKey(),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
   name: text('name').notNull(),

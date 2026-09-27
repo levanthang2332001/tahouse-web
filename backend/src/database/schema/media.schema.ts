@@ -1,10 +1,13 @@
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
+import { randomUUID } from 'crypto';
 
 export const media = sqliteTable(
   'media',
   {
-    id: text('id').primaryKey(),
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => randomUUID()),
     filename: text('filename').notNull(),
     url: text('url').notNull(),
     key: text('key').notNull(),

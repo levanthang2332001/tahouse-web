@@ -10,8 +10,36 @@ async function applyD1Schema() {
 
   console.log(`Applying schema to D1 Database: ${databaseId}...`);
 
-  const sqlFilePath = path.join(__dirname, '../drizzle/0000_wild_solo.sql');
+  const drizzleDir = path.join(__dirname, '../drizzle');
+  const sqlFiles = fs.readdirSync(drizzleDir).filter((f) => f.endsWith('.sql'));
+  if (sqlFiles.length === 0) throw new Error('No SQL migration files found in drizzle/');
+
+  const sqlFilePath = path.join(drizzleDir, sqlFiles[0]);
+  console.log(`Reading SQL file: ${sqlFilePath}`);
   const fullSql = fs.readFileSync(sqlFilePath, 'utf-8');
+
+  // Drop existing tables to recreate with new UUID schema
+  const dropTables = [
+    'DROP TABLE IF EXISTS subcategories;',
+    'DROP TABLE IF EXISTS categories;',
+    'DROP TABLE IF EXISTS products;',
+    'DROP TABLE IF EXISTS brands;',
+    'DROP TABLE IF EXISTS media;',
+    'DROP TABLE IF EXISTS users;',
+    'DROP TABLE IF EXISTS sqlite_sequence;',
+  ];
+
+  for (const drop of dropTables) {
+    try {
+      await axios.post(
+        `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}/query`,
+        { sql: drop },
+        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } },
+      );
+    } catch {
+      // ignore
+    }
+  }
 
   // Split statements by drizzle statement-breakpoint
   const statements = fullSql
@@ -63,7 +91,7 @@ async function applyD1Schema() {
 
   console.log('\n--- BẢNG HIỆN CÓ TRÊN CLOUDFLARE D1 ---');
   console.log(tablesRes.data?.result?.[0]?.results);
-  console.log('\n✅ Toàn bộ schema đã được tạo thành công trên Cloudflare D1!');
+  console.log('\n✅ Toàn bộ schema UUID đã được tạo thành công trên Cloudflare D1!');
 }
 
 applyD1Schema().catch((err) => {

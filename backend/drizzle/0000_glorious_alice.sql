@@ -12,11 +12,12 @@ CREATE TABLE `users` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);--> statement-breakpoint
 CREATE TABLE `brands` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
 	`slug` text NOT NULL,
 	`logo` text NOT NULL,
 	`logo_html` text,
+	`order_index` integer DEFAULT 0,
 	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
 	`updated_at` integer DEFAULT (unixepoch()) NOT NULL
 );
@@ -24,8 +25,8 @@ CREATE TABLE `brands` (
 CREATE UNIQUE INDEX `brands_slug_unique` ON `brands` (`slug`);--> statement-breakpoint
 CREATE UNIQUE INDEX `brands_slug_idx` ON `brands` (`slug`);--> statement-breakpoint
 CREATE TABLE `categories` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`brand_id` integer NOT NULL,
+	`id` text PRIMARY KEY NOT NULL,
+	`brand_id` text NOT NULL,
 	`name` text NOT NULL,
 	`slug` text NOT NULL,
 	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
@@ -35,8 +36,8 @@ CREATE TABLE `categories` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `categories_brand_slug_idx` ON `categories` (`brand_id`,`slug`);--> statement-breakpoint
 CREATE TABLE `subcategories` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`category_id` integer NOT NULL,
+	`id` text PRIMARY KEY NOT NULL,
+	`category_id` text NOT NULL,
 	`name` text NOT NULL,
 	`slug` text NOT NULL,
 	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
@@ -48,10 +49,11 @@ CREATE UNIQUE INDEX `subcategories_cat_slug_idx` ON `subcategories` (`category_i
 CREATE TABLE `products` (
 	`id` text PRIMARY KEY NOT NULL,
 	`code` text NOT NULL,
+	`slug` text NOT NULL,
 	`name` text NOT NULL,
 	`description` text,
 	`short_description` text,
-	`brand_id` integer NOT NULL,
+	`brand_id` text NOT NULL,
 	`category_slug` text NOT NULL,
 	`subcategory_slug` text,
 	`price` real NOT NULL,
@@ -80,6 +82,7 @@ CREATE TABLE `products` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `products_code_unique` ON `products` (`code`);--> statement-breakpoint
 CREATE UNIQUE INDEX `products_code_idx` ON `products` (`code`);--> statement-breakpoint
+CREATE INDEX `products_slug_idx` ON `products` (`slug`);--> statement-breakpoint
 CREATE INDEX `products_brand_idx` ON `products` (`brand_id`);--> statement-breakpoint
 CREATE INDEX `products_category_idx` ON `products` (`category_slug`);--> statement-breakpoint
 CREATE INDEX `products_subcategory_idx` ON `products` (`subcategory_slug`);--> statement-breakpoint
