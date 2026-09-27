@@ -53,11 +53,13 @@ CREATE TABLE `products` (
 	`name` text NOT NULL,
 	`description` text,
 	`short_description` text,
+	`content` text,
 	`brand_id` text NOT NULL,
 	`category_slug` text NOT NULL,
 	`subcategory_slug` text,
 	`price` real NOT NULL,
 	`original_price` real,
+	`discount_percent` real,
 	`price_range` text,
 	`image_url` text NOT NULL,
 	`images_json` text DEFAULT '[]' NOT NULL,
@@ -67,12 +69,14 @@ CREATE TABLE `products` (
 	`warranty` integer DEFAULT 24,
 	`warranty_text` text,
 	`colors_json` text DEFAULT '[]',
+	`installation_json` text DEFAULT '{"images":[],"videos":[]}',
 	`installation_manual_json` text DEFAULT '[]',
 	`faq_json` text DEFAULT '[]',
 	`has_variants` integer DEFAULT false,
 	`options_json` text DEFAULT '[]',
 	`variants_json` text DEFAULT '[]',
 	`installation_preview_json` text DEFAULT '[]',
+	`priority` integer DEFAULT 9999,
 	`status` text DEFAULT 'ACTIVE' NOT NULL,
 	`views` integer DEFAULT 0 NOT NULL,
 	`created_at` integer DEFAULT (unixepoch()) NOT NULL,
@@ -87,6 +91,7 @@ CREATE INDEX `products_brand_idx` ON `products` (`brand_id`);--> statement-break
 CREATE INDEX `products_category_idx` ON `products` (`category_slug`);--> statement-breakpoint
 CREATE INDEX `products_subcategory_idx` ON `products` (`subcategory_slug`);--> statement-breakpoint
 CREATE INDEX `products_price_idx` ON `products` (`price`);--> statement-breakpoint
+CREATE INDEX `products_priority_idx` ON `products` (`priority`);--> statement-breakpoint
 CREATE INDEX `products_status_idx` ON `products` (`status`);--> statement-breakpoint
 CREATE TABLE `media` (
 	`id` text PRIMARY KEY NOT NULL,

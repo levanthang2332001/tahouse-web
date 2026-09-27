@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "d9ec47c1-92af-47d0-a355-8753853f0b7d",
+  "id": "926636ec-de29-43c2-b55c-b38f2345088a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "users": {
@@ -371,6 +371,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "brand_id": {
           "name": "brand_id",
           "type": "text",
@@ -401,6 +408,13 @@
         },
         "original_price": {
           "name": "original_price",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "discount_percent": {
+          "name": "discount_percent",
           "type": "real",
           "primaryKey": false,
           "notNull": false,
@@ -475,6 +489,14 @@
           "autoincrement": false,
           "default": "'[]'"
         },
+        "installation_json": {
+          "name": "installation_json",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'{\"images\":[],\"videos\":[]}'"
+        },
         "installation_manual_json": {
           "name": "installation_manual_json",
           "type": "text",
@@ -522,6 +544,14 @@
           "notNull": false,
           "autoincrement": false,
           "default": "'[]'"
+        },
+        "priority": {
+          "name": "priority",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 9999
         },
         "status": {
           "name": "status",
@@ -603,6 +633,13 @@
           "name": "products_price_idx",
           "columns": [
             "price"
+          ],
+          "isUnique": false
+        },
+        "products_priority_idx": {
+          "name": "products_priority_idx",
+          "columns": [
+            "priority"
           ],
           "isUnique": false
         },

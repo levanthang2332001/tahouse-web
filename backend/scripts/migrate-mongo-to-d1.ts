@@ -162,17 +162,17 @@ async function runMigration() {
 
       return {
         sql: `INSERT INTO products (
-          id, code, slug, name, description, short_description, brand_id, category_slug, subcategory_slug,
-          price, original_price, price_range, image_url, images_json, features_json, specs_json,
-          technologies_json, warranty, warranty_text, colors_json, installation_manual_json,
+          id, code, slug, name, description, short_description, content, brand_id, category_slug, subcategory_slug,
+          price, original_price, discount_percent, price_range, image_url, images_json, features_json, specs_json,
+          technologies_json, warranty, warranty_text, colors_json, installation_json, installation_manual_json,
           faq_json, has_variants, options_json, variants_json, installation_preview_json,
-          status, views, created_at, updated_at
+          priority, status, views, created_at, updated_at
         ) VALUES (
-          ?, ?, ?, ?, ?, ?, ?, ?, ?,
-          ?, ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?,
           ?, ?, ?, ?, ?,
-          ?, ?, ?, ?, ?,
-          ?, ?, ?, ?
+          ?, ?, ?, ?, ?
         );`,
         params: [
           productUuid,
@@ -181,11 +181,13 @@ async function runMigration() {
           p.name,
           p.description || '',
           p.shortDescription || '',
+          p.content || '',
           brandUuid,
           p.categorySlug || p.category || '',
           p.subcategorySlug || p.subcategory || null,
           typeof p.price === 'number' ? p.price : parseFloat(p.price) || 0,
           p.originalPrice ? (typeof p.originalPrice === 'number' ? p.originalPrice : parseFloat(p.originalPrice)) : null,
+          p.discountPercent ? (typeof p.discountPercent === 'number' ? p.discountPercent : parseFloat(p.discountPercent)) : null,
           p.priceRange || null,
           p.imageUrl || (Array.isArray(p.images) && p.images[0]) || '',
           JSON.stringify(p.images || []),
@@ -195,12 +197,14 @@ async function runMigration() {
           typeof p.warranty === 'number' ? p.warranty : 24,
           p.warrantyText || '',
           JSON.stringify(p.colors || []),
+          JSON.stringify(p.installation || { images: [], videos: [] }),
           JSON.stringify(p.installationManual || []),
           JSON.stringify(p.faq || []),
           p.has_variants ? 1 : 0,
           JSON.stringify(p.options || []),
           JSON.stringify(p.variants || []),
           JSON.stringify(p.installation_preview || []),
+          typeof p.priority === 'number' ? p.priority : 9999,
           p.status || 'ACTIVE',
           p.views || 0,
           Math.floor(new Date(p.createdAt || Date.now()).getTime() / 1000),
