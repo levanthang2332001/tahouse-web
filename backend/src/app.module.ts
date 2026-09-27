@@ -8,6 +8,8 @@ import { UploadModule } from './modules/upload/upload.module';
 import { RagModule } from './modules/rag/rag.module';
 import { AuthModule } from './modules/auth/auth.module';
 
+import { StatsModule } from './modules/stats/stats.module';
+
 /**
  * Module gốc (Root Module) của toàn bộ ứng dụng.
  * Thực hiện nạp các module cấu hình (ConfigModule) và module log (LoggerModule).
@@ -25,6 +27,7 @@ import { AuthModule } from './modules/auth/auth.module';
     BrandsModule,
     UploadModule,
     RagModule,
+    StatsModule,
   ],
   controllers: [],
   providers: [],

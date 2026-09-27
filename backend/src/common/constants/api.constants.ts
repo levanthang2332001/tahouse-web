@@ -32,6 +32,9 @@ export enum ApiRoute {
   ADMIN_BRANDS_SUBCATEGORIES = 'admin/brands/:idOrSlug/categories/:categorySlug/subcategories',
   ADMIN_BRANDS_SUBCATEGORY_DETAIL = 'admin/brands/:idOrSlug/categories/:categorySlug/subcategories/:subcategorySlug',
 
+  // --- Admin Stats APIs ---
+  ADMIN_STATS = 'admin/stats',
+
   // --- Upload & Media Management APIs ---
   ADMIN_UPLOAD = 'admin/upload',
   ADMIN_UPLOAD_DETAIL = 'admin/upload/:id',
@@ -46,5 +49,6 @@ export enum SwaggerTag {
   AUTH = 'Auth & Quản trị viên',
   ADMIN_PRODUCTS = 'Admin - Quản lý Sản phẩm',
   ADMIN_BRANDS = 'Admin - Quản lý Thương hiệu',
+  ADMIN_STATS = 'Admin - Thống kê Dashboard',
   ADMIN_UPLOAD = 'Admin - Quản lý Tải lên File (Media)',
 }
