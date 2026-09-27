@@ -37,11 +37,8 @@ RUN pnpm install --frozen-lockfile --prod
 # Copy compiled application code from the builder stage
 COPY --from=builder /app/dist ./dist
 
-# Copy the database files (since application uses JSON database)
-COPY --from=builder /app/database ./database
-
-# Create uploads directory for file uploads if needed
-RUN mkdir -p uploads
+# Create necessary directories for storage/runtime if needed
+RUN mkdir -p uploads database
 
 # Expose port
 EXPOSE 3001
