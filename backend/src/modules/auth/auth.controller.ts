@@ -101,7 +101,8 @@ export class AuthController {
   @ApiBearerAuth()
   @Patch(ApiRoute.AUTH_ME)
   @ApiOperation({
-    summary: 'Cập nhật thông tin tài khoản cá nhân (Họ tên, Email, Ảnh đại diện)',
+    summary:
+      'Cập nhật thông tin tài khoản cá nhân (Họ tên, Email, Ảnh đại diện)',
     description:
       'Cho phép người dùng cập nhật họ tên hiển thị, email và URL avatar (đã upload lên R2).',
   })

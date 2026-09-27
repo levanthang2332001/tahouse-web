@@ -38,7 +38,10 @@ export function slugify(text: string): string {
 /**
  * Tính toán tỷ lệ khung hình chuẩn từ width & height
  */
-function calculateAspectRatio(width: number | null, height: number | null): string | null {
+function calculateAspectRatio(
+  width: number | null,
+  height: number | null,
+): string | null {
   if (!width || !height || width <= 0 || height <= 0) return null;
   const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
   const divisor = gcd(Math.round(width), Math.round(height));
@@ -99,8 +102,10 @@ export function extractVideoMetadata(buffer: Buffer): {
       // Movie Header Box -> Thời lượng video
       if (type === 'mvhd') {
         const version = buffer.readUInt8(offset + 8);
-        const timeScaleOffset = version === 1 ? offset + 8 + 16 : offset + 8 + 8;
-        const durationOffset = version === 1 ? offset + 8 + 20 : offset + 8 + 12;
+        const timeScaleOffset =
+          version === 1 ? offset + 8 + 16 : offset + 8 + 8;
+        const durationOffset =
+          version === 1 ? offset + 8 + 20 : offset + 8 + 12;
         if (durationOffset + 8 <= buffer.length) {
           const timescale = buffer.readUInt32BE(timeScaleOffset);
           const rawDuration =
@@ -155,8 +160,7 @@ export class UploadService implements OnModuleInit {
     const secretAccessKey = this.configService.get<string>(
       'R2_SECRET_ACCESS_KEY',
     );
-    this.bucketName =
-      this.configService.get<string>('R2_BUCKET_NAME') || '';
+    this.bucketName = this.configService.get<string>('R2_BUCKET_NAME') || '';
     this.publicUrl = (
       this.configService.get<string>('R2_PUBLIC_URL') ||
       this.configService.get<string>('IMAGE_BASE_URL') ||
@@ -320,19 +324,22 @@ export class UploadService implements OnModuleInit {
     username: string = 'admin',
   ) {
     if (!file || !file.buffer || file.buffer.length === 0) {
-      throw new BadRequestException('Uploaded file is empty (0 bytes) or invalid');
+      throw new BadRequestException(
+        'Uploaded file is empty (0 bytes) or invalid',
+      );
     }
 
     const fileType = this.determineFileType(file.mimetype, file.originalname);
 
     // File Size Limits per media type
-    const MAX_FILE_SIZES: Record<string, { maxBytes: number; label: string }> = {
-      [MediaType.IMAGE]: { maxBytes: 15 * 1024 * 1024, label: '15MB' },
-      [MediaType.VIDEO]: { maxBytes: 100 * 1024 * 1024, label: '100MB' },
-      [MediaType.DOCUMENT]: { maxBytes: 50 * 1024 * 1024, label: '50MB' },
-      [MediaType.AUDIO]: { maxBytes: 20 * 1024 * 1024, label: '20MB' },
-      [MediaType.OTHER]: { maxBytes: 50 * 1024 * 1024, label: '50MB' },
-    };
+    const MAX_FILE_SIZES: Record<string, { maxBytes: number; label: string }> =
+      {
+        [MediaType.IMAGE]: { maxBytes: 15 * 1024 * 1024, label: '15MB' },
+        [MediaType.VIDEO]: { maxBytes: 100 * 1024 * 1024, label: '100MB' },
+        [MediaType.DOCUMENT]: { maxBytes: 50 * 1024 * 1024, label: '50MB' },
+        [MediaType.AUDIO]: { maxBytes: 20 * 1024 * 1024, label: '20MB' },
+        [MediaType.OTHER]: { maxBytes: 50 * 1024 * 1024, label: '50MB' },
+      };
 
     const limit = MAX_FILE_SIZES[fileType] || MAX_FILE_SIZES[MediaType.OTHER];
     const actualSize = file.size || file.buffer.length;
@@ -409,7 +416,9 @@ export class UploadService implements OnModuleInit {
         subcategory: dto?.subcategory ? slugify(dto.subcategory) : '',
         productCode: dto?.productCode ? dto.productCode.trim() : '',
         title: file.originalname,
-        altText: dto?.productCode ? `${dto.productCode} ${file.originalname}` : file.originalname,
+        altText: dto?.productCode
+          ? `${dto.productCode} ${file.originalname}`
+          : file.originalname,
         description: '',
         uploadedBy: username,
         metadata: {

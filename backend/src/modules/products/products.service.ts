@@ -123,7 +123,7 @@ export class ProductsService {
     discountPercent?: number | null;
     priceRange?: string;
   }) {
-    let originalPrice =
+    const originalPrice =
       typeof input.originalPrice === 'number' && !isNaN(input.originalPrice)
         ? input.originalPrice
         : null;
@@ -137,7 +137,11 @@ export class ProductsService {
         : null;
 
     // Nếu có giá gốc và % giảm -> tự tính giá bán (price) nếu chưa có
-    if (originalPrice !== null && discountPercent !== null && discountPercent > 0) {
+    if (
+      originalPrice !== null &&
+      discountPercent !== null &&
+      discountPercent > 0
+    ) {
       if (price === null) {
         price = Math.round(originalPrice * (1 - discountPercent / 100));
       }
@@ -148,7 +152,9 @@ export class ProductsService {
       (discountPercent === null || discountPercent === 0)
     ) {
       // Tự suy ra % giảm nếu có giá gốc và giá bán
-      discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
+      discountPercent = Math.round(
+        ((originalPrice - price) / originalPrice) * 100,
+      );
     }
 
     let priceRange = input.priceRange || '';
@@ -192,11 +198,7 @@ export class ProductsService {
     if (dto.brandId !== undefined && dto.brandId !== null) {
       data.brandId = dto.brandId;
     } else if ((dto as any).brandSlug || (dto as any).brand) {
-      const bSlug = (
-        (dto as any).brandSlug ||
-        (dto as any).brand ||
-        ''
-      )
+      const bSlug = ((dto as any).brandSlug || (dto as any).brand || '')
         .toLowerCase()
         .trim();
       const brandDoc = await this.brandModel
@@ -214,10 +216,10 @@ export class ProductsService {
     }
 
     // Xóa các trường tên tĩnh để đảm bảo DB chỉ lưu brandId, category, subcategory
-    delete (data as any).brand;
-    delete (data as any).brandSlug;
-    delete (data as any).categoryName;
-    delete (data as any).subcategoryName;
+    delete data.brand;
+    delete data.brandSlug;
+    delete data.categoryName;
+    delete data.subcategoryName;
 
     // Auto-generate clean id if missing
     if (!data.id && data.code) {
@@ -500,10 +502,7 @@ export class ProductsService {
     return productResponse;
   }
 
-  async getInstallationMedia(
-    idOrCode: string,
-    query: GetInstallationMediaDto,
-  ) {
+  async getInstallationMedia(idOrCode: string, query: GetInstallationMediaDto) {
     const { page = 1, limit = 12, type = MediaType.ALL } = query;
 
     const cleanQuery = idOrCode.trim();
@@ -594,8 +593,11 @@ export class ProductsService {
     return newProduct.save();
   }
 
-  async update(idOrCode: string, updateProductDto: UpdateProductDto): Promise<any> {
-    const payload = await this.enrichRelations(updateProductDto as any);
+  async update(
+    idOrCode: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<any> {
+    const payload = await this.enrichRelations(updateProductDto);
     const product = await this.productModel.findOneAndUpdate(
       { $or: [{ id: idOrCode }, { code: idOrCode }] },
       { $set: payload },

@@ -67,7 +67,8 @@ export class RagController {
 
   @Get('client')
   @ApiOperation({
-    summary: 'Giao diện chat client để test tư vấn AI trên mọi thiết bị trong mạng LAN',
+    summary:
+      'Giao diện chat client để test tư vấn AI trên mọi thiết bị trong mạng LAN',
   })
   getClient(@Res() res: Response) {
     const filePath = path.join(process.cwd(), 'test-chat.html');

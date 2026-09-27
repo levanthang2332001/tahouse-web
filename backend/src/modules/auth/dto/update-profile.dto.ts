@@ -21,7 +21,8 @@ export class UpdateProfileDto {
 
   @ApiPropertyOptional({
     description: 'URL ảnh đại diện (Avatar) tải lên từ Cloudflare R2',
-    example: 'https://pub-574171c4de1f4094b5bcfb3b35270183.r2.dev/avatars/admin-avatar.png',
+    example:
+      'https://pub-574171c4de1f4094b5bcfb3b35270183.r2.dev/avatars/admin-avatar.png',
   })
   @IsOptional()
   @IsString()

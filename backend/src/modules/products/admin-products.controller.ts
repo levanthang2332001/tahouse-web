@@ -32,7 +32,8 @@ export class AdminProductsController {
 
   @Get(ApiRoute.ADMIN_PRODUCTS)
   @ApiOperation({
-    summary: 'Lấy danh sách sản phẩm quản trị (Có phân trang, bộ lọc, tìm kiếm)',
+    summary:
+      'Lấy danh sách sản phẩm quản trị (Có phân trang, bộ lọc, tìm kiếm)',
   })
   @ApiResponse({ status: 200, description: 'Danh sách sản phẩm cho Admin.' })
   async findAll(@Query() query: GetProductsDto) {

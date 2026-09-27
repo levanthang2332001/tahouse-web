@@ -65,7 +65,8 @@ export class CreateProductDto {
   shortDescription?: string;
 
   @ApiPropertyOptional({
-    description: 'Nội dung bài viết chi tiết của sản phẩm (hỗ trợ văn bản thuần hoặc mã HTML/Rich Text)',
+    description:
+      'Nội dung bài viết chi tiết của sản phẩm (hỗ trợ văn bản thuần hoặc mã HTML/Rich Text)',
     example: '<p>Chi tiết đánh giá sản phẩm...</p>',
   })
   @IsOptional()
@@ -82,12 +83,18 @@ export class CreateProductDto {
   @IsArray()
   images?: string[];
 
-  @ApiPropertyOptional({ description: 'Giá bán thực tế / Giá sau giảm (VNĐ)', example: 45000000 })
+  @ApiPropertyOptional({
+    description: 'Giá bán thực tế / Giá sau giảm (VNĐ)',
+    example: 45000000,
+  })
   @IsOptional()
   @IsNumber()
   price?: number;
 
-  @ApiPropertyOptional({ description: 'Giá gốc niêm yết từ hãng (VNĐ)', example: 50000000 })
+  @ApiPropertyOptional({
+    description: 'Giá gốc niêm yết từ hãng (VNĐ)',
+    example: 50000000,
+  })
   @IsOptional()
   @IsNumber()
   originalPrice?: number;

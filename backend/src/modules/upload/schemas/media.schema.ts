@@ -36,7 +36,11 @@ export class Media {
   @Prop({ required: true, trim: true })
   mimeType: string;
 
-  @Prop({ required: true, enum: Object.values(MediaType), default: MediaType.IMAGE })
+  @Prop({
+    required: true,
+    enum: Object.values(MediaType),
+    default: MediaType.IMAGE,
+  })
   fileType: string;
 
   @Prop({ required: true, default: 0 })

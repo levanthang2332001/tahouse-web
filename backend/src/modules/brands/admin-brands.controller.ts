@@ -46,7 +46,11 @@ export class AdminBrandsController {
   @ApiOperation({
     summary: 'Lấy chi tiết thương hiệu theo ID hoặc Slug (Admin)',
   })
-  @ApiParam({ name: 'idOrSlug', description: 'ID số hoặc slug của thương hiệu', example: '1' })
+  @ApiParam({
+    name: 'idOrSlug',
+    description: 'ID số hoặc slug của thương hiệu',
+    example: '1',
+  })
   @ApiResponse({ status: 200, description: 'Chi tiết thương hiệu.' })
   async findOne(@Param('idOrSlug') idOrSlug: string) {
     return this.brandsService.findOne(idOrSlug);
@@ -65,7 +69,11 @@ export class AdminBrandsController {
   @ApiOperation({
     summary: 'Cập nhật toàn bộ thông tin thương hiệu',
   })
-  @ApiParam({ name: 'idOrSlug', description: 'ID số hoặc slug của thương hiệu', example: '1' })
+  @ApiParam({
+    name: 'idOrSlug',
+    description: 'ID số hoặc slug của thương hiệu',
+    example: '1',
+  })
   @ApiResponse({ status: 200, description: 'Cập nhật thương hiệu thành công.' })
   async update(
     @Param('idOrSlug') idOrSlug: string,
@@ -78,7 +86,11 @@ export class AdminBrandsController {
   @ApiOperation({
     summary: 'Xóa thương hiệu',
   })
-  @ApiParam({ name: 'idOrSlug', description: 'ID số hoặc slug của thương hiệu', example: '1' })
+  @ApiParam({
+    name: 'idOrSlug',
+    description: 'ID số hoặc slug của thương hiệu',
+    example: '1',
+  })
   @ApiResponse({ status: 200, description: 'Xóa thương hiệu thành công.' })
   async remove(@Param('idOrSlug') idOrSlug: string) {
     return this.brandsService.remove(idOrSlug);

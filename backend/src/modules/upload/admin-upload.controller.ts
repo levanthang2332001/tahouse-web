@@ -35,7 +35,8 @@ const unifiedUploadSchema = {
     file: {
       type: 'string',
       format: 'binary',
-      description: 'Tệp tin đơn lẻ tải lên (hoặc dùng trường files để tải nhiều tệp cùng lúc)',
+      description:
+        'Tệp tin đơn lẻ tải lên (hoặc dùng trường files để tải nhiều tệp cùng lúc)',
     },
     files: {
       type: 'array',
@@ -43,11 +44,13 @@ const unifiedUploadSchema = {
         type: 'string',
         format: 'binary',
       },
-      description: 'Danh sách nhiều tệp tin tải lên đồng thời (Hình ảnh, Video, PDF, ZIP...)',
+      description:
+        'Danh sách nhiều tệp tin tải lên đồng thời (Hình ảnh, Video, PDF, ZIP...)',
     },
     folder: {
       type: 'string',
-      description: 'Thư mục gốc lưu trữ trên Cloudflare R2 (mặc định: products, hoặc brands, categories, avatars, banners, documents, videos)',
+      description:
+        'Thư mục gốc lưu trữ trên Cloudflare R2 (mặc định: products, hoặc brands, categories, avatars, banners, documents, videos)',
       example: 'products',
     },
     brand: {
@@ -82,7 +85,8 @@ export class AdminUploadController {
 
   @Post(ApiRoute.ADMIN_UPLOAD)
   @ApiOperation({
-    summary: 'API Upload tổng hợp duy nhất lên Cloudflare R2 & Lưu trữ Document Media MongoDB',
+    summary:
+      'API Upload tổng hợp duy nhất lên Cloudflare R2 & Lưu trữ Document Media MongoDB',
     description: `Tải lên 1 hoặc nhiều tệp tin bất kỳ (Hình ảnh, Video, Tài liệu PDF/DOC/ZIP...) trực tiếp lên Cloudflare R2.
 Hệ thống tự động:
 1. Phân loại định dạng tệp (image, video, document, audio, other).
@@ -124,7 +128,8 @@ Hệ thống tự động:
   @Get(ApiRoute.ADMIN_UPLOAD)
   @ApiOperation({
     summary: 'Lấy danh sách các tài nguyên Media đã lưu trữ trong hệ thống',
-    description: 'Hỗ trợ tìm kiếm, lọc theo brand, category, subcategory, productCode, fileType và phân trang.',
+    description:
+      'Hỗ trợ tìm kiếm, lọc theo brand, category, subcategory, productCode, fileType và phân trang.',
   })
   async getMediaList(@Query() query: QueryMediaDto) {
     return this.uploadService.findAll(query);

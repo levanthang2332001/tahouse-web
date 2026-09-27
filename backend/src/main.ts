@@ -80,7 +80,10 @@ async function bootstrap() {
     .addTag(SwaggerTag.AUTH, 'API xác thực và quản lý phiên đăng nhập')
     .addTag(SwaggerTag.ADMIN_PRODUCTS, 'API quản trị sản phẩm')
     .addTag(SwaggerTag.ADMIN_BRANDS, 'API quản trị thương hiệu')
-    .addTag(SwaggerTag.ADMIN_UPLOAD, 'API tải lên và quản lý tệp tin (Ảnh, Video, Tài liệu)')
+    .addTag(
+      SwaggerTag.ADMIN_UPLOAD,
+      'API tải lên và quản lý tệp tin (Ảnh, Video, Tài liệu)',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);

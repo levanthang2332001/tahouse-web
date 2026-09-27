@@ -373,6 +373,78 @@ export interface IBrand {
 
 ---
 
+### 5. GET `/admin/stats` — Thống Kê Tổng Quan Dashboard Admin
+
+**Yêu cầu:** Header `Authorization: Bearer <access_token>`
+
+Trả về dữ liệu tổng quan cho Dashboard Admin bao gồm 5 thẻ thống kê và cây phân cấp dữ liệu chi tiết **Brand -> Categories -> Subcategories** 100% bằng MongoDB Aggregation:
+
+**Response `200 OK`:**
+
+```json
+{
+  "summary": {
+    "totalProducts": 1233,
+    "totalBrands": 14,
+    "totalCategories": 67,
+    "totalSubcategories": 12,
+    "discountedProducts": 0
+  },
+  "brands": [
+    {
+      "id": 11,
+      "name": "Eurogold",
+      "slug": "eurogold",
+      "logo": "/brand/eurogold.png",
+      "totalProducts": 350,
+      "percentage": 28.39,
+      "categories": [
+        {
+          "slug": "phu-kien-nha-bep",
+          "name": "Phụ Kiện Nhà Bếp",
+          "totalProducts": 350,
+          "percentage": 100,
+          "subcategories": []
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Kassler",
+      "slug": "kassler",
+      "logo": "/brand/kassler.png",
+      "totalProducts": 160,
+      "percentage": 12.98,
+      "categories": [
+        {
+          "slug": "dai-sanh",
+          "name": "Khóa Đại Sảnh",
+          "totalProducts": 95,
+          "percentage": 59.38,
+          "subcategories": []
+        },
+        {
+          "slug": "Smart",
+          "name": "Két Sắt Thông Minh",
+          "totalProducts": 6,
+          "percentage": 3.75,
+          "subcategories": [
+            {
+              "slug": "ket-mini",
+              "name": "Két Sắt Mini",
+              "totalProducts": 2,
+              "percentage": 33.33
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
 ## 🛠️ FE Integration Code Mẫu
 
 ```typescript

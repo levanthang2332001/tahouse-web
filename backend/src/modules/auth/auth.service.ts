@@ -98,11 +98,7 @@ export class AuthService {
     };
   }
 
-  async login(
-    loginDto: LoginDto,
-    userAgent?: string,
-    ipAddress?: string,
-  ) {
+  async login(loginDto: LoginDto, userAgent?: string, ipAddress?: string) {
     const identifier = loginDto.username.trim().toLowerCase();
     const user = await this.userModel
       .findOne({
@@ -178,7 +174,9 @@ export class AuthService {
     });
 
     if (!tokenRecord) {
-      throw new UnauthorizedException('Refresh token has been revoked or expired');
+      throw new UnauthorizedException(
+        'Refresh token has been revoked or expired',
+      );
     }
 
     const user = await this.userModel.findById(tokenRecord.userId).exec();
@@ -229,10 +227,7 @@ export class AuthService {
     return { message: 'All sessions have been revoked' };
   }
 
-  async updateProfile(
-    userId: string,
-    updateProfileDto: UpdateProfileDto,
-  ) {
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
     const user = await this.userModel.findById(userId).exec();
     if (!user) {
       throw new NotFoundException('User not found');
@@ -245,7 +240,9 @@ export class AuthService {
         _id: { $ne: user._id },
       });
       if (existingEmail) {
-        throw new BadRequestException('Email is already in use by another account');
+        throw new BadRequestException(
+          'Email is already in use by another account',
+        );
       }
       user.email = email;
     }

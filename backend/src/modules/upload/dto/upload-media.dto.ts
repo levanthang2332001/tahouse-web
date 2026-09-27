@@ -3,7 +3,8 @@ import { IsOptional, IsString } from 'class-validator';
 
 export class UploadMediaDto {
   @ApiPropertyOptional({
-    description: 'Thư mục gốc lưu trữ trên Cloudflare R2 (mặc định: products, hoặc brands, categories, avatars, banners, documents, videos)',
+    description:
+      'Thư mục gốc lưu trữ trên Cloudflare R2 (mặc định: products, hoặc brands, categories, avatars, banners, documents, videos)',
     example: 'products',
   })
   @IsOptional()
