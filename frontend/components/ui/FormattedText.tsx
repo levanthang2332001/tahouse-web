@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface FormattedTextProps {
   content?: string | null;
@@ -8,7 +9,7 @@ interface FormattedTextProps {
 }
 
 /**
- * Renders both TipTap HTML output and plain Markdown formatted text.
+ * Renders both TipTap HTML output and plain Markdown formatted text with XSS protection.
  */
 export function FormattedText({ content, className = "" }: FormattedTextProps) {
   if (!content || typeof content !== "string" || !content.trim()) {
@@ -18,10 +19,11 @@ export function FormattedText({ content, className = "" }: FormattedTextProps) {
   // If content contains HTML tags (from TipTap WYSIWYG Editor)
   const isHtml = /<\/?[a-z][\s\S]*>/i.test(content);
   if (isHtml) {
+    const cleanHtml = sanitizeHtml(content);
     return (
       <div
         className={`prose max-w-none prose-sm sm:prose-base prose-p:my-2.5 prose-headings:text-navy prose-h3:text-base sm:prose-h3:text-lg prose-h3:font-black prose-h3:mt-5 prose-h3:mb-2 prose-h4:text-sm sm:prose-h4:text-base prose-h4:font-bold prose-ul:my-2.5 prose-ol:my-2.5 prose-li:my-1 prose-blockquote:border-l-4 prose-blockquote:border-brand-green prose-blockquote:bg-brand-green/10 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-2xl prose-blockquote:italic prose-blockquote:text-navy/90 prose-strong:text-navy prose-strong:font-bold leading-relaxed text-navy/90 ${className}`}
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: cleanHtml }}
       />
     );
   }

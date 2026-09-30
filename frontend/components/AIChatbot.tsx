@@ -8,6 +8,7 @@ import { HouseIcon } from "@/components/ui/icons";
 import { streamChat } from "@/lib/api/chat";
 import type { ChatMessage as ApiChatMessage } from "@/lib/types/chat";
 import { COMPANY_LEGAL } from "@/data/company-legal";
+import { isSafeUrl } from "@/lib/sanitize-html";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -46,6 +47,9 @@ function formatInline(text: string, keyPrefix = "inline"): React.ReactNode[] {
     const imageMatch = chunk.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
     if (imageMatch) {
       const [, alt, src] = imageMatch;
+      if (!isSafeUrl(src)) {
+        return <React.Fragment key={`${keyPrefix}-img-${chunkIndex}`} />;
+      }
       return (
         <a
           key={`${keyPrefix}-img-${chunkIndex}`}
@@ -71,6 +75,13 @@ function formatInline(text: string, keyPrefix = "inline"): React.ReactNode[] {
       const linkMatch = segment.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
       if (linkMatch) {
         const [, label, href] = linkMatch;
+        if (!isSafeUrl(href)) {
+          return (
+            <span key={`${keyPrefix}-text-${chunkIndex}-${segmentIndex}`}>
+              {label}
+            </span>
+          );
+        }
         return (
           <a
             key={`${keyPrefix}-a-${chunkIndex}-${segmentIndex}`}
