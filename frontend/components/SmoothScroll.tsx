@@ -1,15 +1,24 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
 export default function SmoothScroll() {
   const lenisRef = useRef<Lenis | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     // Không can thiệp scroll trên màn hình cảm ứng để giữ 120Hz native scrolling
+    // Không chạy Lenis trên trang quản trị /admin để tránh xung đột với form, bảng, editor và modal
     const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    if (isTouch) {
+    if (isTouch || pathname?.startsWith("/admin")) {
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+        const win = window as Window & { __lenis?: Lenis };
+        if (win.__lenis) delete win.__lenis;
+      }
       return;
     }
 
@@ -70,7 +79,7 @@ export default function SmoothScroll() {
       const win = window as Window & { __lenis?: Lenis };
       if (win.__lenis === lenis) delete win.__lenis;
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }

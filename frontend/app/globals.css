@@ -244,12 +244,17 @@ html.lenis body {
   font-family: inherit;
   font-size: 13.5px;
   color: #062B3D;
+  height: auto !important;
 }
 
 .quill-editor-wrapper .ql-editor {
   min-height: 200px;
   max-height: 480px;
-  overflow-y: auto;
+  height: auto !important;
+  overflow-y: auto !important;
+  overscroll-behavior: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #D9DDE1 transparent;
   padding: 1rem;
   line-height: 1.75;
 }

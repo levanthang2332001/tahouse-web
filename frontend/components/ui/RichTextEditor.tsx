@@ -190,7 +190,10 @@ export function RichTextEditor({
       )}
 
       {/* Full-featured Quill WYSIWYG Editor Container */}
-      <div className="quill-editor-wrapper relative rounded-2xl border border-brand-green/30 bg-white shadow-xs focus-within:border-brand-green focus-within:ring-2 focus-within:ring-brand-green/20 transition-all">
+      <div
+        data-lenis-prevent
+        className="quill-editor-wrapper relative rounded-2xl border border-brand-green/30 bg-white shadow-xs focus-within:border-brand-green focus-within:ring-2 focus-within:ring-brand-green/20 transition-all"
+      >
         <ReactQuill
           theme="snow"
           value={value || ""}
