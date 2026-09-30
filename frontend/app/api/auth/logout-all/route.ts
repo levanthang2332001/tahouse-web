@@ -8,19 +8,18 @@ import { adminBackendFetch } from "@/lib/admin/api-client";
 
 export async function POST() {
   try {
-    // Attempt backend logout to invalidate refresh token
-    await adminBackendFetch("/auth/logout", {
+    await adminBackendFetch("/auth/logout-all", {
       method: "POST",
     }).catch(() => {
-      // Ignore errors on backend logout if token already expired
+      // Ignore if already logged out
     });
   } catch {
-    // Ignore errors
+    // Ignore
   }
 
   const response = NextResponse.json({
     success: true,
-    message: "Đăng xuất thành công",
+    message: "Đã đăng xuất khỏi tất cả thiết bị",
   });
 
   const clearOptions = {

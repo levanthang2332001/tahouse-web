@@ -3,15 +3,15 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Lock, Mail, ShieldCheck, ArrowRight, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, ShieldCheck, ArrowRight } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
 
 export default function AdminLoginPage() {
-  const [username, setUsername] = useState("admin@tahouse.vn");
-  const [password, setPassword] = useState("admin123");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAdminAuth();
@@ -80,7 +80,7 @@ export default function AdminLoginPage() {
               <div className="relative">
                 <Input
                   type="text"
-                  placeholder="admin@tahouse.vn hoặc admin"
+                  placeholder="Tên tài khoản hoặc email..."
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="pl-3.5"
@@ -130,17 +130,6 @@ export default function AdminLoginPage() {
               )}
             </Button>
           </form>
-
-          {/* Demo account hint */}
-          <div className="mt-6 p-3.5 rounded-2xl bg-[#FAF9F5] border border-gray-light/60 text-xs text-navy/70 space-y-1">
-            <div className="font-bold text-navy flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
-              <Sparkles size={13} className="text-brand-green" /> Tài khoản mặc định:
-            </div>
-            <div className="flex justify-between font-mono text-[11.5px] pt-1">
-              <span>Tài khoản: <strong className="text-navy">admin@tahouse.vn</strong></span>
-              <span>Mật khẩu: <strong className="text-navy">admin123</strong></span>
-            </div>
-          </div>
 
           <div className="mt-6 text-center">
             <Link
