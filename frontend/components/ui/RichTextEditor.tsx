@@ -31,9 +31,11 @@ interface QuillInstance {
   deleteText: (index: number, length: number) => void;
   insertText: (index: number, text: string, format?: string, value?: unknown) => void;
   formatText: (index: number, length: number, format: string, value: unknown) => void;
-  setSelection: (index: number, length: number) => void;
+  setSelection: (index: number, length: number, source?: string) => void;
   getLength: () => number;
   focus: () => void;
+  root?: HTMLElement;
+  scrollSelectionIntoView?: () => void;
 }
 
 interface RichTextEditorProps {
@@ -61,7 +63,7 @@ export function RichTextEditor({
   const [linkUrl, setLinkUrl] = useState("");
   const [savedRange, setSavedRange] = useState<{ index: number; length: number } | null>(null);
 
-  // Pre-configured full-featured WYSIWYG toolbar with custom link handler
+  // Pre-configured full-featured WYSIWYG toolbar with custom link handler and bottom-line Enter support
   const modules = useMemo(
     () => ({
       toolbar: {
@@ -92,6 +94,76 @@ export function RichTextEditor({
 
             setLinkUrl("");
             setLinkModalOpen(true);
+          },
+        },
+      },
+      keyboard: {
+        bindings: {
+          enterAtBottom: {
+            key: "Enter",
+            shiftKey: false,
+            handler: function (
+              range: { index: number; length: number },
+              context: { format?: Record<string, unknown> },
+            ) {
+              const quill = (
+                this as unknown as {
+                  quill: QuillInstance & {
+                    root?: HTMLElement;
+                    scrollSelectionIntoView?: () => void;
+                  };
+                }
+              ).quill;
+              if (!quill) return true;
+              activeQuillRef.current = quill;
+
+              const length = quill.getLength();
+              // If the cursor is at or near the very bottom/end of the document
+              if (range.index >= length - 1) {
+                // If in a list or blockquote, let standard Quill behavior unformat or split
+                if (context?.format?.list || context?.format?.blockquote) {
+                  return true;
+                }
+                quill.insertText(range.index, "\n", "user");
+                quill.setSelection(range.index + 1, 0, "user");
+                setTimeout(() => {
+                  const editorEl = quill.root;
+                  if (editorEl) {
+                    editorEl.scrollTop = editorEl.scrollHeight;
+                  }
+                }, 10);
+                return false;
+              }
+
+              // Ensure newly created lines elsewhere are always scrolled into view
+              setTimeout(() => {
+                quill.scrollSelectionIntoView?.();
+              }, 10);
+              return true;
+            },
+          },
+          shiftEnter: {
+            key: "Enter",
+            shiftKey: true,
+            handler: function (range: { index: number; length: number }) {
+              const quill = (
+                this as unknown as {
+                  quill: QuillInstance & { root?: HTMLElement };
+                }
+              ).quill;
+              if (!quill) return true;
+              activeQuillRef.current = quill;
+
+              quill.insertText(range.index, "\n", "user");
+              quill.setSelection(range.index + 1, 0, "user");
+              setTimeout(() => {
+                const editorEl = quill.root;
+                if (editorEl) {
+                  editorEl.scrollTop = editorEl.scrollHeight;
+                }
+              }, 10);
+              return false;
+            },
           },
         },
       },
@@ -192,7 +264,24 @@ export function RichTextEditor({
       {/* Full-featured Quill WYSIWYG Editor Container */}
       <div
         data-lenis-prevent
-        className="quill-editor-wrapper relative rounded-2xl border border-brand-green/30 bg-white shadow-xs focus-within:border-brand-green focus-within:ring-2 focus-within:ring-brand-green/20 transition-all"
+        onClick={(e) => {
+          const target = e.target as HTMLElement;
+          if (
+            target.classList.contains("ql-container") ||
+            target.classList.contains("quill-editor-wrapper")
+          ) {
+            const quill = activeQuillRef.current;
+            if (quill) {
+              quill.focus();
+              const length = quill.getLength();
+              quill.setSelection(Math.max(0, length - 1), 0, "user");
+            } else {
+              const editorEl = (e.currentTarget as HTMLElement).querySelector(".ql-editor") as HTMLElement;
+              editorEl?.focus();
+            }
+          }
+        }}
+        className="quill-editor-wrapper relative rounded-2xl border border-brand-green/30 bg-white shadow-xs focus-within:border-brand-green focus-within:ring-2 focus-within:ring-brand-green/20 transition-all cursor-text"
       >
         <ReactQuill
           theme="snow"

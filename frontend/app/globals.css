@@ -245,6 +245,7 @@ html.lenis body {
   font-size: 13.5px;
   color: #062B3D;
   height: auto !important;
+  cursor: text;
 }
 
 .quill-editor-wrapper .ql-editor {
@@ -255,8 +256,16 @@ html.lenis body {
   overscroll-behavior: auto;
   scrollbar-width: thin;
   scrollbar-color: #D9DDE1 transparent;
-  padding: 1rem;
+  padding: 1rem 1rem 3.5rem 1rem !important;
   line-height: 1.75;
+}
+
+.quill-editor-wrapper .ql-editor p {
+  margin-bottom: 0.5rem;
+}
+
+.quill-editor-wrapper .ql-editor p:last-child {
+  margin-bottom: 0;
 }
 
 .quill-editor-wrapper .ql-editor.ql-blank::before {
