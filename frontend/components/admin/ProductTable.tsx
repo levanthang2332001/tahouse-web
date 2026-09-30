@@ -46,14 +46,16 @@ export function ProductTable() {
   const [category, setCategory] = useState(() => searchParams.get("category") ?? "all");
   const [sortBy, setSortBy] = useState("newest");
 
-  // Sync state khi URL params thay đổi (navigate từ trang khác, component không unmount)
-  useEffect(() => {
-    const urlCategory = searchParams.get("category") ?? "all";
-    const urlSearch = searchParams.get("search") ?? "";
+  const urlCategory = searchParams.get("category") ?? "all";
+  const urlSearch = searchParams.get("search") ?? "";
+  const [prevParams, setPrevParams] = useState({ category: urlCategory, search: urlSearch });
+
+  if (prevParams.category !== urlCategory || prevParams.search !== urlSearch) {
+    setPrevParams({ category: urlCategory, search: urlSearch });
     setCategory(urlCategory);
     setSearch(urlSearch);
     setPage(1);
-  }, [searchParams]);
+  }
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<AdminProductViewMode>("table");
   const [stats, setStats] = useState<{

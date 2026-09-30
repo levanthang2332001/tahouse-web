@@ -4,7 +4,6 @@ import React, { useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   Link as LinkIcon,
-  ExternalLink,
   X,
   Check,
   Globe,

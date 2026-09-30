@@ -8,7 +8,6 @@ import {
   ClipboardList,
   Sparkles,
   Check,
-  X,
   ArrowUp,
   ArrowDown,
 } from "lucide-react";

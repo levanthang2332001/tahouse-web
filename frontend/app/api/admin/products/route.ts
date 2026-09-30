@@ -1,27 +1,63 @@
-// Admin products API handler
 import { NextRequest, NextResponse } from "next/server";
 import { checkAdminRequestAuth } from "@/lib/admin/auth";
-import {
-  createProduct,
-  getAdminStats,
-  getMergedProducts,
-  PRODUCT_SECTORS,
-} from "@/lib/admin/product-store";
+import { adminBackendFetch } from "@/lib/admin/api-client";
+import { getAdminStats, invalidateRemoteProductsCache, PRODUCT_SECTORS } from "@/lib/admin/product-store";
 import type { Product } from "@/lib/types/product";
+
+interface BackendProductListResponse {
+  items: Product[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+interface BackendBrandItem {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+let cachedBrandMap: Map<string, number> | null = null;
+let lastBrandMapTime = 0;
+
+async function getBrandIdByNameOrSlug(brandStr?: string): Promise<number | undefined> {
+  if (!brandStr) return undefined;
+  const now = Date.now();
+  if (!cachedBrandMap || now - lastBrandMapTime > 5 * 60 * 1000) {
+    try {
+      const brands = await adminBackendFetch<BackendBrandItem[]>("/admin/brands");
+      const map = new Map<string, number>();
+      for (const b of brands) {
+        if (b.id) {
+          map.set(b.name.toLowerCase(), b.id);
+          map.set(b.slug.toLowerCase(), b.id);
+        }
+      }
+      cachedBrandMap = map;
+      lastBrandMapTime = now;
+    } catch {
+      // ignore
+    }
+  }
+  return cachedBrandMap?.get(brandStr.toLowerCase());
+}
 
 export async function GET(request: NextRequest) {
   const user = checkAdminRequestAuth(request);
   if (!user) {
-    return NextResponse.json({ message: "Chưa xác thực quyền quản trị" }, { status: 401 });
+    return NextResponse.json(
+      { message: "Chưa xác thực quyền quản trị" },
+      { status: 401 },
+    );
   }
 
   try {
     const searchParams = request.nextUrl.searchParams;
-    const search = (searchParams.get("search") || "").toLowerCase().trim();
-    const category = searchParams.get("category")?.trim();
-    const brand = searchParams.get("brand")?.trim();
-    const forceRefresh = searchParams.get("refresh") === "true";
+    const search = searchParams.get("search")?.trim() || "";
+    const category = searchParams.get("category")?.trim() || "";
+    const brand = searchParams.get("brand")?.trim() || "";
     const sortBy = searchParams.get("sortBy")?.trim() || "newest";
+    const forceRefresh = searchParams.get("refresh") === "true";
 
     const parsedPage = parseInt(searchParams.get("page") || "1", 10);
     const page = isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
@@ -29,56 +65,75 @@ export async function GET(request: NextRequest) {
     const parsedLimit = parseInt(searchParams.get("limit") || "16", 10);
     const limit = isNaN(parsedLimit) || parsedLimit < 1 ? 16 : Math.min(parsedLimit, 100);
 
-    let items = await getMergedProducts(forceRefresh);
+    // Build backend query parameters
+    const query = new URLSearchParams();
+    query.set("page", String(page));
+    query.set("limit", String(limit));
 
-    // Filtering
     if (search) {
-      items = items.filter((p) => {
-        const haystack = `${p.name} ${p.code} ${p.brand} ${p.categoryName || ""}`.toLowerCase();
-        return haystack.includes(search);
-      });
+      query.set("search", search);
     }
+
+    if (brand && brand !== "all") {
+      query.set("brand", brand);
+    }
+
+    if (sortBy && sortBy !== "newest") {
+      query.set("sortBy", sortBy);
+    }
+
+    // Check if category is a sector or specific slug
+    let isSectorQuery = false;
+    let sectorSlugs: string[] = [];
 
     if (category && category !== "all") {
       const sector = PRODUCT_SECTORS.find((s) => s.id === category);
       if (sector) {
-        items = items.filter((p) => sector.slugs.includes(p.category || ""));
+        // If it is 'thiet-bi-nha-bep', backend directly matches category='thiet-bi-nha-bep'
+        if (category === "thiet-bi-nha-bep") {
+          query.set("category", "thiet-bi-nha-bep");
+        } else {
+          isSectorQuery = true;
+          sectorSlugs = sector.slugs;
+        }
       } else {
-        items = items.filter(
-          (p) => p.category === category || p.subcategory === category,
-        );
+        query.set("category", category);
       }
     }
 
-    if (brand && brand !== "all") {
-      items = items.filter(
-        (p) =>
-          p.brand?.toLowerCase() === brand.toLowerCase() ||
-          p.brandSlug?.toLowerCase() === brand.toLowerCase(),
+    let items: Product[] = [];
+    let total = 0;
+    let totalPages = 1;
+
+    if (!isSectorQuery) {
+      // Normal direct backend query
+      const backendData = await adminBackendFetch<BackendProductListResponse>(
+        `/admin/products?${query.toString()}`,
       );
+      items = backendData.items || [];
+      total = backendData.total || 0;
+      totalPages = Math.max(1, Math.ceil(total / limit));
+    } else {
+      // For sectors spanning multiple categories, fetch and filter
+      const allData = await adminBackendFetch<BackendProductListResponse>(
+        `/admin/products?page=1&limit=2500${search ? `&search=${encodeURIComponent(search)}` : ""}${brand && brand !== "all" ? `&brand=${encodeURIComponent(brand)}` : ""}`,
+      );
+      const filtered = (allData.items || []).filter((p) =>
+        sectorSlugs.includes(p.category || ""),
+      );
+      total = filtered.length;
+      totalPages = Math.max(1, Math.ceil(total / limit));
+      const start = (page - 1) * limit;
+      items = filtered.slice(start, start + limit);
     }
 
-    // Sorting
-    if (sortBy === "price-asc") {
-      items.sort((a, b) => (a.price ?? 999999999) - (b.price ?? 999999999));
-    } else if (sortBy === "price-desc") {
-      items.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
-    } else if (sortBy === "name-asc") {
-      items.sort((a, b) => a.name.localeCompare(b.name, "vi"));
-    }
-
-    const total = items.length;
-    const totalPages = Math.max(1, Math.ceil(total / limit));
-    const validPage = Math.min(page, totalPages);
-    const start = (validPage - 1) * limit;
-    const paginatedItems = items.slice(start, start + limit);
-
-    const stats = await getAdminStats();
+    // Include dashboard stats
+    const stats = await getAdminStats(forceRefresh);
 
     return NextResponse.json({
-      items: paginatedItems,
+      items,
       total,
-      page: validPage,
+      page,
       limit,
       totalPages,
       stats,
@@ -86,7 +141,12 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("[GET /api/admin/products]", error);
     return NextResponse.json(
-      { message: "Không thể lấy danh sách sản phẩm" },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : "Không thể lấy danh sách sản phẩm từ backend",
+      },
       { status: 500 },
     );
   }
@@ -95,7 +155,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const user = checkAdminRequestAuth(request);
   if (!user) {
-    return NextResponse.json({ message: "Chưa xác thực quyền quản trị" }, { status: 401 });
+    return NextResponse.json(
+      { message: "Chưa xác thực quyền quản trị" },
+      { status: 401 },
+    );
   }
 
   try {
@@ -115,11 +178,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const created = await createProduct(body);
+    if (!body.code || typeof body.code !== "string" || !body.code.trim()) {
+      return NextResponse.json(
+        { message: "Mã sản phẩm không được để trống" },
+        { status: 400 },
+      );
+    }
+
+    // Resolve brandId if missing
+    let brandId = body.brandId;
+    if (!brandId && body.brand) {
+      brandId = await getBrandIdByNameOrSlug(body.brand);
+    }
+
+    const payload = {
+      ...body,
+      brandId,
+      code: body.code.trim(),
+      name: body.name.trim(),
+    };
+
+    const created = await adminBackendFetch<Product>("/admin/products", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+
+    invalidateRemoteProductsCache();
+
     return NextResponse.json(
       {
         success: true,
-        message: "Tạo sản phẩm thành công",
+        message: "Tạo sản phẩm thành công trên hệ thống",
         product: created,
       },
       { status: 201 },

@@ -1,45 +1,8 @@
-import fs from "fs";
-import path from "path";
 import { backendFetch } from "@/lib/backend/client";
 import { mapProductDetail, mapProductListItem } from "@/lib/backend/map-product";
 import { CATEGORY_LABELS } from "@/data/catalog-taxonomy";
-import { calculateProductDiscount, parseProductPrice } from "@/lib/format-price";
-import { formatProductName } from "@/lib/format-product-name";
-import { slugify } from "@/lib/utils";
+import { calculateProductDiscount } from "@/lib/format-price";
 import type { Product, ProductsListResponse } from "@/lib/types/product";
-
-interface LocalStoreData {
-  created: Record<string, Product>;
-  updated: Record<string, Product>;
-  deleted: string[];
-}
-
-const STORE_FILE_PATH = path.join(process.cwd(), "data", "custom-products.json");
-
-function readStoreFile(): LocalStoreData {
-  try {
-    if (!fs.existsSync(STORE_FILE_PATH)) {
-      return { created: {}, updated: {}, deleted: [] };
-    }
-    const content = fs.readFileSync(STORE_FILE_PATH, "utf-8");
-    return JSON.parse(content) as LocalStoreData;
-  } catch (error) {
-    console.error("[readStoreFile] Error reading store file:", error);
-    return { created: {}, updated: {}, deleted: [] };
-  }
-}
-
-function writeStoreFile(data: LocalStoreData): void {
-  try {
-    const dir = path.dirname(STORE_FILE_PATH);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(STORE_FILE_PATH, JSON.stringify(data, null, 2), "utf-8");
-  } catch (error) {
-    console.error("[writeStoreFile] Error writing store file:", error);
-  }
-}
 
 let cachedRemoteProducts: Product[] | null = null;
 let lastCacheTime = 0;
@@ -57,7 +20,7 @@ export async function fetchRemoteProducts(forceRefresh = false): Promise<Product
   }
 
   try {
-    // Fetch full catalog (backend currently has ~1233 items, use 2500 for headroom)
+    // Fetch full catalog directly from backend database
     const data = await backendFetch<ProductsListResponse>(
       "/products/locks?page=1&limit=2500",
     );
@@ -73,273 +36,41 @@ export async function fetchRemoteProducts(forceRefresh = false): Promise<Product
   }
 }
 
+/**
+ * Returns all products fetched directly from the backend database.
+ */
 export async function getMergedProducts(forceRefresh = false): Promise<Product[]> {
-  const store = readStoreFile();
   const remoteItems = await fetchRemoteProducts(forceRefresh);
-
-  const productMap = new Map<string, Product>();
-
-  // 1. Add newly created local products FIRST so they appear at the top
-  for (const [id, item] of Object.entries(store.created)) {
-    if (!store.deleted.includes(id)) {
-      if (store.updated[id]) {
-        productMap.set(id, mapProductListItem(store.updated[id]));
-      } else {
-        productMap.set(id, mapProductListItem(item));
-      }
-    }
-  }
-
-  // 2. Add remote products that are not deleted
-  for (const item of remoteItems) {
-    if (!store.deleted.includes(item.id) && !productMap.has(item.id)) {
-      // If updated locally, use updated version
-      if (store.updated[item.id]) {
-        productMap.set(item.id, mapProductListItem(store.updated[item.id]));
-      } else {
-        productMap.set(item.id, mapProductListItem(item));
-      }
-    }
-  }
-
-  return Array.from(productMap.values());
+  return remoteItems.map((item) => mapProductListItem(item));
 }
 
+/**
+ * Retrieve a single product by ID or Code directly from the database.
+ */
 export async function getProductById(id: string): Promise<Product | null> {
-  const store = readStoreFile();
-
-  if (store.deleted.includes(id)) {
-    return null;
-  }
-
-  if (store.created[id]) {
-    return mapProductDetail(store.updated[id] || store.created[id]);
-  }
-
-  if (store.updated[id]) {
-    return mapProductDetail(store.updated[id]);
-  }
+  const cleanId = id.trim();
+  if (!cleanId) return null;
 
   try {
-    const remote = await backendFetch<Product>(`/products/locks/${encodeURIComponent(id)}`);
-    if (remote && !store.deleted.includes(remote.id)) {
+    const remote = await backendFetch<Product>(
+      `/products/locks/${encodeURIComponent(cleanId)}`,
+    );
+    if (remote) {
       return mapProductDetail(remote);
     }
   } catch {
-    // If not found in remote, check by code or slug in merged list
-    const all = await getMergedProducts();
+    // If not found by direct ID, check by code or slug in the remote database catalog
+    const all = await fetchRemoteProducts();
     const found = all.find(
-      (p) => p.id === id || p.code?.toLowerCase() === id.toLowerCase(),
+      (p) =>
+        p.id === cleanId ||
+        p.code?.toLowerCase() === cleanId.toLowerCase() ||
+        p.slug === cleanId,
     );
     if (found) return mapProductDetail(found);
   }
 
   return null;
-}
-
-export async function createProduct(data: Partial<Product>): Promise<Product> {
-  const store = readStoreFile();
-
-  const name = formatProductName((data.name || "").trim());
-  if (!name) {
-    throw new Error("Tên sản phẩm không được để trống");
-  }
-
-  const id = (data.id?.trim() || slugify(name) || `sp-${Date.now()}`).toLowerCase();
-  const code = formatProductName((data.code?.trim() || id.toUpperCase().slice(0, 8)).toUpperCase());
-
-  const price = data.price !== undefined && data.price !== null ? Math.max(0, parseProductPrice(data.price) ?? 0) : null;
-  const originalPrice = data.originalPrice ? Math.max(0, parseProductPrice(data.originalPrice) ?? 0) : undefined;
-
-  let priceRange = data.priceRange?.trim() || "";
-  if (!priceRange && price) {
-    priceRange = `${new Intl.NumberFormat("vi-VN").format(price)} đ`;
-  } else if (!priceRange) {
-    priceRange = "Liên hệ";
-  }
-
-  const brand = (data.brand?.trim() || "Chính hãng");
-  const brandSlug = data.brandSlug?.trim() || slugify(brand);
-  const category = data.category?.trim() || "khoa-dien-tu";
-  const categoryName = data.categoryName?.trim() || category;
-
-  // Sanitize specs
-  const specs = typeof data.specs === "object" && data.specs !== null
-    ? Object.fromEntries(
-        Object.entries(data.specs).filter(
-          ([k, v]) => typeof k === "string" && k.trim() && typeof v === "string" && v.trim(),
-        ),
-      )
-    : {};
-
-  // Sanitize FAQ
-  const faq = Array.isArray(data.faq)
-    ? data.faq
-        .filter((f) => f && typeof f === "object" && (f.question?.trim() || f.answer?.trim()))
-        .map((f) => ({
-          question: f.question?.trim() || "",
-          answer: f.answer?.trim() || "",
-        }))
-    : [];
-
-  const cleanStringArray = (arr: unknown): string[] =>
-    Array.isArray(arr)
-      ? arr.filter((x): x is string => typeof x === "string" && Boolean(x.trim())).map((x) => x.trim())
-      : [];
-
-  const newProduct: Product = {
-    id,
-    code,
-    name,
-    brand,
-    brandSlug,
-    category,
-    categoryName,
-    subcategory: data.subcategory?.trim() || undefined,
-    subcategoryName: data.subcategoryName?.trim() || undefined,
-    imageUrl: data.imageUrl?.trim() || "/images/placeholder-product.png",
-    price,
-    originalPrice,
-    priceRange,
-    features: cleanStringArray(data.features),
-    has_variants: Boolean(data.has_variants),
-    description: (data.description || "").trim(),
-    shortDescription: (data.shortDescription || "").trim(),
-    images: cleanStringArray(data.images),
-    specs,
-    technologies: cleanStringArray(data.technologies),
-    warranty: typeof data.warranty === "number" && data.warranty >= 0 ? data.warranty : 24,
-    warrantyText: data.warrantyText?.trim() || "Chính hãng 24 tháng",
-    colors: cleanStringArray(data.colors),
-    installationManual: cleanStringArray(data.installationManual),
-    faq,
-    options: Array.isArray(data.options) ? data.options : [],
-    variants: Array.isArray(data.variants) ? data.variants : [],
-    installation_preview: cleanStringArray(data.installation_preview),
-  };
-
-  store.created[id] = newProduct;
-  // If previously marked deleted, un-delete it
-  store.deleted = store.deleted.filter((d) => d !== id);
-  writeStoreFile(store);
-  invalidateRemoteProductsCache();
-
-  return newProduct;
-}
-
-export async function updateProduct(id: string, data: Partial<Product>): Promise<Product> {
-  const existing = await getProductById(id);
-  if (!existing) {
-    throw new Error(`Không tìm thấy sản phẩm với mã: ${id}`);
-  }
-
-  const store = readStoreFile();
-
-  const name = data.name !== undefined ? formatProductName(data.name.trim()) : existing.name;
-  if (data.name !== undefined && !name) {
-    throw new Error("Tên sản phẩm không được để trống");
-  }
-
-  const price =
-    data.price !== undefined
-      ? (data.price !== null ? Math.max(0, parseProductPrice(data.price) ?? 0) : null)
-      : existing.price;
-
-  const originalPrice =
-    data.originalPrice !== undefined
-      ? (data.originalPrice ? Math.max(0, parseProductPrice(data.originalPrice) ?? 0) : undefined)
-      : existing.originalPrice;
-
-  let priceRange = data.priceRange !== undefined ? data.priceRange.trim() : existing.priceRange;
-  if (!priceRange && price) {
-    priceRange = `${new Intl.NumberFormat("vi-VN").format(price)} đ`;
-  }
-
-  const cleanStringArray = (arr: unknown, fallback: string[] = []): string[] =>
-    Array.isArray(arr)
-      ? arr.filter((x): x is string => typeof x === "string" && Boolean(x.trim())).map((x) => x.trim())
-      : fallback;
-
-  const specs =
-    data.specs !== undefined
-      ? typeof data.specs === "object" && data.specs !== null
-        ? Object.fromEntries(
-            Object.entries(data.specs).filter(
-              ([k, v]) => typeof k === "string" && k.trim() && typeof v === "string" && v.trim(),
-            ),
-          )
-        : {}
-      : existing.specs;
-
-  const faq =
-    data.faq !== undefined
-      ? Array.isArray(data.faq)
-        ? data.faq
-            .filter((f) => f && typeof f === "object" && (f.question?.trim() || f.answer?.trim()))
-            .map((f) => ({
-              question: f.question?.trim() || "",
-              answer: f.answer?.trim() || "",
-            }))
-        : []
-      : existing.faq;
-
-  const updatedProduct: Product = {
-    ...existing,
-    ...data,
-    id: existing.id, // Preserve ID
-    code: data.code !== undefined ? formatProductName(data.code.trim()) : existing.code,
-    name,
-    brand: data.brand !== undefined ? data.brand.trim() : existing.brand,
-    brandSlug: data.brand !== undefined ? slugify(data.brand) : existing.brandSlug,
-    category: data.category !== undefined ? data.category.trim() : existing.category,
-    categoryName: data.categoryName !== undefined ? data.categoryName.trim() : existing.categoryName,
-    subcategory: data.subcategory !== undefined ? data.subcategory?.trim() || undefined : existing.subcategory,
-    subcategoryName: data.subcategoryName !== undefined ? data.subcategoryName?.trim() || undefined : existing.subcategoryName,
-    imageUrl: data.imageUrl !== undefined ? data.imageUrl.trim() : existing.imageUrl,
-    price,
-    originalPrice,
-    priceRange,
-    features: data.features !== undefined ? cleanStringArray(data.features) : existing.features,
-    has_variants: data.has_variants !== undefined ? Boolean(data.has_variants) : existing.has_variants,
-    description: data.description !== undefined ? data.description.trim() : existing.description,
-    shortDescription: data.shortDescription !== undefined ? data.shortDescription.trim() : existing.shortDescription,
-    images: data.images !== undefined ? cleanStringArray(data.images) : existing.images,
-    specs,
-    technologies: data.technologies !== undefined ? cleanStringArray(data.technologies) : existing.technologies,
-    warranty: data.warranty !== undefined && typeof data.warranty === "number" && data.warranty >= 0 ? data.warranty : existing.warranty,
-    warrantyText: data.warrantyText !== undefined ? data.warrantyText.trim() : existing.warrantyText,
-    colors: data.colors !== undefined ? cleanStringArray(data.colors) : existing.colors,
-    installationManual: data.installationManual !== undefined ? cleanStringArray(data.installationManual) : existing.installationManual,
-    faq,
-    options: Array.isArray(data.options) ? data.options : existing.options,
-    variants: Array.isArray(data.variants) ? data.variants : existing.variants,
-    installation_preview: data.installation_preview !== undefined ? cleanStringArray(data.installation_preview) : existing.installation_preview,
-  };
-
-  if (store.created[id]) {
-    store.created[id] = updatedProduct;
-  } else {
-    store.updated[id] = updatedProduct;
-  }
-
-  writeStoreFile(store);
-  invalidateRemoteProductsCache();
-  return updatedProduct;
-}
-
-export async function deleteProduct(id: string): Promise<boolean> {
-  const store = readStoreFile();
-
-  if (!store.deleted.includes(id)) {
-    store.deleted.push(id);
-  }
-
-  delete store.created[id];
-  delete store.updated[id];
-
-  writeStoreFile(store);
-  invalidateRemoteProductsCache();
-  return true;
 }
 
 export interface SectorBreakdown {
@@ -390,8 +121,8 @@ export const PRODUCT_SECTORS = [
   },
 ];
 
-export async function getAdminStats() {
-  const products = await getMergedProducts();
+export async function getAdminStats(forceRefresh = false) {
+  const products = await getMergedProducts(forceRefresh);
 
   const totalProducts = products.length;
   const brands = new Set(products.map((p) => p.brand).filter(Boolean));

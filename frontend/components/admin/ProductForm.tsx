@@ -26,6 +26,8 @@ import {
   ChevronLeft,
   CheckCircle2,
   AlertTriangle,
+  Upload,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,25 +59,8 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
   const [id, setId] = useState(initialData?.id || "");
   const [autoSlugSync, setAutoSlugSync] = useState(!isEditing && !initialData?.id);
   const [code, setCode] = useState(formatProductName(initialData?.code || ""));
-  const [brand, setBrand] = useState(initialData?.brand || "Kassler");
-  const [availableBrands, setAvailableBrands] = useState<Array<{ value: string; label: string }>>([
-    { value: "Kassler", label: "Kassler" },
-    { value: "Bosch", label: "Bosch" },
-    { value: "Philips", label: "Philips" },
-    { value: "Eurogold", label: "Eurogold" },
-    { value: "Karofi", label: "Karofi" },
-    { value: "Malloca", label: "Malloca" },
-    { value: "Hubert", label: "Hubert" },
-    { value: "Hyundai", label: "Hyundai" },
-    { value: "Sharp", label: "Sharp" },
-    { value: "Fanlight", label: "Fanlight" },
-    { value: "Hafele", label: "Hafele" },
-    { value: "Kaff", label: "Kaff" },
-    { value: "Grob", label: "Grob" },
-    { value: "HD Door", label: "HD Door" },
-    { value: "GrandX", label: "GrandX" },
-    { value: "Nobinox", label: "Nobinox" },
-  ]);
+  const [brand, setBrand] = useState(initialData?.brand || "");
+  const [availableBrands, setAvailableBrands] = useState<Array<{ value: string; label: string }>>([]);
 
   const [isCustomBrand, setIsCustomBrand] = useState(false);
   const [customBrandName, setCustomBrandName] = useState("");
@@ -90,10 +75,13 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
             label: b.name,
           }));
           setAvailableBrands(mapped);
+          if (!initialData?.brand && mapped[0]?.value) {
+            setBrand((prev) => prev || mapped[0].value);
+          }
         }
       })
       .catch(() => {});
-  }, []);
+  }, [initialData?.brand]);
 
   const [category, setCategory] = useState(initialData?.category || "dai-sanh");
   const [categoryName, setCategoryName] = useState(
@@ -126,11 +114,64 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
   const [installationPreview, setInstallationPreview] = useState<string[]>(
     initialData?.installation_preview || [],
   );
+  const [uploadingPrimary, setUploadingPrimary] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+
+  const handleUploadFile = async (
+    file: File,
+    onSuccess: (url: string) => void,
+    setLoading: (loading: boolean) => void,
+  ) => {
+    setLoading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "products");
+      if (brand) fd.append("brand", brand);
+      if (category) fd.append("category", category);
+      if (code) fd.append("productCode", code);
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: fd,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Tải lên thất bại");
+      }
+
+      const uploadedUrl = data.data?.url;
+      if (uploadedUrl) {
+        onSuccess(uploadedUrl);
+        toast.success("Tải ảnh lên Cloudflare R2 thành công!");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Lỗi khi tải ảnh");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Content & Features
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || "");
-  const [description, setDescription] = useState(initialData?.description || "");
+  const [description, setDescription] = useState(initialData?.content || initialData?.description || "");
   const [features, setFeatures] = useState<string[]>(initialData?.features || []);
+  const [priority, setPriority] = useState<number>(initialData?.priority ?? 10);
+
+  // Variants State
+  const [hasVariants, setHasVariants] = useState<boolean>(Boolean(initialData?.has_variants));
+  const [variants, setVariants] = useState<
+    Array<{
+      id: string;
+      label: string;
+      attributes: Record<string, string>;
+      price: number;
+      originalPrice?: number;
+      priceRange: string;
+      is_default: boolean;
+    }>
+  >(initialData?.variants || []);
 
   // Specs & Tech
   const [specs, setSpecs] = useState<Record<string, string>>(initialData?.specs || {});
@@ -184,7 +225,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
     setImages(initialData.images || []);
     setInstallationPreview(initialData.installation_preview || []);
     setShortDescription(initialData.shortDescription || "");
-    setDescription(initialData.description || "");
+    setDescription(initialData.content || initialData.description || "");
     setFeatures(initialData.features || []);
     setSpecs(initialData.specs || {});
     setTechnologies(initialData.technologies || []);
@@ -193,6 +234,9 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
     setWarrantyText(initialData.warrantyText || "Chính hãng 24 tháng");
     setInstallationManual(initialData.installationManual || []);
     setFaq(initialData.faq || []);
+    setPriority(initialData.priority ?? 10);
+    setHasVariants(Boolean(initialData.has_variants));
+    setVariants(initialData.variants || []);
   }
 
   // Live numerical values for discount calculations
@@ -314,9 +358,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
     { id: "extra", label: "Lắp đặt & FAQ", icon: HelpCircle },
   ];
 
-  const currentTabIndex = TAB_STEPS.findIndex((t) => t.id === activeTab);
-  const prevTab = currentTabIndex > 0 ? TAB_STEPS[currentTabIndex - 1] : null;
-  const nextTab = currentTabIndex < TAB_STEPS.length - 1 ? TAB_STEPS[currentTabIndex + 1] : null;
+
 
   // FAQ Handlers
   const handleAddFaq = () => {
@@ -399,6 +441,22 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
       .filter((f) => f.question.trim() || f.answer.trim())
       .map((f) => ({ question: f.question.trim(), answer: f.answer.trim() }));
 
+    const cleanVariants = hasVariants
+      ? variants
+          .filter((v) => v.label.trim())
+          .map((v, idx) => ({
+            id: v.id || `v${idx + 1}`,
+            label: v.label.trim(),
+            attributes: v.attributes || { color: v.label.trim() },
+            price: Number(v.price) || 0,
+            originalPrice: v.originalPrice ? Number(v.originalPrice) : undefined,
+            priceRange:
+              v.priceRange ||
+              (v.price ? `${new Intl.NumberFormat("vi-VN").format(v.price)} đ` : ""),
+            is_default: Boolean(v.is_default),
+          }))
+      : [];
+
     const payload: Partial<Product> = {
       id: cleanId,
       code: formatProductName(code.trim() || cleanId.toUpperCase().slice(0, 8)),
@@ -416,9 +474,23 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
         priceRange.trim() ||
         (parsedPrice !== null ? `${new Intl.NumberFormat("vi-VN").format(parsedPrice)} đ` : "Liên hệ"),
       features: features.map((f) => f.trim()).filter(Boolean),
-      has_variants: false,
+      has_variants: hasVariants && cleanVariants.length > 0,
+      variants: cleanVariants,
+      options:
+        hasVariants && cleanVariants.length > 0
+          ? [
+              {
+                name: "Màu sắc",
+                values: cleanVariants
+                  .map((v) => v.attributes?.color || v.label)
+                  .filter(Boolean),
+              },
+            ]
+          : [],
       description: description.trim(),
       shortDescription: shortDescription.trim(),
+      content: description.trim(),
+      priority: Number(priority) || 10,
       images: images.map((img) => img.trim()).filter(Boolean),
       specs: cleanSpecs,
       technologies: technologies.map((t) => t.trim()).filter(Boolean),
@@ -428,6 +500,10 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
       installationManual: installationManual.map((m) => m.trim()).filter(Boolean),
       faq: cleanFaq,
       installation_preview: installationPreview.map((p) => p.trim()).filter(Boolean),
+      installation: {
+        images: installationPreview.map((p) => p.trim()).filter(Boolean),
+        videos: [],
+      },
     };
 
     try {
@@ -1027,6 +1103,208 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                 </div>
               </div>
 
+              {/* Priority Field */}
+              <div className="space-y-1.5 pt-3 border-t border-gray-light/60">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-navy">
+                    Thứ tự ưu tiên hiển thị (Priority)
+                  </label>
+                  <span className="text-[11px] font-normal text-navy/50">
+                    Số nhỏ hơn hiển thị trước trên danh sách (Mặc định: 10)
+                  </span>
+                </div>
+                <Input
+                  type="number"
+                  min="1"
+                  max="9999"
+                  placeholder="10"
+                  value={priority}
+                  onChange={(e) => setPriority(Number(e.target.value) || 10)}
+                  className="w-40 text-xs font-semibold"
+                />
+              </div>
+
+              {/* Variants Section */}
+              <div className="space-y-3 pt-4 border-t border-gray-light/60">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-xs font-bold text-navy flex items-center gap-2">
+                      <span>Quản lý biến thể & Màu sắc (Variants)</span>
+                      {hasVariants && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full font-extrabold bg-brand-green/20 text-brand-green">
+                          {variants.length} biến thể
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-navy/50 mt-0.5">
+                      Bật khi sản phẩm có nhiều màu sắc hoặc phiên bản cấu hình khác giá.
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={hasVariants}
+                      onChange={(e) => {
+                        setHasVariants(e.target.checked);
+                        if (e.target.checked && variants.length === 0) {
+                          setVariants([
+                            {
+                              id: "v1",
+                              label: `${name || code} - Mặc định`,
+                              attributes: { color: colors[0] || "Tiêu chuẩn" },
+                              price: numPrice || 0,
+                              originalPrice: numOrigPrice || undefined,
+                              priceRange: priceRange || "",
+                              is_default: true,
+                            },
+                          ]);
+                        }
+                      }}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-green"></div>
+                  </label>
+                </div>
+
+                {hasVariants && (
+                  <div className="space-y-3 pt-2">
+                    <div className="rounded-xl border border-gray-light overflow-x-auto bg-white">
+                      <table className="w-full text-xs min-w-[500px]">
+                        <thead className="bg-[#FAF9F5] border-b border-gray-light text-navy/70 font-bold">
+                          <tr>
+                            <th className="px-3 py-2 text-left">Tên phiên bản</th>
+                            <th className="px-3 py-2 text-left">Màu sắc</th>
+                            <th className="px-3 py-2 text-left">Giá bán (VNĐ)</th>
+                            <th className="px-3 py-2 text-left">Giá gốc</th>
+                            <th className="px-3 py-2 text-center">Mặc định</th>
+                            <th className="px-3 py-2 text-right">Xóa</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-light">
+                          {variants.map((v, vIdx) => (
+                            <tr key={v.id || vIdx} className="hover:bg-slate-50/50">
+                              <td className="p-2">
+                                <Input
+                                  type="text"
+                                  value={v.label}
+                                  placeholder="VD: Bản Màu Vàng Gold"
+                                  onChange={(e) => {
+                                    const updated = [...variants];
+                                    updated[vIdx] = { ...updated[vIdx], label: e.target.value };
+                                    setVariants(updated);
+                                  }}
+                                  className="h-8 text-xs font-medium"
+                                />
+                              </td>
+                              <td className="p-2">
+                                <Input
+                                  type="text"
+                                  value={v.attributes?.color || ""}
+                                  placeholder="VD: Gold"
+                                  onChange={(e) => {
+                                    const updated = [...variants];
+                                    updated[vIdx] = {
+                                      ...updated[vIdx],
+                                      attributes: { ...updated[vIdx].attributes, color: e.target.value },
+                                    };
+                                    setVariants(updated);
+                                  }}
+                                  className="h-8 text-xs font-medium"
+                                />
+                              </td>
+                              <td className="p-2">
+                                <Input
+                                  type="number"
+                                  value={v.price || ""}
+                                  placeholder="14500000"
+                                  onChange={(e) => {
+                                    const updated = [...variants];
+                                    updated[vIdx] = {
+                                      ...updated[vIdx],
+                                      price: Number(e.target.value) || 0,
+                                    };
+                                    setVariants(updated);
+                                  }}
+                                  className="h-8 text-xs font-bold text-rose-600"
+                                />
+                              </td>
+                              <td className="p-2">
+                                <Input
+                                  type="number"
+                                  value={v.originalPrice || ""}
+                                  placeholder="18000000"
+                                  onChange={(e) => {
+                                    const updated = [...variants];
+                                    updated[vIdx] = {
+                                      ...updated[vIdx],
+                                      originalPrice: Number(e.target.value) || undefined,
+                                    };
+                                    setVariants(updated);
+                                  }}
+                                  className="h-8 text-xs font-medium"
+                                />
+                              </td>
+                              <td className="p-2 text-center">
+                                <input
+                                  type="radio"
+                                  name="default_variant"
+                                  checked={v.is_default}
+                                  onChange={() => {
+                                    const updated = variants.map((item, idx) => ({
+                                      ...item,
+                                      is_default: idx === vIdx,
+                                    }));
+                                    setVariants(updated);
+                                  }}
+                                  className="h-4 w-4 text-brand-green accent-brand-green cursor-pointer"
+                                />
+                              </td>
+                              <td className="p-2 text-right">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setVariants(variants.filter((_, idx) => idx !== vIdx));
+                                  }}
+                                  className="h-8 w-8 p-0 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
+                                >
+                                  <Trash2 size={13} />
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setVariants((prev) => [
+                          ...prev,
+                          {
+                            id: `v${prev.length + 1}`,
+                            label: `${name || code} - Bản ${prev.length + 1}`,
+                            attributes: { color: "" },
+                            price: numPrice || 0,
+                            originalPrice: numOrigPrice || undefined,
+                            priceRange: "",
+                            is_default: prev.length === 0,
+                          },
+                        ]);
+                      }}
+                      className="text-xs font-bold gap-1 text-navy border-dashed"
+                    >
+                      <Plus size={14} />
+                      <span>Thêm biến thể mới</span>
+                    </Button>
+                  </div>
+                )}
+              </div>
+
               {/* Step Navigation Footer */}
               <div className="pt-4 border-t border-gray-light/60 flex items-center justify-between">
                 <Button
@@ -1067,13 +1345,41 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
             <CardContent className="space-y-6">
               {/* Primary Image */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-navy">
-                  Ảnh đại diện chính (Primary Image URL) <span className="text-rose-600">*</span>
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-navy">
+                    Ảnh đại diện chính (Primary Image) <span className="text-rose-600">*</span>
+                  </label>
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold text-brand-green hover:underline">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploadingPrimary}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleUploadFile(file, setImageUrl, setUploadingPrimary);
+                          e.target.value = "";
+                        }
+                      }}
+                    />
+                    {uploadingPrimary ? (
+                      <>
+                        <Loader2 size={13} className="animate-spin" />
+                        <span>Đang tải lên...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={13} />
+                        <span>Tải ảnh lên R2</span>
+                      </>
+                    )}
+                  </label>
+                </div>
                 <div className="flex gap-4 items-start">
                   <Input
                     type="text"
-                    placeholder="VD: https://... hoặc /images/products/kl-600.png"
+                    placeholder="Nhập URL ảnh hoặc nhấn Tải ảnh lên R2 ở trên"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
                     className="flex-1 text-xs"
@@ -1095,14 +1401,49 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
               </div>
 
               {/* Gallery Images */}
-              <DynamicListInput
-                label="Album ảnh chi tiết (Gallery Images)"
-                description="Nhập URL các hình ảnh chi tiết của sản phẩm và nhấn Thêm."
-                placeholder="https://... hoặc /images/products/kl-600-angle.png"
-                items={images}
-                onChange={setImages}
-                addButtonText="Thêm ảnh chi tiết"
-              />
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-navy">Thêm ảnh vào Album</span>
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold text-brand-green hover:underline">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploadingGallery}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleUploadFile(
+                            file,
+                            (url) => setImages((prev) => [...prev, url]),
+                            setUploadingGallery,
+                          );
+                          e.target.value = "";
+                        }
+                      }}
+                    />
+                    {uploadingGallery ? (
+                      <>
+                        <Loader2 size={13} className="animate-spin" />
+                        <span>Đang tải lên...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={13} />
+                        <span>Tải ảnh album lên R2</span>
+                      </>
+                    )}
+                  </label>
+                </div>
+                <DynamicListInput
+                  label="Album ảnh chi tiết (Gallery Images)"
+                  description="Nhập URL các hình ảnh chi tiết của sản phẩm hoặc bấm nút tải ảnh lên ở trên."
+                  placeholder="https://... hoặc /images/products/kl-600-angle.png"
+                  items={images}
+                  onChange={setImages}
+                  addButtonText="Thêm ảnh chi tiết"
+                />
+              </div>
 
               {/* Gallery Preview Strip */}
               {images.length > 0 && (

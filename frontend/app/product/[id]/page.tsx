@@ -221,6 +221,8 @@ function ProductDetailView({ id }: { id: string }) {
     () => false,
   );
 
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
+
   const { addToRecentlyViewed, setIsChatbotOpen } = useApp();
 
   useEffect(() => {
@@ -230,6 +232,8 @@ function ProductDetailView({ id }: { id: string }) {
       .then((data) => {
         if (cancelled) return;
         setProduct(data);
+        const defVariant = data.variants?.find((v) => v.is_default)?.id || data.variants?.[0]?.id || null;
+        setSelectedVariantId(defVariant);
         addToRecentlyViewed(data.id);
       })
       .catch((error: Error) => {
@@ -354,13 +358,24 @@ function ProductDetailView({ id }: { id: string }) {
       : installWorkflow.steps;
   const warrantyNote = installWorkflow.warrantyNote;
 
+  const hasVariants = Boolean(product.has_variants && product.variants && product.variants.length > 0);
+  const activeVariant = hasVariants
+    ? (product.variants?.find((v) => v.id === selectedVariantId) || product.variants?.[0] || null)
+    : null;
+
+  const currentPrice = activeVariant?.price !== undefined && activeVariant.price > 0
+    ? activeVariant.price
+    : product.price;
+
+  const currentPriceRange = activeVariant?.priceRange || product.priceRange;
+
   const discountInfo = calculateProductDiscount(
-    product.price,
+    currentPrice,
     product.originalPrice,
-    product.priceRange,
+    currentPriceRange,
     product.id,
   );
-  const hasNumericPrice = typeof product.price === "number" && product.price > 0;
+  const hasNumericPrice = typeof currentPrice === "number" && currentPrice > 0;
   const showDiscount = discountInfo.hasDiscount;
   const discountPercent = discountInfo.discountPercent;
 
@@ -650,8 +665,39 @@ function ProductDetailView({ id }: { id: string }) {
                   </div>
                 </div>
 
-                {/* Available Colors if present */}
-                {colors.length > 0 && (
+                {/* Available Variants or Colors */}
+                {hasVariants && product.variants && product.variants.length > 0 ? (
+                  <div className="mb-4 space-y-2">
+                    <span className="text-xs font-bold text-navy/70 flex items-center gap-1.5">
+                      <Palette size={13} className="text-brand-green" /> Tùy chọn phiên bản / Màu sắc:
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {product.variants.map((v) => {
+                        const isSelected = activeVariant?.id === v.id;
+                        return (
+                          <button
+                            key={v.id}
+                            type="button"
+                            onClick={() => setSelectedVariantId(v.id)}
+                            className={`flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition-all cursor-pointer border ${
+                              isSelected
+                                ? "border-brand-green bg-brand-green/10 text-navy shadow-xs ring-1 ring-brand-green"
+                                : "border-gray-light/80 bg-white text-navy/80 hover:border-brand-green/50 hover:bg-neutral/40"
+                            }`}
+                          >
+                            <span className={`h-2 w-2 rounded-full ${isSelected ? "bg-brand-green" : "bg-gray-400"}`} />
+                            <span>{v.label}</span>
+                            {v.price > 0 && (
+                              <span className="text-[11px] font-semibold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded-md">
+                                {new Intl.NumberFormat("vi-VN").format(v.price)} đ
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : colors.length > 0 ? (
                   <div className="mb-4 flex items-center gap-2 text-xs">
                     <span className="font-semibold text-navy/70 flex items-center gap-1">
                       <Palette size={13} className="text-brand-green" /> Màu sắc:
@@ -664,7 +710,7 @@ function ProductDetailView({ id }: { id: string }) {
                       ))}
                     </div>
                   </div>
-                )}
+                ) : null}
 
                 {/* Quick Highlights / Specs Summary (ul.info-pro) */}
                 <div className="mb-6 rounded-2xl bg-[#F8F7F3]/70 border border-gray-light/60 p-4">
@@ -794,9 +840,9 @@ function ProductDetailView({ id }: { id: string }) {
 
                 {/* Article Intro */}
                 <div className="prose max-w-none text-sm leading-relaxed text-navy/90 space-y-4">
-                  {product.description ? (
+                  {product.content || product.description ? (
                     <FormattedText
-                      content={product.description}
+                      content={product.content || product.description}
                       className="text-base text-navy leading-relaxed"
                     />
                   ) : (
