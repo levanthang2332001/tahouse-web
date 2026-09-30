@@ -11,6 +11,9 @@ import {
   LogOut,
   Tag,
   ChevronRight,
+  FolderOpen,
+  Bot,
+  Settings,
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { cn } from "@/lib/utils";
@@ -47,10 +50,28 @@ export function AdminSidebar({
       exact: false,
     },
     {
+      title: "Thư viện Media & R2",
+      href: "/admin/media",
+      icon: FolderOpen,
+      exact: false,
+    },
+    {
+      title: "Trợ lý AI Chatbot",
+      href: "/admin/chatbot",
+      icon: Bot,
+      exact: false,
+    },
+    {
       title: "Thêm sản phẩm mới",
       href: "/admin/products/new",
       icon: PlusCircle,
       exact: true,
+    },
+    {
+      title: "Cài đặt & Tài khoản",
+      href: "/admin/settings",
+      icon: Settings,
+      exact: false,
     },
   ];
 
@@ -142,19 +163,34 @@ export function AdminSidebar({
 
       {/* User Info & Logout Footer */}
       <div className="pt-4 border-t border-white/10 space-y-3">
-        <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl bg-white/5 border border-white/5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-green/20 text-brand-green font-bold text-xs">
-            AD
+        <Link
+          href="/admin/settings"
+          onClick={onCloseMobile}
+          className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group cursor-pointer"
+          title="Xem và chỉnh sửa hồ sơ quản trị"
+        >
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-green/20 text-brand-green font-bold text-xs overflow-hidden">
+            {user?.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user.avatarUrl}
+                alt="Avatar"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span>{user?.name?.charAt(0) || "A"}</span>
+            )}
           </div>
           <div className="flex flex-col min-w-0 flex-1">
-            <span className="text-xs font-bold text-white truncate">
+            <span className="text-xs font-bold text-white truncate group-hover:text-brand-green transition-colors">
               {user?.name || "Admin"}
             </span>
             <span className="text-[10px] text-white/50 truncate font-mono">
               {user?.username || "admin"}
             </span>
           </div>
-        </div>
+          <ChevronRight size={13} className="text-white/30 group-hover:text-white/70 transition-colors" />
+        </Link>
 
         <button
           type="button"
