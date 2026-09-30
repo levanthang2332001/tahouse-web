@@ -1,18 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAdminRequestAuth } from "@/lib/admin/auth";
-import {
-  deleteBrand,
-  saveBrand,
-  type CustomBrand,
-} from "@/lib/admin/brand-store";
+import { adminBackendFetch } from "@/lib/admin/api-client";
 
-export async function PUT(
+export async function GET(
   request: NextRequest,
   context: { params: Promise<{ slug: string }> },
 ) {
   const user = checkAdminRequestAuth(request);
   if (!user) {
-    return NextResponse.json({ message: "Chưa xác thực quyền quản trị" }, { status: 401 });
+    return NextResponse.json(
+      { message: "Chưa xác thực quyền quản trị" },
+      { status: 401 },
+    );
   }
 
   try {
@@ -26,7 +25,49 @@ export async function PUT(
       );
     }
 
-    const body = (await request.json()) as Partial<CustomBrand>;
+    const brand = await adminBackendFetch(
+      `/admin/brands/${encodeURIComponent(cleanSlug)}`,
+    );
+
+    return NextResponse.json(brand);
+  } catch (error) {
+    console.error("[GET /api/admin/brands/[slug]]", error);
+    return NextResponse.json(
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : "Lỗi khi lấy thông tin thương hiệu",
+      },
+      { status: 404 },
+    );
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  context: { params: Promise<{ slug: string }> },
+) {
+  const user = checkAdminRequestAuth(request);
+  if (!user) {
+    return NextResponse.json(
+      { message: "Chưa xác thực quyền quản trị" },
+      { status: 401 },
+    );
+  }
+
+  try {
+    const { slug } = await context.params;
+    const cleanSlug = slug?.trim();
+
+    if (!cleanSlug) {
+      return NextResponse.json(
+        { message: "Mã định danh thương hiệu không hợp lệ" },
+        { status: 400 },
+      );
+    }
+
+    const body = await request.json();
     if (!body || typeof body !== "object") {
       return NextResponse.json(
         { message: "Dữ liệu cập nhật không đúng định dạng" },
@@ -34,10 +75,13 @@ export async function PUT(
       );
     }
 
-    const saved = await saveBrand({
-      ...body,
-      slug: cleanSlug,
-    });
+    const saved = await adminBackendFetch(
+      `/admin/brands/${encodeURIComponent(cleanSlug)}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      },
+    );
 
     return NextResponse.json({
       success: true,
@@ -47,11 +91,18 @@ export async function PUT(
   } catch (error) {
     console.error("[PUT /api/admin/brands/[slug]]", error);
     return NextResponse.json(
-      { message: "Lỗi khi cập nhật thương hiệu" },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : "Lỗi khi cập nhật thương hiệu",
+      },
       { status: 500 },
     );
   }
 }
+
+export const PATCH = PUT;
 
 export async function DELETE(
   request: NextRequest,
@@ -59,7 +110,10 @@ export async function DELETE(
 ) {
   const user = checkAdminRequestAuth(request);
   if (!user) {
-    return NextResponse.json({ message: "Chưa xác thực quyền quản trị" }, { status: 401 });
+    return NextResponse.json(
+      { message: "Chưa xác thực quyền quản trị" },
+      { status: 401 },
+    );
   }
 
   try {
@@ -73,16 +127,21 @@ export async function DELETE(
       );
     }
 
-    await deleteBrand(cleanSlug);
+    await adminBackendFetch(`/admin/brands/${encodeURIComponent(cleanSlug)}`, {
+      method: "DELETE",
+    });
 
     return NextResponse.json({
       success: true,
-      message: "Đã xóa thương hiệu",
+      message: "Đã xóa thương hiệu thành công",
     });
   } catch (error) {
     console.error("[DELETE /api/admin/brands/[slug]]", error);
     return NextResponse.json(
-      { message: "Lỗi khi xóa thương hiệu" },
+      {
+        message:
+          error instanceof Error ? error.message : "Lỗi khi xóa thương hiệu",
+      },
       { status: 500 },
     );
   }

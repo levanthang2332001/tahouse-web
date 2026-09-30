@@ -1,28 +1,69 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAdminRequestAuth } from "@/lib/admin/auth";
-import {
-  getAllBrandsWithStats,
-  saveBrand,
-  type CustomBrand,
-} from "@/lib/admin/brand-store";
+import { adminBackendFetch } from "@/lib/admin/api-client";
+import { getAdminStats } from "@/lib/admin/product-store";
+
+interface BackendBrandItem {
+  id?: number;
+  name: string;
+  slug: string;
+  logo?: string;
+  logoHtml?: string;
+  country?: string;
+  description?: string;
+  website?: string;
+  categories?: Array<{
+    name: string;
+    slug: string;
+    subcategories?: Array<{ name: string; slug: string }>;
+  }>;
+}
 
 export async function GET(request: NextRequest) {
   const user = checkAdminRequestAuth(request);
   if (!user) {
-    return NextResponse.json({ message: "Chưa xác thực quyền quản trị" }, { status: 401 });
+    return NextResponse.json(
+      { message: "Chưa xác thực quyền quản trị" },
+      { status: 401 },
+    );
   }
 
   try {
-    const brands = await getAllBrandsWithStats();
+    const brands = await adminBackendFetch<BackendBrandItem[]>("/admin/brands");
+
+    // Fetch product counts from stats
+    let brandCountMap: Record<string, number> = {};
+    try {
+      const stats = await getAdminStats();
+      if (stats.brandBreakdown) {
+        brandCountMap = stats.brandBreakdown;
+      }
+    } catch {
+      // ignore
+    }
+
+    const items = brands.map((b) => ({
+      ...b,
+      productCount:
+        brandCountMap[b.name] ??
+        brandCountMap[b.slug] ??
+        0,
+    }));
+
     return NextResponse.json({
       success: true,
-      items: brands,
-      total: brands.length,
+      items,
+      total: items.length,
     });
   } catch (error) {
     console.error("[GET /api/admin/brands]", error);
     return NextResponse.json(
-      { message: "Lỗi khi lấy danh sách thương hiệu" },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : "Lỗi khi lấy danh sách thương hiệu",
+      },
       { status: 500 },
     );
   }
@@ -31,11 +72,14 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const user = checkAdminRequestAuth(request);
   if (!user) {
-    return NextResponse.json({ message: "Chưa xác thực quyền quản trị" }, { status: 401 });
+    return NextResponse.json(
+      { message: "Chưa xác thực quyền quản trị" },
+      { status: 401 },
+    );
   }
 
   try {
-    const body = (await request.json()) as Partial<CustomBrand>;
+    const body = (await request.json()) as Partial<BackendBrandItem>;
 
     if (!body || typeof body !== "object") {
       return NextResponse.json(
@@ -51,14 +95,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (body.name.trim().length < 2) {
-      return NextResponse.json(
-        { message: "Tên thương hiệu phải có ít nhất 2 ký tự" },
-        { status: 400 },
-      );
-    }
-
-    const saved = await saveBrand(body);
+    const saved = await adminBackendFetch<BackendBrandItem>("/admin/brands", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
 
     return NextResponse.json(
       {
@@ -71,7 +111,12 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("[POST /api/admin/brands]", error);
     return NextResponse.json(
-      { message: "Lỗi hệ thống khi lưu thương hiệu" },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : "Lỗi hệ thống khi lưu thương hiệu",
+      },
       { status: 500 },
     );
   }

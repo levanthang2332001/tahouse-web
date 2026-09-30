@@ -1,26 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { fadeUp, fadeUpSlow, staggerContainer } from "@/lib/motion-variants";
-import { PARTNER_BRANDS } from "@/data/home-data";
 import content from "@/data/content.json";
+
+interface DisplayBrand {
+  name: string;
+  logo?: string;
+}
 
 function PartnerLogo({
   name,
   logo,
-  className,
 }: {
   name: string;
   logo?: string;
-  className: string;
 }) {
   const [failed, setFailed] = useState(false);
   const isKassler = name.toLowerCase() === "kassler";
 
   if (!logo || failed) {
     return (
-      <span className={`text-center text-lg sm:text-xl lg:text-2xl ${className}`}>
+      <span className="text-center text-lg sm:text-xl lg:text-2xl font-sans font-bold tracking-tight text-navy">
         {name}
       </span>
     );
@@ -42,6 +44,23 @@ function PartnerLogo({
 }
 
 export default function BrandsSection() {
+  const [brands, setBrands] = useState<DisplayBrand[]>([]);
+
+  useEffect(() => {
+    fetch("/api/brands")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setBrands(data.map((b: { name: string; logo?: string }) => ({ name: b.name, logo: b.logo })));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  if (brands.length === 0) {
+    return null;
+  }
+
   return (
     <section className="w-full bg-cream py-14 lg:py-20">
       <motion.div
@@ -78,7 +97,7 @@ export default function BrandsSection() {
           variants={fadeUp}
           className="grid grid-cols-2 gap-y-10 sm:grid-cols-4 sm:gap-y-14"
         >
-          {PARTNER_BRANDS.map((brand, index) => {
+          {brands.map((brand, index) => {
             const mobileDivider = index % 2 === 0;
             const desktopDivider = (index + 1) % 4 !== 0;
 
@@ -96,7 +115,6 @@ export default function BrandsSection() {
                 <PartnerLogo
                   name={brand.name}
                   logo={brand.logo}
-                  className={brand.className}
                 />
               </div>
             );
