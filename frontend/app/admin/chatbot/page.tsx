@@ -166,7 +166,13 @@ export default function AdminChatbotPage() {
                       : "bg-navy text-white font-medium"
                   }`}
                 >
-                  <FormattedText content={m.content} />
+                  {isBot ? (
+                    <FormattedText content={m.content} />
+                  ) : (
+                    <p className="whitespace-pre-wrap text-white font-medium leading-relaxed">
+                      {m.content}
+                    </p>
+                  )}
                 </div>
               </div>
             );

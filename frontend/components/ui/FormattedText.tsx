@@ -28,6 +28,9 @@ export function FormattedText({ content, className = "" }: FormattedTextProps) {
     );
   }
 
+  const hasCustomTextColor = Boolean(className && /(^|\s)text-/.test(className));
+  const defaultTextColor = hasCustomTextColor ? "" : "text-navy/85";
+
   // Parse inline styles: bold, italic, underline, checkmarks for plain markdown
   const parseInline = (text: string): React.ReactNode[] => {
     const parts: React.ReactNode[] = [];
@@ -42,13 +45,13 @@ export function FormattedText({ content, className = "" }: FormattedTextProps) {
 
       if (match[2] || match[3]) {
         parts.push(
-          <strong key={match.index} className="font-bold text-navy">
+          <strong key={match.index} className={`font-bold ${hasCustomTextColor ? "" : "text-navy"}`}>
             {match[2] || match[3]}
           </strong>,
         );
       } else if (match[4] || match[5]) {
         parts.push(
-          <em key={match.index} className="italic text-navy/90">
+          <em key={match.index} className={`italic ${hasCustomTextColor ? "opacity-90" : "text-navy/90"}`}>
             {match[4] || match[5]}
           </em>,
         );
@@ -151,7 +154,7 @@ export function FormattedText({ content, className = "" }: FormattedTextProps) {
                 }
 
                 return (
-                  <li key={lIdx} className="flex items-start gap-2.5 text-xs sm:text-sm text-navy/85 font-medium">
+                  <li key={lIdx} className={`flex items-start gap-2.5 text-xs sm:text-sm font-medium ${defaultTextColor}`}>
                     <span
                       className={`h-5 w-5 rounded-full shrink-0 flex items-center justify-center text-[10px] font-bold mt-0.5 ${
                         isCheck
@@ -170,7 +173,7 @@ export function FormattedText({ content, className = "" }: FormattedTextProps) {
         }
 
         return (
-          <p key={pIdx} className="text-xs sm:text-sm text-navy/85 leading-relaxed font-medium">
+          <p key={pIdx} className={`text-xs sm:text-sm leading-relaxed font-medium ${defaultTextColor}`}>
             {lines.map((line, lIdx) => (
               <React.Fragment key={lIdx}>
                 {parseInline(line)}
