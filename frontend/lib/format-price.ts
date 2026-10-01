@@ -1,8 +1,33 @@
-/** Parse BE price field (may be null, number, or numeric string). */
+/** Parse BE price field (may be null, number, or numeric string with thousand separators). */
 export function parseProductPrice(value: unknown): number | null {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string" && value.trim() !== "") {
-    const parsed = Number(value.replace(/[^\d.-]/g, ""));
+    let clean = value.trim().replace(/[^\d.,-]/g, "");
+    if (!clean) return null;
+
+    if ((clean.match(/\./g) || []).length > 1) {
+      clean = clean.replace(/\./g, "");
+    } else if ((clean.match(/,/g) || []).length > 1) {
+      clean = clean.replace(/,/g, "");
+    } else if (clean.includes(".") && clean.includes(",")) {
+      if (clean.indexOf(".") < clean.indexOf(",")) {
+        clean = clean.replace(/\./g, "").replace(",", ".");
+      } else {
+        clean = clean.replace(/,/g, "");
+      }
+    } else if (clean.includes(".") && !clean.includes(",")) {
+      const parts = clean.split(".");
+      if (parts[1] && parts[1].length === 3) {
+        clean = clean.replace(/\./g, "");
+      }
+    } else if (clean.includes(",") && !clean.includes(".")) {
+      const parts = clean.split(",");
+      if (parts[1] && parts[1].length === 3) {
+        clean = clean.replace(/,/g, "");
+      }
+    }
+
+    const parsed = Number(clean);
     if (Number.isFinite(parsed)) return parsed;
   }
   return null;

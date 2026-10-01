@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 45" width="200" height="45">
+  <rect x="15" y="8" width="28" height="30" rx="3" fill="#002C5F"/>
+  <rect x="20" y="13" width="18" height="20" rx="1.5" fill="#FFFFFF"/>
+  <circle cx="24" cy="23" r="1.5" fill="#D4AF37"/>
+  <text x="52" y="32" font-family="'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="900" letter-spacing="1" fill="#002C5F">HD</text>
+  <text x="96" y="32" font-family="'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="900" letter-spacing="1" fill="#D4AF37">DOOR</text>
+</svg>

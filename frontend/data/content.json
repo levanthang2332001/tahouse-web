@@ -46,29 +46,7 @@
     "categories": {
       "prefix": "Danh mục sản phẩm",
       "title": "Giải pháp toàn diện\ncho ngôi nhà của bạn",
-      "viewAll": "Xem tất cả sản phẩm",
-      "items": [
-        {
-          "title": "Khóa cửa vân tay",
-          "count": "200+ sản phẩm"
-        },
-        {
-          "title": "Khóa khuôn mặt",
-          "count": "150+ sản phẩm"
-        },
-        {
-          "title": "Khóa cửa nhôm",
-          "count": "80+ sản phẩm"
-        },
-        {
-          "title": "Khóa khách sạn",
-          "count": "120+ sản phẩm"
-        },
-        {
-          "title": "Phụ kiện cửa",
-          "count": "60+ sản phẩm"
-        }
-      ]
+      "viewAll": "Xem tất cả sản phẩm"
     },
     "partners": {
       "title": "CHỌN ĐÚNG GIẢI PHÁP",

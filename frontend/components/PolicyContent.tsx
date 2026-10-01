@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, Info, Phone, Mail, MapPin, Building, ShieldCheck, FileCheck } from "lucide-react";
+import { Check, Phone, Mail, MapPin, Building, ShieldCheck, FileCheck } from "lucide-react";
 import type { PolicyBlock } from "@/lib/policy-types";
 import { COMPANY_LEGAL } from "@/data/company-legal";
 

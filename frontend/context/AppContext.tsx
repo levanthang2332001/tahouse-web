@@ -29,7 +29,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       addToRecentlyViewed,
       setIsChatbotOpen,
     }),
-    [isChatbotOpen, recentlyViewed],
+    [isChatbotOpen, recentlyViewed, addToRecentlyViewed],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

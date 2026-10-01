@@ -2,7 +2,9 @@ export interface Product {
   id: string;
   code: string;
   name: string;
+  slug?: string;
   brand: string;
+  brandId?: number;
   brandSlug: string;
   category: string;
   categoryName: string;
@@ -16,6 +18,8 @@ export interface Product {
   has_variants: boolean;
   description?: string;
   shortDescription?: string;
+  content?: string;
+  priority?: number;
   images?: string[];
   specs?: Record<string, string>;
   technologies?: string[];
@@ -34,6 +38,10 @@ export interface Product {
     is_default: boolean;
   }[];
   installation_preview?: string[];
+  installation?: {
+    images?: string[];
+    videos?: string[];
+  };
 }
 
 export interface ProductsListResponse {
@@ -49,6 +57,9 @@ export interface Brand {
   slug: string;
   logo: string;
   logoHtml?: string;
+  description?: string;
+  website?: string;
+  country?: string;
   categories: { slug: string; name: string }[];
 }
 

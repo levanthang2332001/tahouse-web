@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
+import { ToastProvider } from "@/components/ui/toast";
 import SmoothScroll from "@/components/SmoothScroll";
 import AgentationProvider from "@/components/AgentationProvider";
 
@@ -33,9 +34,11 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AppProvider>
-          <SmoothScroll />
-          {children}
-          <AgentationProvider />
+          <ToastProvider>
+            <SmoothScroll />
+            {children}
+            <AgentationProvider />
+          </ToastProvider>
         </AppProvider>
       </body>
     </html>
