@@ -262,10 +262,7 @@ html.lenis body {
 
 .quill-editor-wrapper .ql-editor p {
   margin-bottom: 0.5rem;
-}
-
-.quill-editor-wrapper .ql-editor p:last-child {
-  margin-bottom: 0;
+  min-height: 1.5em;
 }
 
 .quill-editor-wrapper .ql-editor.ql-blank::before {

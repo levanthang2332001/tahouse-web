@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   Link as LinkIcon,
@@ -14,6 +14,13 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
 import "react-quill-new/dist/quill.snow.css";
 
+import type ReactQuillType from "react-quill-new";
+
+interface ReactQuillComponent {
+  getEditor?: () => QuillInstance;
+  editor?: QuillInstance;
+}
+
 // Dynamic import with SSR disabled for Next.js App Router compatibility
 const ReactQuill = dynamic(() => import("react-quill-new"), {
   ssr: false,
@@ -23,7 +30,7 @@ const ReactQuill = dynamic(() => import("react-quill-new"), {
       <span className="text-xs text-navy/50 font-medium">Đang tải bộ soạn thảo văn bản...</span>
     </div>
   ),
-});
+}) as unknown as React.ComponentType<React.ComponentProps<typeof ReactQuillType> & { ref?: React.Ref<ReactQuillComponent> }>;
 
 interface QuillInstance {
   getSelection: (focus?: boolean) => { index: number; length: number } | null;
@@ -36,6 +43,10 @@ interface QuillInstance {
   focus: () => void;
   root?: HTMLElement;
   scrollSelectionIntoView?: () => void;
+  clipboard?: {
+    dangerouslyPasteHTML?: (indexOrHtml: number | string, html?: string) => void;
+  };
+  setText: (text: string) => void;
 }
 
 interface RichTextEditorProps {
@@ -48,6 +59,31 @@ interface RichTextEditorProps {
   required?: boolean;
 }
 
+const TOOLBAR_CONTAINER = [
+  [{ header: [2, 3, 4, false] }],
+  ["bold", "italic", "underline", "strike"],
+  [{ color: [] }, { background: [] }],
+  [{ list: "ordered" }, { list: "bullet" }],
+  ["blockquote", "code-block"],
+  [{ align: [] }],
+  ["link", "clean"],
+];
+
+const FORMATS = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "color",
+  "background",
+  "list",
+  "blockquote",
+  "code-block",
+  "align",
+  "link",
+];
+
 export function RichTextEditor({
   label,
   description,
@@ -57,25 +93,45 @@ export function RichTextEditor({
   required = false,
 }: RichTextEditorProps) {
   const activeQuillRef = useRef<QuillInstance | null>(null);
+  const quillComponentRef = useRef<ReactQuillComponent | null>(null);
+
+  // Track the last value emitted by editor to avoid overwriting user edits or creating loops
+  const lastEmittedValueRef = useRef<string>(value || "");
+
   // Custom Link Dialog State
   const [linkModalOpen, setLinkModalOpen] = useState(false);
   const [linkText, setLinkText] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
   const [savedRange, setSavedRange] = useState<{ index: number; length: number } | null>(null);
 
-  // Pre-configured full-featured WYSIWYG toolbar with custom link handler and bottom-line Enter support
+  // Synchronize external changes to value (e.g. initial fetch or form reset) into Quill
+  useEffect(() => {
+    const quill = (quillComponentRef.current?.getEditor?.() as QuillInstance | undefined) || activeQuillRef.current;
+    if (!quill) return;
+
+    if (value !== lastEmittedValueRef.current) {
+      lastEmittedValueRef.current = value || "";
+      const currentHtml = quill.root?.innerHTML || "";
+      const cleanCurrent = currentHtml === "<p><br></p>" ? "" : currentHtml;
+      const target = value || "";
+
+      if (cleanCurrent !== target) {
+        if (!target) {
+          quill.setText("");
+        } else if (quill.clipboard?.dangerouslyPasteHTML) {
+          quill.clipboard.dangerouslyPasteHTML(target);
+        } else if (quill.root) {
+          quill.root.innerHTML = target;
+        }
+      }
+    }
+  }, [value]);
+
+  // Pre-configured full-featured WYSIWYG toolbar with custom link handler and auto-scroll on Enter
   const modules = useMemo(
     () => ({
       toolbar: {
-        container: [
-          [{ header: [2, 3, 4, false] }],
-          ["bold", "italic", "underline", "strike"],
-          [{ color: [] }, { background: [] }],
-          [{ list: "ordered" }, { list: "bullet" }],
-          ["blockquote", "code-block"],
-          [{ align: [] }],
-          ["link", "clean"],
-        ],
+        container: TOOLBAR_CONTAINER,
         handlers: {
           link: function () {
             const toolbarContext = this as unknown as { quill?: QuillInstance };
@@ -99,70 +155,25 @@ export function RichTextEditor({
       },
       keyboard: {
         bindings: {
-          enterAtBottom: {
+          enterScroll: {
             key: "Enter",
-            shiftKey: false,
-            handler: function (
-              range: { index: number; length: number },
-              context: { format?: Record<string, unknown> },
-            ) {
-              const quill = (
-                this as unknown as {
-                  quill: QuillInstance & {
-                    root?: HTMLElement;
-                    scrollSelectionIntoView?: () => void;
-                  };
-                }
-              ).quill;
-              if (!quill) return true;
-              activeQuillRef.current = quill;
-
-              const length = quill.getLength();
-              // If the cursor is at or near the very bottom/end of the document
-              if (range.index >= length - 1) {
-                // If in a list or blockquote, let standard Quill behavior unformat or split
-                if (context?.format?.list || context?.format?.blockquote) {
-                  return true;
-                }
-                quill.insertText(range.index, "\n", "user");
-                quill.setSelection(range.index + 1, 0, "user");
+            shiftKey: null,
+            handler: function () {
+              const quill = (this as unknown as { quill?: QuillInstance }).quill;
+              if (quill) {
+                activeQuillRef.current = quill;
                 setTimeout(() => {
+                  quill.scrollSelectionIntoView?.();
                   const editorEl = quill.root;
-                  if (editorEl) {
+                  const range = quill.getSelection?.();
+                  const length = quill.getLength?.();
+                  if (editorEl && range && length && range.index >= length - 2) {
                     editorEl.scrollTop = editorEl.scrollHeight;
                   }
                 }, 10);
-                return false;
               }
-
-              // Ensure newly created lines elsewhere are always scrolled into view
-              setTimeout(() => {
-                quill.scrollSelectionIntoView?.();
-              }, 10);
+              // IMPORTANT: return true so Quill's native handleEnter runs and creates the new line
               return true;
-            },
-          },
-          shiftEnter: {
-            key: "Enter",
-            shiftKey: true,
-            handler: function (range: { index: number; length: number }) {
-              const quill = (
-                this as unknown as {
-                  quill: QuillInstance & { root?: HTMLElement };
-                }
-              ).quill;
-              if (!quill) return true;
-              activeQuillRef.current = quill;
-
-              quill.insertText(range.index, "\n", "user");
-              quill.setSelection(range.index + 1, 0, "user");
-              setTimeout(() => {
-                const editorEl = quill.root;
-                if (editorEl) {
-                  editorEl.scrollTop = editorEl.scrollHeight;
-                }
-              }, 10);
-              return false;
             },
           },
         },
@@ -170,21 +181,6 @@ export function RichTextEditor({
     }),
     [],
   );
-
-  const formats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "color",
-    "background",
-    "list",
-    "blockquote",
-    "code-block",
-    "align",
-    "link",
-  ];
 
   // Save Link Handler
   const handleConfirmLink = (e?: React.FormEvent) => {
@@ -207,7 +203,7 @@ export function RichTextEditor({
       cleanUrl = `https://${cleanUrl}`;
     }
 
-    const quill = activeQuillRef.current;
+    const quill = (quillComponentRef.current?.getEditor?.() as QuillInstance | undefined) || activeQuillRef.current;
     if (quill) {
       quill.focus();
 
@@ -235,7 +231,7 @@ export function RichTextEditor({
   };
 
   const handleRemoveLink = () => {
-    const quill = activeQuillRef.current;
+    const quill = (quillComponentRef.current?.getEditor?.() as QuillInstance | undefined) || activeQuillRef.current;
     if (quill && savedRange) {
       quill.formatText(savedRange.index, savedRange.length || 1, "link", false);
       toast.info("Đã gỡ liên kết");
@@ -270,7 +266,7 @@ export function RichTextEditor({
             target.classList.contains("ql-container") ||
             target.classList.contains("quill-editor-wrapper")
           ) {
-            const quill = activeQuillRef.current;
+            const quill = (quillComponentRef.current?.getEditor?.() as QuillInstance | undefined) || activeQuillRef.current;
             if (quill) {
               quill.focus();
               const length = quill.getLength();
@@ -284,18 +280,34 @@ export function RichTextEditor({
         className="quill-editor-wrapper relative rounded-2xl border border-brand-green/30 bg-white shadow-xs focus-within:border-brand-green focus-within:ring-2 focus-within:ring-brand-green/20 transition-all cursor-text"
       >
         <ReactQuill
-          theme="snow"
-          value={value || ""}
-          onChange={(content, delta, source, editor) => {
-            const html = editor.getHTML();
-            if (html === "<p><br></p>" || !editor.getText().trim()) {
-              onChange("");
-            } else {
-              onChange(html);
+          ref={(instance: ReactQuillComponent | null) => {
+            if (instance) {
+              quillComponentRef.current = instance;
+              const editor = instance.getEditor?.() || instance.editor;
+              if (editor) {
+                activeQuillRef.current = editor;
+                // If there is an initial value and editor root is empty, ensure it's populated
+                const current = editor.root?.innerHTML || "";
+                const clean = current === "<p><br></p>" ? "" : current;
+                if (value && !clean) {
+                  if (editor.clipboard?.dangerouslyPasteHTML) {
+                    editor.clipboard.dangerouslyPasteHTML(value);
+                  } else if (editor.root) {
+                    editor.root.innerHTML = value;
+                  }
+                }
+              }
             }
           }}
+          theme="snow"
+          defaultValue={value || ""}
+          onChange={(content: string) => {
+            const cleanHtml = content === "<p><br></p>" ? "" : content;
+            lastEmittedValueRef.current = cleanHtml;
+            onChange(cleanHtml);
+          }}
           modules={modules}
-          formats={formats}
+          formats={FORMATS}
           placeholder={placeholder}
         />
       </div>
