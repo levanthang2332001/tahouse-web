@@ -1,30 +1,14 @@
 import type { Metadata } from "next";
-import {
-  Plus_Jakarta_Sans,
-  Cormorant_Garamond,
-  Great_Vibes,
-} from "next/font/google";
+import { Be_Vietnam_Pro } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
 import SmoothScroll from "@/components/SmoothScroll";
+import AgentationProvider from "@/components/AgentationProvider";
 
-const sansFont = Plus_Jakarta_Sans({
+const sansFont = Be_Vietnam_Pro({
   variable: "--font-sans",
   subsets: ["latin", "vietnamese"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-});
-
-const serifFont = Cormorant_Garamond({
-  variable: "--font-serif",
-  subsets: ["latin", "vietnamese"],
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
-});
-
-const cursiveFont = Great_Vibes({
-  variable: "--font-cursive",
-  subsets: ["latin"],
-  weight: ["400"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -41,7 +25,7 @@ export default function RootLayout({
   return (
     <html
       lang="vi"
-      className={`${sansFont.variable} ${serifFont.variable} ${cursiveFont.variable} h-full antialiased`}
+      className={`${sansFont.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body
@@ -51,6 +35,7 @@ export default function RootLayout({
         <AppProvider>
           <SmoothScroll />
           {children}
+          <AgentationProvider />
         </AppProvider>
       </body>
     </html>
