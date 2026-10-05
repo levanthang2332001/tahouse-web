@@ -8,6 +8,7 @@ import { HouseIcon } from "@/components/ui/icons";
 import { streamChat } from "@/lib/api/chat";
 import type { ChatMessage as ApiChatMessage } from "@/lib/types/chat";
 import { COMPANY_LEGAL } from "@/data/company-legal";
+import { isSafeUrl } from "@/lib/sanitize-html";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -46,6 +47,9 @@ function formatInline(text: string, keyPrefix = "inline"): React.ReactNode[] {
     const imageMatch = chunk.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
     if (imageMatch) {
       const [, alt, src] = imageMatch;
+      if (!isSafeUrl(src)) {
+        return <React.Fragment key={`${keyPrefix}-img-${chunkIndex}`} />;
+      }
       return (
         <a
           key={`${keyPrefix}-img-${chunkIndex}`}
@@ -71,6 +75,13 @@ function formatInline(text: string, keyPrefix = "inline"): React.ReactNode[] {
       const linkMatch = segment.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
       if (linkMatch) {
         const [, label, href] = linkMatch;
+        if (!isSafeUrl(href)) {
+          return (
+            <span key={`${keyPrefix}-text-${chunkIndex}-${segmentIndex}`}>
+              {label}
+            </span>
+          );
+        }
         return (
           <a
             key={`${keyPrefix}-a-${chunkIndex}-${segmentIndex}`}
@@ -179,6 +190,7 @@ function WelcomeContent() {
 function BotAvatar() {
   return (
     <div className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full overflow-hidden border border-brand-green/15 shadow-sm">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/logoTAicon.svg" alt="TA House Icon" className="h-full w-full object-contain" />
     </div>
   );
@@ -354,6 +366,7 @@ export default function AIChatbot() {
               <div className="flex h-15 sm:h-16 items-center justify-between px-4 sm:px-5">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl overflow-hidden shadow-xs">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/logoTAicon.svg" alt="TA House Icon" className="h-full w-full object-contain" />
                   </div>
                   <div>

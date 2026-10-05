@@ -25,15 +25,16 @@ export default function BrandLogo({
   className?: string;
 }) {
   const localLogo = getLocalBrandLogo(brand.slug, brand.name);
+  const logoSrc = brand.logo || localLogo;
   const localLabel = getLocalBrandLabel(brand.slug, brand.name);
   const [failed, setFailed] = useState(false);
 
-  if (localLogo && !failed) {
+  if (logoSrc && !failed) {
     const isKassler = brand.slug === "kassler" || brand.name.toLowerCase() === "kassler";
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={localLogo}
+        src={logoSrc}
         alt={brand.name}
         className={
           isKassler

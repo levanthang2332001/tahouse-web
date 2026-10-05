@@ -68,6 +68,7 @@ export default function HeroSection() {
             transition={{ delay: 0.2 }}
             className="mb-8 max-w-lg text-sm font-semibold leading-relaxed text-navy/80 md:text-base"
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logoTAtitle1.svg"
               alt="TA HOUSE"

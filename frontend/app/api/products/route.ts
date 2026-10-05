@@ -1,4 +1,6 @@
+// Public products API handler
 import { NextRequest, NextResponse } from "next/server";
+import { getMergedProducts } from "@/lib/admin/product-store";
 import {
   buildSidebarSectionsFromBrands,
   SIDEBAR_SECTIONS,
@@ -8,7 +10,7 @@ import { mapProductListItem } from "@/lib/backend/map-product";
 import { resolveKitchenCategorySlugs } from "@/lib/product-filters";
 import type { Brand, Product, ProductsListResponse } from "@/lib/types/product";
 
-const GROUP_PAGE_FETCH_LIMIT = 200;
+const GROUP_PAGE_FETCH_LIMIT = 1000;
 
 function buildBackendPath(searchParams: URLSearchParams): string {
   const query = searchParams.toString();
@@ -36,14 +38,25 @@ function applyClientFilters(
     search?: string | null;
     minPrice?: string | null;
     maxPrice?: string | null;
+    category?: string | null;
   },
 ): Product[] {
   const brand = params.brand?.trim().toLowerCase();
   const search = params.search?.trim().toLowerCase();
+  const category = params.category?.trim().toLowerCase();
   const minPrice = params.minPrice ? Number(params.minPrice) : null;
   const maxPrice = params.maxPrice ? Number(params.maxPrice) : null;
 
   return items.filter((item) => {
+    if (
+      category &&
+      category !== "all" &&
+      category !== "lock-parent" &&
+      item.category?.toLowerCase() !== category &&
+      item.subcategory?.toLowerCase() !== category
+    ) {
+      return false;
+    }
     if (
       brand &&
       item.brandSlug?.toLowerCase() !== brand &&
@@ -155,9 +168,39 @@ export async function GET(request: NextRequest) {
         await resolveExtrasCategorySlugs(),
       );
     } else {
-      const params = new URLSearchParams(request.nextUrl.searchParams);
-      params.delete("group");
-      data = await backendFetch<ProductsListResponse>(buildBackendPath(params));
+      // Use local overlay merged products to include custom admin creations/updates
+      const page = Math.max(
+        1,
+        Number(request.nextUrl.searchParams.get("page") || "1"),
+      );
+      const limit = Math.max(
+        1,
+        Number(request.nextUrl.searchParams.get("limit") || "21"),
+      );
+      const sortBy = request.nextUrl.searchParams.get("sortBy");
+
+      let allMerged = await getMergedProducts();
+
+      allMerged = applyClientFilters(allMerged, {
+        category: request.nextUrl.searchParams.get("category"),
+        brand: request.nextUrl.searchParams.get("brand"),
+        search: request.nextUrl.searchParams.get("search"),
+        minPrice: request.nextUrl.searchParams.get("minPrice"),
+        maxPrice: request.nextUrl.searchParams.get("maxPrice"),
+      });
+
+      allMerged = sortProducts(allMerged, sortBy);
+
+      const total = allMerged.length;
+      const start = (page - 1) * limit;
+      const pageItems = allMerged.slice(start, start + limit);
+
+      data = {
+        items: pageItems,
+        total,
+        page,
+        limit,
+      };
     }
 
     return NextResponse.json(

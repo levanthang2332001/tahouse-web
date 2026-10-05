@@ -18,13 +18,13 @@ type ApiEnvelope<T> = {
 const BACKEND_TIMEOUT_MS = 60_000;
 const BACKEND_RETRIES = 1;
 
-const backendAgent = new Agent({
+export const backendAgent = new Agent({
   connectTimeout: BACKEND_TIMEOUT_MS,
   headersTimeout: BACKEND_TIMEOUT_MS,
   bodyTimeout: BACKEND_TIMEOUT_MS,
 });
 
-function isRetryableFetchError(error: unknown): boolean {
+export function isRetryableFetchError(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
   const message = `${error.name} ${error.message}`.toLowerCase();
   const cause =

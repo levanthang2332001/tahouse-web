@@ -9,7 +9,6 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  MessageCircle,
   Phone,
   Share2,
   Sparkles,
@@ -37,11 +36,11 @@ import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import SocialFloating from "@/components/SocialFloating";
+import { FormattedText } from "@/components/ui/FormattedText";
 import { SiZalo } from "react-icons/si";
 import { useApp } from "@/context/AppContext";
 import { COMPANY_LEGAL } from "@/data/company-legal";
 import content from "@/data/content.json";
-import { formatCurrency, formatProductPrice } from "@/data/products";
 import { calculateProductDiscount } from "@/lib/format-price";
 import { fetchProduct } from "@/lib/api/products";
 import { formatProductName } from "@/lib/format-product-name";
@@ -216,13 +215,15 @@ function ProductDetailView({ id }: { id: string }) {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
   const [isZoomedIn, setIsZoomedIn] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
 
   const { addToRecentlyViewed, setIsChatbotOpen } = useApp();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -231,6 +232,8 @@ function ProductDetailView({ id }: { id: string }) {
       .then((data) => {
         if (cancelled) return;
         setProduct(data);
+        const defVariant = data.variants?.find((v) => v.is_default)?.id || data.variants?.[0]?.id || null;
+        setSelectedVariantId(defVariant);
         addToRecentlyViewed(data.id);
       })
       .catch((error: Error) => {
@@ -355,13 +358,24 @@ function ProductDetailView({ id }: { id: string }) {
       : installWorkflow.steps;
   const warrantyNote = installWorkflow.warrantyNote;
 
+  const hasVariants = Boolean(product.has_variants && product.variants && product.variants.length > 0);
+  const activeVariant = hasVariants
+    ? (product.variants?.find((v) => v.id === selectedVariantId) || product.variants?.[0] || null)
+    : null;
+
+  const currentPrice = activeVariant?.price !== undefined && activeVariant.price > 0
+    ? activeVariant.price
+    : product.price;
+
+  const currentPriceRange = activeVariant?.priceRange || product.priceRange;
+
   const discountInfo = calculateProductDiscount(
-    product.price,
+    currentPrice,
     product.originalPrice,
-    product.priceRange,
+    currentPriceRange,
     product.id,
   );
-  const hasNumericPrice = typeof product.price === "number" && product.price > 0;
+  const hasNumericPrice = typeof currentPrice === "number" && currentPrice > 0;
   const showDiscount = discountInfo.hasDiscount;
   const discountPercent = discountInfo.discountPercent;
 
@@ -651,8 +665,39 @@ function ProductDetailView({ id }: { id: string }) {
                   </div>
                 </div>
 
-                {/* Available Colors if present */}
-                {colors.length > 0 && (
+                {/* Available Variants or Colors */}
+                {hasVariants && product.variants && product.variants.length > 0 ? (
+                  <div className="mb-4 space-y-2">
+                    <span className="text-xs font-bold text-navy/70 flex items-center gap-1.5">
+                      <Palette size={13} className="text-brand-green" /> Tùy chọn phiên bản / Màu sắc:
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {product.variants.map((v) => {
+                        const isSelected = activeVariant?.id === v.id;
+                        return (
+                          <button
+                            key={v.id}
+                            type="button"
+                            onClick={() => setSelectedVariantId(v.id)}
+                            className={`flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition-all cursor-pointer border ${
+                              isSelected
+                                ? "border-brand-green bg-brand-green/10 text-navy shadow-xs ring-1 ring-brand-green"
+                                : "border-gray-light/80 bg-white text-navy/80 hover:border-brand-green/50 hover:bg-neutral/40"
+                            }`}
+                          >
+                            <span className={`h-2 w-2 rounded-full ${isSelected ? "bg-brand-green" : "bg-gray-400"}`} />
+                            <span>{v.label}</span>
+                            {v.price > 0 && (
+                              <span className="text-[11px] font-semibold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded-md">
+                                {new Intl.NumberFormat("vi-VN").format(v.price)} đ
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : colors.length > 0 ? (
                   <div className="mb-4 flex items-center gap-2 text-xs">
                     <span className="font-semibold text-navy/70 flex items-center gap-1">
                       <Palette size={13} className="text-brand-green" /> Màu sắc:
@@ -665,7 +710,7 @@ function ProductDetailView({ id }: { id: string }) {
                       ))}
                     </div>
                   </div>
-                )}
+                ) : null}
 
                 {/* Quick Highlights / Specs Summary (ul.info-pro) */}
                 <div className="mb-6 rounded-2xl bg-[#F8F7F3]/70 border border-gray-light/60 p-4">
@@ -795,10 +840,11 @@ function ProductDetailView({ id }: { id: string }) {
 
                 {/* Article Intro */}
                 <div className="prose max-w-none text-sm leading-relaxed text-navy/90 space-y-4">
-                  {product.description ? (
-                    <p className="font-medium text-base text-navy leading-relaxed">
-                      {product.description}
-                    </p>
+                  {product.content || product.description ? (
+                    <FormattedText
+                      content={product.content || product.description}
+                      className="text-base text-navy leading-relaxed"
+                    />
                   ) : (
                     <p className="font-medium">
                       <strong>{displayName}</strong> là dòng sản phẩm cao cấp phân phối chính hãng bởi {COMPANY_LEGAL.tradeName}. 
@@ -821,7 +867,9 @@ function ProductDetailView({ id }: { id: string }) {
                             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-green/15 text-brand-green">
                               <Check size={14} strokeWidth={2.6} />
                             </div>
-                            <span className="text-xs font-bold leading-snug text-navy/90">{feature}</span>
+                            <div className="flex-1">
+                              <FormattedText content={feature} className="text-xs font-bold leading-snug text-navy/90" />
+                            </div>
                           </div>
                         ))}
                       </div>

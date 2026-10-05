@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getProductById } from "@/lib/admin/product-store";
 import { backendFetch } from "@/lib/backend/client";
 import { mapProductDetail } from "@/lib/backend/map-product";
-import type { Product } from "@/lib/types/product";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -10,16 +10,29 @@ type RouteContext = {
 export async function GET(_request: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
-    const data = await backendFetch<Product>(
-      `/products/locks/${encodeURIComponent(id)}`,
-    );
+    const cleanId = id?.trim();
+
+    if (!cleanId) {
+      return NextResponse.json(
+        { message: "Mã sản phẩm không hợp lệ" },
+        { status: 400 },
+      );
+    }
+
+    const data = await getProductById(cleanId);
+    if (!data) {
+      return NextResponse.json(
+        { message: "Không tìm thấy sản phẩm" },
+        { status: 404 },
+      );
+    }
 
     // If installation_preview is empty, check /installation sub-endpoint for real jobsite photos
-    if (!data.installation_preview || data.installation_preview.length === 0) {
+    if (data.id && (!data.installation_preview || data.installation_preview.length === 0)) {
       try {
         const installData = await backendFetch<{
           items?: Array<{ url: string; type: string }>;
-        }>(`/products/locks/${encodeURIComponent(id)}/installation`);
+        }>(`/products/locks/${encodeURIComponent(data.id)}/installation`);
         if (installData?.items && installData.items.length > 0) {
           data.installation_preview = installData.items
             .filter((item) => item.type === "image" && Boolean(item.url))
@@ -52,4 +65,3 @@ export async function GET(_request: NextRequest, context: RouteContext) {
     );
   }
 }
-
