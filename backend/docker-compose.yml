@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ta_house_backend
+    restart: always
+    ports:
+      - '3001:3001'
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    volumes:
+      - ./uploads:/app/uploads
+      # Đồng bộ database JSON từ máy local vào container để khi sửa file JSON bên ngoài, ứng dụng nhận được thay đổi ngay lập tức
+      - ./database:/app/database
