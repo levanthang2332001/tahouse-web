@@ -10,7 +10,6 @@ import {
   Loader2,
   Server,
   RefreshCw,
-  Camera,
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { Button } from "@/components/ui/button";
@@ -24,10 +23,8 @@ export default function AdminSettingsPage() {
   // Profile Form State
   const [fullName, setFullName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
-  const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || "");
   const [prevUserId, setPrevUserId] = useState(user?.id);
   const [savingProfile, setSavingProfile] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   // Security Form State
   const [oldPassword, setOldPassword] = useState("");
@@ -43,37 +40,7 @@ export default function AdminSettingsPage() {
     setPrevUserId(user.id);
     setFullName(user.name || "");
     setEmail(user.email || "");
-    setAvatarUrl(user.avatarUrl || "");
   }
-
-  const handleAvatarUpload = async (file: File) => {
-    setUploadingAvatar(true);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("folder", "avatars");
-
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: fd,
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.message || "Tải ảnh avatar thất bại");
-      }
-
-      const uploadedUrl = data.data?.url;
-      if (uploadedUrl) {
-        setAvatarUrl(uploadedUrl);
-        toast.success("Tải ảnh đại diện lên Cloudflare R2 thành công!");
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Lỗi khi tải avatar");
-    } finally {
-      setUploadingAvatar(false);
-    }
-  };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +52,6 @@ export default function AdminSettingsPage() {
         body: JSON.stringify({
           fullName: fullName.trim(),
           email: email.trim(),
-          avatarUrl: avatarUrl.trim(),
         }),
       });
 
@@ -214,50 +180,7 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          {/* Avatar Area */}
-          <div className="flex items-center gap-4">
-            <div className="relative h-16 w-16 rounded-2xl bg-[#FAF9F5] border border-gray-light overflow-hidden flex items-center justify-center shadow-xs">
-              {avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={avatarUrl}
-                  alt="Avatar"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="text-xl font-black text-brand-green">
-                  {fullName.charAt(0) || "A"}
-                </span>
-              )}
 
-              {uploadingAvatar && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white">
-                  <Loader2 size={16} className="animate-spin" />
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-light bg-[#FAF9F5] hover:bg-white text-xs font-bold text-navy shadow-2xs transition-colors">
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  disabled={uploadingAvatar}
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) {
-                      handleAvatarUpload(f);
-                      e.target.value = "";
-                    }
-                  }}
-                />
-                <Camera size={13} className="text-brand-green" />
-                <span>Đổi ảnh đại diện R2</span>
-              </label>
-              <p className="text-[10px] text-navy/40 mt-1">Ảnh PNG, JPG tối đa 5MB</p>
-            </div>
-          </div>
 
           <form onSubmit={handleSaveProfile} className="space-y-4">
             <div className="space-y-1">

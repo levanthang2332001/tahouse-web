@@ -14,6 +14,7 @@ import {
   FolderOpen,
   Bot,
   Settings,
+  User,
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { cn } from "@/lib/utils";
@@ -169,17 +170,8 @@ export function AdminSidebar({
           className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group cursor-pointer"
           title="Xem và chỉnh sửa hồ sơ quản trị"
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-green/20 text-brand-green font-bold text-xs overflow-hidden">
-            {user?.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={user.avatarUrl}
-                alt="Avatar"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <span>{user?.name?.charAt(0) || "A"}</span>
-            )}
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-green/20 text-brand-green font-bold text-xs">
+            <User size={15} />
           </div>
           <div className="flex flex-col min-w-0 flex-1">
             <span className="text-xs font-bold text-white truncate group-hover:text-brand-green transition-colors">
