@@ -17,7 +17,7 @@ export const SERVICES: Service[] = [
     title: "Khóa điện tử - khóa vân tay",
     catId: "lock-parent",
     icon: Lock,
-    img: "/pic/khoa-kassler.jpg",
+    img: "/pic/khoa-kassler.png",
     imgClass: "object-contain bg-white p-3",
   },
   {
