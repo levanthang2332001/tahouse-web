@@ -29,7 +29,6 @@ export class ChatMessageDto {
     example: 'Tìm cho tôi khóa cửa gỗ Kassler mạ vàng',
   })
   @IsString()
-  @IsNotEmpty()
   content: string;
 }
 

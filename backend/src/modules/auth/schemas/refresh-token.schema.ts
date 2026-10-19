@@ -1,4 +1,10 @@
-import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import {
+  sqliteTable,
+  text,
+  integer,
+  index,
+  uniqueIndex,
+} from 'drizzle-orm/sqlite-core';
 import { sql, relations } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { users } from './user.schema';
@@ -15,7 +21,9 @@ export const refreshTokens = sqliteTable(
     hashedToken: text('hashed_token').notNull().unique(),
     userAgent: text('user_agent'),
     ipAddress: text('ip_address'),
-    isRevoked: integer('is_revoked', { mode: 'boolean' }).notNull().default(false),
+    isRevoked: integer('is_revoked', { mode: 'boolean' })
+      .notNull()
+      .default(false),
     expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
     createdAt: integer('created_at', { mode: 'timestamp' })
       .notNull()

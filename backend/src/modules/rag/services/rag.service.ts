@@ -25,10 +25,13 @@ export class RagService {
     history: IChatMessage[],
     location?: string,
   ): Observable<string> {
+    const validHistory = (history || []).filter(
+      (h) => h && typeof h.content === 'string' && h.content.trim().length > 0,
+    );
     return from(this.retriever.retrieve(message, 4)).pipe(
       mergeMap((context) => {
         const systemPrompt = buildSystemPrompt(context, location);
-        return this.llmProvider.streamChat(systemPrompt, message, history);
+        return this.llmProvider.streamChat(systemPrompt, message, validHistory);
       }),
     );
   }

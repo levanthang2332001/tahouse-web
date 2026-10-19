@@ -22,6 +22,7 @@ export interface IProductOption {
 export interface IProduct {
   id: string;
   code: string;
+  slug: string;
   brandId?: string | number | null;
   brand?: string;
   brandSlug?: string;

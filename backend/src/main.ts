@@ -1,11 +1,12 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as os from 'os';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { config } from '@/common/config';
 import { GlobalExceptionFilter } from '@/common/filters';
+import { validationExceptionFactory } from '@/common/exceptions';
 import { LoggingInterceptor } from '@/common/logger/logging.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor';
@@ -51,9 +52,10 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(
-    new (await import('@nestjs/common')).ValidationPipe({
+    new ValidationPipe({
       transform: true,
       whitelist: true,
+      exceptionFactory: validationExceptionFactory,
     }),
   );
 

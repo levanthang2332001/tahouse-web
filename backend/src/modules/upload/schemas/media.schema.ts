@@ -26,7 +26,9 @@ export const media = sqliteTable(
     category: text('category'),
     subcategory: text('subcategory'),
     productCode: text('product_code'),
-    metadata: text('metadata_json').default('{}'), // { width, height, aspectRatio, duration, format }
+    metadata: text('metadata_json', { mode: 'json' })
+      .$type<Record<string, any>>()
+      .default(sql`'{}'`),
     createdAt: integer('created_at', { mode: 'timestamp' })
       .notNull()
       .default(sql`(unixepoch())`),

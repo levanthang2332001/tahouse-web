@@ -87,7 +87,7 @@ export class AuthController {
     status: 200,
     description: 'Thông tin tài khoản.',
   })
-  async getProfile(@CurrentUser() user: any) {
+  getProfile(@CurrentUser() user: any) {
     return {
       username: user.username,
       email: user.email,

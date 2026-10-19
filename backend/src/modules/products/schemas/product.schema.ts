@@ -1,7 +1,20 @@
-import { sqliteTable, text, integer, real, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import {
+  sqliteTable,
+  text,
+  integer,
+  real,
+  index,
+  uniqueIndex,
+} from 'drizzle-orm/sqlite-core';
 import { sql, relations } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { brands } from '../../brands/schemas/brand.schema';
+
+import type {
+  IInstallation,
+  IProductOption,
+  IProductVariant,
+} from '../types/product.types';
 
 export const products = sqliteTable(
   'products',
@@ -25,20 +38,43 @@ export const products = sqliteTable(
     discountPercent: real('discount_percent'),
     priceRange: text('price_range'),
     imageUrl: text('image_url').notNull(),
-    images: text('images_json').notNull().default('[]'), // JSON array of string
-    features: text('features_json').default('[]'), // JSON array of string
-    specs: text('specs_json').default('{}'), // JSON object Record<string, string>
-    technologies: text('technologies_json').default('[]'), // JSON array of string
+    images: text('images_json', { mode: 'json' })
+      .$type<string[]>()
+      .notNull()
+      .default(sql`'[]'`),
+    features: text('features_json', { mode: 'json' })
+      .$type<string[]>()
+      .default(sql`'[]'`),
+    specs: text('specs_json', { mode: 'json' })
+      .$type<Record<string, string>>()
+      .default(sql`'{}'`),
+    technologies: text('technologies_json', { mode: 'json' })
+      .$type<string[]>()
+      .default(sql`'[]'`),
     warranty: integer('warranty').default(24),
     warrantyText: text('warranty_text'),
-    colors: text('colors_json').default('[]'), // JSON array of string
-    installation: text('installation_json').default('{"images":[],"videos":[]}'), // { images: [], videos: [] }
-    installationManual: text('installation_manual_json').default('[]'), // JSON array of string
-    faq: text('faq_json').default('[]'), // JSON array of { question, answer }
+    colors: text('colors_json', { mode: 'json' })
+      .$type<string[]>()
+      .default(sql`'[]'`),
+    installation: text('installation_json', { mode: 'json' })
+      .$type<IInstallation>()
+      .default(sql`'{"images":[],"videos":[]}'`),
+    installationManual: text('installation_manual_json', { mode: 'json' })
+      .$type<string[]>()
+      .default(sql`'[]'`),
+    faq: text('faq_json', { mode: 'json' })
+      .$type<Array<{ question: string; answer: string }>>()
+      .default(sql`'[]'`),
     hasVariants: integer('has_variants', { mode: 'boolean' }).default(false),
-    options: text('options_json').default('[]'), // JSON array of options
-    variants: text('variants_json').default('[]'), // JSON array of variants
-    installationPreview: text('installation_preview_json').default('[]'), // JSON array of string
+    options: text('options_json', { mode: 'json' })
+      .$type<IProductOption[]>()
+      .default(sql`'[]'`),
+    variants: text('variants_json', { mode: 'json' })
+      .$type<IProductVariant[]>()
+      .default(sql`'[]'`),
+    installationPreview: text('installation_preview_json', { mode: 'json' })
+      .$type<string[]>()
+      .default(sql`'[]'`),
     priority: integer('priority').default(9999),
     status: text('status').notNull().default('ACTIVE'),
     views: integer('views').notNull().default(0),

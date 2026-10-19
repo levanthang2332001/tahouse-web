@@ -37,8 +37,6 @@ export function buildSystemPrompt(
 
   // Tối ưu hóa Prompt Caching bằng cách loại bỏ phút/giây khỏi prompt hệ thống
   const currentTime = `${dateStr}, Buổi ${sessionOfDay} (khoảng ${hour} giờ)`;
-  const zaloPhone = process.env.ZALO_PHONE_NUMBER || '0987654321';
-  const backendUrl = process.env.BACKEND_BASE_URL || 'http://localhost:3001';
   const metadataBlock = `<session_metadata>
 <current_time>${currentTime}</current_time>
 <user_location>${location || 'Không xác định (hỏi nếu cần)'}</user_location>

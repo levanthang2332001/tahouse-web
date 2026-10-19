@@ -1,4 +1,9 @@
-import { sqliteTable, text, integer, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import {
+  sqliteTable,
+  text,
+  integer,
+  uniqueIndex,
+} from 'drizzle-orm/sqlite-core';
 import { sql, relations } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { products } from '../../products/schemas/product.schema';

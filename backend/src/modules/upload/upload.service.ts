@@ -1,6 +1,5 @@
 import {
   Injectable,
-  Inject,
   BadRequestException,
   NotFoundException,
   InternalServerErrorException,
@@ -16,10 +15,8 @@ import {
 import * as path from 'path';
 import { randomUUID } from 'crypto';
 import { imageSize } from 'image-size';
-import { eq, desc, and, like, or, sql } from 'drizzle-orm';
-import { D1_DATABASE } from '../../database/d1.constants';
-import type { D1Database } from '../../database/d1.client';
-import { media, MediaType, Media } from './schemas/media.schema';
+import { MediaType } from './schemas/media.schema';
+import { MediaRepository } from './repositories/media.repository';
 import { UploadMediaDto } from './dto/upload-media.dto';
 import { QueryMediaDto } from './dto/query-media.dto';
 
@@ -32,7 +29,7 @@ export function slugify(text: string): string {
     .toLowerCase()
     .trim()
     .replace(/[đĐ]/g, 'd')
-    .replace(/[^a-z0-9\-_\/ ]/g, '')
+    .replace(/[^a-z0-9\-_/ ]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '');
@@ -153,8 +150,8 @@ export class UploadService implements OnModuleInit {
   private publicUrl: string = '';
 
   constructor(
+    private readonly mediaRepository: MediaRepository,
     private readonly configService: ConfigService,
-    @Inject(D1_DATABASE) private readonly db: D1Database,
   ) {}
 
   onModuleInit() {
@@ -199,54 +196,6 @@ export class UploadService implements OnModuleInit {
       );
     }
     return this.s3Client;
-  }
-
-  /**
-   * Định dạng trả về: Ghép động R2_PUBLIC_URL từ biến môi trường với key
-   */
-  formatMediaResponse(raw: any) {
-    if (!raw) return null;
-    const id = raw.id || (raw._id ? raw._id.toString() : '');
-    const key = raw.key || '';
-    const url = raw.url || (this.publicUrl ? `${this.publicUrl}/${key}` : `/${key}`);
-    const metadata =
-      typeof raw.metadata === 'string'
-        ? JSON.parse(raw.metadata || '{}')
-        : typeof raw.metadata_json === 'string'
-          ? JSON.parse(raw.metadata_json || '{}')
-          : raw.metadata || {};
-
-    const mime = raw.mimeType || raw.mime_type || '';
-    const filename = raw.filename || '';
-
-    return {
-      id,
-      url,
-      key,
-      filename,
-      originalName: raw.originalName || filename,
-      mimeType: mime,
-      fileType: raw.fileType || this.determineFileType(mime, filename),
-      size: raw.size || 0,
-      width: raw.width ?? metadata?.width ?? null,
-      height: raw.height ?? metadata?.height ?? null,
-      aspectRatio: raw.aspectRatio ?? metadata?.aspectRatio ?? null,
-      duration: raw.duration ?? metadata?.duration ?? null,
-      storage: raw.storage || 'r2',
-      bucket: raw.bucket || this.bucketName,
-      folder: raw.folder || '',
-      brand: raw.brand || null,
-      category: raw.category || null,
-      subcategory: raw.subcategory || null,
-      productCode: raw.productCode || raw.product_code || null,
-      title: raw.title || filename,
-      altText: raw.altText || (raw.productCode || raw.product_code ? `${raw.productCode || raw.product_code} ${filename}` : filename),
-      description: raw.description || '',
-      uploadedBy: raw.uploadedBy || 'admin',
-      metadata,
-      createdAt: raw.createdAt || raw.created_at,
-      updatedAt: raw.updatedAt || raw.updated_at,
-    };
   }
 
   /**
@@ -300,7 +249,6 @@ export class UploadService implements OnModuleInit {
 
     const segments: string[] = [];
 
-    // Phân cấp thư mục theo brand / category / subcategory / productCode
     if (brand || category || subcategory || productCode) {
       const baseFolder = folder ? slugify(folder) : 'products';
       segments.push(baseFolder);
@@ -327,13 +275,9 @@ export class UploadService implements OnModuleInit {
   }
 
   /**
-   * Tải 1 file trực tiếp lên Cloudflare R2 và server tự động trích xuất kích thước, thời lượng, dung lượng để lưu vào D1
+   * Tải 1 file trực tiếp lên Cloudflare R2 và lưu metadata vào D1 qua MediaRepository
    */
-  async uploadSingle(
-    file: Express.Multer.File,
-    dto?: UploadMediaDto,
-    username: string = 'admin',
-  ) {
+  async uploadSingle(file: Express.Multer.File, dto?: UploadMediaDto) {
     if (!file || !file.buffer || file.buffer.length === 0) {
       throw new BadRequestException(
         'Uploaded file is empty (0 bytes) or invalid',
@@ -342,7 +286,6 @@ export class UploadService implements OnModuleInit {
 
     const fileType = this.determineFileType(file.mimetype, file.originalname);
 
-    // File Size Limits per media type
     const MAX_FILE_SIZES: Record<string, { maxBytes: number; label: string }> =
       {
         [MediaType.IMAGE]: { maxBytes: 15 * 1024 * 1024, label: '15MB' },
@@ -374,7 +317,6 @@ export class UploadService implements OnModuleInit {
     const filename = this.generateSafeFilename(file.originalname);
     const key = `${subFolder}/${filename}`;
 
-    // Server tự động phân tích kích thước (width, height, aspectRatio) và thời lượng (duration)
     let width: number | null = null;
     let height: number | null = null;
     let aspectRatio: string | null = null;
@@ -421,23 +363,8 @@ export class UploadService implements OnModuleInit {
       const subcategoryVal = dto?.subcategory ? slugify(dto.subcategory) : null;
       const productCodeVal = dto?.productCode ? dto.productCode.trim() : null;
 
-      // 2. Lưu document metadata đầy đủ vào D1
-      await this.db.insert(media).values({
-        id: newId,
-        filename,
-        url: this.publicUrl ? `${this.publicUrl}/${key}` : `/${key}`,
-        key,
-        mimeType: file.mimetype,
-        size: file.size || file.buffer.length,
-        folder: subFolder,
-        brand: brandVal,
-        category: categoryVal,
-        subcategory: subcategoryVal,
-        productCode: productCodeVal,
-        metadata: JSON.stringify(metadataObj),
-      });
-
-      return this.formatMediaResponse({
+      // 2. Lưu document metadata qua MediaRepository
+      return this.mediaRepository.create({
         id: newId,
         filename,
         url: this.publicUrl ? `${this.publicUrl}/${key}` : `/${key}`,
@@ -450,8 +377,6 @@ export class UploadService implements OnModuleInit {
         subcategory: subcategoryVal,
         productCode: productCodeVal,
         metadata: metadataObj,
-        originalName: file.originalname,
-        uploadedBy: username,
       });
     } catch (error) {
       this.logger.error(
@@ -464,135 +389,30 @@ export class UploadService implements OnModuleInit {
     }
   }
 
-  /**
-   * Xử lý tải lên 1 hoặc nhiều file đồng nhất qua 1 API duy nhất
-   */
-  async uploadFiles(
-    files: Express.Multer.File[],
-    dto?: UploadMediaDto,
-    username: string = 'admin',
-  ) {
+  async uploadFiles(files: Express.Multer.File[], dto?: UploadMediaDto) {
     if (!files || files.length === 0) {
       throw new BadRequestException('No files provided in request');
     }
 
     if (files.length === 1) {
-      return this.uploadSingle(files[0], dto, username);
+      return this.uploadSingle(files[0], dto);
     }
 
-    return Promise.all(
-      files.map((file) => this.uploadSingle(file, dto, username)),
-    );
+    return Promise.all(files.map((file) => this.uploadSingle(file, dto)));
   }
 
-  /**
-   * Lấy danh sách Media với bộ lọc, tìm kiếm và phân trang
-   */
   async findAll(query: QueryMediaDto) {
-    const {
-      page = 1,
-      limit = 20,
-      fileType,
-      brand,
-      category,
-      subcategory,
-      productCode,
-      search,
-    } = query;
-
-    const conditions: any[] = [];
-
-    if (brand) {
-      conditions.push(eq(media.brand, slugify(brand)));
-    }
-
-    if (category) {
-      conditions.push(eq(media.category, slugify(category)));
-    }
-
-    if (subcategory) {
-      conditions.push(eq(media.subcategory, slugify(subcategory)));
-    }
-
-    if (productCode) {
-      conditions.push(like(media.productCode, `%${productCode.trim()}%`));
-    }
-
-    if (fileType) {
-      if (fileType === MediaType.IMAGE) {
-        conditions.push(like(media.mimeType, 'image/%'));
-      } else if (fileType === MediaType.VIDEO) {
-        conditions.push(like(media.mimeType, 'video/%'));
-      } else if (fileType === MediaType.AUDIO) {
-        conditions.push(like(media.mimeType, 'audio/%'));
-      } else if (fileType === MediaType.DOCUMENT) {
-        conditions.push(
-          or(
-            like(media.mimeType, '%pdf%'),
-            like(media.mimeType, '%document%'),
-            like(media.mimeType, '%sheet%'),
-            like(media.mimeType, '%zip%'),
-          ),
-        );
-      }
-    }
-
-    if (search && search.trim()) {
-      const term = `%${search.trim()}%`;
-      conditions.push(
-        or(
-          like(media.filename, term),
-          like(media.key, term),
-          like(media.productCode, term),
-        ),
-      );
-    }
-
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-    const offset = (page - 1) * limit;
-
-    const [itemsResult, countResult] = await Promise.all([
-      this.db
-        .select()
-        .from(media)
-        .where(whereClause)
-        .orderBy(desc(media.createdAt))
-        .limit(limit)
-        .offset(offset),
-      this.db
-        .select({ count: sql<number>`count(*)` })
-        .from(media)
-        .where(whereClause),
-    ]);
-
-    const total = Number(countResult[0]?.count || 0);
-
-    return {
-      items: itemsResult.map((item) => this.formatMediaResponse(item)),
-      pagination: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit) || 1,
-      },
-    };
+    return this.mediaRepository.findAllPaginated(query);
   }
 
-  /**
-   * Lấy chi tiết 1 Media document theo ID
-   */
   async findById(id: string) {
-    const records = await this.db.select().from(media).where(eq(media.id, id)).limit(1);
-    const item = records[0];
+    const item = await this.mediaRepository.findById(id);
     if (!item) {
       throw new NotFoundException(`Media document not found with ID [${id}]`);
     }
-    return this.formatMediaResponse(item);
+    return item;
   }
 
-  /**
-   * Xóa file khỏi Cloudflare R2 và xóa document khỏi D1
-   */
   async deleteMedia(
     idOrKeyOrUrl: string,
   ): Promise<{ message: string; deletedId?: string; key: string }> {
@@ -603,17 +423,14 @@ export class UploadService implements OnModuleInit {
     const client = this.getClient();
     const cleanKey = this.extractKeyFromUrl(idOrKeyOrUrl);
 
-    // 1. Tìm media record trong D1
-    const records = await this.db
-      .select()
-      .from(media)
-      .where(or(eq(media.id, idOrKeyOrUrl), eq(media.key, idOrKeyOrUrl), eq(media.key, cleanKey)))
-      .limit(1);
-
-    const mediaDoc = records[0];
+    // Tìm media record trong D1
+    const mediaDoc = await this.mediaRepository.findByIdOrKey(
+      idOrKeyOrUrl,
+      cleanKey,
+    );
     const key = mediaDoc ? mediaDoc.key : cleanKey;
 
-    // 2. Xóa khỏi Cloudflare R2
+    // Xóa khỏi Cloudflare R2
     try {
       await client.send(
         new DeleteObjectCommand({
@@ -628,9 +445,9 @@ export class UploadService implements OnModuleInit {
       );
     }
 
-    // 3. Xóa document khỏi D1
+    // Xóa document khỏi D1
     if (mediaDoc) {
-      await this.db.delete(media).where(eq(media.id, mediaDoc.id));
+      await this.mediaRepository.delete(mediaDoc.id);
     }
 
     return {

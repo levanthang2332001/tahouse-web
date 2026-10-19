@@ -1,32 +1,25 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  BadRequestException,
-  NotFoundException,
-  Logger,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { eq, and, ne } from 'drizzle-orm';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
-import { D1_DATABASE } from '@/database';
-import type { D1Database } from '@/database';
-import { users, User } from './schemas/user.schema';
-import { refreshTokens } from './schemas/refresh-token.schema';
+import { User } from './schemas/user.schema';
+import { UsersRepository } from './repositories/users.repository';
+import { RefreshTokensRepository } from './repositories/refresh-tokens.repository';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { BusinessException } from '@/common/exceptions';
+import { ErrorCode } from '@/common/constants';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    @Inject(D1_DATABASE)
-    private readonly db: D1Database,
+    private readonly usersRepository: UsersRepository,
+    private readonly refreshTokensRepository: RefreshTokensRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
@@ -97,13 +90,14 @@ export class AuthService {
   async login(loginDto: LoginDto, userAgent?: string, ipAddress?: string) {
     const identifier = loginDto.username.trim().toLowerCase();
 
-    // Query user by email using Drizzle query API
-    const user = await this.db.query.users.findFirst({
-      where: eq(users.email, identifier),
-    });
+    // Query user via UsersRepository
+    const user = await this.usersRepository.findByEmail(identifier);
 
     if (!user || !user.password) {
-      throw new UnauthorizedException('Invalid username or password');
+      throw new BusinessException(
+        ErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Invalid username or password',
+      );
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -111,13 +105,16 @@ export class AuthService {
       user.password,
     );
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid username or password');
+      throw new BusinessException(
+        ErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Invalid username or password',
+      );
     }
 
     const { accessToken, refreshToken, expiresAt } =
       await this.generateTokens(user);
 
-    await this.db.insert(refreshTokens).values({
+    await this.refreshTokensRepository.create({
       userId: user.id,
       hashedToken: this.hashToken(refreshToken),
       userAgent: userAgent || '',
@@ -146,23 +143,20 @@ export class AuthService {
         secret: refreshSecret,
       });
     } catch {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+      throw new BusinessException(
+        ErrorCode.AUTH_REFRESH_TOKEN_INVALID,
+        'Invalid or expired refresh token',
+      );
     }
 
     const hashedToken = this.hashToken(refreshToken);
 
-    const tokenRecord = await this.db.query.refreshTokens.findFirst({
-      where: and(
-        eq(refreshTokens.hashedToken, hashedToken),
-        eq(refreshTokens.isRevoked, false),
-      ),
-      with: {
-        user: true,
-      },
-    });
+    const tokenRecord =
+      await this.refreshTokensRepository.findActiveByHashedToken(hashedToken);
 
     if (!tokenRecord || !tokenRecord.user) {
-      throw new UnauthorizedException(
+      throw new BusinessException(
+        ErrorCode.AUTH_REFRESH_TOKEN_INVALID,
         'Refresh token has been revoked, expired or user not found',
       );
     }
@@ -170,14 +164,11 @@ export class AuthService {
     const user = tokenRecord.user;
 
     // Revoke old token
-    await this.db
-      .update(refreshTokens)
-      .set({ isRevoked: true })
-      .where(eq(refreshTokens.id, tokenRecord.id));
+    await this.refreshTokensRepository.revokeById(tokenRecord.id);
 
     const tokens = await this.generateTokens(user);
 
-    await this.db.insert(refreshTokens).values({
+    await this.refreshTokensRepository.create({
       userId: user.id,
       hashedToken: this.hashToken(tokens.refreshToken),
       userAgent: userAgent || tokenRecord.userAgent,
@@ -195,34 +186,24 @@ export class AuthService {
   async logout(refreshToken?: string): Promise<{ message: string }> {
     if (refreshToken) {
       const hashedToken = this.hashToken(refreshToken);
-      await this.db
-        .update(refreshTokens)
-        .set({ isRevoked: true })
-        .where(eq(refreshTokens.hashedToken, hashedToken));
+      await this.refreshTokensRepository.revokeByHashedToken(hashedToken);
     }
     return { message: 'Logged out successfully' };
   }
 
   async logoutAll(userId: string): Promise<{ message: string }> {
-    await this.db
-      .update(refreshTokens)
-      .set({ isRevoked: true })
-      .where(
-        and(
-          eq(refreshTokens.userId, userId),
-          eq(refreshTokens.isRevoked, false),
-        ),
-      );
+    await this.refreshTokensRepository.revokeAllByUserId(userId);
     return { message: 'All sessions have been revoked' };
   }
 
   async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
-    const user = await this.db.query.users.findFirst({
-      where: eq(users.id, userId),
-    });
+    const user = await this.usersRepository.findById(userId);
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new BusinessException(
+        ErrorCode.AUTH_USER_NOT_FOUND,
+        'User not found',
+      );
     }
 
     const updates: Partial<User> = {
@@ -231,13 +212,17 @@ export class AuthService {
 
     if (updateProfileDto.email) {
       const email = updateProfileDto.email.trim().toLowerCase();
-      const existingEmail = await this.db.query.users.findFirst({
-        where: and(eq(users.email, email), ne(users.id, user.id)),
-      });
+      const existingEmail = await this.usersRepository.findOtherUserByEmail(
+        email,
+        user.id,
+      );
 
       if (existingEmail) {
-        throw new BadRequestException(
+        throw new BusinessException(
+          ErrorCode.AUTH_EMAIL_EXISTS,
           'Email is already in use by another account',
+          'email',
+          { email },
         );
       }
       updates.email = email;
@@ -251,7 +236,7 @@ export class AuthService {
       updates.avatar = updateProfileDto.avatarUrl.trim();
     }
 
-    await this.db.update(users).set(updates).where(eq(users.id, userId));
+    await this.usersRepository.update(userId, updates);
 
     return {
       username: updates.email || user.email,
@@ -265,16 +250,20 @@ export class AuthService {
     userId: string,
     changePasswordDto: ChangePasswordDto,
   ): Promise<{ message: string }> {
-    const user = await this.db.query.users.findFirst({
-      where: eq(users.id, userId),
-    });
+    const user = await this.usersRepository.findById(userId);
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new BusinessException(
+        ErrorCode.AUTH_USER_NOT_FOUND,
+        'User not found',
+      );
     }
 
     if (!user.password) {
-      throw new BadRequestException('Password is not set for this account');
+      throw new BusinessException(
+        ErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Password is not set for this account',
+      );
     }
 
     const isMatch = await bcrypt.compare(
@@ -282,7 +271,10 @@ export class AuthService {
       user.password,
     );
     if (!isMatch) {
-      throw new BadRequestException('Current password is incorrect');
+      throw new BusinessException(
+        ErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Current password is incorrect',
+      );
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -291,10 +283,10 @@ export class AuthService {
       salt,
     );
 
-    await this.db
-      .update(users)
-      .set({ password: newHashedPassword, updatedAt: new Date() })
-      .where(eq(users.id, userId));
+    await this.usersRepository.update(userId, {
+      password: newHashedPassword,
+      updatedAt: new Date(),
+    });
 
     await this.logoutAll(userId);
 

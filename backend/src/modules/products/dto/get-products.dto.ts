@@ -1,6 +1,8 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, Max, Min, IsString, IsEnum } from 'class-validator';
+import { DefaultErrorCode } from '@/common/decorators';
+import { ErrorCode } from '@/common/constants';
 
 export enum ProductSortBy {
   NEWEST = 'newest',
@@ -8,6 +10,7 @@ export enum ProductSortBy {
   PRICE_DESC = 'price-desc',
 }
 
+@DefaultErrorCode(ErrorCode.PRODUCT_VALIDATION_ERROR)
 export class GetProductsDto {
   @ApiPropertyOptional({
     description: 'Trang hiện tại',

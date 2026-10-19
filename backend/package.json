@@ -104,7 +104,7 @@
       "^@/(.*)$": "<rootDir>/$1"
     },
     "transformIgnorePatterns": [
-      "node_modules/(?!@nestjs/mongoose)"
+      "node_modules/(?!(\\.pnpm/.*@nestjs/jwt|@nestjs/jwt|@nestjs/mongoose))"
     ]
   }
 }

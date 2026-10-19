@@ -1,11 +1,8 @@
-import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { eq } from 'drizzle-orm';
-import { D1_DATABASE } from '@/database';
-import type { D1Database } from '@/database';
-import { users } from '../schemas/user.schema';
+import { UsersRepository } from '../repositories/users.repository';
 
 export interface JwtPayload {
   sub: string;
@@ -17,8 +14,7 @@ export interface JwtPayload {
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,
-    @Inject(D1_DATABASE)
-    private readonly db: D1Database,
+    private readonly usersRepository: UsersRepository,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -28,15 +24,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
-    const result = await this.db
-      .select()
-      .from(users)
-      .where(eq(users.id, payload.sub));
-
-    const user = result[0];
+    const user = await this.usersRepository.findById(payload.sub);
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException(
+        'Token không hợp lệ hoặc người dùng không tồn tại',
+      );
     }
-    return user;
+
+    return {
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    };
   }
 }

@@ -9,7 +9,6 @@ import {
   UseInterceptors,
   UploadedFiles,
   UseGuards,
-  Req,
   BadRequestException,
 } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
@@ -113,7 +112,6 @@ Hệ thống tự động:
   async uploadMedia(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() dto: UploadMediaDto,
-    @Req() req: any,
   ) {
     if (!files || files.length === 0) {
       throw new BadRequestException(
@@ -121,8 +119,7 @@ Hệ thống tự động:
       );
     }
 
-    const username = req.user?.username || 'admin';
-    return this.uploadService.uploadFiles(files, dto, username);
+    return this.uploadService.uploadFiles(files, dto);
   }
 
   @Get(ApiRoute.ADMIN_UPLOAD)
