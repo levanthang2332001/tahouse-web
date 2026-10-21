@@ -92,8 +92,82 @@ export function formatProductContext(
       });
     }
     if (p.description) {
-      context += `- Mô tả chi tiết: ${p.description}\n`;
+      context += `- Mô tả tổng quan: ${p.description}\n`;
     }
+
+    // Công nghệ ứng dụng (Fingerprint, FaceID, App, IC card...)
+    const technologies = Array.isArray(p.technologies)
+      ? p.technologies
+      : typeof p.technologies === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(p.technologies);
+            } catch {
+              return [p.technologies];
+            }
+          })()
+        : [];
+    if (Array.isArray(technologies) && technologies.length > 0) {
+      context += `- Công nghệ nổi bật: ${technologies.join(', ')}\n`;
+    }
+
+    // Các phiên bản & mức giá theo màu / chức năng
+    const variants = Array.isArray(p.variants)
+      ? p.variants
+      : typeof p.variants === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(p.variants);
+            } catch {
+              return [];
+            }
+          })()
+        : [];
+    if (Array.isArray(variants) && variants.length > 0) {
+      const variantStr = variants
+        .map((v: any) => `${v.name || v.label || ''} (${v.price ? Number(v.price).toLocaleString('vi-VN') + 'đ' : 'Liên hệ'})`)
+        .filter(Boolean)
+        .join('; ');
+      if (variantStr) {
+        context += `- Các phiên bản lựa chọn: ${variantStr}\n`;
+      }
+    }
+
+    // FAQ kiến thức giải đáp (đọc để nắm vững kiến thức tư vấn, không in nguyên văn ra chat)
+    const faq = Array.isArray(p.faq)
+      ? p.faq
+      : typeof p.faq === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(p.faq);
+            } catch {
+              return [];
+            }
+          })()
+        : [];
+    if (Array.isArray(faq) && faq.length > 0) {
+      context += `- FAQ kiến thức tham khảo (chỉ đọc để giải đáp khi khách hỏi, không in nguyên văn):\n`;
+      faq.slice(0, 5).forEach((item: any) => {
+        if (item.question && item.answer) {
+          context += `  * Q: ${item.question} -> A: ${item.answer}\n`;
+        }
+      });
+    }
+
+    // Bài viết chi tiết (đã lọc sạch thẻ HTML, lấy kiến thức cốt lõi tối đa 600 ký tự làm căn cứ tư vấn)
+    if (p.content && typeof p.content === 'string') {
+      const cleanContent = p.content
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (cleanContent.length > 0) {
+        context += `- Kiến thức chuyên sâu bài viết (đọc để hiểu thấu đáo đố cửa & công năng, không tuôn nguyên văn bài viết): ${cleanContent.slice(0, 600)}...\n`;
+      }
+    }
+
     if (installation && typeof installation === 'object') {
       const instImages = Array.isArray(installation.images)
         ? installation.images

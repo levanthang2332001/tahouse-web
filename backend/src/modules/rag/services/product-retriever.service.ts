@@ -155,6 +155,29 @@ export class ProductRetrieverService implements IRetriever {
         });
       }
 
+      // Quét qua công nghệ technologies (FPC Thụy Điển, Face ID, Tuya...)
+      if (Array.isArray(p.technologies) && p.technologies.length > 0) {
+        const techNorm = removeDiacritics(p.technologies.join(' ').toLowerCase());
+        queryKeywords.forEach((keyword) => {
+          if (techNorm.includes(keyword)) {
+            score += 10;
+          }
+        });
+      }
+
+      // Quét qua kiến thức FAQ thường gặp
+      if (Array.isArray(p.faq) && p.faq.length > 0) {
+        const faqText = p.faq
+          .map((item: any) => `${item.question || ''} ${item.answer || ''}`)
+          .join(' ');
+        const faqNorm = removeDiacritics(faqText.toLowerCase());
+        queryKeywords.forEach((keyword) => {
+          if (faqNorm.includes(keyword)) {
+            score += 8;
+          }
+        });
+      }
+
       return { product: p, score };
     });
 
