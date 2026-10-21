@@ -10,7 +10,10 @@ export class IpGeoService {
    * Phân giải địa chỉ IP thành vị trí địa lý thực tế (Quận/Huyện, Tỉnh/Thành phố, Quốc gia)
    * Sử dụng kết hợp Headers của Cloudflare + Dịch vụ miễn phí ip-api.com & ipwho.is (Không cần API Key)
    */
-  async resolveLocation(ip?: string, headers?: Record<string, any>): Promise<string> {
+  async resolveLocation(
+    ip?: string,
+    headers?: Record<string, any>,
+  ): Promise<string> {
     if (!ip || ip === 'unknown') return 'Không xác định';
 
     const cleanIp = ip.replace(/^::ffff:/, '').trim();
