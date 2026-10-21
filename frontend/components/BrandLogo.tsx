@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Brand } from "@/lib/types/product";
-import { getLocalBrandLabel, getLocalBrandLogo } from "@/lib/brand-logos";
+import { getBrandLogoCandidates, getLocalBrandLabel } from "@/lib/brand-logos";
 
 const BRAND_TEXT_CLASS: Record<string, string> = {
   philips: "text-[#0066a1]",
@@ -24,12 +24,13 @@ export default function BrandLogo({
   brand: Brand;
   className?: string;
 }) {
-  const localLogo = getLocalBrandLogo(brand.slug, brand.name);
-  const logoSrc = brand.logo || localLogo;
+  const candidates = getBrandLogoCandidates(brand.logo, brand.slug, brand.name);
   const localLabel = getLocalBrandLabel(brand.slug, brand.name);
-  const [failed, setFailed] = useState(false);
+  // Step to the next source whenever one fails to load
+  const [attempt, setAttempt] = useState(0);
+  const logoSrc = candidates[attempt];
 
-  if (logoSrc && !failed) {
+  if (logoSrc) {
     const isKassler = brand.slug === "kassler" || brand.name.toLowerCase() === "kassler";
     return (
       // eslint-disable-next-line @next/next/no-img-element
@@ -41,7 +42,7 @@ export default function BrandLogo({
             ? "h-9 w-auto max-w-[140px] object-contain sm:h-10 sm:max-w-[160px]"
             : className
         }
-        onError={() => setFailed(true)}
+        onError={() => setAttempt((n) => n + 1)}
       />
     );
   }

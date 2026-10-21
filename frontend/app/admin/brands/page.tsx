@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { toast } from "@/components/ui/toast";
-import { getLocalBrandLogo } from "@/lib/brand-logos";
+import { getBrandLogoCandidates } from "@/lib/brand-logos";
 import type { CustomBrand } from "@/lib/admin/brand-store";
 
 export interface BrandSubcategory {
@@ -43,8 +43,10 @@ export type BrandItem = CustomBrand & {
 };
 
 function BrandCardLogo({ brand }: { brand: BrandItem }) {
-  const [failed, setFailed] = useState(false);
-  const logoSrc = (!failed && (brand.logo || getLocalBrandLogo(brand.slug, brand.name))) || "";
+  const candidates = getBrandLogoCandidates(brand.logo, brand.slug, brand.name);
+  // Step to the next source whenever one fails to load
+  const [attempt, setAttempt] = useState(0);
+  const logoSrc = candidates[attempt];
 
   if (logoSrc) {
     return (
@@ -53,7 +55,7 @@ function BrandCardLogo({ brand }: { brand: BrandItem }) {
         src={logoSrc}
         alt={brand.name}
         className="max-h-12 w-auto max-w-[85%] object-contain drop-shadow-xs transition-transform group-hover:scale-105"
-        onError={() => setFailed(true)}
+        onError={() => setAttempt((n) => n + 1)}
       />
     );
   }

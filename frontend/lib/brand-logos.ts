@@ -48,3 +48,19 @@ export function getLocalBrandLabel(
   const key = (name || "").trim().toLowerCase().replace(/\s+/g, "-");
   return LOCAL_BRAND_LABELS[key];
 }
+
+/**
+ * Logo sources to try in order: the stored logo first, then the bundled asset.
+ * Seeded backend logos point at `/brand/*.png`, which this app does not serve, so the
+ * local `/brands/*` asset must stay available as a fallback when the first one fails to load.
+ */
+export function getBrandLogoCandidates(
+  logo?: string | null,
+  slug?: string | null,
+  name?: string | null,
+): string[] {
+  const candidates = [logo?.trim(), getLocalBrandLogo(slug, name)].filter(
+    (src): src is string => Boolean(src),
+  );
+  return Array.from(new Set(candidates));
+}

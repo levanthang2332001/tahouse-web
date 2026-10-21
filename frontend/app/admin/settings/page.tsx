@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import StoreSettingsForm from "@/components/admin/StoreSettingsForm";
 
 export default function AdminSettingsPage() {
   const { user, login, logout } = useAdminAuth();
@@ -151,7 +153,7 @@ export default function AdminSettingsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6">
       {/* Page Header */}
       <div>
         <div className="flex items-center gap-2">
@@ -163,10 +165,21 @@ export default function AdminSettingsPage() {
           </Badge>
         </div>
         <p className="text-xs sm:text-sm text-navy/60 mt-1">
-          Quản lý hồ sơ cá nhân, đổi mật khẩu bảo mật và kiểm tra kết nối hệ thống Backend
+          Thông tin liên hệ của cửa hàng, hồ sơ quản trị viên và kết nối hệ thống Backend
         </p>
       </div>
 
+      <Tabs defaultValue="store">
+        <TabsList>
+          <TabsTrigger value="store">Thông tin cửa hàng</TabsTrigger>
+          <TabsTrigger value="account">Tài khoản & bảo mật</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="store">
+          <StoreSettingsForm />
+        </TabsContent>
+
+        <TabsContent value="account" className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Profile Card */}
         <div className="rounded-3xl bg-white border border-gray-light/80 p-6 shadow-xs space-y-5">
@@ -373,6 +386,8 @@ export default function AdminSettingsPage() {
           </div>
         </div>
       </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

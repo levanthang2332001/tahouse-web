@@ -2,7 +2,10 @@ import test, { describe, before } from "node:test";
 import assert from "node:assert/strict";
 import { fetch as undiciFetch, Agent } from "undici";
 
-const BACKEND_URL = process.env.BACKEND_API_URL || "https://tahouse-backend.onrender.com";
+const BACKEND_URL = process.env.BACKEND_API_URL?.replace(/\/$/, "");
+if (!BACKEND_URL) {
+  throw new Error("BACKEND_API_URL is not configured");
+}
 const ADMIN_USER = process.env.ADMIN_USER || "admin";
 const ADMIN_PASS = process.env.ADMIN_PASS || "Admin@123456";
 
