@@ -1,4 +1,4 @@
-account_id = "01e798a646dcdb5e2fc7c86ff1c7907f"
+account_id = "your_cloudflare_account_id"
 main = "dist-worker/worker.js"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
@@ -11,7 +11,7 @@ name = "ta-house-api"
 [[d1_databases]]
 binding = "DB"
 database_name = "tahouseta"
-database_id = "12656177-18a7-42c2-b421-42776a7530ed"
+database_id = "your_production_d1_database_id"
 
 [[r2_buckets]]
 binding = "BUCKET"
@@ -19,10 +19,10 @@ bucket_name = "tahouse"
 
 [vars]
 NODE_ENV = "production"
-R2_ACCOUNT_ID = "01e798a646dcdb5e2fc7c86ff1c7907f"
+R2_ACCOUNT_ID = "your_cloudflare_account_id"
 R2_BUCKET_NAME = "tahouse"
-R2_PUBLIC_URL = "https://pub-e5d9624d0e30443e9355576fdab7d40a.r2.dev"
-IMAGE_BASE_URL = "https://pub-e5d9624d0e30443e9355576fdab7d40a.r2.dev"
+R2_PUBLIC_URL = "https://your-r2-public-domain.r2.dev"
+IMAGE_BASE_URL = "https://your-r2-public-domain.r2.dev"
 JWT_ACCESS_EXPIRES_IN = "15m"
 JWT_REFRESH_EXPIRES_IN = "7d"
 LLM_API_BASE_URL = "https://openrouter.ai/api/v1"
@@ -39,7 +39,7 @@ name = "ta-house-api-test"
 [[env.test.d1_databases]]
 binding = "DB"
 database_name = "tahouseta-test"
-database_id = "cb45aa60-e040-4600-a977-4a179c808ef2"
+database_id = "your_test_d1_database_id"
 
 [[env.test.r2_buckets]]
 binding = "BUCKET"
@@ -47,10 +47,10 @@ bucket_name = "tahouse"
 
 [env.test.vars]
 NODE_ENV = "test"
-R2_ACCOUNT_ID = "01e798a646dcdb5e2fc7c86ff1c7907f"
+R2_ACCOUNT_ID = "your_cloudflare_account_id"
 R2_BUCKET_NAME = "tahouse"
-R2_PUBLIC_URL = "https://pub-e5d9624d0e30443e9355576fdab7d40a.r2.dev"
-IMAGE_BASE_URL = "https://pub-e5d9624d0e30443e9355576fdab7d40a.r2.dev"
+R2_PUBLIC_URL = "https://your-r2-public-domain.r2.dev"
+IMAGE_BASE_URL = "https://your-r2-public-domain.r2.dev"
 JWT_ACCESS_EXPIRES_IN = "15m"
 JWT_REFRESH_EXPIRES_IN = "7d"
 LLM_API_BASE_URL = "https://openrouter.ai/api/v1"
