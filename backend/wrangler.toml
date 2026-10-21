@@ -1,0 +1,59 @@
+account_id = "01e798a646dcdb5e2fc7c86ff1c7907f"
+main = "dist-worker/worker.js"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ==========================================
+# 1. PRODUCTION (Mặc định: npx wrangler deploy)
+# ==========================================
+name = "ta-house-api"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tahouseta"
+database_id = "12656177-18a7-42c2-b421-42776a7530ed"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "tahouse"
+
+[vars]
+NODE_ENV = "production"
+R2_ACCOUNT_ID = "01e798a646dcdb5e2fc7c86ff1c7907f"
+R2_BUCKET_NAME = "tahouse"
+R2_PUBLIC_URL = "https://pub-e5d9624d0e30443e9355576fdab7d40a.r2.dev"
+IMAGE_BASE_URL = "https://pub-e5d9624d0e30443e9355576fdab7d40a.r2.dev"
+JWT_ACCESS_EXPIRES_IN = "15m"
+JWT_REFRESH_EXPIRES_IN = "7d"
+LLM_API_BASE_URL = "https://openrouter.ai/api/v1"
+LLM_MODEL_NAME = "openai/gpt-4o-mini"
+ZALO_PHONE_NUMBER = "0938824479"
+ZALO_LINK = "https://zalo.me/0938824479"
+
+# ==========================================
+# 2. TEST (npx wrangler deploy --env test)
+# ==========================================
+[env.test]
+name = "ta-house-api-test"
+
+[[env.test.d1_databases]]
+binding = "DB"
+database_name = "tahouseta-test"
+database_id = "cb45aa60-e040-4600-a977-4a179c808ef2"
+
+[[env.test.r2_buckets]]
+binding = "BUCKET"
+bucket_name = "tahouse"
+
+[env.test.vars]
+NODE_ENV = "test"
+R2_ACCOUNT_ID = "01e798a646dcdb5e2fc7c86ff1c7907f"
+R2_BUCKET_NAME = "tahouse"
+R2_PUBLIC_URL = "https://pub-e5d9624d0e30443e9355576fdab7d40a.r2.dev"
+IMAGE_BASE_URL = "https://pub-e5d9624d0e30443e9355576fdab7d40a.r2.dev"
+JWT_ACCESS_EXPIRES_IN = "15m"
+JWT_REFRESH_EXPIRES_IN = "7d"
+LLM_API_BASE_URL = "https://openrouter.ai/api/v1"
+LLM_MODEL_NAME = "openai/gpt-4o-mini"
+ZALO_PHONE_NUMBER = "0938824479"
+ZALO_LINK = "https://zalo.me/0938824479"

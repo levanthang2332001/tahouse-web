@@ -8,7 +8,8 @@ export interface D1Config {
   apiToken?: string;
 }
 
-export type D1Database = ReturnType<typeof createD1Client>;
+export type DrizzleD1Client = ReturnType<typeof createD1Client>;
+export type D1Database = DrizzleD1Client;
 
 export function createD1Client(config: D1Config) {
   const { accountId, databaseId, apiToken } = config;

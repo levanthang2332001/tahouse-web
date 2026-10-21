@@ -38,6 +38,14 @@ export enum ApiRoute {
   // --- Upload & Media Management APIs ---
   ADMIN_UPLOAD = 'admin/upload',
   ADMIN_UPLOAD_DETAIL = 'admin/upload/:id',
+
+  // --- Settings APIs ---
+  SETTINGS = 'settings',
+  ADMIN_SETTINGS = 'admin/settings',
+
+  // --- Admin Chat Audit APIs ---
+  ADMIN_CHAT_SESSIONS = 'admin/chat/sessions',
+  ADMIN_CHAT_SESSION_DETAIL = 'admin/chat/sessions/:id',
 }
 
 /**
@@ -47,8 +55,11 @@ export enum SwaggerTag {
   PRODUCTS = 'products',
   BRANDS = 'brands',
   AUTH = 'Auth & Quản trị viên',
+  SETTINGS = 'Cài đặt & Thông tin cửa hàng',
   ADMIN_PRODUCTS = 'Admin - Quản lý Sản phẩm',
   ADMIN_BRANDS = 'Admin - Quản lý Thương hiệu',
   ADMIN_STATS = 'Admin - Thống kê Dashboard',
   ADMIN_UPLOAD = 'Admin - Quản lý Tải lên File (Media)',
+  ADMIN_SETTINGS = 'Admin - Cấu hình Hệ thống & Thông tin liên hệ',
+  ADMIN_CHAT = 'Admin - Quản lý Lịch sử & Audit Chatbot',
 }

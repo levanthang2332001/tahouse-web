@@ -8,6 +8,7 @@ import { UploadModule } from './modules/upload/upload.module';
 import { RagModule } from './modules/rag/rag.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { StatsModule } from './modules/stats/stats.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 /**
  * Module gốc (Root Module) của toàn bộ ứng dụng.
@@ -27,6 +28,7 @@ import { StatsModule } from './modules/stats/stats.module';
     UploadModule,
     RagModule,
     StatsModule,
+    SettingsModule,
   ],
   controllers: [],
   providers: [],

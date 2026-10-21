@@ -1,5 +1,5 @@
 jest.mock('@nestjs/jwt');
-jest.mock('bcrypt');
+jest.mock('bcryptjs');
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
@@ -8,7 +8,7 @@ import { RefreshTokensRepository } from './repositories/refresh-tokens.repositor
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { BusinessException } from '@/common/exceptions';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -279,6 +279,26 @@ describe('AuthService', () => {
         'user-uuid-1',
       );
       expect(result).toEqual({ message: 'Password changed successfully' });
+    });
+  });
+
+  describe('bcryptjs parity check', () => {
+    it('should verify standard bcrypt $2a$ and $2b$ hashes correctly without native binary', async () => {
+      const realBcrypt =
+        jest.requireActual<typeof import('bcryptjs')>('bcryptjs');
+      const password = 'TestSecurePassword#123';
+      const hash = await realBcrypt.hash(password, 10);
+
+      const isValid = await realBcrypt.compare(password, hash);
+      expect(isValid).toBe(true);
+
+      // Kiểm tra tương thích chuẩn $2a$ và $2b$
+      const hash2a = hash.replace(/^\$2[by]\$/, '$2a$');
+      const is2aValid = await realBcrypt.compare(password, hash2a);
+      expect(is2aValid).toBe(true);
+
+      const isWrongValid = await realBcrypt.compare('wrongpassword', hash);
+      expect(isWrongValid).toBe(false);
     });
   });
 });

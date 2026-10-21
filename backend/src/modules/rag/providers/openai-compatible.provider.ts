@@ -28,9 +28,12 @@ export class OpenAiCompatibleProvider implements ILlmProvider {
     history: IChatMessage[],
   ): Observable<string> {
     return new Observable<string>((subscriber) => {
+      // Chỉ giữ tối đa 4 tin nhắn gần nhất từ history để tiết kiệm chi phí token
+      const recentHistory = (history || []).slice(-4);
+
       const messages = [
         { role: 'system', content: systemPrompt },
-        ...history,
+        ...recentHistory,
         { role: 'user', content: message },
       ];
 
@@ -51,6 +54,8 @@ export class OpenAiCompatibleProvider implements ILlmProvider {
         body: JSON.stringify({
           model: this.modelName,
           messages,
+          max_tokens: 400,
+          temperature: 0.3,
           stream: true,
         }),
         signal: controller.signal,

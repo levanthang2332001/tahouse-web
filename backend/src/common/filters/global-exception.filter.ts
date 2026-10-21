@@ -105,11 +105,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       );
     }
 
+    // Trên Production: Không để lộ raw error message của DB hay detail ra ngoài client
+    const isProd = process.env.NODE_ENV === 'production';
+    const clientMessage =
+      isProd && status >= HttpStatus.INTERNAL_SERVER_ERROR
+        ? 'Đã xảy ra lỗi nội bộ hệ thống, vui lòng thử lại sau.'
+        : message;
+
     const hasStructuredData = field !== undefined || params !== undefined;
     const errorBody: Record<string, any> = {
       success: false,
       code: errorCode ?? status,
-      message,
+      message: clientMessage,
       data: hasStructuredData
         ? {
             ...(field !== undefined ? { field } : {}),
@@ -122,7 +129,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       errorBody.errorName = errorName;
     }
 
-    if (detail !== undefined) {
+    if (detail !== undefined && !isProd) {
       errorBody.detail = detail;
     }
 

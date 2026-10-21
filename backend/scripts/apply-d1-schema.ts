@@ -12,7 +12,8 @@ async function applyD1Schema() {
 
   const drizzleDir = path.join(__dirname, '../drizzle');
   const sqlFiles = fs.readdirSync(drizzleDir).filter((f) => f.endsWith('.sql'));
-  if (sqlFiles.length === 0) throw new Error('No SQL migration files found in drizzle/');
+  if (sqlFiles.length === 0)
+    throw new Error('No SQL migration files found in drizzle/');
 
   const sqlFilePath = path.join(drizzleDir, sqlFiles[0]);
   console.log(`Reading SQL file: ${sqlFilePath}`);
@@ -25,6 +26,10 @@ async function applyD1Schema() {
     'DROP TABLE IF EXISTS products;',
     'DROP TABLE IF EXISTS brands;',
     'DROP TABLE IF EXISTS media;',
+    'DROP TABLE IF EXISTS chat_messages;',
+    'DROP TABLE IF EXISTS chat_sessions;',
+    'DROP TABLE IF EXISTS store_settings;',
+    'DROP TABLE IF EXISTS refresh_tokens;',
     'DROP TABLE IF EXISTS users;',
     'DROP TABLE IF EXISTS sqlite_sequence;',
   ];
@@ -34,7 +39,12 @@ async function applyD1Schema() {
       await axios.post(
         `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}/query`,
         { sql: drop },
-        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
       );
     } catch {
       // ignore
@@ -64,9 +74,14 @@ async function applyD1Schema() {
       );
 
       if (res.data?.success) {
-        console.log(`[${i + 1}/${statements.length}] OK: ${stmt.substring(0, 40).replace(/\n/g, ' ')}...`);
+        console.log(
+          `[${i + 1}/${statements.length}] OK: ${stmt.substring(0, 40).replace(/\n/g, ' ')}...`,
+        );
       } else {
-        console.error(`[${i + 1}/${statements.length}] Failed:`, res.data?.errors);
+        console.error(
+          `[${i + 1}/${statements.length}] Failed:`,
+          res.data?.errors,
+        );
       }
     } catch (err: any) {
       console.error(
@@ -91,7 +106,9 @@ async function applyD1Schema() {
 
   console.log('\n--- BẢNG HIỆN CÓ TRÊN CLOUDFLARE D1 ---');
   console.log(tablesRes.data?.result?.[0]?.results);
-  console.log('\n✅ Toàn bộ schema UUID đã được tạo thành công trên Cloudflare D1!');
+  console.log(
+    '\n✅ Toàn bộ schema UUID đã được tạo thành công trên Cloudflare D1!',
+  );
 }
 
 applyD1Schema().catch((err) => {

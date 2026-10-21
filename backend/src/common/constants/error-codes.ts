@@ -114,6 +114,25 @@ export const ErrorCode = {
     errorName: 'INVALID_FILE_TYPE',
     httpStatus: HttpStatus.BAD_REQUEST,
   },
+
+  // --- SETTINGS (8xxx) ---
+  SETTINGS_VALIDATION_ERROR: {
+    errorCode: 8000,
+    errorName: 'SETTINGS_VALIDATION_ERROR',
+    httpStatus: HttpStatus.BAD_REQUEST,
+  },
+  SETTINGS_NOT_FOUND: {
+    errorCode: 8001,
+    errorName: 'SETTINGS_NOT_FOUND',
+    httpStatus: HttpStatus.NOT_FOUND,
+  },
+
+  // --- CHAT / RAG (9xxx) ---
+  CHAT_SESSION_NOT_FOUND: {
+    errorCode: 9001,
+    errorName: 'CHAT_SESSION_NOT_FOUND',
+    httpStatus: HttpStatus.NOT_FOUND,
+  },
 } as const;
 
 export type ErrorCodeKey = keyof typeof ErrorCode;

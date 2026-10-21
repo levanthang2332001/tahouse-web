@@ -23,6 +23,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Public, CurrentUser } from '@/common/decorators';
 import { JwtAuthGuard } from '@/common/guards';
+import { LoginRateLimitGuard } from './guards/login-rate-limit.guard';
 
 @ApiTags(SwaggerTag.AUTH)
 @Controller()
@@ -30,6 +31,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
+  @UseGuards(LoginRateLimitGuard)
   @Post(ApiRoute.AUTH_LOGIN)
   @ApiOperation({
     summary: 'Đăng nhập tài khoản quản trị viên',

@@ -3,3 +3,5 @@ export * from '../modules/auth/schemas/refresh-token.schema';
 export * from '../modules/brands/schemas/brand.schema';
 export * from '../modules/products/schemas/product.schema';
 export * from '../modules/upload/schemas/media.schema';
+export * from '../modules/settings/schemas/settings.schema';
+export * from '../modules/rag/schemas/chat.schema';

@@ -286,13 +286,17 @@ export class UploadService implements OnModuleInit {
 
     const fileType = this.determineFileType(file.mimetype, file.originalname);
 
+    // Ràng buộc bảo mật: Chỉ cho phép tải lên Hình ảnh và Video
+    if (fileType !== MediaType.IMAGE && fileType !== MediaType.VIDEO) {
+      throw new BadRequestException(
+        `Chỉ cho phép tải lên tệp tin Hình ảnh hoặc Video. Tệp "${file.originalname}" không được hỗ trợ.`,
+      );
+    }
+
     const MAX_FILE_SIZES: Record<string, { maxBytes: number; label: string }> =
       {
         [MediaType.IMAGE]: { maxBytes: 15 * 1024 * 1024, label: '15MB' },
         [MediaType.VIDEO]: { maxBytes: 100 * 1024 * 1024, label: '100MB' },
-        [MediaType.DOCUMENT]: { maxBytes: 50 * 1024 * 1024, label: '50MB' },
-        [MediaType.AUDIO]: { maxBytes: 20 * 1024 * 1024, label: '20MB' },
-        [MediaType.OTHER]: { maxBytes: 50 * 1024 * 1024, label: '50MB' },
       };
 
     const limit = MAX_FILE_SIZES[fileType] || MAX_FILE_SIZES[MediaType.OTHER];

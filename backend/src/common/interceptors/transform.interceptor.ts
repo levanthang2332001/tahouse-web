@@ -4,8 +4,10 @@ import {
   ExecutionContext,
   CallHandler,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { BYPASS_TRANSFORM_KEY } from '../decorators/bypass-transform.decorator';
 
 export interface ResponseFormat<T> {
   success: boolean;
@@ -17,12 +19,20 @@ export interface ResponseFormat<T> {
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<
   T,
-  ResponseFormat<T>
+  ResponseFormat<T> | T
 > {
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<ResponseFormat<T>> {
+  constructor(private readonly reflector?: Reflector) {}
+
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const isBypass = this.reflector?.getAllAndOverride<boolean>(
+      BYPASS_TRANSFORM_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
+    if (isBypass) {
+      return next.handle();
+    }
+
     const response = context.switchToHttp().getResponse();
     const statusCode = response.statusCode || 200;
 

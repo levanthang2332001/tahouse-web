@@ -313,4 +313,36 @@ describe('API Contract Parity: dev-cuong (MongoDB) vs Cloudflare D1', () => {
       expect(profile).not.toHaveProperty('password');
     });
   });
+
+  describe('Settings Module Contract Parity', () => {
+    it('StoreSettingsResponseDto must provide all required store contact and social fields', () => {
+      const { StoreSettingsResponseDto } = require('@/modules/settings/dto/store-settings-response.dto');
+      const dto = StoreSettingsResponseDto.fromEntity(null);
+
+      expect(dto).toHaveProperty('id');
+      expect(dto).toHaveProperty('storeName');
+      expect(dto).toHaveProperty('slogan');
+      expect(dto).toHaveProperty('socialLinks');
+      expect(dto.socialLinks).toHaveProperty('zalo');
+      expect(dto.socialLinks).toHaveProperty('facebook');
+      expect(dto).toHaveProperty('phoneNumbers');
+      expect(Array.isArray(dto.phoneNumbers)).toBe(true);
+      expect(dto.phoneNumbers.length).toBeGreaterThan(0);
+      expect(dto.phoneNumbers[0]).toHaveProperty('number');
+      expect(dto.phoneNumbers[0]).toHaveProperty('label');
+      expect(dto).toHaveProperty('emails');
+      expect(Array.isArray(dto.emails)).toBe(true);
+      expect(dto.emails[0]).toHaveProperty('email');
+      expect(dto.emails[0]).toHaveProperty('label');
+      expect(dto).toHaveProperty('addresses');
+      expect(Array.isArray(dto.addresses)).toBe(true);
+      expect(dto.addresses[0]).toHaveProperty('address');
+      expect(dto.addresses[0]).toHaveProperty('branchName');
+      expect(dto).toHaveProperty('openingHours');
+      expect(dto.openingHours).toHaveProperty('text');
+      expect(dto).toHaveProperty('primaryPhone');
+      expect(dto).toHaveProperty('primaryEmail');
+      expect(dto).toHaveProperty('mainAddress');
+    });
+  });
 });

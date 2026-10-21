@@ -1,25 +1,23 @@
-import { createLogger, format, transports } from 'winston';
-import 'winston-daily-rotate-file';
-import * as path from 'path';
-
-const logFormat = format.combine(
-  format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  format.printf(({ timestamp, level, message, ...meta }) => {
-    const metaStr = Object.keys(meta).length ? JSON.stringify(meta) : '';
-    return `[${String(timestamp)}] [${String(level).toUpperCase()}] ${String(message)} ${metaStr}`;
-  }),
-);
-
-export const logger = createLogger({
-  level: 'info',
-  format: logFormat,
-  transports: [
-    new transports.Console(),
-    new transports.DailyRotateFile({
-      filename: path.join(process.cwd(), 'logs/api-%DATE%.log'),
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '10m',
-      maxFiles: '14d',
-    }),
-  ],
-});
+/**
+ * Logger tối ưu cho Cloudflare Workers & Node.js
+ * Sử dụng console native để tránh lỗi "The _write() method is not implemented"
+ * của process.stdout trong môi trường V8 Isolate.
+ */
+export const logger = {
+  info: (message: string, ...meta: any[]) => {
+    const metaStr = meta.length ? ' ' + JSON.stringify(meta) : '';
+    console.log(`[${new Date().toISOString()}] [INFO] ${message}${metaStr}`);
+  },
+  warn: (message: string, ...meta: any[]) => {
+    const metaStr = meta.length ? ' ' + JSON.stringify(meta) : '';
+    console.warn(`[${new Date().toISOString()}] [WARN] ${message}${metaStr}`);
+  },
+  error: (message: string, ...meta: any[]) => {
+    const metaStr = meta.length ? ' ' + JSON.stringify(meta) : '';
+    console.error(`[${new Date().toISOString()}] [ERROR] ${message}${metaStr}`);
+  },
+  debug: (message: string, ...meta: any[]) => {
+    const metaStr = meta.length ? ' ' + JSON.stringify(meta) : '';
+    console.debug(`[${new Date().toISOString()}] [DEBUG] ${message}${metaStr}`);
+  },
+};

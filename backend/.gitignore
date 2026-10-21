@@ -11,3 +11,7 @@ logs/
 coverage/
 .claude/
 test/products-view.html
+.dev.vars
+dist-worker/
+dist-worker-ts/
+.wrangler/
