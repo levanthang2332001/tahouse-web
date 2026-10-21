@@ -97,6 +97,23 @@ export function formatProductContext(
       const imgUrl = resolveMediaUrl(p.imageUrl, imageBaseUrl);
       context += `- Đường dẫn ảnh đại diện sản phẩm (Image URL): ${imgUrl}\n`;
     }
+    const galleryImages = Array.isArray(p.images)
+      ? p.images
+      : typeof p.images === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(p.images);
+            } catch {
+              return [];
+            }
+          })()
+        : [];
+    if (galleryImages.length > 0) {
+      context += `- Các hình ảnh chi tiết khác của sản phẩm:\n`;
+      galleryImages.slice(0, 3).forEach((img: string) => {
+        context += `  * ${resolveMediaUrl(img, imageBaseUrl)}\n`;
+      });
+    }
     if (Array.isArray(colors) && colors.length > 0) {
       context += `- Màu sắc: ${colors.join(', ')}\n`;
     }

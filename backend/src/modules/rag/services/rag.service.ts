@@ -24,6 +24,7 @@ export class RagService {
     message: string,
     history: IChatMessage[],
     location?: string,
+    referer?: string,
   ): Observable<string> {
     const validHistory = (history || []).filter(
       (h) => h && typeof h.content === 'string' && h.content.trim().length > 0,
@@ -38,7 +39,9 @@ export class RagService {
       );
     }
 
-    return from(this.retriever.retrieve(message, 4)).pipe(
+    return from(
+      this.retriever.retrieve(message, 4, validHistory, referer),
+    ).pipe(
       mergeMap((context) => {
         const systemPrompt = buildSystemPrompt(context, location);
         return this.llmProvider.streamChat(systemPrompt, message, validHistory);

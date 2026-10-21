@@ -39,11 +39,17 @@ export class OpenAiCompatibleProvider implements ILlmProvider {
 
       const url = `${this.baseUrl.replace(/\/$/, '')}/chat/completions`;
 
+      const effectiveApiKey =
+        this.apiKey ||
+        this.configService.get<string>('LLM_API_KEY') ||
+        process.env.LLM_API_KEY ||
+        '';
+
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
-      if (this.apiKey) {
-        headers['Authorization'] = `Bearer ${this.apiKey}`;
+      if (effectiveApiKey) {
+        headers['Authorization'] = `Bearer ${effectiveApiKey}`;
       }
 
       const controller = new AbortController();

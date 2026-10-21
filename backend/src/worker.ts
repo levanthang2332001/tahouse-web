@@ -31,13 +31,43 @@ export interface Env {
 const PORT = 8080;
 let initPromise: Promise<void> | null = null;
 
-async function initApp(env: Env): Promise<void> {
-  // Đồng bộ environment variables vào process.env cho ConfigService
-  for (const [key, value] of Object.entries(env)) {
-    if (typeof value === 'string' && process.env[key] === undefined) {
-      process.env[key] = value;
+function syncEnv(env: any): void {
+  if (!env) return;
+  for (const key in env) {
+    try {
+      const val = env[key];
+      if (typeof val === 'string' && val.length > 0) {
+        process.env[key] = val;
+      }
+    } catch {}
+  }
+  const knownKeys = [
+    'LLM_API_KEY',
+    'LLM_API_BASE_URL',
+    'LLM_MODEL_NAME',
+    'JWT_ACCESS_SECRET',
+    'JWT_REFRESH_SECRET',
+    'JWT_ACCESS_EXPIRES_IN',
+    'JWT_REFRESH_EXPIRES_IN',
+    'R2_ACCOUNT_ID',
+    'R2_ACCESS_KEY_ID',
+    'R2_SECRET_ACCESS_KEY',
+    'R2_BUCKET_NAME',
+    'R2_PUBLIC_URL',
+    'IMAGE_BASE_URL',
+    'ZALO_PHONE_NUMBER',
+    'ZALO_LINK',
+    'NODE_ENV',
+  ];
+  for (const k of knownKeys) {
+    if (typeof env[k] === 'string' && env[k].length > 0) {
+      process.env[k] = env[k];
     }
   }
+}
+
+async function initApp(env: Env): Promise<void> {
+  syncEnv(env);
 
   const expressInstance = express();
   const adapter = new ExpressAdapter(expressInstance);
@@ -109,6 +139,7 @@ export default {
     ctx: ExecutionContext,
   ): Promise<Response> {
     const startWall = performance.now();
+    syncEnv(env);
 
     if (!initPromise) {
       const initStart = performance.now();

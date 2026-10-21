@@ -11,6 +11,7 @@ describe('ProductRetrieverService', () => {
     {
       id: '1',
       code: 'KL-989F',
+      slug: 'kl-989f',
       name: 'Khóa cửa vân tay Kassler KL-989F',
       brand: 'Kassler',
       categoryName: 'Khóa Face ID',
@@ -23,6 +24,7 @@ describe('ProductRetrieverService', () => {
     {
       id: '2',
       code: 'PL-7000',
+      slug: 'pl-7000',
       name: 'Khóa cửa Philips Alpha-V',
       brand: 'Philips',
       categoryName: 'Khóa Thông Minh',
@@ -62,5 +64,30 @@ describe('ProductRetrieverService', () => {
     const result = await service.retrieve('KL-989F Face ID');
     expect(result).toContain('KL-989F');
     expect(result).toContain('Khóa cửa vân tay Kassler KL-989F');
+  });
+
+  it('should retrieve product from previous turn when user asks follow-up', async () => {
+    const history = [
+      { role: 'user', content: 'Mẫu Kassler KL-989F' },
+      { role: 'assistant', content: 'Dạ đây là Khóa cửa vân tay Kassler KL-989F giá tốt ạ' },
+    ];
+    const result = await service.retrieve('cho xme đi', 4, history);
+    expect(result).toContain('KL-989F');
+  });
+
+  it('should match product code even if user enters space instead of hyphen', async () => {
+    const result = await service.retrieve('KL 989F');
+    expect(result).toContain('KL-989F');
+  });
+
+  it('should prioritize product from current page URL (referer)', async () => {
+    const result = await service.retrieve('sản phẩm này có tốt không', 4, [], 'https://tahouse.vn/product/pl-7000');
+    expect(result).toContain('PL-7000');
+    expect(result).toContain('Philips');
+  });
+
+  it('should match exact product code when user asks in natural language', async () => {
+    const result = await service.retrieve('cho mình hỏi mã KL - 989F này có những màu gì');
+    expect(result).toContain('KL-989F');
   });
 });

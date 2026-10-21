@@ -42,6 +42,11 @@ describe('RagService', () => {
     expect(retriever.retrieve).toHaveBeenCalledWith(
       'Khóa Kassler giá bao nhiêu',
       4,
+      [
+        { role: 'user', content: 'Tư vấn khóa' },
+        { role: 'assistant', content: 'Chào bạn' },
+      ],
+      undefined,
     );
     expect(llmProvider.streamChat).toHaveBeenCalledWith(
       expect.stringContaining('Thông tin sản phẩm: Khóa KL-989F'),

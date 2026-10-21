@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Res, Req, Get, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Res,
+  Req,
+  Get,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import type { Request, Response } from 'express';
 import * as path from 'path';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -41,10 +50,17 @@ export class RagController {
 
     // 2. Tự động tra cứu vị trí địa lý từ IP (Cloudflare headers hoặc free IP service)
     let location = body.location;
-    const ipLocation = await this.ipGeoService.resolveLocation(audit.ipAddress, req.headers);
+    const ipLocation = await this.ipGeoService.resolveLocation(
+      audit.ipAddress,
+      req.headers,
+    );
     if (!location || location.trim().length === 0) {
       location = ipLocation;
-    } else if (ipLocation && ipLocation !== 'Không xác định' && ipLocation !== 'Localhost / Mạng nội bộ') {
+    } else if (
+      ipLocation &&
+      ipLocation !== 'Không xác định' &&
+      ipLocation !== 'Localhost / Mạng nội bộ'
+    ) {
       location = `${location} (IP: ${ipLocation})`;
     }
 
@@ -91,6 +107,7 @@ export class RagController {
       body.message,
       body.history || [],
       body.location,
+      audit.referer,
     );
 
     let fullAssistantResponse = '';
@@ -112,9 +129,7 @@ export class RagController {
           metadata: { error: true },
         });
 
-        res.write(
-          `data: ${JSON.stringify({ error: errorMsg })}\n\n`,
-        );
+        res.write(`data: ${JSON.stringify({ error: errorMsg })}\n\n`);
         res.end();
       },
       complete: async () => {
@@ -303,7 +318,7 @@ export class RagController {
       <div style="user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;">${templateMessage}</div>
       <div style="font-size: 0.75rem; color: #a855f7; font-weight: 600; margin-top: 8px; border-top: 1px dashed rgba(168, 85, 247, 0.2); padding-top: 6px; text-align: right; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;">📋 Nhấn vào đây để copy nhanh</div>
     </div>
-    
+
     <a href="${zaloLink}" target="_blank" class="btn" id="zaloBtn">Sao chép & Mở Zalo</a>
   </div>
 
@@ -351,14 +366,14 @@ export class RagController {
       copyToClipboard(message).then(() => {
         // Hiển thị thông báo Toast thành công
         toast.classList.add('show');
-        
+
         // Đổi giao diện nút bấm sang trạng thái thành công
         const originalText = zaloBtn.innerText;
         const originalBg = zaloBtn.style.background;
-        
+
         zaloBtn.innerText = "Đã sao chép! Đang mở Zalo...";
         zaloBtn.style.background = "linear-gradient(135deg, #10b981, #059669)";
-        
+
         setTimeout(() => {
           toast.classList.remove('show');
           zaloBtn.innerText = originalText;
@@ -367,7 +382,7 @@ export class RagController {
       }).catch(err => {
         console.error('Lỗi khi copy:', err);
       });
-      
+
       // Cho phép trình duyệt mở tab mới tự nhiên theo thuộc tính target="_blank"
     });
   </script>

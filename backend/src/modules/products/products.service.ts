@@ -16,8 +16,24 @@ export class ProductsService {
     private readonly brandsRepository: BrandsRepository,
   ) {}
 
+  private cachedRawProducts: any[] | null = null;
+  private cachedRawProductsAt = 0;
+  private readonly CACHE_TTL_MS = 3 * 60 * 1000;
+
   async getRawProducts(): Promise<any[]> {
-    return this.productsRepository.findAllRaw();
+    const now = Date.now();
+    if (this.cachedRawProducts && now - this.cachedRawProductsAt < this.CACHE_TTL_MS) {
+      return this.cachedRawProducts;
+    }
+    const products = await this.productsRepository.findAllRaw();
+    this.cachedRawProducts = products;
+    this.cachedRawProductsAt = now;
+    return products;
+  }
+
+  clearRawProductsCache(): void {
+    this.cachedRawProducts = null;
+    this.cachedRawProductsAt = 0;
   }
 
   async findAll(query: GetProductsDto): Promise<IProductsListResponse> {
@@ -114,7 +130,9 @@ export class ProductsService {
       }
     }
 
-    return this.productsRepository.createProduct(dto);
+    const product = await this.productsRepository.createProduct(dto);
+    this.clearRawProductsCache();
+    return product;
   }
 
   async update(idOrCode: string, dto: UpdateProductDto): Promise<IProduct> {
@@ -241,12 +259,15 @@ export class ProductsService {
       }
     }
 
-    return this.productsRepository.updateProduct(current.id, dto);
+    const result = await this.productsRepository.updateProduct(current.id, dto);
+    this.clearRawProductsCache();
+    return result;
   }
 
   async remove(idOrCode: string): Promise<{ message: string }> {
     const current = await this.findOne(idOrCode);
     await this.productsRepository.deleteProduct(current.id);
+    this.clearRawProductsCache();
     return {
       message: `Product "${current.name}" (${current.code}) deleted successfully`,
     };
