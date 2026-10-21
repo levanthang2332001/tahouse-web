@@ -70,7 +70,28 @@ export function formatProductContext(
     context += `- Tên sản phẩm: ${p.name}\n`;
     context += `- Thương hiệu: ${p.brand || ''}\n`;
     context += `- Danh mục: ${p.categoryName || p.category || ''}\n`;
-    context += `- Giá bán: ${p.priceRange || 'Liên hệ'}\n`;
+
+    // Cấu trúc giá chi tiết: Giá niêm yết (gốc), Giá khuyến mãi (cuối cùng), Mức chiết khấu %
+    const origPriceNum = typeof p.originalPrice === 'number' ? p.originalPrice : Number(p.originalPrice);
+    const finalPriceNum = typeof p.price === 'number' ? p.price : Number(p.price);
+    const hasOrigPrice = !isNaN(origPriceNum) && origPriceNum > 0;
+    const hasFinalPrice = !isNaN(finalPriceNum) && finalPriceNum > 0;
+    const discountPct = p.discountPercent || (hasOrigPrice && hasFinalPrice && origPriceNum > finalPriceNum ? Math.round(((origPriceNum - finalPriceNum) / origPriceNum) * 100) : null);
+
+    if (hasOrigPrice && hasFinalPrice && origPriceNum > finalPriceNum) {
+      context += `- Giá niêm yết (Giá gốc hãng): ${origPriceNum.toLocaleString('vi-VN')} VNĐ\n`;
+      context += `- Giá khuyến mãi (Giá cuối cùng thanh toán): ${finalPriceNum.toLocaleString('vi-VN')} VNĐ (Tiết kiệm ${discountPct}%)\n`;
+    } else if (hasFinalPrice) {
+      context += `- Giá bán cuối cùng: ${finalPriceNum.toLocaleString('vi-VN')} VNĐ\n`;
+    } else if (p.priceRange) {
+      context += `- Giá bán: ${p.priceRange}\n`;
+    } else {
+      context += `- Giá bán: Liên hệ để nhận báo giá ưu đãi\n`;
+    }
+    if (p.priceRange && (p.priceRange.includes('-') || p.priceRange.includes('~'))) {
+      context += `- Khoảng giá các phiên bản: ${p.priceRange}\n`;
+    }
+
     context += `- Thời gian bảo hành: ${p.warrantyText || 'Theo tiêu chuẩn'}\n`;
     if (p.imageUrl) {
       const imgUrl = resolveMediaUrl(p.imageUrl, imageBaseUrl);
