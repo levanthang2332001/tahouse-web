@@ -81,4 +81,20 @@ describe('IpGeoService', () => {
     expect(loc).toBe('Hà Nội, Ha Noi, Vietnam');
     expect(mockedAxios.get).toHaveBeenCalledTimes(2);
   });
+
+  it('nên chặn link-local metadata IP 169.254.169.254 chống SSRF', async () => {
+    const loc = await service.resolveLocation('169.254.169.254');
+    expect(loc).toBe('Localhost / Mạng nội bộ');
+    expect(mockedAxios.get).not.toHaveBeenCalled();
+  });
+
+  it('nên trả về "Không xác định" đối với chuỗi IP giả mạo hoặc có ký tự đặc biệt', async () => {
+    const loc1 = await service.resolveLocation('malicious.domain.com');
+    expect(loc1).toBe('Không xác định');
+
+    const loc2 = await service.resolveLocation('1.2.3.4?param=injection');
+    expect(loc2).toBe('Không xác định');
+
+    expect(mockedAxios.get).not.toHaveBeenCalled();
+  });
 });
