@@ -5,9 +5,9 @@ import { Phone } from "lucide-react";
 import { SiZalo } from "react-icons/si";
 import { COMPANY_LEGAL } from "@/data/company-legal";
 
-export default function SocialFloating() {
+export default function SocialFloating({ className = "flex" }: { className?: string }) {
   return (
-    <div className="fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 flex flex-col gap-3">
+    <div className={`fixed bottom-5 left-4 sm:bottom-6 sm:left-6 z-30 flex-col gap-3 ${className}`}>
       <a
         href={COMPANY_LEGAL.zaloUrl}
         target="_blank"

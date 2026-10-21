@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getProductById } from "@/lib/admin/product-store";
-import { backendFetch } from "@/lib/backend/client";
-import { mapProductDetail } from "@/lib/backend/map-product";
+import { getProductDetail } from "@/lib/server/product-detail";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -19,7 +17,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       );
     }
 
-    const data = await getProductById(cleanId);
+    const data = await getProductDetail(cleanId);
     if (!data) {
       return NextResponse.json(
         { message: "Không tìm thấy sản phẩm" },
@@ -27,23 +25,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
       );
     }
 
-    // If installation_preview is empty, check /installation sub-endpoint for real jobsite photos
-    if (data.id && (!data.installation_preview || data.installation_preview.length === 0)) {
-      try {
-        const installData = await backendFetch<{
-          items?: Array<{ url: string; type: string }>;
-        }>(`/products/locks/${encodeURIComponent(data.id)}/installation`);
-        if (installData?.items && installData.items.length > 0) {
-          data.installation_preview = installData.items
-            .filter((item) => item.type === "image" && Boolean(item.url))
-            .map((item) => item.url);
-        }
-      } catch {
-        // Soft-fail: product might not have an installation record
-      }
-    }
-
-    return NextResponse.json(mapProductDetail(data));
+    return NextResponse.json(data);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     if (message.includes("(404)")) {

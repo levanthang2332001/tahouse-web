@@ -65,28 +65,16 @@ export function calculateProductDiscount(
   price: unknown,
   originalPrice?: unknown,
   priceRange?: string | null,
-  productId?: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _productId?: string,
 ): ProductDiscountInfo {
   const current = parseProductPrice(price);
-  let original = parseProductPrice(originalPrice);
+  const original = parseProductPrice(originalPrice);
 
   const formattedCurrentPrice = formatProductPrice(price, priceRange);
 
-  if (current !== null && current > 0) {
-    if (original === null || original <= current) {
-      // Deterministically derive a realistic, natural original price based on productId or price
-      const seed = (productId || String(current))
-        .split("")
-        .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const discountRates = [0.15, 0.18, 0.2, 0.22, 0.25];
-      const rate = discountRates[seed % discountRates.length];
-
-      // Round to natural numbers (nearest 50k or 100k)
-      const rawOriginal = current / (1 - rate);
-      const roundUnit = current >= 5_000_000 ? 100_000 : current >= 1_000_000 ? 50_000 : 10_000;
-      original = Math.ceil(rawOriginal / roundUnit) * roundUnit;
-    }
-
+  // Only show a discount backed by a real original price; never derive one
+  if (current !== null && current > 0 && original !== null) {
     if (original > current) {
       const savedAmount = original - current;
       const discountPercent = Math.round((savedAmount / original) * 100);

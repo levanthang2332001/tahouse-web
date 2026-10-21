@@ -17,5 +17,23 @@ export function formatProductName(name: string): string {
     return `${p1}-${p2}${p3 || ""}`;
   });
 
-  return result;
+  return normalizeToneMarks(result);
+}
+
+// New-style tone placement ("khoá", "thuỷ") → the traditional style used across site copy ("khóa", "thủy")
+const TONE_SHIFT: Record<string, string> = {
+  "oá": "óa", "oà": "òa", "oả": "ỏa", "oã": "õa", "oạ": "ọa",
+  "oé": "óe", "oè": "òe", "oẻ": "ỏe", "oẽ": "õe", "oẹ": "ọe",
+  "uý": "úy", "uỳ": "ùy", "uỷ": "ủy", "uỹ": "ũy", "uỵ": "ụy",
+};
+
+function normalizeToneMarks(text: string): string {
+  // Only open syllables ("khoá" but not "hoàn"), and not "qu" clusters ("quý" stays)
+  return text.replace(/(?<![qQ])([oOuU])([áàảãạéèẻẽẹýỳỷỹỵÁÀẢÃẠÉÈẺẼẸÝỲỶỸỴ])(?!\p{L})/gu, (match, v: string, toned: string) => {
+    const shifted = TONE_SHIFT[`${v.toLowerCase()}${toned.toLowerCase()}`];
+    if (!shifted) return match;
+    const first = v === v.toUpperCase() ? shifted[0].toUpperCase() : shifted[0];
+    const second = toned === toned.toUpperCase() ? shifted[1].toUpperCase() : shifted[1];
+    return first + second;
+  });
 }

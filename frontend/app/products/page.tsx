@@ -466,7 +466,7 @@ function ProductListContent() {
             <span className="font-bold italic text-brand-green">thiết bị & khóa thông minh</span>
           </h1>
           <div className="flex flex-col items-stretch justify-between gap-6 pt-4 xl:flex-row xl:items-center">
-            <div className="relative w-full shrink-0 md:max-w-md">
+            <div className="relative w-full shrink-0 lg:w-80">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
               <input
                 placeholder="Tìm sản phẩm, model..."
@@ -477,11 +477,11 @@ function ProductListContent() {
             </div>
 
             {/* Brands filter — theo danh mục đang chọn (khóa / bếp / quạt / nước / cửa) */}
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-navy/40 mr-1 hidden sm:block">
+            <div className="flex min-w-0 flex-1 items-center gap-3 xl:justify-end">
+              <span className="hidden shrink-0 text-[10px] font-bold uppercase tracking-widest text-navy/40 sm:block">
                 Thương hiệu:
               </span>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2 overflow-x-auto py-1 invisible-scrollbar">
                 <button
                   type="button"
                   onMouseDown={(event) => event.preventDefault()}
@@ -489,7 +489,7 @@ function ProductListContent() {
                     setSelectedBrand("all");
                     setPage(1);
                   }}
-                  className={`cursor-pointer rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 h-10 flex items-center justify-center ${
+                  className={`flex h-12 shrink-0 cursor-pointer items-center justify-center rounded-xl px-5 text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
                     selectedBrand === "all"
                       ? "bg-brand-green text-white shadow-md shadow-brand-green/20"
                       : "bg-cream border border-gray-light/60 text-navy/60 hover:text-brand-green hover:border-brand-green/30 shadow-xs"
@@ -508,7 +508,7 @@ function ProductListContent() {
                         setSelectedBrand(brand.slug);
                         setPage(1);
                       }}
-                      className={`cursor-pointer flex items-center justify-center rounded-xl bg-white border px-4 py-2.5 transition-all duration-300 h-12 min-w-[110px] shadow-xs hover:scale-102 hover:shadow-sm ${
+                      className={`flex h-12 w-[120px] shrink-0 cursor-pointer items-center justify-center rounded-xl border bg-white px-3 shadow-xs transition-all duration-300 hover:shadow-sm ${
                         isActive
                           ? "border-brand-green ring-2 ring-brand-green/10 shadow-sm"
                           : "border-gray-light/60 hover:border-brand-green/30"
@@ -516,13 +516,13 @@ function ProductListContent() {
                     >
                       <BrandLogo
                         brand={brand}
-                        className="h-7 w-auto max-w-[110px] object-contain"
+                        className="h-7 w-auto max-w-full object-contain"
                       />
                     </button>
                   );
                 })}
                 {visibleBrands.length === 0 && (
-                  <span className="text-xs font-medium text-navy/45">
+                  <span className="whitespace-nowrap text-xs font-medium text-navy/45">
                     Không có thương hiệu cho danh mục này
                   </span>
                 )}
@@ -850,8 +850,8 @@ function ProductListContent() {
                   </AnimatePresence>
                 </div>
 
-                {/* 3. View Mode Switcher (Lưới lớn 2 cột / Lưới vừa 3 cột / Danh sách hàng ngang) */}
-                <div className="flex items-center rounded-xl bg-white border border-gray-light/60 p-0.5 shadow-xs">
+                {/* 3. View Mode Switcher (Lưới lớn 2 cột / Lưới vừa 3 cột / Danh sách hàng ngang) — every mode is a single column below md, so hide it there */}
+                <div className="hidden md:flex items-center rounded-xl bg-white border border-gray-light/60 p-0.5 shadow-xs">
                   <button
                     type="button"
                     onClick={() => setViewMode("grid-large")}

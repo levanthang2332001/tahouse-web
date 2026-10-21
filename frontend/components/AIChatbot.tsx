@@ -208,7 +208,11 @@ function toApiHistory(messages: Message[]): ApiChatMessage[] {
 // ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
-export default function AIChatbot() {
+export default function AIChatbot({
+  launcherClassName = "bottom-5 right-5 sm:bottom-6 sm:right-6",
+}: {
+  launcherClassName?: string;
+}) {
   const { isChatbotOpen, setIsChatbotOpen } = useApp();
   const nextIdRef = useRef(0);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -321,7 +325,7 @@ export default function AIChatbot() {
     <>
       {/* Floating trigger button */}
       {!isChatbotOpen && (
-        <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 flex items-center gap-2">
+        <div className={`fixed z-40 flex items-center gap-2 ${launcherClassName}`}>
           <button
             onClick={() => setIsChatbotOpen(true)}
             className="flex h-14 w-14 sm:h-16 sm:w-16 cursor-pointer items-center justify-center rounded-full bg-brand-green text-white shadow-[0_10px_30px_rgba(121,193,67,0.4)] transition-all hover:bg-lime-dark hover:scale-105 active:scale-95"

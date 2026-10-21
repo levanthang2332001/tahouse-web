@@ -16,13 +16,16 @@ export function FormattedText({ content, className = "" }: FormattedTextProps) {
     return null;
   }
 
+  // Content pasted into the editor often stores every space as &nbsp;, which blocks line wrapping
+  const normalized = content.replace(/&nbsp;|&#160;|&#xa0;| /gi, " ");
+
   // If content contains HTML tags (from TipTap WYSIWYG Editor)
-  const isHtml = /<\/?[a-z][\s\S]*>/i.test(content);
+  const isHtml = /<\/?[a-z][\s\S]*>/i.test(normalized);
   if (isHtml) {
-    const cleanHtml = sanitizeHtml(content);
+    const cleanHtml = sanitizeHtml(normalized);
     return (
       <div
-        className={`prose max-w-none prose-sm sm:prose-base prose-p:my-2.5 prose-headings:text-navy prose-h3:text-base sm:prose-h3:text-lg prose-h3:font-black prose-h3:mt-5 prose-h3:mb-2 prose-h4:text-sm sm:prose-h4:text-base prose-h4:font-bold prose-ul:my-2.5 prose-ol:my-2.5 prose-li:my-1 prose-blockquote:border-l-4 prose-blockquote:border-brand-green prose-blockquote:bg-brand-green/10 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-2xl prose-blockquote:italic prose-blockquote:text-navy/90 prose-strong:text-navy prose-strong:font-bold leading-relaxed text-navy/90 ${className}`}
+        className={`prose max-w-none break-words leading-relaxed text-navy/90 prose-headings:font-bold prose-headings:text-navy prose-h2:mt-6 prose-h2:mb-3 prose-h2:text-lg sm:prose-h2:text-xl prose-h3:mt-5 prose-h3:mb-2 prose-h3:text-base sm:prose-h3:text-lg prose-h4:mt-4 prose-h4:mb-1.5 prose-h4:text-base prose-h4:font-semibold prose-p:my-2.5 prose-ul:my-2.5 prose-ol:my-2.5 prose-li:my-1 [&_li::marker]:text-brand-green prose-strong:font-semibold prose-strong:text-navy prose-a:text-brand-green prose-a:underline-offset-2 prose-blockquote:rounded-r-2xl prose-blockquote:border-l-4 prose-blockquote:border-brand-green prose-blockquote:bg-brand-green/10 prose-blockquote:px-4 prose-blockquote:py-2 prose-blockquote:font-normal prose-blockquote:not-italic prose-blockquote:text-navy/90 prose-img:max-w-full prose-img:rounded-xl prose-pre:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto ${className}`}
         dangerouslySetInnerHTML={{ __html: cleanHtml }}
       />
     );
@@ -83,10 +86,10 @@ export function FormattedText({ content, className = "" }: FormattedTextProps) {
   };
 
   // Split into block paragraphs separated by double newlines
-  const rawParagraphs = content.split(/\r?\n\r?\n/);
+  const rawParagraphs = normalized.split(/\r?\n\r?\n/);
 
   return (
-    <div className={`space-y-3.5 leading-relaxed ${className}`}>
+    <div className={`space-y-3.5 leading-relaxed break-words ${className}`}>
       {rawParagraphs.map((para, pIdx) => {
         const trimmed = para.trim();
         if (!trimmed) return null;
@@ -95,7 +98,7 @@ export function FormattedText({ content, className = "" }: FormattedTextProps) {
           return (
             <h3
               key={pIdx}
-              className="text-base sm:text-lg font-black text-navy tracking-tight pt-2 pb-1 border-b border-gray-light/60 flex items-center gap-2"
+              className="text-base sm:text-lg font-bold text-navy pt-2 pb-1 border-b border-gray-light/60 flex items-center gap-2"
             >
               <span className="h-2 w-2 rounded-full bg-brand-green inline-block" />
               {parseInline(trimmed.substring(4))}
@@ -118,7 +121,7 @@ export function FormattedText({ content, className = "" }: FormattedTextProps) {
           return (
             <div
               key={pIdx}
-              className="p-3.5 rounded-2xl bg-brand-green/10 border-l-4 border-brand-green text-xs sm:text-sm text-navy/90 font-medium my-2"
+              className="p-3.5 rounded-2xl bg-brand-green/10 border-l-4 border-brand-green text-navy/90 my-2"
             >
               {parseInline(trimmed.substring(2))}
             </div>
@@ -154,7 +157,7 @@ export function FormattedText({ content, className = "" }: FormattedTextProps) {
                 }
 
                 return (
-                  <li key={lIdx} className={`flex items-start gap-2.5 text-xs sm:text-sm font-medium ${defaultTextColor}`}>
+                  <li key={lIdx} className={`flex items-start gap-2.5 ${defaultTextColor}`}>
                     <span
                       className={`h-5 w-5 rounded-full shrink-0 flex items-center justify-center text-[10px] font-bold mt-0.5 ${
                         isCheck
@@ -173,7 +176,7 @@ export function FormattedText({ content, className = "" }: FormattedTextProps) {
         }
 
         return (
-          <p key={pIdx} className={`text-xs sm:text-sm leading-relaxed font-medium ${defaultTextColor}`}>
+          <p key={pIdx} className={`leading-relaxed ${defaultTextColor}`}>
             {lines.map((line, lIdx) => (
               <React.Fragment key={lIdx}>
                 {parseInline(line)}
