@@ -1,0 +1,59 @@
+account_id = "your_cloudflare_account_id"
+main = "dist-worker/worker.js"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ==========================================
+# 1. PRODUCTION (Mặc định: npx wrangler deploy)
+# ==========================================
+name = "ta-house-api"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tahouseta"
+database_id = "your_production_d1_database_id"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "tahouse"
+
+[vars]
+NODE_ENV = "production"
+R2_ACCOUNT_ID = "your_cloudflare_account_id"
+R2_BUCKET_NAME = "tahouse"
+R2_PUBLIC_URL = "https://your-r2-public-domain.r2.dev"
+IMAGE_BASE_URL = "https://your-r2-public-domain.r2.dev"
+JWT_ACCESS_EXPIRES_IN = "15m"
+JWT_REFRESH_EXPIRES_IN = "7d"
+LLM_API_BASE_URL = "https://openrouter.ai/api/v1"
+LLM_MODEL_NAME = "openai/gpt-4o-mini"
+ZALO_PHONE_NUMBER = "0938824479"
+ZALO_LINK = "https://zalo.me/0938824479"
+
+# ==========================================
+# 2. TEST (npx wrangler deploy --env test)
+# ==========================================
+[env.test]
+name = "ta-house-api-test"
+
+[[env.test.d1_databases]]
+binding = "DB"
+database_name = "tahouseta-test"
+database_id = "your_test_d1_database_id"
+
+[[env.test.r2_buckets]]
+binding = "BUCKET"
+bucket_name = "tahouse"
+
+[env.test.vars]
+NODE_ENV = "test"
+R2_ACCOUNT_ID = "your_cloudflare_account_id"
+R2_BUCKET_NAME = "tahouse"
+R2_PUBLIC_URL = "https://your-r2-public-domain.r2.dev"
+IMAGE_BASE_URL = "https://your-r2-public-domain.r2.dev"
+JWT_ACCESS_EXPIRES_IN = "15m"
+JWT_REFRESH_EXPIRES_IN = "7d"
+LLM_API_BASE_URL = "https://openrouter.ai/api/v1"
+LLM_MODEL_NAME = "openai/gpt-4o-mini"
+ZALO_PHONE_NUMBER = "0938824479"
+ZALO_LINK = "https://zalo.me/0938824479"

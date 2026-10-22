@@ -9,13 +9,22 @@ import { Response, Request } from 'express';
 import { logger } from '@/common/logger/winston.logger';
 
 /**
- * Global Exception Filter standardizes all error responses to match the API format:
+ * Global Exception Filter standardizes all error responses to match the API format.
+ * HTTP status (400/401/403/404/409/500...) is only set on the response status line
+ * (response.status(status)) — it is NOT duplicated in the JSON body. The body's "code"
+ * is the business error code (falls back to the HTTP status number when the exception
+ * has no business error code, e.g. generic validation errors).
+ * "message" is for developers/logs only — clients must render localized text from
+ * "errorName" + "data.params", never by parsing "message".
  * {
  *   "success": false,
- *   "code": 401,
- *   "message": "No auth token",
- *   "data": null,
- *   "error": "Unauthorized"
+ *   "code": 6003,
+ *   "errorName": "PRODUCT_INVALID_PRICE",
+ *   "message": "price (999999) must not exceed originalPrice (500000)",
+ *   "data": {
+ *     "field": "price",
+ *     "params": { "price": 999999, "originalPrice": 500000 }
+ *   }
  * }
  */
 @Catch()
@@ -27,7 +36,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message: string | string[] = 'Internal server error';
-    let error = 'Internal Server Error';
+    let errorCode: number | undefined = undefined;
+    let errorName: string | undefined = undefined;
+    let field: string | undefined = undefined;
+    let params: Record<string, unknown> | undefined = undefined;
     let detail: any = undefined;
 
     if (exception instanceof HttpException) {
@@ -36,7 +48,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
       if (typeof res === 'string') {
         message = res;
-        error = exception.name.replace(/Exception$/, '');
       } else if (typeof res === 'object' && res !== null) {
         const resObj = res as any;
         if (Array.isArray(resObj.message)) {
@@ -44,7 +55,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         } else {
           message = resObj.message || exception.message;
         }
-        error = resObj.error || exception.name.replace(/Exception$/, '');
+        if (resObj.errorCode) {
+          errorCode = resObj.errorCode;
+        }
+        if (resObj.errorName) {
+          errorName = resObj.errorName;
+        }
+        if (resObj.field) {
+          field = resObj.field;
+        }
+        if (resObj.params) {
+          params = resObj.params;
+        }
         if (resObj.detail) {
           detail = resObj.detail;
         }
@@ -59,18 +81,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           detail?.detail ||
           axiosError.message ||
           'External service error';
-        error = 'Bad Gateway';
       } else if (exception.message?.includes('timeout')) {
         message = 'Gateway timeout';
         status = HttpStatus.GATEWAY_TIMEOUT;
-        error = 'Gateway Timeout';
       } else if (exception.message?.includes('ECONNREFUSED')) {
         message = 'Service unavailable';
         status = HttpStatus.SERVICE_UNAVAILABLE;
-        error = 'Service Unavailable';
       } else {
         message = exception.message || 'Internal server error';
-        error = 'Internal Server Error';
       }
     }
 
@@ -87,15 +105,31 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       );
     }
 
+    // Trên Production: Không để lộ raw error message của DB hay detail ra ngoài client
+    const isProd = process.env.NODE_ENV === 'production';
+    const clientMessage =
+      isProd && status >= HttpStatus.INTERNAL_SERVER_ERROR
+        ? 'Đã xảy ra lỗi nội bộ hệ thống, vui lòng thử lại sau.'
+        : message;
+
+    const hasStructuredData = field !== undefined || params !== undefined;
     const errorBody: Record<string, any> = {
       success: false,
-      code: status,
-      message,
-      data: null,
-      error,
+      code: errorCode ?? status,
+      message: clientMessage,
+      data: hasStructuredData
+        ? {
+            ...(field !== undefined ? { field } : {}),
+            ...(params !== undefined ? { params } : {}),
+          }
+        : null,
     };
 
-    if (detail !== undefined) {
+    if (errorName !== undefined) {
+      errorBody.errorName = errorName;
+    }
+
+    if (detail !== undefined && !isProd) {
       errorBody.detail = detail;
     }
 

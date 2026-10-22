@@ -9,7 +9,6 @@ import {
   UseInterceptors,
   UploadedFiles,
   UseGuards,
-  Req,
   BadRequestException,
 } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
@@ -86,14 +85,14 @@ export class AdminUploadController {
   @Post(ApiRoute.ADMIN_UPLOAD)
   @ApiOperation({
     summary:
-      'API Upload tổng hợp duy nhất lên Cloudflare R2 & Lưu trữ Document Media MongoDB',
-    description: `Tải lên 1 hoặc nhiều tệp tin bất kỳ (Hình ảnh, Video, Tài liệu PDF/DOC/ZIP...) trực tiếp lên Cloudflare R2.
+      'API Upload hình ảnh và video lên Cloudflare R2',
+    description: `Tải lên 1 hoặc nhiều tệp tin Hình ảnh hoặc Video trực tiếp lên Cloudflare R2.
 Hệ thống tự động:
-1. Phân loại định dạng tệp (image, video, document, audio, other).
+1. Ràng buộc bảo mật: Chỉ cho phép tệp Hình ảnh (JPG, PNG, WebP, GIF, SVG, AVIF) và Video (MP4, WebM, MOV, AVI). Chặn toàn bộ định dạng khác.
 2. Tự động sinh đường dẫn phân cấp theo: [folder]/[brand]/[category]/[subcategory]/[productCode]/[filename].
 3. Tự động trích xuất dung lượng size, kích thước width, height, aspectRatio, và duration video.
 4. Upload trực tiếp buffer lên Cloudflare R2 (100% không dùng lưu trữ local).
-5. Tạo document lưu toàn bộ thông số metadata vào collection "media" trong MongoDB Atlas để quản lý.`,
+5. Tạo bản ghi lưu toàn bộ thông số metadata vào D1 SQLite để quản lý.`,
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ schema: unifiedUploadSchema })
@@ -113,7 +112,6 @@ Hệ thống tự động:
   async uploadMedia(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() dto: UploadMediaDto,
-    @Req() req: any,
   ) {
     if (!files || files.length === 0) {
       throw new BadRequestException(
@@ -121,8 +119,7 @@ Hệ thống tự động:
       );
     }
 
-    const username = req.user?.username || 'admin';
-    return this.uploadService.uploadFiles(files, dto, username);
+    return this.uploadService.uploadFiles(files, dto);
   }
 
   @Get(ApiRoute.ADMIN_UPLOAD)

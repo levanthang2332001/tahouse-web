@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Observable, from } from 'rxjs';
+import { Observable, from, of } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import type {
   ILlmProvider,
@@ -24,11 +24,27 @@ export class RagService {
     message: string,
     history: IChatMessage[],
     location?: string,
+    referer?: string,
   ): Observable<string> {
-    return from(this.retriever.retrieve(message, 4)).pipe(
+    const validHistory = (history || []).filter(
+      (h) => h && typeof h.content === 'string' && h.content.trim().length > 0,
+    );
+
+    // Session Quota: Nếu đã trao đổi từ 8 tin nhắn trở lên, điều hướng khách sang Zalo tư vấn thật để tiết kiệm API
+    if (validHistory.length >= 8) {
+      const zaloPhone = process.env.ZALO_PHONE_NUMBER || '0938824479';
+      const zaloLink = process.env.ZALO_LINK || `https://zalo.me/${zaloPhone}`;
+      return of(
+        `Cảm ơn bạn đã quan tâm đến TA House! Để nhận được tư vấn chi tiết về đố cửa và báo giá ưu đãi nhất, bạn vui lòng bấm kết nối trực tiếp với chuyên viên qua Zalo [${zaloPhone}](${zaloLink}) nhé!`,
+      );
+    }
+
+    return from(
+      this.retriever.retrieve(message, 4, validHistory, referer),
+    ).pipe(
       mergeMap((context) => {
         const systemPrompt = buildSystemPrompt(context, location);
-        return this.llmProvider.streamChat(systemPrompt, message, history);
+        return this.llmProvider.streamChat(systemPrompt, message, validHistory);
       }),
     );
   }

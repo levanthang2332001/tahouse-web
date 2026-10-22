@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "outDir": "./dist-worker-ts",
+    "noEmit": false,
+    "incremental": false,
+    "declaration": false,
+    "sourceMap": false,
+    "types": ["@cloudflare/workers-types", "node"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/worker.ts", "src/app-worker.module.ts", "src/**/*.ts"],
+  "exclude": [
+    "src/**/*.spec.ts",
+    "node_modules",
+    "dist",
+    "dist-worker-ts",
+    "dist-worker"
+  ]
+}

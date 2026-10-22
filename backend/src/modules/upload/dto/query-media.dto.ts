@@ -2,7 +2,10 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { MediaType } from '../schemas/media.schema';
+import { DefaultErrorCode } from '@/common/decorators';
+import { ErrorCode } from '@/common/constants';
 
+@DefaultErrorCode(ErrorCode.MEDIA_VALIDATION_ERROR)
 export class QueryMediaDto {
   @ApiPropertyOptional({
     description: 'Trang hiện tại (bắt đầu từ 1)',
@@ -30,7 +33,7 @@ export class QueryMediaDto {
   })
   @IsOptional()
   @IsEnum(MediaType)
-  fileType?: string;
+  fileType?: MediaType;
 
   @ApiPropertyOptional({
     description: 'Lọc theo slug hoặc tên thương hiệu (brand)',

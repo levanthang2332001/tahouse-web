@@ -14,7 +14,7 @@ export interface ICategoryStat {
 }
 
 export interface IBrandStat {
-  id: number;
+  id: string | number;
   name: string;
   slug: string;
   logo?: string;

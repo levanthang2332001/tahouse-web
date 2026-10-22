@@ -14,42 +14,204 @@ export function formatProductContext(
 
   let context = 'DƯỚI ĐÂY LÀ DANH SÁCH SẢN PHẨM PHÙ HỢP:\n\n';
   products.forEach((p, index) => {
+    const colors = Array.isArray(p.colors)
+      ? p.colors
+      : typeof p.colors === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(p.colors);
+            } catch {
+              return [p.colors];
+            }
+          })()
+        : [];
+
+    const features = Array.isArray(p.features)
+      ? p.features
+      : typeof p.features === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(p.features);
+            } catch {
+              return [p.features];
+            }
+          })()
+        : [];
+
+    const specs =
+      typeof p.specs === 'object' && p.specs !== null
+        ? p.specs
+        : typeof p.specs === 'string'
+          ? (() => {
+              try {
+                return JSON.parse(p.specs);
+              } catch {
+                return {};
+              }
+            })()
+          : {};
+
+    const installation =
+      typeof p.installation === 'object' && p.installation !== null
+        ? p.installation
+        : typeof p.installation === 'string'
+          ? (() => {
+              try {
+                return JSON.parse(p.installation);
+              } catch {
+                return { images: [], videos: [] };
+              }
+            })()
+          : { images: [], videos: [] };
+
     context += `[Sản phẩm ${index + 1}]\n`;
     context += `- ID: ${p.id}\n`;
     context += `- Mã sản phẩm (Code): ${p.code}\n`;
     context += `- Tên sản phẩm: ${p.name}\n`;
-    context += `- Thương hiệu: ${p.brand}\n`;
-    context += `- Danh mục: ${p.categoryName}\n`;
-    context += `- Giá bán: ${p.priceRange || 'Liên hệ'}\n`;
+    context += `- Thương hiệu: ${p.brand || ''}\n`;
+    context += `- Danh mục: ${p.categoryName || p.category || ''}\n`;
+
+    // Cấu trúc giá chi tiết: Giá niêm yết (gốc), Giá khuyến mãi (cuối cùng), Mức chiết khấu %
+    const origPriceNum = typeof p.originalPrice === 'number' ? p.originalPrice : Number(p.originalPrice);
+    const finalPriceNum = typeof p.price === 'number' ? p.price : Number(p.price);
+    const hasOrigPrice = !isNaN(origPriceNum) && origPriceNum > 0;
+    const hasFinalPrice = !isNaN(finalPriceNum) && finalPriceNum > 0;
+    const discountPct = p.discountPercent || (hasOrigPrice && hasFinalPrice && origPriceNum > finalPriceNum ? Math.round(((origPriceNum - finalPriceNum) / origPriceNum) * 100) : null);
+
+    if (hasOrigPrice && hasFinalPrice && origPriceNum > finalPriceNum) {
+      context += `- Giá niêm yết (Giá gốc hãng): ${origPriceNum.toLocaleString('vi-VN')} VNĐ\n`;
+      context += `- Giá khuyến mãi (Giá cuối cùng thanh toán): ${finalPriceNum.toLocaleString('vi-VN')} VNĐ (Tiết kiệm ${discountPct}%)\n`;
+    } else if (hasFinalPrice) {
+      context += `- Giá bán cuối cùng: ${finalPriceNum.toLocaleString('vi-VN')} VNĐ\n`;
+    } else if (p.priceRange) {
+      context += `- Giá bán: ${p.priceRange}\n`;
+    } else {
+      context += `- Giá bán: Liên hệ để nhận báo giá ưu đãi\n`;
+    }
+    if (p.priceRange && (p.priceRange.includes('-') || p.priceRange.includes('~'))) {
+      context += `- Khoảng giá các phiên bản: ${p.priceRange}\n`;
+    }
+
     context += `- Thời gian bảo hành: ${p.warrantyText || 'Theo tiêu chuẩn'}\n`;
     if (p.imageUrl) {
       const imgUrl = resolveMediaUrl(p.imageUrl, imageBaseUrl);
       context += `- Đường dẫn ảnh đại diện sản phẩm (Image URL): ${imgUrl}\n`;
     }
-    if (p.colors && p.colors.length > 0) {
-      context += `- Màu sắc: ${p.colors.join(', ')}\n`;
+    const galleryImages = Array.isArray(p.images)
+      ? p.images
+      : typeof p.images === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(p.images);
+            } catch {
+              return [];
+            }
+          })()
+        : [];
+    if (galleryImages.length > 0) {
+      context += `- Các hình ảnh chi tiết khác của sản phẩm:\n`;
+      galleryImages.slice(0, 3).forEach((img: string) => {
+        context += `  * ${resolveMediaUrl(img, imageBaseUrl)}\n`;
+      });
     }
-    if (p.features && p.features.length > 0) {
+    if (Array.isArray(colors) && colors.length > 0) {
+      context += `- Màu sắc: ${colors.join(', ')}\n`;
+    }
+    if (Array.isArray(features) && features.length > 0) {
       context += `- Các tính năng nổi bật:\n`;
-      p.features.forEach((f: string) => {
+      features.forEach((f: string) => {
         context += `  * ${f}\n`;
       });
     }
-    if (p.specs && typeof p.specs === 'object') {
+    if (specs && typeof specs === 'object' && Object.keys(specs).length > 0) {
       context += `- Thông số kỹ thuật:\n`;
-      Object.entries(p.specs).forEach(([k, v]) => {
+      Object.entries(specs).forEach(([k, v]) => {
         context += `  * ${k}: ${String(v)}\n`;
       });
     }
     if (p.description) {
-      context += `- Mô tả chi tiết: ${p.description}\n`;
+      context += `- Mô tả tổng quan: ${p.description}\n`;
     }
-    if (p.installation && typeof p.installation === 'object') {
-      const instImages = Array.isArray(p.installation.images)
-        ? p.installation.images
+
+    // Công nghệ ứng dụng (Fingerprint, FaceID, App, IC card...)
+    const technologies = Array.isArray(p.technologies)
+      ? p.technologies
+      : typeof p.technologies === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(p.technologies);
+            } catch {
+              return [p.technologies];
+            }
+          })()
         : [];
-      const instVideos = Array.isArray(p.installation.videos)
-        ? p.installation.videos
+    if (Array.isArray(technologies) && technologies.length > 0) {
+      context += `- Công nghệ nổi bật: ${technologies.join(', ')}\n`;
+    }
+
+    // Các phiên bản & mức giá theo màu / chức năng
+    const variants = Array.isArray(p.variants)
+      ? p.variants
+      : typeof p.variants === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(p.variants);
+            } catch {
+              return [];
+            }
+          })()
+        : [];
+    if (Array.isArray(variants) && variants.length > 0) {
+      const variantStr = variants
+        .map((v: any) => `${v.name || v.label || ''} (${v.price ? Number(v.price).toLocaleString('vi-VN') + 'đ' : 'Liên hệ'})`)
+        .filter(Boolean)
+        .join('; ');
+      if (variantStr) {
+        context += `- Các phiên bản lựa chọn: ${variantStr}\n`;
+      }
+    }
+
+    // FAQ kiến thức giải đáp (đọc để nắm vững kiến thức tư vấn, không in nguyên văn ra chat)
+    const faq = Array.isArray(p.faq)
+      ? p.faq
+      : typeof p.faq === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(p.faq);
+            } catch {
+              return [];
+            }
+          })()
+        : [];
+    if (Array.isArray(faq) && faq.length > 0) {
+      context += `- FAQ kiến thức tham khảo (chỉ đọc để giải đáp khi khách hỏi, không in nguyên văn):\n`;
+      faq.slice(0, 5).forEach((item: any) => {
+        if (item.question && item.answer) {
+          context += `  * Q: ${item.question} -> A: ${item.answer}\n`;
+        }
+      });
+    }
+
+    // Bài viết chi tiết (đã lọc sạch thẻ HTML, lấy kiến thức cốt lõi tối đa 600 ký tự làm căn cứ tư vấn)
+    if (p.content && typeof p.content === 'string') {
+      const cleanContent = p.content
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (cleanContent.length > 0) {
+        context += `- Kiến thức chuyên sâu bài viết (đọc để hiểu thấu đáo đố cửa & công năng, không tuôn nguyên văn bài viết): ${cleanContent.slice(0, 600)}...\n`;
+      }
+    }
+
+    if (installation && typeof installation === 'object') {
+      const instImages = Array.isArray(installation.images)
+        ? installation.images
+        : [];
+      const instVideos = Array.isArray(installation.videos)
+        ? installation.videos
         : [];
       if (instImages.length > 0 || instVideos.length > 0) {
         context += `- Dữ liệu thực tế từ công trình lắp đặt:\n`;

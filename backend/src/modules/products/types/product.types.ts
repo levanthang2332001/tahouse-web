@@ -22,7 +22,8 @@ export interface IProductOption {
 export interface IProduct {
   id: string;
   code: string;
-  brandId?: number | null;
+  slug: string;
+  brandId?: string | number | null;
   brand?: string;
   brandSlug?: string;
   category: string;
@@ -57,7 +58,7 @@ export interface IProductListItem {
   id: string;
   code: string;
   name: string;
-  brandId?: number | null;
+  brandId?: string | number | null;
   brand: string;
   brandSlug: string;
   category: string;

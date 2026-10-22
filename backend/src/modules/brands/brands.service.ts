@@ -1,11 +1,5 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Brand, BrandDocument } from './schemas/brand.schema';
+import { Injectable } from '@nestjs/common';
+import { BrandsRepository } from './repositories/brands.repository';
 import {
   CreateBrandDto,
   CategoryDto,
@@ -13,189 +7,172 @@ import {
   UpdateCategoryItemDto,
 } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
-import { removeDiacritics } from '@/common/utils/string.util';
-import type { IBrand } from './types/brand.types';
+import { BrandResponseDto } from './dto/brand-response.dto';
+import { BusinessException } from '@/common/exceptions';
+import { ErrorCode } from '@/common/constants';
 
 @Injectable()
 export class BrandsService {
-  constructor(
-    @InjectModel(Brand.name) private readonly brandModel: Model<BrandDocument>,
-  ) {}
+  constructor(private readonly brandsRepository: BrandsRepository) {}
 
-  async findAll(): Promise<IBrand[]> {
-    const brands = await this.brandModel.find().sort({ id: 1 }).lean().exec();
-    return brands.map((b: any) => ({
-      id: b.id,
-      name: b.name,
-      slug: b.slug,
-      logo: b.logo,
-      logoHtml: b.logoHtml,
-      categories: b.categories || [],
-    }));
+  async findAll(): Promise<BrandResponseDto[]> {
+    return this.brandsRepository.findAll();
   }
 
-  async findOne(idOrSlug: string | number): Promise<any> {
-    const isNum = !isNaN(Number(idOrSlug));
-    const brand = await this.brandModel
-      .findOne({
-        $or: [
-          ...(isNum ? [{ id: Number(idOrSlug) }] : []),
-          { slug: String(idOrSlug).toLowerCase().trim() },
-        ],
-      })
-      .lean()
-      .exec();
-
+  async findOne(idOrSlug: string | number): Promise<BrandResponseDto> {
+    const brand = await this.brandsRepository.findByIdOrSlug(String(idOrSlug));
     if (!brand) {
-      throw new NotFoundException(`Brand not found: ${idOrSlug}`);
+      throw new BusinessException(
+        ErrorCode.BRAND_NOT_FOUND,
+        `Brand not found: ${idOrSlug}`,
+        undefined,
+        { idOrSlug },
+      );
     }
     return brand;
   }
 
-  async create(createBrandDto: CreateBrandDto): Promise<any> {
-    const cleanSlug = (
-      createBrandDto.slug ||
-      removeDiacritics(createBrandDto.name)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-    ).trim();
-
-    let brandId = createBrandDto.id;
-    if (!brandId) {
-      const maxBrand = await this.brandModel
-        .findOne()
-        .sort({ id: -1 })
-        .lean()
-        .exec();
-      brandId = (maxBrand?.id ?? 0) + 1;
-    }
-
-    const existing = await this.brandModel.findOne({
-      $or: [{ id: brandId }, { slug: cleanSlug }],
-    });
+  async create(
+    createBrandDto: CreateBrandDto,
+  ): Promise<BrandResponseDto | null> {
+    const existing = await this.brandsRepository.findBySlug(
+      createBrandDto.slug!,
+    );
     if (existing) {
-      throw new ConflictException(
-        `Brand with ID "${brandId}" or slug "${cleanSlug}" already exists`,
+      throw new BusinessException(
+        ErrorCode.BRAND_ALREADY_EXISTS,
+        `Brand with slug "${createBrandDto.slug}" already exists`,
+        undefined,
+        { slug: createBrandDto.slug },
       );
     }
 
-    const newBrand = new this.brandModel({
-      ...createBrandDto,
+    const brandId = createBrandDto.id!;
+    await this.brandsRepository.insertBrand({
       id: brandId,
-      slug: cleanSlug,
-      categories: createBrandDto.categories || [],
+      name: createBrandDto.name,
+      slug: createBrandDto.slug!,
+      logo: createBrandDto.logo || '',
+      logoHtml: createBrandDto.logoHtml || null,
+      orderIndex: createBrandDto.orderIndex ?? 0,
     });
-    return newBrand.save();
+
+    if (createBrandDto.categories?.length) {
+      await this.persistCategoriesHierarchy(brandId, createBrandDto.categories);
+    }
+
+    return this.brandsRepository.findByIdOrSlug(brandId);
   }
 
   async update(
     idOrSlug: string | number,
     updateBrandDto: UpdateBrandDto,
-  ): Promise<any> {
-    const isNum = !isNaN(Number(idOrSlug));
-    const payload = { ...updateBrandDto };
-    if (payload.slug) {
-      payload.slug = payload.slug.toLowerCase().trim();
+  ): Promise<BrandResponseDto | null> {
+    const brand = await this.findOne(idOrSlug);
+
+    await this.brandsRepository.updateBrand(brand.id, {
+      name: updateBrandDto.name,
+      slug: updateBrandDto.slug,
+      logo: updateBrandDto.logo,
+      logoHtml: updateBrandDto.logoHtml,
+      orderIndex: updateBrandDto.orderIndex,
+    });
+
+    if (updateBrandDto.categories) {
+      await this.brandsRepository.deleteCategoriesByBrandId(brand.id);
+      await this.persistCategoriesHierarchy(
+        brand.id,
+        updateBrandDto.categories,
+      );
     }
 
-    const brand = await this.brandModel.findOneAndUpdate(
-      {
-        $or: [
-          ...(isNum ? [{ id: Number(idOrSlug) }] : []),
-          { slug: String(idOrSlug).toLowerCase().trim() },
-        ],
-      },
-      { $set: payload },
-      { new: true },
-    );
-
-    if (!brand) {
-      throw new NotFoundException(`Brand not found: ${idOrSlug}`);
-    }
-    return brand;
+    return this.brandsRepository.findByIdOrSlug(brand.id);
   }
 
   async remove(idOrSlug: string | number): Promise<{ message: string }> {
-    const isNum = !isNaN(Number(idOrSlug));
-    const result = await this.brandModel.findOneAndDelete({
-      $or: [
-        ...(isNum ? [{ id: Number(idOrSlug) }] : []),
-        { slug: String(idOrSlug).toLowerCase().trim() },
-      ],
-    });
-
-    if (!result) {
-      throw new NotFoundException(`Brand not found: ${idOrSlug}`);
-    }
-    return { message: `Brand "${result.name}" deleted successfully` };
+    const brand = await this.findOne(idOrSlug);
+    await this.brandsRepository.deleteBrand(brand.id);
+    return { message: `Brand "${brand.name}" deleted successfully` };
   }
-
-  // --- Sub-resource: Category CRUD inside Brand ---
 
   async addCategory(
     idOrSlug: string | number,
     categoryDto: CategoryDto,
-  ): Promise<any> {
+  ): Promise<BrandResponseDto | null> {
     const brand = await this.findOne(idOrSlug);
-    const cSlug = (
-      categoryDto.slug ||
-      removeDiacritics(categoryDto.name)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-    ).trim();
+    const cSlug = categoryDto.slug!;
 
-    const existingCat = (brand.categories || []).find(
-      (c: any) => c.slug === cSlug,
-    );
+    const existingCat = (brand.categories || []).find((c) => c.slug === cSlug);
     if (existingCat) {
-      throw new ConflictException(
+      throw new BusinessException(
+        ErrorCode.CATEGORY_ALREADY_EXISTS,
         `Category with slug "${cSlug}" already exists in brand "${brand.name}"`,
+        undefined,
+        { slug: cSlug, brand: brand.name },
       );
     }
 
-    const newCat = {
+    await this.brandsRepository.insertCategory({
+      id: categoryDto.id!,
+      brandId: brand.id,
       name: categoryDto.name,
       slug: cSlug,
-      subcategories: categoryDto.subcategories || [],
-    };
+    });
 
-    return this.brandModel.findByIdAndUpdate(
-      brand._id,
-      { $push: { categories: newCat } },
-      { new: true },
-    );
+    if (categoryDto.subcategories?.length) {
+      const subcategoriesToInsert = categoryDto.subcategories.map((sub) => ({
+        id: sub.id,
+        categoryId: categoryDto.id!,
+        name: sub.name,
+        slug: sub.slug!,
+      }));
+      await this.brandsRepository.insertSubcategoriesBatch(
+        subcategoriesToInsert,
+      );
+    }
+
+    return this.brandsRepository.findByIdOrSlug(brand.id);
   }
 
   async updateCategory(
     idOrSlug: string | number,
     categorySlug: string,
     dto: UpdateCategoryItemDto,
-  ): Promise<any> {
+  ): Promise<BrandResponseDto | null> {
     const brand = await this.findOne(idOrSlug);
     const cleanCatSlug = categorySlug.toLowerCase().trim();
 
-    const catIndex = (brand.categories || []).findIndex(
-      (c: any) => c.slug?.toLowerCase() === cleanCatSlug,
+    const targetCat = (brand.categories || []).find(
+      (c) => c.slug === cleanCatSlug,
     );
-    if (catIndex === -1) {
-      throw new NotFoundException(
+    if (!targetCat) {
+      throw new BusinessException(
+        ErrorCode.CATEGORY_NOT_FOUND,
         `Category "${categorySlug}" not found in brand "${brand.name}"`,
+        undefined,
+        { category: categorySlug, brand: brand.name },
       );
     }
 
-    const categories = [...brand.categories];
-    categories[catIndex] = {
-      ...categories[catIndex],
-      ...(dto.name ? { name: dto.name } : {}),
-      ...(dto.slug ? { slug: dto.slug.toLowerCase().trim() } : {}),
-      ...(dto.subcategories ? { subcategories: dto.subcategories } : {}),
-    };
+    await this.brandsRepository.updateCategory(targetCat.id, {
+      name: dto.name,
+      slug: dto.slug,
+    });
 
-    return this.brandModel.findByIdAndUpdate(
-      brand._id,
-      { $set: { categories } },
-      { new: true },
-    );
+    if (dto.subcategories) {
+      await this.brandsRepository.deleteSubcategoriesByCategoryId(targetCat.id);
+      const subcategoriesToInsert = dto.subcategories.map((sub) => ({
+        id: sub.id,
+        categoryId: targetCat.id,
+        name: sub.name,
+        slug: sub.slug!,
+      }));
+      await this.brandsRepository.insertSubcategoriesBatch(
+        subcategoriesToInsert,
+      );
+    }
+
+    return this.brandsRepository.findByIdOrSlug(brand.id);
   }
 
   async removeCategory(
@@ -205,69 +182,65 @@ export class BrandsService {
     const brand = await this.findOne(idOrSlug);
     const cleanCatSlug = categorySlug.toLowerCase().trim();
 
-    const updated = await this.brandModel.findByIdAndUpdate(
-      brand._id,
-      {
-        $pull: {
-          categories: { slug: cleanCatSlug },
-        },
-      },
-      { new: true },
+    const targetCat = (brand.categories || []).find(
+      (c) => c.slug === cleanCatSlug,
     );
+    if (!targetCat) {
+      throw new BusinessException(
+        ErrorCode.CATEGORY_NOT_FOUND,
+        `Category "${categorySlug}" not found in brand "${brand.name}"`,
+        undefined,
+        { category: categorySlug, brand: brand.name },
+      );
+    }
 
+    await this.brandsRepository.deleteCategory(targetCat.id);
     return {
       message: `Category "${categorySlug}" removed from brand "${brand.name}" successfully`,
     };
   }
 
-  // --- Sub-resource: Subcategory CRUD inside Category of Brand ---
-
   async addSubcategory(
     idOrSlug: string | number,
     categorySlug: string,
     subDto: SubcategoryDto,
-  ): Promise<any> {
+  ): Promise<BrandResponseDto | null> {
     const brand = await this.findOne(idOrSlug);
     const cleanCatSlug = categorySlug.toLowerCase().trim();
-    const cleanSubSlug = (
-      subDto.slug ||
-      removeDiacritics(subDto.name)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-    ).trim();
+    const cleanSubSlug = subDto.slug!;
 
-    const catIndex = (brand.categories || []).findIndex(
-      (c: any) => c.slug?.toLowerCase() === cleanCatSlug,
+    const targetCat = (brand.categories || []).find(
+      (c) => c.slug === cleanCatSlug,
     );
-    if (catIndex === -1) {
-      throw new NotFoundException(
+    if (!targetCat) {
+      throw new BusinessException(
+        ErrorCode.CATEGORY_NOT_FOUND,
         `Category "${categorySlug}" not found in brand "${brand.name}"`,
+        undefined,
+        { category: categorySlug, brand: brand.name },
       );
     }
 
-    const category = brand.categories[catIndex];
-    const existingSub = (category.subcategories || []).find(
-      (s: any) => s.slug === cleanSubSlug,
+    const existingSub = (targetCat.subcategories || []).find(
+      (s) => s.slug === cleanSubSlug,
     );
     if (existingSub) {
-      throw new ConflictException(
-        `Subcategory "${cleanSubSlug}" already exists in category "${category.name}"`,
+      throw new BusinessException(
+        ErrorCode.SUBCATEGORY_ALREADY_EXISTS,
+        `Subcategory "${cleanSubSlug}" already exists in category "${targetCat.name}"`,
+        undefined,
+        { subcategory: cleanSubSlug, category: targetCat.name },
       );
     }
 
-    const updatedSubcategories = [
-      ...(category.subcategories || []),
-      { name: subDto.name, slug: cleanSubSlug },
-    ];
+    await this.brandsRepository.insertSubcategory({
+      id: subDto.id,
+      categoryId: targetCat.id,
+      name: subDto.name,
+      slug: cleanSubSlug,
+    });
 
-    const categories = [...brand.categories];
-    categories[catIndex].subcategories = updatedSubcategories;
-
-    return this.brandModel.findByIdAndUpdate(
-      brand._id,
-      { $set: { categories } },
-      { new: true },
-    );
+    return this.brandsRepository.findByIdOrSlug(brand.id);
   }
 
   async removeSubcategory(
@@ -278,29 +251,66 @@ export class BrandsService {
     const brand = await this.findOne(idOrSlug);
     const cleanCatSlug = categorySlug.toLowerCase().trim();
     const cleanSubSlug = subcategorySlug.toLowerCase().trim();
-
-    const catIndex = (brand.categories || []).findIndex(
-      (c: any) => c.slug?.toLowerCase() === cleanCatSlug,
+    const targetCat = (brand.categories || []).find(
+      (c) => c.slug === cleanCatSlug,
     );
-    if (catIndex === -1) {
-      throw new NotFoundException(
+    if (!targetCat) {
+      throw new BusinessException(
+        ErrorCode.CATEGORY_NOT_FOUND,
         `Category "${categorySlug}" not found in brand "${brand.name}"`,
+        undefined,
+        { category: categorySlug, brand: brand.name },
       );
     }
 
-    const categories = [...brand.categories];
-    categories[catIndex].subcategories = (
-      categories[catIndex].subcategories || []
-    ).filter((s: any) => s.slug?.toLowerCase() !== cleanSubSlug);
-
-    await this.brandModel.findByIdAndUpdate(
-      brand._id,
-      { $set: { categories } },
-      { new: true },
+    const targetSub = (targetCat.subcategories || []).find(
+      (s) => s.slug === cleanSubSlug,
     );
+    if (!targetSub) {
+      throw new BusinessException(
+        ErrorCode.SUBCATEGORY_NOT_FOUND,
+        `Subcategory "${subcategorySlug}" not found in category "${targetCat.name}"`,
+        undefined,
+        { subcategory: subcategorySlug, category: targetCat.name },
+      );
+    }
 
+    await this.brandsRepository.deleteSubcategory(targetSub.id);
     return {
       message: `Subcategory "${subcategorySlug}" removed from category "${categorySlug}" successfully`,
     };
+  }
+
+  /**
+   * Helper chèn toàn bộ cây category & subcategory theo cơ chế Batch Insert (1-2 query duy nhất)
+   */
+  private async persistCategoriesHierarchy(
+    brandId: string,
+    categories: CategoryDto[],
+  ): Promise<void> {
+    if (!categories || categories.length === 0) return;
+
+    const categoriesToInsert = categories.map((cat) => ({
+      id: cat.id!,
+      brandId,
+      name: cat.name,
+      slug: cat.slug!,
+    }));
+
+    const subcategoriesToInsert = categories.flatMap((cat) =>
+      (cat.subcategories || []).map((sub) => ({
+        id: sub.id,
+        categoryId: cat.id!,
+        name: sub.name,
+        slug: sub.slug!,
+      })),
+    );
+
+    await this.brandsRepository.insertCategoriesBatch(categoriesToInsert);
+    if (subcategoriesToInsert.length > 0) {
+      await this.brandsRepository.insertSubcategoriesBatch(
+        subcategoriesToInsert,
+      );
+    }
   }
 }

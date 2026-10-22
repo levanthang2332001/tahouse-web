@@ -1,6 +1,9 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsOptional, IsString, MaxLength } from 'class-validator';
+import { DefaultErrorCode } from '@/common/decorators';
+import { ErrorCode } from '@/common/constants';
 
+@DefaultErrorCode(ErrorCode.AUTH_VALIDATION_ERROR)
 export class UpdateProfileDto {
   @ApiPropertyOptional({
     description: 'Họ và tên hiển thị của tài khoản',

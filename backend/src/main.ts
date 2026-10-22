@@ -1,27 +1,15 @@
-import { NestFactory } from '@nestjs/core';
-import { Logger } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as os from 'os';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { config } from '@/common/config';
 import { GlobalExceptionFilter } from '@/common/filters';
+import { validationExceptionFactory } from '@/common/exceptions';
 import { LoggingInterceptor } from '@/common/logger/logging.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor';
 import { SwaggerTag } from '@/common/constants';
-
-function getLocalIP(): string {
-  const interfaces = os.networkInterfaces();
-  for (const name of Object.keys(interfaces)) {
-    for (const net of interfaces[name] || []) {
-      if (net.family === 'IPv4' && !net.internal) {
-        return net.address;
-      }
-    }
-  }
-  return 'localhost';
-}
 
 /**
  * Hàm khởi động ứng dụng (Bootstrap).
@@ -51,16 +39,18 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(
-    new (await import('@nestjs/common')).ValidationPipe({
+    new ValidationPipe({
       transform: true,
       whitelist: true,
+      exceptionFactory: validationExceptionFactory,
     }),
   );
 
+  const reflector = app.get(Reflector);
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalInterceptors(
     new LoggingInterceptor(),
-    new TransformInterceptor(),
+    new TransformInterceptor(reflector),
   );
 
   app.enableCors({
@@ -84,16 +74,21 @@ async function bootstrap() {
       SwaggerTag.ADMIN_UPLOAD,
       'API tải lên và quản lý tệp tin (Ảnh, Video, Tài liệu)',
     )
+    .addTag(SwaggerTag.SETTINGS, 'API thông tin liên hệ & cấu hình cửa hàng')
+    .addTag(
+      SwaggerTag.ADMIN_SETTINGS,
+      'API quản trị cấu hình hệ thống (Social, SĐT, Email, Địa chỉ, Giờ mở cửa)',
+    )
+    .addTag(
+      SwaggerTag.ADMIN_CHAT,
+      'API quản trị phiên trò chuyện & audit chatbot (IP, Browser, OS, Origin)',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(config.port, '0.0.0.0');
-  const localIp = getLocalIP();
   logger.log(`Application is running on: http://localhost:${config.port}`);
-  logger.log(
-    `For testing on phone (same Wi-Fi): http://${localIp}:${config.port}/rag/client`,
-  );
   logger.log(
     `Swagger document is available at: http://localhost:${config.port}/api/docs`,
   );

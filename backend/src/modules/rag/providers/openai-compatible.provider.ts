@@ -28,19 +28,28 @@ export class OpenAiCompatibleProvider implements ILlmProvider {
     history: IChatMessage[],
   ): Observable<string> {
     return new Observable<string>((subscriber) => {
+      // Chỉ giữ tối đa 4 tin nhắn gần nhất từ history để tiết kiệm chi phí token
+      const recentHistory = (history || []).slice(-4);
+
       const messages = [
         { role: 'system', content: systemPrompt },
-        ...history,
+        ...recentHistory,
         { role: 'user', content: message },
       ];
 
       const url = `${this.baseUrl.replace(/\/$/, '')}/chat/completions`;
 
+      const effectiveApiKey =
+        this.apiKey ||
+        this.configService.get<string>('LLM_API_KEY') ||
+        process.env.LLM_API_KEY ||
+        '';
+
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
-      if (this.apiKey) {
-        headers['Authorization'] = `Bearer ${this.apiKey}`;
+      if (effectiveApiKey) {
+        headers['Authorization'] = `Bearer ${effectiveApiKey}`;
       }
 
       const controller = new AbortController();
@@ -51,6 +60,8 @@ export class OpenAiCompatibleProvider implements ILlmProvider {
         body: JSON.stringify({
           model: this.modelName,
           messages,
+          max_tokens: 400,
+          temperature: 0.3,
           stream: true,
         }),
         signal: controller.signal,

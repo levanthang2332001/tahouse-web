@@ -1,6 +1,9 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
+import { DefaultErrorCode } from '@/common/decorators';
+import { ErrorCode } from '@/common/constants';
 
+@DefaultErrorCode(ErrorCode.MEDIA_VALIDATION_ERROR)
 export class UploadMediaDto {
   @ApiPropertyOptional({
     description:

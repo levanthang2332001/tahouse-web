@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { DefaultErrorCode } from '@/common/decorators';
+import { ErrorCode } from '@/common/constants';
 
+@DefaultErrorCode(ErrorCode.AUTH_VALIDATION_ERROR)
 export class LoginDto {
   @ApiProperty({
     description: 'Tên đăng nhập hoặc Email của Admin',

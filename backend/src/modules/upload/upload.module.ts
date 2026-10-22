@@ -1,15 +1,11 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { UploadService } from './upload.service';
 import { AdminUploadController } from './admin-upload.controller';
-import { Media, MediaSchema } from './schemas/media.schema';
+import { MediaRepository } from './repositories/media.repository';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Media.name, schema: MediaSchema }]),
-  ],
   controllers: [AdminUploadController],
-  providers: [UploadService],
-  exports: [UploadService],
+  providers: [UploadService, MediaRepository],
+  exports: [UploadService, MediaRepository],
 })
 export class UploadModule {}

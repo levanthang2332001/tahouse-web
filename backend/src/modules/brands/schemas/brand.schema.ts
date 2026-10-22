@@ -1,73 +1,103 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import {
+  sqliteTable,
+  text,
+  integer,
+  uniqueIndex,
+} from 'drizzle-orm/sqlite-core';
+import { sql, relations } from 'drizzle-orm';
+import { randomUUID } from 'crypto';
+import { products } from '../../products/schemas/product.schema';
 
-export type BrandDocument = Brand & Document;
-
-@Schema({ _id: false })
-export class Subcategory {
-  @Prop({ type: String, required: true })
-  slug: string;
-
-  @Prop({ type: String, required: true })
-  name: string;
-}
-
-@Schema({ _id: false })
-export class Category {
-  @Prop({ type: String, required: true })
-  slug: string;
-
-  @Prop({ type: String, required: true })
-  name: string;
-
-  @Prop({ type: [Subcategory], default: [] })
-  subcategories?: Subcategory[];
-}
-
-@Schema({
-  collection: 'brands',
-  timestamps: true,
-  toJSON: {
-    virtuals: true,
-    transform: (_, ret: any) => {
-      if (!ret.id && ret._id) {
-        ret.id = ret._id.toString();
-      }
-      delete ret._id;
-      delete ret.__v;
-      return ret;
-    },
+export const brands = sqliteTable(
+  'brands',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => randomUUID()),
+    name: text('name').notNull(),
+    slug: text('slug').notNull().unique(),
+    logo: text('logo').notNull(),
+    logoHtml: text('logo_html'),
+    orderIndex: integer('order_index').default(0),
+    createdAt: integer('created_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
   },
-  toObject: {
-    virtuals: true,
-    transform: (_, ret: any) => {
-      if (!ret.id && ret._id) {
-        ret.id = ret._id.toString();
-      }
-      delete ret._id;
-      delete ret.__v;
-      return ret;
-    },
+  (table) => [uniqueIndex('brands_slug_idx').on(table.slug)],
+);
+
+export const categories = sqliteTable(
+  'categories',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => randomUUID()),
+    brandId: text('brand_id')
+      .notNull()
+      .references(() => brands.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    slug: text('slug').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
   },
-})
-export class Brand {
-  @Prop({ type: Number, required: true, unique: true })
-  id: number;
+  (table) => [
+    uniqueIndex('categories_brand_slug_idx').on(table.brandId, table.slug),
+  ],
+);
 
-  @Prop({ type: String, required: true })
-  name: string;
+export const subcategories = sqliteTable(
+  'subcategories',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => randomUUID()),
+    categoryId: text('category_id')
+      .notNull()
+      .references(() => categories.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    slug: text('slug').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (table) => [
+    uniqueIndex('subcategories_cat_slug_idx').on(table.categoryId, table.slug),
+  ],
+);
 
-  @Prop({ type: String, required: true, unique: true })
-  slug: string;
+export const brandsRelations = relations(brands, ({ many }) => ({
+  categories: many(categories),
+  products: many(products),
+}));
 
-  @Prop({ type: String, default: '' })
-  logo: string;
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+  brand: one(brands, {
+    fields: [categories.brandId],
+    references: [brands.id],
+  }),
+  subcategories: many(subcategories),
+}));
 
-  @Prop({ type: String, default: '' })
-  logoHtml?: string;
+export const subcategoriesRelations = relations(subcategories, ({ one }) => ({
+  category: one(categories, {
+    fields: [subcategories.categoryId],
+    references: [categories.id],
+  }),
+}));
 
-  @Prop({ type: [Category], default: [] })
-  categories: Category[];
-}
-
-export const BrandSchema = SchemaFactory.createForClass(Brand);
+export type Brand = typeof brands.$inferSelect;
+export type NewBrand = typeof brands.$inferInsert;
+export type Category = typeof categories.$inferSelect;
+export type NewCategory = typeof categories.$inferInsert;
+export type Subcategory = typeof subcategories.$inferSelect;
+export type NewSubcategory = typeof subcategories.$inferInsert;

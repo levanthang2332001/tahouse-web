@@ -11,3 +11,15 @@ export function removeDiacritics(str: string): string {
     .replace(/đ/g, 'd')
     .replace(/Đ/g, 'D');
 }
+
+/**
+ * Tạo slug chuẩn URL từ chuỗi bất kỳ (hỗ trợ tiếng Việt có dấu).
+ */
+export function slugify(str: string): string {
+  if (!str) return '';
+  return removeDiacritics(str)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}

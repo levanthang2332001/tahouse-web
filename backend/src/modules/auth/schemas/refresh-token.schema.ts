@@ -1,55 +1,49 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema, Types } from 'mongoose';
-import { User } from './user.schema';
+import {
+  sqliteTable,
+  text,
+  integer,
+  index,
+  uniqueIndex,
+} from 'drizzle-orm/sqlite-core';
+import { sql, relations } from 'drizzle-orm';
+import { randomUUID } from 'crypto';
+import { users } from './user.schema';
 
-export type RefreshTokenDocument = RefreshToken & Document;
-
-@Schema({
-  collection: 'refresh_tokens',
-  timestamps: true,
-  toJSON: {
-    virtuals: true,
-    transform: (_, ret: any) => {
-      delete ret._id;
-      delete ret.__v;
-      return ret;
-    },
+export const refreshTokens = sqliteTable(
+  'refresh_tokens',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => randomUUID()),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    hashedToken: text('hashed_token').notNull().unique(),
+    userAgent: text('user_agent'),
+    ipAddress: text('ip_address'),
+    isRevoked: integer('is_revoked', { mode: 'boolean' })
+      .notNull()
+      .default(false),
+    expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
   },
-  toObject: {
-    virtuals: true,
-    transform: (_, ret: any) => {
-      delete ret._id;
-      delete ret.__v;
-      return ret;
-    },
-  },
-})
-export class RefreshToken {
-  @Prop({
-    type: MongooseSchema.Types.ObjectId,
-    ref: User.name,
-    required: true,
-  })
-  userId: Types.ObjectId;
+  (table) => [
+    uniqueIndex('refresh_tokens_hashed_idx').on(table.hashedToken),
+    index('refresh_tokens_user_revoked_idx').on(table.userId, table.isRevoked),
+  ],
+);
 
-  @Prop({ type: String, required: true, unique: true })
-  hashedToken: string;
+export const refreshTokensRelations = relations(refreshTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [refreshTokens.userId],
+    references: [users.id],
+  }),
+}));
 
-  @Prop({ type: String, default: '' })
-  userAgent?: string;
-
-  @Prop({ type: String, default: '' })
-  ipAddress?: string;
-
-  @Prop({ type: Boolean, default: false, index: true })
-  isRevoked: boolean;
-
-  @Prop({ type: Date, required: true })
-  expiresAt: Date;
-}
-
-export const RefreshTokenSchema = SchemaFactory.createForClass(RefreshToken);
-
-// TTL Index: MongoDB tự động dọn dẹp các token hết hạn
-RefreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-RefreshTokenSchema.index({ userId: 1, isRevoked: 1 });
+export type RefreshToken = typeof refreshTokens.$inferSelect;
+export type NewRefreshToken = typeof refreshTokens.$inferInsert;

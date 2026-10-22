@@ -1,35 +1,25 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  BadRequestException,
-  NotFoundException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
 import * as crypto from 'crypto';
-import * as bcrypt from 'bcrypt';
-import { User, UserDocument } from './schemas/user.schema';
-import {
-  RefreshToken,
-  RefreshTokenDocument,
-} from './schemas/refresh-token.schema';
+import * as bcrypt from 'bcryptjs';
+import { User } from './schemas/user.schema';
+import { UsersRepository } from './repositories/users.repository';
+import { RefreshTokensRepository } from './repositories/refresh-tokens.repository';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { BusinessException } from '@/common/exceptions';
+import { ErrorCode } from '@/common/constants';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    @InjectModel(User.name)
-    private readonly userModel: Model<UserDocument>,
-    @InjectModel(RefreshToken.name)
-    private readonly refreshTokenModel: Model<RefreshTokenDocument>,
+    private readonly usersRepository: UsersRepository,
+    private readonly refreshTokensRepository: RefreshTokensRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
@@ -55,12 +45,11 @@ export class AuthService {
     }
   }
 
-  private async generateTokens(user: any) {
+  private async generateTokens(user: User) {
     const payload = {
-      sub: user._id ? user._id.toString() : user.id,
-      username: user.username,
+      sub: user.id,
       email: user.email,
-      fullName: user.fullName,
+      name: user.name,
       role: user.role,
     };
 
@@ -100,23 +89,15 @@ export class AuthService {
 
   async login(loginDto: LoginDto, userAgent?: string, ipAddress?: string) {
     const identifier = loginDto.username.trim().toLowerCase();
-    const user = await this.userModel
-      .findOne({
-        $or: [{ username: identifier }, { email: identifier }],
-      })
-      .select('+password')
-      .exec();
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid username or password');
-    }
+    // Query user via UsersRepository
+    const user = await this.usersRepository.findByEmail(identifier);
 
-    if (user.isActive === false) {
-      throw new UnauthorizedException('Account has been deactivated');
-    }
-
-    if (!user.password) {
-      throw new UnauthorizedException('Invalid username or password');
+    if (!user || !user.password) {
+      throw new BusinessException(
+        ErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Invalid username or password',
+      );
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -124,23 +105,22 @@ export class AuthService {
       user.password,
     );
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid username or password');
+      throw new BusinessException(
+        ErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Invalid username or password',
+      );
     }
 
     const { accessToken, refreshToken, expiresAt } =
       await this.generateTokens(user);
 
-    await this.refreshTokenModel.create({
-      userId: new Types.ObjectId(user._id.toString()),
+    await this.refreshTokensRepository.create({
+      userId: user.id,
       hashedToken: this.hashToken(refreshToken),
       userAgent: userAgent || '',
       ipAddress: ipAddress || '',
       isRevoked: false,
       expiresAt,
-    });
-
-    await this.userModel.findByIdAndUpdate(user._id, {
-      $set: { lastLoginAt: new Date() },
     });
 
     return {
@@ -163,38 +143,33 @@ export class AuthService {
         secret: refreshSecret,
       });
     } catch {
-      throw new UnauthorizedException('Invalid or expired refresh token');
-    }
-
-    const hashedToken = this.hashToken(refreshToken);
-    const tokenRecord = await this.refreshTokenModel.findOne({
-      hashedToken,
-      isRevoked: false,
-      expiresAt: { $gt: new Date() },
-    });
-
-    if (!tokenRecord) {
-      throw new UnauthorizedException(
-        'Refresh token has been revoked or expired',
+      throw new BusinessException(
+        ErrorCode.AUTH_REFRESH_TOKEN_INVALID,
+        'Invalid or expired refresh token',
       );
     }
 
-    const user = await this.userModel.findById(tokenRecord.userId).exec();
-    if (!user) {
-      throw new UnauthorizedException('User not found');
+    const hashedToken = this.hashToken(refreshToken);
+
+    const tokenRecord =
+      await this.refreshTokensRepository.findActiveByHashedToken(hashedToken);
+
+    if (!tokenRecord || !tokenRecord.user) {
+      throw new BusinessException(
+        ErrorCode.AUTH_REFRESH_TOKEN_INVALID,
+        'Refresh token has been revoked, expired or user not found',
+      );
     }
 
-    if (user.isActive === false) {
-      throw new UnauthorizedException('Account has been deactivated');
-    }
+    const user = tokenRecord.user;
 
-    tokenRecord.isRevoked = true;
-    await tokenRecord.save();
+    // Revoke old token
+    await this.refreshTokensRepository.revokeById(tokenRecord.id);
 
     const tokens = await this.generateTokens(user);
 
-    await this.refreshTokenModel.create({
-      userId: new Types.ObjectId(user._id.toString()),
+    await this.refreshTokensRepository.create({
+      userId: user.id,
       hashedToken: this.hashToken(tokens.refreshToken),
       userAgent: userAgent || tokenRecord.userAgent,
       ipAddress: ipAddress || tokenRecord.ipAddress,
@@ -211,58 +186,63 @@ export class AuthService {
   async logout(refreshToken?: string): Promise<{ message: string }> {
     if (refreshToken) {
       const hashedToken = this.hashToken(refreshToken);
-      await this.refreshTokenModel.updateMany(
-        { hashedToken },
-        { $set: { isRevoked: true } },
-      );
+      await this.refreshTokensRepository.revokeByHashedToken(hashedToken);
     }
     return { message: 'Logged out successfully' };
   }
 
   async logoutAll(userId: string): Promise<{ message: string }> {
-    await this.refreshTokenModel.updateMany(
-      { userId: new Types.ObjectId(userId), isRevoked: false },
-      { $set: { isRevoked: true } },
-    );
+    await this.refreshTokensRepository.revokeAllByUserId(userId);
     return { message: 'All sessions have been revoked' };
   }
 
   async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
-    const user = await this.userModel.findById(userId).exec();
+    const user = await this.usersRepository.findById(userId);
+
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new BusinessException(
+        ErrorCode.AUTH_USER_NOT_FOUND,
+        'User not found',
+      );
     }
+
+    const updates: Partial<User> = {
+      updatedAt: new Date(),
+    };
 
     if (updateProfileDto.email) {
       const email = updateProfileDto.email.trim().toLowerCase();
-      const existingEmail = await this.userModel.findOne({
+      const existingEmail = await this.usersRepository.findOtherUserByEmail(
         email,
-        _id: { $ne: user._id },
-      });
+        user.id,
+      );
+
       if (existingEmail) {
-        throw new BadRequestException(
+        throw new BusinessException(
+          ErrorCode.AUTH_EMAIL_EXISTS,
           'Email is already in use by another account',
+          'email',
+          { email },
         );
       }
-      user.email = email;
+      updates.email = email;
     }
 
     if (updateProfileDto.fullName !== undefined) {
-      user.fullName = updateProfileDto.fullName.trim();
+      updates.name = updateProfileDto.fullName.trim();
     }
 
     if (updateProfileDto.avatarUrl !== undefined) {
-      user.avatarUrl = updateProfileDto.avatarUrl.trim();
+      updates.avatar = updateProfileDto.avatarUrl.trim();
     }
 
-    await user.save();
+    await this.usersRepository.update(userId, updates);
 
     return {
-      username: user.username,
-      email: user.email,
-      fullName: user.fullName || '',
-      avatarUrl: user.avatarUrl || '',
-      lastLoginAt: user.lastLoginAt,
+      username: updates.email || user.email,
+      email: updates.email || user.email,
+      fullName: updates.name || user.name || '',
+      avatarUrl: updates.avatar || user.avatar || '',
     };
   }
 
@@ -270,17 +250,20 @@ export class AuthService {
     userId: string,
     changePasswordDto: ChangePasswordDto,
   ): Promise<{ message: string }> {
-    const user = await this.userModel
-      .findById(userId)
-      .select('+password')
-      .exec();
+    const user = await this.usersRepository.findById(userId);
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new BusinessException(
+        ErrorCode.AUTH_USER_NOT_FOUND,
+        'User not found',
+      );
     }
 
     if (!user.password) {
-      throw new BadRequestException('Password is not set for this account');
+      throw new BusinessException(
+        ErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Password is not set for this account',
+      );
     }
 
     const isMatch = await bcrypt.compare(
@@ -288,12 +271,22 @@ export class AuthService {
       user.password,
     );
     if (!isMatch) {
-      throw new BadRequestException('Current password is incorrect');
+      throw new BusinessException(
+        ErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Current password is incorrect',
+      );
     }
 
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(changePasswordDto.newPassword, salt);
-    await user.save();
+    const newHashedPassword = await bcrypt.hash(
+      changePasswordDto.newPassword,
+      salt,
+    );
+
+    await this.usersRepository.update(userId, {
+      password: newHashedPassword,
+      updatedAt: new Date(),
+    });
 
     await this.logoutAll(userId);
 

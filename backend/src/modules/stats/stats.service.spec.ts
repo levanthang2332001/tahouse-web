@@ -1,18 +1,11 @@
-jest.mock('@nestjs/mongoose', () => ({
-  InjectModel: () => () => {},
-  Prop: () => () => {},
-  Schema: () => () => {},
-  SchemaFactory: {
-    createForClass: () => ({ index: jest.fn() }),
-  },
-}));
-
 import { StatsService } from './stats.service';
+import { StatsRepository } from './repositories/stats.repository';
+import { IAdminDashboardStatsResponse } from './types/stats.types';
 
 describe('StatsService', () => {
   let service: StatsService;
 
-  const mockAggregatedOutput = {
+  const mockResponse: IAdminDashboardStatsResponse = {
     summary: {
       totalProducts: 2,
       totalBrands: 2,
@@ -22,7 +15,7 @@ describe('StatsService', () => {
     },
     brands: [
       {
-        id: 1,
+        id: 'b1',
         name: 'Kassler',
         slug: 'kassler',
         logo: '/brand/kassler.png',
@@ -46,7 +39,7 @@ describe('StatsService', () => {
         ],
       },
       {
-        id: 3,
+        id: 'b2',
         name: 'Bosch',
         slug: 'bosch',
         logo: '/brand/bosch.png',
@@ -65,42 +58,24 @@ describe('StatsService', () => {
     ],
   };
 
-  const mockProductModel = {};
-  const mockBrandModel = {
-    aggregate: jest.fn().mockResolvedValue([mockAggregatedOutput]),
+  const mockStatsRepository = {
+    getDashboardStats: jest.fn().mockResolvedValue(mockResponse),
   };
 
   beforeEach(() => {
-    service = new StatsService(mockProductModel as any, mockBrandModel as any);
+    service = new StatsService(
+      mockStatsRepository as unknown as StatsRepository,
+    );
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('should execute hierarchical aggregation (Brand -> Category -> Subcategory)', async () => {
+  it('should delegate getDashboardStats to StatsRepository', async () => {
     const result = await service.getDashboardStats();
 
-    expect(result.summary.totalProducts).toBe(2);
-    expect(result.summary.totalBrands).toBe(2);
-    expect(result.summary.totalCategories).toBe(3);
-    expect(result.summary.totalSubcategories).toBe(2);
-    expect(result.summary.discountedProducts).toBe(1);
-    expect(result.brands.length).toBe(2);
-
-    const kasslerBrand = result.brands.find((b) => b.slug === 'kassler');
-    expect(kasslerBrand).toBeDefined();
-    expect(kasslerBrand?.totalProducts).toBe(1);
-    expect(kasslerBrand?.percentage).toBe(50);
-    expect(kasslerBrand?.categories.length).toBe(1);
-
-    const daiSanhCat = kasslerBrand?.categories[0];
-    expect(daiSanhCat?.slug).toBe('dai-sanh');
-    expect(daiSanhCat?.name).toBe('Khóa Đại Sảnh');
-    expect(daiSanhCat?.totalProducts).toBe(1);
-    expect(daiSanhCat?.percentage).toBe(100);
-    expect(daiSanhCat?.subcategories.length).toBe(1);
-
-    expect(mockBrandModel.aggregate).toHaveBeenCalled();
+    expect(result).toEqual(mockResponse);
+    expect(mockStatsRepository.getDashboardStats).toHaveBeenCalled();
   });
 });

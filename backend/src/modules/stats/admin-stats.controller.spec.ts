@@ -1,11 +1,3 @@
-jest.mock('@nestjs/mongoose', () => ({
-  InjectModel: () => () => {},
-  Prop: () => () => {},
-  Schema: () => () => {},
-  SchemaFactory: {
-    createForClass: () => ({ index: jest.fn() }),
-  },
-}));
 jest.mock('@nestjs/passport', () => ({
   AuthGuard: () => class {},
 }));
