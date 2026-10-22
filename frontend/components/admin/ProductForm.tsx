@@ -1092,24 +1092,17 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                   </div>
                   <div>
                     <CardTitle className="text-base">Thông số kỹ thuật & Công nghệ</CardTitle>
-                    <CardDescription className="text-xs">
-                      Bảng thông số kỹ thuật chi tiết theo cặp Key-Value, thẻ công nghệ và màu sắc.
-                    </CardDescription>
+                    <CardDescription className="text-xs">Thông số, thẻ công nghệ và màu sắc</CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-5">
                 {/* Key Value Specs Editor */}
-                <KeyValueEditor
-                  label="Bảng thông số kỹ thuật (Specs Key-Value)"
-                  description="Thêm các thông số như Xuất xứ, Kích thước, Chất liệu, Nguồn điện, Ruột khóa..."
-                  specs={specs}
-                  onChange={setSpecs}
-                />
+                <KeyValueEditor label="Bảng thông số kỹ thuật" specs={specs} onChange={setSpecs} />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-gray-light/60">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-light/60">
                   <DynamicListInput
-                    label="Thẻ công nghệ nổi bật (Technologies)"
+                    label="Thẻ công nghệ nổi bật"
                     placeholder="VD: Face ID 3D, Chống nước IP65, App Tuya Smart"
                     items={technologies}
                     onChange={setTechnologies}
@@ -1117,7 +1110,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                   />
 
                   <DynamicListInput
-                    label="Tùy chọn màu sắc (Colors)"
+                    label="Màu sắc"
                     placeholder="VD: Đen Titan, Đồng Cổ, Vàng Champagne"
                     items={colors}
                     onChange={setColors}

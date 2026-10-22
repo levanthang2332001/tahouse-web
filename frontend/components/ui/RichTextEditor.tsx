@@ -8,6 +8,7 @@ import {
   Check,
   Globe,
   Type,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,10 @@ interface QuillInstance {
   insertText: (index: number, text: string, format?: string, value?: unknown) => void;
   formatText: (index: number, length: number, format: string, value: unknown) => void;
   setSelection: (index: number, length: number, source?: string) => void;
+  insertEmbed: (index: number, type: string, value: unknown, source?: string) => void;
+  format: (name: string, value: unknown, source?: string) => void;
+  getModule?: (name: string) => unknown;
+  on?: (event: string, handler: (...args: unknown[]) => void) => void;
   getLength: () => number;
   focus: () => void;
   root?: HTMLElement;
@@ -66,7 +71,7 @@ const TOOLBAR_CONTAINER = [
   [{ list: "ordered" }, { list: "bullet" }],
   ["blockquote", "code-block"],
   [{ align: [] }],
-  ["link", "clean"],
+  ["link", "image", "clean"],
 ];
 
 const FORMATS = [
@@ -82,7 +87,62 @@ const FORMATS = [
   "code-block",
   "align",
   "link",
+  "image",
 ];
+
+// Inline formats that only apply to highlighted text: disabled while nothing is selected
+const SELECTION_FORMATS = ["bold", "italic", "underline", "strike"] as const;
+
+/** Enables/disables the selection-only toolbar buttons to match whether text is highlighted. */
+function syncSelectionButtons(quill: QuillInstance, hasSelection: boolean) {
+  const toolbar = quill.getModule?.("toolbar") as { container?: HTMLElement } | undefined;
+  for (const name of SELECTION_FORMATS) {
+    toolbar?.container?.querySelectorAll<HTMLButtonElement>(`button.ql-${name}`).forEach((button) => {
+      button.disabled = !hasSelection;
+      button.style.opacity = hasSelection ? "" : "0.35";
+      button.style.cursor = hasSelection ? "" : "not-allowed";
+      button.title = hasSelection ? "" : "Bôi đen đoạn chữ trước khi định dạng";
+    });
+  }
+}
+
+/**
+ * One row, one height: every toolbar control is a 32px box with an 18px icon, vertically centred.
+ * Icon pickers (align, colours) look like plain buttons; only the heading picker keeps its bordered box.
+ * Component-scoped (not globals.css) and `!` because globals.css styles `.ql-picker-label` more specifically.
+ */
+const TOOLBAR_LAYOUT = [
+  "[&_.ql-toolbar]:flex! [&_.ql-toolbar]:flex-wrap [&_.ql-toolbar]:items-center [&_.ql-toolbar]:gap-y-1.5",
+  "[&_.ql-formats]:inline-flex! [&_.ql-formats]:items-center [&_.ql-formats]:gap-0.5",
+  // buttons
+  "[&_.ql-toolbar_button]:flex! [&_.ql-toolbar_button]:h-8! [&_.ql-toolbar_button]:w-8! [&_.ql-toolbar_button]:items-center [&_.ql-toolbar_button]:justify-center [&_.ql-toolbar_button]:p-0! [&_.ql-toolbar_button]:float-none!",
+  "[&_.ql-toolbar_button_svg]:size-[18px]!",
+  // icon pickers (align, text colour, background)
+  "[&_.ql-icon-picker]:h-8! [&_.ql-icon-picker]:w-8! [&_.ql-color-picker]:h-8! [&_.ql-color-picker]:w-8! [&_.ql-picker]:float-none!",
+  "[&_.ql-icon-picker_.ql-picker-label]:flex! [&_.ql-color-picker_.ql-picker-label]:flex! [&_.ql-icon-picker_.ql-picker-label]:items-center! [&_.ql-color-picker_.ql-picker-label]:items-center! [&_.ql-icon-picker_.ql-picker-label]:justify-center! [&_.ql-color-picker_.ql-picker-label]:justify-center!",
+  "[&_.ql-icon-picker_.ql-picker-label]:p-0! [&_.ql-color-picker_.ql-picker-label]:p-0! [&_.ql-icon-picker_.ql-picker-label]:border-transparent! [&_.ql-color-picker_.ql-picker-label]:border-transparent! [&_.ql-icon-picker_.ql-picker-label]:bg-transparent! [&_.ql-color-picker_.ql-picker-label]:bg-transparent!",
+  "[&_.ql-icon-picker_.ql-picker-label_svg]:static! [&_.ql-color-picker_.ql-picker-label_svg]:static! [&_.ql-icon-picker_.ql-picker-label_svg]:size-[18px]! [&_.ql-color-picker_.ql-picker-label_svg]:size-[18px]!",
+  // heading picker: same height, text vertically centred
+  "[&_.ql-header.ql-picker]:h-8! [&_.ql-header_.ql-picker-label]:flex! [&_.ql-header_.ql-picker-label]:items-center!",
+].join(" ");
+
+// Mirrors the backend upload limit for images
+const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
+const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+/** Uploads an image to R2 through the admin upload API and returns its public URL. */
+async function uploadEditorImage(file: File): Promise<string> {
+  if (!IMAGE_TYPES.includes(file.type)) throw new Error(`"${file.name}" không phải ảnh JPG, PNG, WEBP hoặc GIF`);
+  if (file.size > MAX_IMAGE_BYTES) throw new Error(`"${file.name}" vượt quá 15MB`);
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("folder", "products");
+  const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+  const data = await res.json().catch(() => ({}));
+  const url = data?.data?.url;
+  if (!res.ok || typeof url !== "string" || !url) throw new Error(data?.message || `Tải ảnh "${file.name}" thất bại`);
+  return url;
+}
 
 export function RichTextEditor({
   label,
@@ -103,6 +163,81 @@ export function RichTextEditor({
   const [linkText, setLinkText] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
   const [savedRange, setSavedRange] = useState<{ index: number; length: number } | null>(null);
+
+  // Image upload state
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingImages, setUploadingImages] = useState(0);
+  const pasteBoundRootRef = useRef<HTMLElement | null>(null);
+
+  const getQuill = () =>
+    (quillComponentRef.current?.getEditor?.() as QuillInstance | undefined) || activeQuillRef.current;
+
+  /** Uploads images and embeds them at the cursor (or the end), one after another in order. */
+  const insertImages = async (files: File[]) => {
+    const images = files.filter((f) => f.type.startsWith("image/"));
+    if (images.length === 0) return;
+    setUploadingImages((n) => n + images.length);
+    for (const file of images) {
+      try {
+        const url = await uploadEditorImage(file);
+        const quill = getQuill();
+        if (!quill) continue;
+        const range = quill.getSelection(true);
+        const index = range ? range.index : Math.max(0, quill.getLength() - 1);
+        quill.insertEmbed(index, "image", url, "user");
+        quill.setSelection(index + 1, 0, "user");
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Tải ảnh thất bại");
+      } finally {
+        setUploadingImages((n) => n - 1);
+      }
+    }
+  };
+
+  const selectionBoundRef = useRef<QuillInstance | null>(null);
+  const bindSelectionButtons = (quill: QuillInstance) => {
+    if (selectionBoundRef.current === quill) return;
+    selectionBoundRef.current = quill;
+    syncSelectionButtons(quill, false);
+    quill.on?.("selection-change", (range) => {
+      // null range = editor lost focus; keep the last state so clicking a toolbar button still works
+      if (range === null) return;
+      syncSelectionButtons(quill, (range as { length: number }).length > 0);
+    });
+  };
+
+  /**
+   * Quill embeds pasted/dropped images as base64 data URLs, which bloats the saved HTML by megabytes.
+   * Intercept them (capture phase, before Quill sees them) and upload to R2 instead.
+   * Binding once is safe: insertImages only reads refs and stable state setters.
+   */
+  const bindImagePasteAndDrop = (root?: HTMLElement) => {
+    if (!root || pasteBoundRootRef.current === root) return;
+    pasteBoundRootRef.current = root;
+    const imageFiles = (list?: FileList | null) => Array.from(list ?? []).filter((f) => f.type.startsWith("image/"));
+    root.addEventListener(
+      "paste",
+      (e: ClipboardEvent) => {
+        const files = imageFiles(e.clipboardData?.files);
+        if (files.length === 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        void insertImages(files);
+      },
+      true,
+    );
+    root.addEventListener(
+      "drop",
+      (e: DragEvent) => {
+        const files = imageFiles(e.dataTransfer?.files);
+        if (files.length === 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        void insertImages(files);
+      },
+      true,
+    );
+  };
 
   // Synchronize external changes to value (e.g. initial fetch or form reset) into Quill
   useEffect(() => {
@@ -133,6 +268,22 @@ export function RichTextEditor({
       toolbar: {
         container: TOOLBAR_CONTAINER,
         handlers: {
+          ...Object.fromEntries(
+            SELECTION_FORMATS.map((name) => [
+              name,
+              function (this: unknown, value: unknown) {
+                const quill = (this as { quill?: QuillInstance }).quill;
+                const range = quill?.getSelection();
+                if (!quill || !range || range.length === 0) return;
+                quill.format(name, value, "user");
+              },
+            ]),
+          ),
+          image: function () {
+            const quill = (this as unknown as { quill?: QuillInstance }).quill;
+            if (quill) activeQuillRef.current = quill;
+            imageInputRef.current?.click();
+          },
           link: function () {
             const toolbarContext = this as unknown as { quill?: QuillInstance };
             const quill = toolbarContext.quill;
@@ -155,6 +306,21 @@ export function RichTextEditor({
       },
       keyboard: {
         bindings: {
+          // Same rule as the toolbar: Ctrl/⌘+B/I/U only format highlighted text
+          ...Object.fromEntries(
+            (["bold", "italic", "underline"] as const).map((name) => [
+              name,
+              {
+                key: name[0],
+                shortKey: true,
+                handler: function (this: unknown, range: { length: number }, context: { format: Record<string, unknown> }) {
+                  const quill = (this as { quill?: QuillInstance }).quill;
+                  if (quill && range.length > 0) quill.format(name, !context.format[name], "user");
+                  return false;
+                },
+              },
+            ]),
+          ),
           enterScroll: {
             key: "Enter",
             shiftKey: null,
@@ -277,7 +443,7 @@ export function RichTextEditor({
             }
           }
         }}
-        className="quill-editor-wrapper relative rounded-2xl border border-brand-green/30 bg-white shadow-xs focus-within:border-brand-green focus-within:ring-2 focus-within:ring-brand-green/20 transition-all cursor-text"
+        className={`quill-editor-wrapper relative rounded-2xl border border-brand-green/30 bg-white shadow-xs focus-within:border-brand-green focus-within:ring-2 focus-within:ring-brand-green/20 transition-all cursor-text ${TOOLBAR_LAYOUT}`}
       >
         <ReactQuill
           ref={(instance: ReactQuillComponent | null) => {
@@ -286,6 +452,8 @@ export function RichTextEditor({
               const editor = instance.getEditor?.() || instance.editor;
               if (editor) {
                 activeQuillRef.current = editor;
+                bindImagePasteAndDrop(editor.root);
+                bindSelectionButtons(editor);
                 // If there is an initial value and editor root is empty, ensure it's populated
                 const current = editor.root?.innerHTML || "";
                 const clean = current === "<p><br></p>" ? "" : current;
@@ -310,7 +478,27 @@ export function RichTextEditor({
           formats={FORMATS}
           placeholder={placeholder}
         />
+
+        {uploadingImages > 0 && (
+          <div className="pointer-events-none absolute right-3 top-14 z-10 flex items-center gap-1.5 rounded-lg bg-navy/85 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm">
+            <Loader2 size={13} className="animate-spin" /> Đang tải {uploadingImages} ảnh lên...
+          </div>
+        )}
       </div>
+
+      {/* Hidden picker behind the toolbar's image button */}
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept={IMAGE_TYPES.join(",")}
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          const files = Array.from(e.target.files ?? []);
+          e.target.value = "";
+          void insertImages(files);
+        }}
+      />
 
       {/* Custom Link Modal / Dialog */}
       {linkModalOpen && (

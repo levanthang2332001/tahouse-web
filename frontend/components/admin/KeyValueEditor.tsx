@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Plus, Trash2, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { useRef, useState } from "react";
+import { Plus, Trash2 } from "lucide-react";
 
 interface KeyValueEditorProps {
   label: string;
@@ -29,6 +27,10 @@ const COMMON_SPEC_KEYS = [
   "Trọng lượng",
 ];
 
+// Borderless cells inside one table; the row divider does the separating
+const CELL_INPUT =
+  "h-9 w-full min-w-0 rounded-lg border border-transparent bg-transparent px-2.5 text-sm text-navy placeholder:text-navy/40 hover:border-gray-light focus:border-brand-green focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-green/20";
+
 function SpecRow({
   specKey,
   specValue,
@@ -51,72 +53,71 @@ function SpecRow({
     setKeyInput(specKey);
   }
 
+  const commitKey = () => {
+    if (keyInput.trim() && keyInput !== specKey) onUpdateKey(specKey, keyInput.trim());
+    else setKeyInput(specKey);
+  };
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center rounded-xl bg-white border border-gray-light/60 p-2 text-xs">
-      <div className="sm:col-span-4">
-        <Input
-          type="text"
-          value={keyInput}
-          onChange={(e) => setKeyInput(e.target.value)}
-          onBlur={() => {
-            if (keyInput.trim() && keyInput !== specKey) {
-              onUpdateKey(specKey, keyInput.trim());
-            }
-          }}
-          placeholder="Tên thông số"
-          className="h-8 text-xs font-bold text-navy"
-        />
-      </div>
-      <div className="sm:col-span-7">
-        <Input
-          type="text"
-          value={specValue}
-          onChange={(e) => onUpdateValue(specKey, e.target.value)}
-          placeholder="Nhập giá trị thông số..."
-          className="h-8 text-xs"
-        />
-      </div>
-      <div className="sm:col-span-1 text-right">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => onRemove(specKey)}
-          className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
-          title="Xóa thông số"
-        >
-          <Trash2 size={13} />
-        </Button>
-      </div>
+    <div className="group grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)_auto] items-center gap-1 px-1.5 py-1">
+      <input
+        type="text"
+        value={keyInput}
+        onChange={(e) => setKeyInput(e.target.value)}
+        onBlur={commitKey}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            commitKey();
+          }
+        }}
+        placeholder="Tên thông số"
+        aria-label="Tên thông số"
+        className={`${CELL_INPUT} font-semibold`}
+      />
+      <input
+        type="text"
+        value={specValue}
+        onChange={(e) => onUpdateValue(specKey, e.target.value)}
+        placeholder="Giá trị"
+        aria-label={`Giá trị ${specKey}`}
+        className={CELL_INPUT}
+      />
+      <button
+        type="button"
+        onClick={() => onRemove(specKey)}
+        title="Xóa thông số"
+        aria-label={`Xóa ${specKey}`}
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-navy/40 transition-colors hover:bg-rose-50 hover:text-rose-600 cursor-pointer"
+      >
+        <Trash2 size={14} />
+      </button>
     </div>
   );
 }
 
-export function KeyValueEditor({
-  label,
-  specs = {},
-  onChange,
-  description,
-}: KeyValueEditorProps) {
+export function KeyValueEditor({ label, specs = {}, onChange, description }: KeyValueEditorProps) {
   const [newKey, setNewKey] = useState("");
   const [newValue, setNewValue] = useState("");
+  const newKeyRef = useRef<HTMLInputElement>(null);
+  const newValueRef = useRef<HTMLInputElement>(null);
+
+  const entries = Object.entries(specs);
+  const suggestions = COMMON_SPEC_KEYS.filter((k) => specs[k] === undefined);
 
   const handleAdd = () => {
-    if (!newKey.trim()) return;
-    onChange({
-      ...specs,
-      [newKey.trim()]: newValue.trim(),
-    });
+    const key = newKey.trim();
+    if (!key) return;
+    onChange({ ...specs, [key]: newValue.trim() });
     setNewKey("");
     setNewValue("");
+    newKeyRef.current?.focus();
   };
 
-  const handleAddSuggestedKey = (key: string) => {
-    if (specs[key] !== undefined) return;
-    onChange({
-      ...specs,
-      [key]: "",
-    });
+  // A suggestion fills the new-row name and jumps to its value, so the admin only types the value
+  const handlePickSuggestion = (key: string) => {
+    setNewKey(key);
+    newValueRef.current?.focus();
   };
 
   const handleRemove = (keyToRemove: string) => {
@@ -125,116 +126,94 @@ export function KeyValueEditor({
     onChange(next);
   };
 
-  const handleUpdateValue = (key: string, val: string) => {
-    onChange({
-      ...specs,
-      [key]: val,
-    });
-  };
+  const handleUpdateValue = (key: string, val: string) => onChange({ ...specs, [key]: val });
 
   const handleUpdateKey = (oldKey: string, nextKey: string) => {
     if (!nextKey.trim() || oldKey === nextKey) return;
     const next: Record<string, string> = {};
-    for (const [k, v] of Object.entries(specs)) {
-      if (k === oldKey) {
-        next[nextKey.trim()] = v;
-      } else {
-        next[k] = v;
-      }
-    }
+    for (const [k, v] of Object.entries(specs)) next[k === oldKey ? nextKey.trim() : k] = v;
     onChange(next);
   };
 
-  const entries = Object.entries(specs);
-
   return (
-    <div className="space-y-3">
-      <div className="flex flex-col">
-        <label className="text-xs font-bold text-navy">{label}</label>
-        {description && (
-          <span className="text-[11px] text-navy/50">{description}</span>
-        )}
+    <div className="space-y-2">
+      <div className="flex items-baseline justify-between gap-3">
+        <label className="text-xs font-bold text-navy">
+          {label} <span className="font-normal text-navy/50">({entries.length})</span>
+        </label>
+        {description && <span className="hidden truncate text-xs text-navy/50 sm:block">{description}</span>}
       </div>
 
-      {/* Suggested quick chips */}
-      <div className="space-y-1.5">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-navy/50 flex items-center gap-1">
-          <Sparkles size={12} className="text-brand-green" /> Thêm nhanh thông số phổ biến:
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          {COMMON_SPEC_KEYS.map((k) => {
-            const isAdded = specs[k] !== undefined;
-            return (
-              <button
-                key={k}
-                type="button"
-                onClick={() => handleAddSuggestedKey(k)}
-                disabled={isAdded}
-                className={`text-[10.5px] font-medium rounded-lg px-2 py-0.5 border transition-all cursor-pointer ${
-                  isAdded
-                    ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
-                    : "bg-[#FAF9F5] text-navy/70 border-gray-light/70 hover:bg-brand-green/10 hover:text-brand-green hover:border-brand-green/40"
-                }`}
-              >
-                + {k}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <div className="divide-y divide-gray-light/60 overflow-hidden rounded-xl border border-gray-light/80 bg-white">
+        {entries.map(([key, val]) => (
+          <SpecRow
+            key={key}
+            specKey={key}
+            specValue={val}
+            onUpdateKey={handleUpdateKey}
+            onUpdateValue={handleUpdateValue}
+            onRemove={handleRemove}
+          />
+        ))}
 
-      {/* Add custom Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 pt-1">
-        <div className="sm:col-span-4">
-          <Input
+        {/* Always-present empty row: type a name and value, press Enter */}
+        <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)_auto] items-center gap-1 bg-[#FAF9F5] px-1.5 py-1">
+          <input
+            ref={newKeyRef}
             type="text"
-            placeholder="Tên thông số (VD: Kích thước)"
             value={newKey}
             onChange={(e) => setNewKey(e.target.value)}
-            className="text-xs h-10"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                if (newKey.trim()) newValueRef.current?.focus();
+              }
+            }}
+            placeholder="Thêm thông số..."
+            aria-label="Tên thông số mới"
+            className={`${CELL_INPUT} font-semibold`}
           />
-        </div>
-        <div className="sm:col-span-6">
-          <Input
+          <input
+            ref={newValueRef}
             type="text"
-            placeholder="Giá trị (VD: 380 x 75 x 25 mm)"
             value={newValue}
             onChange={(e) => setNewValue(e.target.value)}
-            className="text-xs h-10"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAdd();
+              }
+            }}
+            placeholder="Giá trị, Enter để thêm"
+            aria-label="Giá trị thông số mới"
+            className={CELL_INPUT}
           />
-        </div>
-        <div className="sm:col-span-2">
-          <Button
+          <button
             type="button"
-            variant="outline"
-            size="sm"
             onClick={handleAdd}
-            className="w-full text-xs font-bold h-10"
+            disabled={!newKey.trim()}
+            title="Thêm thông số"
+            aria-label="Thêm thông số"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#3f741b] transition-colors hover:bg-brand-green/15 disabled:cursor-not-allowed disabled:text-navy/25 disabled:hover:bg-transparent cursor-pointer"
           >
-            <Plus size={14} />
-            <span>Thêm</span>
-          </Button>
+            <Plus size={16} />
+          </button>
         </div>
       </div>
 
-      {/* Existing Specs List */}
-      {entries.length > 0 && (
-        <div className="space-y-2 rounded-2xl border border-gray-light/70 bg-[#FAF9F5]/60 p-3">
-          <div className="text-[11px] font-bold text-navy/60 uppercase tracking-wider mb-2">
-            Danh sách thông số đã cấu hình ({entries.length})
-          </div>
-          <div className="space-y-1.5">
-            {entries.map(([key, val]) => (
-              <SpecRow
-                key={key}
-                specKey={key}
-                specValue={val}
-                onUpdateKey={handleUpdateKey}
-                onUpdateValue={handleUpdateValue}
-                onRemove={handleRemove}
-              />
-            ))}
-          </div>
+      {suggestions.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-xs text-navy/50">Gợi ý:</span>
+          {suggestions.map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => handlePickSuggestion(k)}
+              className="rounded-md border border-gray-light/80 bg-white px-2 py-0.5 text-xs text-navy/70 transition-colors hover:border-brand-green/50 hover:bg-brand-green/10 hover:text-[#3f741b] cursor-pointer"
+            >
+              {k}
+            </button>
+          ))}
         </div>
       )}
     </div>
