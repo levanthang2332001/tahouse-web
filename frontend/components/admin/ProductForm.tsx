@@ -40,6 +40,7 @@ import { toast } from "@/components/ui/toast";
 import { CATEGORY_LABELS } from "@/data/catalog-taxonomy";
 import { formatProductName } from "@/lib/format-product-name";
 import { slugify } from "@/lib/utils";
+import { findBrand, type BrandTaxonomy } from "@/lib/types/brand-taxonomy";
 import type { Product } from "@/lib/types/product";
 
 interface ProductFormProps {
@@ -70,6 +71,8 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
   const [code, setCode] = useState(formatProductName(initialData?.code || ""));
   const [brand, setBrand] = useState(initialData?.brand || "");
   const [availableBrands, setAvailableBrands] = useState<Array<{ value: string; label: string }>>([]);
+  // Full brand records keep each brand's category tree for the category pickers and auto-sync on save
+  const [brandRecords, setBrandRecords] = useState<BrandTaxonomy[]>([]);
 
   const [isCustomBrand, setIsCustomBrand] = useState(false);
   const [customBrandName, setCustomBrandName] = useState("");
@@ -77,27 +80,27 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
   useEffect(() => {
     fetch("/api/brands")
       .then((res) => res.json())
-      .then((data: Array<{ name: string }>) => {
+      .then((data: BrandTaxonomy[]) => {
         if (Array.isArray(data) && data.length > 0) {
+          setBrandRecords(data);
           const mapped = data.map((b) => ({
             value: b.name,
             label: b.name,
           }));
-          setAvailableBrands(mapped);
-          if (!initialData?.brand && mapped[0]?.value) {
-            setBrand((prev) => prev || mapped[0].value);
-          }
+          // No preselected brand: a default would silently add the chosen category to that brand's tree
+          setAvailableBrands([{ value: "", label: "— Chọn thương hiệu —" }, ...mapped]);
         }
       })
       .catch(() => {});
   }, [initialData?.brand]);
 
-  const [category, setCategory] = useState(initialData?.category || "dai-sanh");
+  const [category, setCategory] = useState(initialData?.category || "");
   const [categoryName, setCategoryName] = useState(
-    initialData?.categoryName || CATEGORY_LABELS[initialData?.category || "dai-sanh"] || "Khóa đại sảnh",
+    initialData?.categoryName || (initialData?.category ? CATEGORY_LABELS[initialData.category] : "") || "",
   );
   const [subcategory, setSubcategory] = useState(initialData?.subcategory || "");
   const [subcategoryName, setSubcategoryName] = useState(initialData?.subcategoryName || "");
+  const [isNewSubcategory, setIsNewSubcategory] = useState(false);
 
   // Pricing State
   const [price, setPrice] = useState<string>(
@@ -166,12 +169,10 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
     setName(formatProductName(initialData.name || ""));
     setId(initialData.id || "");
     setCode(formatProductName(initialData.code || ""));
-    setBrand(initialData.brand || "Kassler");
-    setCategory(initialData.category || "dai-sanh");
+    setBrand(initialData.brand || "");
+    setCategory(initialData.category || "");
     setCategoryName(
-      initialData.categoryName ||
-        CATEGORY_LABELS[initialData.category || "dai-sanh"] ||
-        "Khóa đại sảnh",
+      initialData.categoryName || (initialData.category ? CATEGORY_LABELS[initialData.category] : "") || "",
     );
     setSubcategory(initialData.subcategory || "");
     setSubcategoryName(initialData.subcategoryName || "");
@@ -341,6 +342,31 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
     }
   };
 
+  // Category pickers follow the selected brand's tree; anything picked outside it is added on save
+  const selectedBrand = findBrand(brandRecords, brand);
+  const brandCategories = selectedBrand?.categories ?? [];
+  const otherCategories = Object.entries(CATEGORY_LABELS).filter(
+    ([slug]) => !brandCategories.some((c) => c.slug === slug),
+  );
+  const isKnownCategory = brandCategories.some((c) => c.slug === category) || Object.hasOwn(CATEGORY_LABELS, category);
+  const categoryMissingFromBrand =
+    Boolean(selectedBrand && category) && !brandCategories.some((c) => c.slug === category);
+  const subcategoryOptions = brandCategories.find((c) => c.slug === category)?.subcategories ?? [];
+  const isKnownSubcategory = !subcategory || subcategoryOptions.some((s) => s.slug === subcategory);
+
+  const handleBrandChange = (nextBrand: string) => {
+    setBrand(nextBrand);
+    const nextRecord = findBrand(brandRecords, nextBrand);
+    // Typing a custom brand name calls this on every keystroke; keep the form unless the brand really changed
+    if (nextRecord === findBrand(brandRecords, brand)) return;
+    const tree = nextRecord?.categories ?? [];
+    setCategoryName(tree.find((c) => c.slug === category)?.name || CATEGORY_LABELS[category] || category);
+    // A subcategory belongs to one brand's tree; never carry it over to another brand
+    setSubcategory("");
+    setSubcategoryName("");
+    setIsNewSubcategory(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -366,6 +392,12 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
 
     if (!category.trim()) {
       toast.error("Vui lòng chọn danh mục chính");
+      document.getElementById("sec-sidebar-org")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+
+    if (subcategoryName.trim() && !subcategory.trim()) {
+      toast.error("Vui lòng nhập mã (slug) cho danh mục phụ");
       document.getElementById("sec-sidebar-org")?.scrollIntoView({ behavior: "smooth" });
       return;
     }
@@ -433,8 +465,9 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
       brandSlug: slugify(brand),
       category: category.trim(),
       categoryName: categoryName.trim() || CATEGORY_LABELS[category] || category,
-      subcategory: subcategory.trim() || undefined,
-      subcategoryName: subcategoryName.trim() || undefined,
+      // Empty strings (not undefined, which JSON drops) so clearing the subcategory clears it on the backend
+      subcategory: subcategory.trim(),
+      subcategoryName: subcategory.trim() ? subcategoryName.trim() : "",
       imageUrl: imageUrl.trim() || "/images/placeholder-product.png",
       price: parsedPrice,
       originalPrice: parsedOrigPrice,
@@ -499,6 +532,13 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
           : `Đã tạo mới sản phẩm: ${payload.name}`,
       );
 
+      // The API route syncs the brand's category tree alongside the save and reports back
+      const taxonomy = data.taxonomy as { added?: string[]; warning?: string } | undefined;
+      if (taxonomy?.added?.length) {
+        toast.info(`Đã thêm ${taxonomy.added.map((label) => `"${label}"`).join(", ")} vào danh mục của ${brand.trim()}`);
+      }
+      if (taxonomy?.warning) toast.warning(`Đã lưu sản phẩm. ${taxonomy.warning}`);
+
       router.push("/admin/products");
       router.refresh();
     } catch {
@@ -507,11 +547,6 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
       setSubmitting(false);
     }
   };
-
-  const categorySelectOptions = Object.entries(CATEGORY_LABELS).map(([slug, lbl]) => ({
-    value: slug,
-    label: lbl,
-  }));
 
   const shouldRenderSection = (secId: string) => {
     if (viewMode === "continuous") return true;
@@ -1308,14 +1343,14 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                     value={customBrandName}
                     onChange={(e) => {
                       setCustomBrandName(e.target.value);
-                      setBrand(e.target.value);
+                      handleBrandChange(e.target.value);
                     }}
                     className="font-bold text-xs h-9"
                   />
                 ) : (
                   <Select
                     value={brand}
-                    onChange={(e) => setBrand(e.target.value)}
+                    onChange={(e) => handleBrandChange(e.target.value)}
                     options={availableBrands}
                   />
                 )}
@@ -1331,10 +1366,39 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                   onChange={(e) => {
                     const val = e.target.value;
                     setCategory(val);
-                    setCategoryName(CATEGORY_LABELS[val] || val);
+                    setCategoryName(brandCategories.find((c) => c.slug === val)?.name || CATEGORY_LABELS[val] || val);
+                    // Subcategories belong to a category, so start over when it changes
+                    setSubcategory("");
+                    setSubcategoryName("");
+                    setIsNewSubcategory(false);
                   }}
-                  options={categorySelectOptions}
-                />
+                >
+                  <option value="" disabled>
+                    — Chọn danh mục —
+                  </option>
+                  {brandCategories.length > 0 && (
+                    <optgroup label={`Danh mục của ${selectedBrand?.name}`}>
+                      {brandCategories.map((c) => (
+                        <option key={c.slug} value={c.slug}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                  <optgroup label={selectedBrand ? "Danh mục khác (tự thêm vào hãng khi lưu)" : "Tất cả danh mục"}>
+                    {otherCategories.map(([slug, label]) => (
+                      <option key={slug} value={slug}>
+                        {label}
+                      </option>
+                    ))}
+                  </optgroup>
+                  {!isKnownCategory && category && <option value={category}>{categoryName || category}</option>}
+                </Select>
+                {categoryMissingFromBrand && (
+                  <p className="text-xs text-amber-700">
+                    Chưa có trong danh mục của {selectedBrand?.name}, sẽ tự thêm khi lưu sản phẩm.
+                  </p>
+                )}
               </div>
 
               {/* Category Name Display */}
@@ -1349,16 +1413,76 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                 />
               </div>
 
-              {/* Subcategory */}
+              {/* Subcategory: pick from the brand tree, or type a new one (slug is derived) */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-navy">Danh mục phụ (Subcategory slug)</label>
-                <Input
-                  type="text"
-                  placeholder="VD: cua-go hoặc ket-mini (tùy chọn)"
-                  value={subcategory}
-                  onChange={(e) => setSubcategory(e.target.value)}
-                  className="text-xs h-9"
-                />
+                <label className="text-xs font-bold text-navy">Danh mục phụ</label>
+                {isNewSubcategory ? (
+                  <>
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        autoFocus
+                        placeholder="VD: Két sắt mini"
+                        value={subcategoryName}
+                        onChange={(e) => {
+                          // Keep the slug following the name until the admin edits it by hand
+                          if (subcategory === slugify(subcategoryName)) setSubcategory(slugify(e.target.value));
+                          setSubcategoryName(e.target.value);
+                        }}
+                        className="text-xs h-9"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setIsNewSubcategory(false);
+                          setSubcategory("");
+                          setSubcategoryName("");
+                        }}
+                        className="h-9 shrink-0 text-xs"
+                      >
+                        Hủy
+                      </Button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="shrink-0 text-xs text-navy/60">Mã:</span>
+                      <Input
+                        type="text"
+                        placeholder="vd: ket-sat-mini"
+                        value={subcategory}
+                        onChange={(e) => setSubcategory(slugify(e.target.value))}
+                        className="h-8 font-mono text-xs"
+                      />
+                    </div>
+                    {selectedBrand && <p className="text-xs text-navy/60">Sẽ tự thêm vào danh mục của {selectedBrand.name} khi lưu.</p>}
+                  </>
+                ) : (
+                  <Select
+                    value={subcategory}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "__new__") {
+                        setIsNewSubcategory(true);
+                        setSubcategory("");
+                        setSubcategoryName("");
+                        return;
+                      }
+                      setSubcategory(val);
+                      setSubcategoryName(subcategoryOptions.find((sub) => sub.slug === val)?.name || "");
+                    }}
+                    className="text-xs h-9"
+                  >
+                    <option value="">Không có</option>
+                    {subcategoryOptions.map((sub) => (
+                      <option key={sub.slug} value={sub.slug}>
+                        {sub.name}
+                      </option>
+                    ))}
+                    {!isKnownSubcategory && <option value={subcategory}>{subcategoryName || subcategory}</option>}
+                    <option value="__new__">+ Thêm danh mục phụ mới</option>
+                  </Select>
+                )}
               </div>
             </CardContent>
           </Card>

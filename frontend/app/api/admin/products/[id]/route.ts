@@ -1,43 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAdminRequestAuth } from "@/lib/admin/auth";
-import { adminBackendFetch } from "@/lib/admin/api-client";
+import { adminBackendFetch, adminErrorResponse } from "@/lib/admin/api-client";
+import { prepareBrandTaxonomy, resolveBrandId, validateTaxonomyFields } from "@/lib/admin/brand-taxonomy";
 import { invalidateRemoteProductsCache } from "@/lib/admin/product-store";
 import type { Product } from "@/lib/types/product";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
-
-interface BackendBrandItem {
-  id: number;
-  name: string;
-  slug: string;
-}
-
-let cachedBrandMap: Map<string, number> | null = null;
-let lastBrandMapTime = 0;
-
-async function getBrandIdByNameOrSlug(brandStr?: string): Promise<number | undefined> {
-  if (!brandStr) return undefined;
-  const now = Date.now();
-  if (!cachedBrandMap || now - lastBrandMapTime > 5 * 60 * 1000) {
-    try {
-      const brands = await adminBackendFetch<BackendBrandItem[]>("/admin/brands");
-      const map = new Map<string, number>();
-      for (const b of brands) {
-        if (b.id) {
-          map.set(b.name.toLowerCase(), b.id);
-          map.set(b.slug.toLowerCase(), b.id);
-        }
-      }
-      cachedBrandMap = map;
-      lastBrandMapTime = now;
-    } catch {
-      // ignore
-    }
-  }
-  return cachedBrandMap?.get(brandStr.toLowerCase());
-}
 
 export async function GET(request: NextRequest, context: RouteContext) {
   const user = checkAdminRequestAuth(request);
@@ -98,12 +68,17 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       );
     }
 
-    const body = (await request.json()) as Partial<Product>;
-    if (!body || typeof body !== "object") {
+    const body = (await request.json().catch(() => null)) as Partial<Product> | null;
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
       return NextResponse.json(
         { message: "Dữ liệu cập nhật không hợp lệ" },
         { status: 400 },
       );
+    }
+
+    const taxonomyError = validateTaxonomyFields(body as Record<string, unknown>);
+    if (taxonomyError) {
+      return NextResponse.json({ message: taxonomyError }, { status: 400 });
     }
 
     if (body.name !== undefined && (typeof body.name !== "string" || !body.name.trim())) {
@@ -116,7 +91,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     // Resolve brandId if missing
     let brandId = body.brandId;
     if (!brandId && body.brand) {
-      brandId = await getBrandIdByNameOrSlug(body.brand);
+      brandId = await resolveBrandId(body.brand);
     }
 
     const payload = {
@@ -124,13 +99,13 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       ...(brandId ? { brandId } : {}),
     };
 
-    const updated = await adminBackendFetch<Product>(
-      `/admin/products/${encodeURIComponent(cleanId)}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(payload),
-      },
-    );
+    // Keep the brand's category tree in step with its products, only once the save has succeeded
+    const taxonomy = await prepareBrandTaxonomy(payload);
+    const updated = await adminBackendFetch<Product>(`/admin/products/${encodeURIComponent(cleanId)}`, {
+      method: "PATCH",
+      body: JSON.stringify(taxonomy.payload),
+    });
+    const taxonomySync = await taxonomy.sync();
 
     invalidateRemoteProductsCache();
 
@@ -138,18 +113,11 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       success: true,
       message: "Cập nhật sản phẩm thành công",
       product: updated,
+      taxonomy: taxonomySync,
     });
   } catch (error) {
     console.error("[PUT /api/admin/products/[id]]", error);
-    return NextResponse.json(
-      {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Lỗi hệ thống khi cập nhật sản phẩm",
-      },
-      { status: 400 },
-    );
+    return adminErrorResponse(error, "Lỗi hệ thống khi cập nhật sản phẩm");
   }
 }
 

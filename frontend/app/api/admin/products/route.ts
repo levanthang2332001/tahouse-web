@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAdminRequestAuth } from "@/lib/admin/auth";
-import { adminBackendFetch } from "@/lib/admin/api-client";
+import { adminBackendFetch, adminErrorResponse } from "@/lib/admin/api-client";
+import { prepareBrandTaxonomy, resolveBrandId, validateTaxonomyFields } from "@/lib/admin/brand-taxonomy";
 import { getAdminStats, invalidateRemoteProductsCache, PRODUCT_SECTORS } from "@/lib/admin/product-store";
 import type { Product } from "@/lib/types/product";
 
@@ -9,37 +10,6 @@ interface BackendProductListResponse {
   total: number;
   page: number;
   limit: number;
-}
-
-interface BackendBrandItem {
-  id: number;
-  name: string;
-  slug: string;
-}
-
-let cachedBrandMap: Map<string, number> | null = null;
-let lastBrandMapTime = 0;
-
-async function getBrandIdByNameOrSlug(brandStr?: string): Promise<number | undefined> {
-  if (!brandStr) return undefined;
-  const now = Date.now();
-  if (!cachedBrandMap || now - lastBrandMapTime > 5 * 60 * 1000) {
-    try {
-      const brands = await adminBackendFetch<BackendBrandItem[]>("/admin/brands");
-      const map = new Map<string, number>();
-      for (const b of brands) {
-        if (b.id) {
-          map.set(b.name.toLowerCase(), b.id);
-          map.set(b.slug.toLowerCase(), b.id);
-        }
-      }
-      cachedBrandMap = map;
-      lastBrandMapTime = now;
-    } catch {
-      // ignore
-    }
-  }
-  return cachedBrandMap?.get(brandStr.toLowerCase());
 }
 
 export async function GET(request: NextRequest) {
@@ -162,13 +132,18 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as Partial<Product>;
+    const body = (await request.json().catch(() => null)) as Partial<Product> | null;
 
-    if (!body || typeof body !== "object") {
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
       return NextResponse.json(
         { message: "Dữ liệu gửi lên không đúng định dạng JSON" },
         { status: 400 },
       );
+    }
+
+    const taxonomyError = validateTaxonomyFields(body as Record<string, unknown>);
+    if (taxonomyError) {
+      return NextResponse.json({ message: taxonomyError }, { status: 400 });
     }
 
     if (!body.name || typeof body.name !== "string" || !body.name.trim()) {
@@ -188,7 +163,7 @@ export async function POST(request: NextRequest) {
     // Resolve brandId if missing
     let brandId = body.brandId;
     if (!brandId && body.brand) {
-      brandId = await getBrandIdByNameOrSlug(body.brand);
+      brandId = await resolveBrandId(body.brand);
     }
 
     const payload = {
@@ -198,10 +173,13 @@ export async function POST(request: NextRequest) {
       name: body.name.trim(),
     };
 
+    // Keep the brand's category tree in step with its products, only once the save has succeeded
+    const taxonomy = await prepareBrandTaxonomy(payload);
     const created = await adminBackendFetch<Product>("/admin/products", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(taxonomy.payload),
     });
+    const taxonomySync = await taxonomy.sync();
 
     invalidateRemoteProductsCache();
 
@@ -210,19 +188,12 @@ export async function POST(request: NextRequest) {
         success: true,
         message: "Tạo sản phẩm thành công trên hệ thống",
         product: created,
+        taxonomy: taxonomySync,
       },
       { status: 201 },
     );
   } catch (error) {
     console.error("[POST /api/admin/products]", error);
-    return NextResponse.json(
-      {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Lỗi hệ thống khi tạo sản phẩm",
-      },
-      { status: 400 },
-    );
+    return adminErrorResponse(error, "Lỗi hệ thống khi tạo sản phẩm");
   }
 }

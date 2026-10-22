@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import { fetch as undiciFetch } from "undici";
 import { getBackendUrl } from "@/lib/backend/config";
 import { backendAgent, isRetryableFetchError } from "@/lib/backend/client";
@@ -6,6 +7,29 @@ import {
   ADMIN_ACCESS_TOKEN_COOKIE,
   ADMIN_REFRESH_TOKEN_COOKIE,
 } from "@/lib/admin/auth";
+
+/** Backend failure that keeps the upstream HTTP status, so routes can pass 4xx through instead of guessing */
+export class BackendError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "BackendError";
+  }
+}
+
+/**
+ * JSON error response for admin API routes: backend 4xx (validation, not found, conflict) keep their status,
+ * an expired session is 401, anything else (network, 5xx) is a 502 from the backend.
+ */
+export function adminErrorResponse(error: unknown, fallback: string) {
+  const message = error instanceof Error && error.message ? error.message : fallback;
+  let status = 502;
+  if (error instanceof BackendError && error.status >= 400 && error.status < 500) status = error.status;
+  else if (message.startsWith("UNAUTHORIZED")) status = 401;
+  return NextResponse.json({ message }, { status });
+}
 
 interface BackendApiResponse<T> {
   success: boolean;
@@ -145,7 +169,7 @@ export async function adminBackendFetch<T>(
   let token = await getValidAdminAccessToken(explicitToken);
 
   if (!token) {
-    throw new Error("UNAUTHORIZED: Phiên làm việc đã hết hạn hoặc chưa đăng nhập");
+    throw new BackendError(401, "UNAUTHORIZED: Phiên làm việc đã hết hạn hoặc chưa đăng nhập");
   }
 
   const base = getBackendUrl();
@@ -241,14 +265,15 @@ export async function adminBackendFetch<T>(
         } catch {
           // fallback
         }
-        throw new Error(errorMsg);
+        throw new BackendError(res.status, errorMsg);
       }
 
       const json = (await res.json()) as BackendApiResponse<T>;
       return json.data;
     } catch (error) {
       lastError = error;
-      if (attempt >= 1 || !isRetryableFetchError(error)) {
+      // The backend answered: retrying would not change the result and could repeat a write
+      if (attempt >= 1 || error instanceof BackendError || !isRetryableFetchError(error)) {
         break;
       }
       await new Promise((resolve) => setTimeout(resolve, 800));
