@@ -7,7 +7,7 @@ import { useApp } from "@/context/AppContext";
 import { HouseIcon } from "@/components/ui/icons";
 import { streamChat } from "@/lib/api/chat";
 import type { ChatMessage as ApiChatMessage } from "@/lib/types/chat";
-import { COMPANY_LEGAL } from "@/data/company-legal";
+import { useStoreInfo } from "@/context/StoreInfoContext";
 import { isSafeUrl } from "@/lib/sanitize-html";
 
 // ---------------------------------------------------------------------------
@@ -21,7 +21,8 @@ type Message = {
   streaming?: boolean;
 };
 
-const FALLBACK_REPLY = `Xin lỗi, hệ thống tư vấn đang bận. Quý khách vui lòng gọi Hotline / Zalo: ${COMPANY_LEGAL.phonesDisplay} để được hỗ trợ nhanh nhất.`;
+const fallbackReply = (phones: string) =>
+  `Xin lỗi, hệ thống tư vấn đang bận. Quý khách vui lòng gọi Hotline / Zalo: ${phones} để được hỗ trợ nhanh nhất.`;
 
 // ---------------------------------------------------------------------------
 // Markdown-lite renderer for streamed AI replies
@@ -214,6 +215,7 @@ export default function AIChatbot({
   launcherClassName?: string;
 }) {
   const { isChatbotOpen, setIsChatbotOpen } = useApp();
+  const store = useStoreInfo();
   const nextIdRef = useRef(0);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -281,7 +283,7 @@ export default function AIChatbot({
           msg.id === aiMessageId
             ? {
                 ...msg,
-                content: reply.trim() || FALLBACK_REPLY,
+                content: reply.trim() || fallbackReply(store.phonesDisplay),
                 streaming: false,
                 time: getTime(),
               }
@@ -294,7 +296,7 @@ export default function AIChatbot({
           msg.id === aiMessageId
             ? {
                 ...msg,
-                content: FALLBACK_REPLY,
+                content: fallbackReply(store.phonesDisplay),
                 streaming: false,
                 time: getTime(),
               }

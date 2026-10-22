@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkAdminRequestAuth } from "@/lib/admin/auth";
 import { adminBackendFetch, adminErrorResponse } from "@/lib/admin/api-client";
 import { prepareBrandTaxonomy, resolveBrandId, validateTaxonomyFields } from "@/lib/admin/brand-taxonomy";
-import { getAdminStats, invalidateRemoteProductsCache, PRODUCT_SECTORS } from "@/lib/admin/product-store";
+import { invalidateRemoteProductsCache, PRODUCT_SECTORS } from "@/lib/admin/product-store";
+import { getDashboardStats } from "@/lib/admin/dashboard-stats";
 import type { Product } from "@/lib/types/product";
 
 interface BackendProductListResponse {
@@ -98,7 +99,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Include dashboard stats
-    const stats = await getAdminStats(forceRefresh);
+    const stats = await getDashboardStats(forceRefresh);
 
     return NextResponse.json({
       items,

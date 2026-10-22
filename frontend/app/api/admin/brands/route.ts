@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAdminRequestAuth } from "@/lib/admin/auth";
 import { adminBackendFetch } from "@/lib/admin/api-client";
-import { getAdminStats } from "@/lib/admin/product-store";
+import { getDashboardStats } from "@/lib/admin/dashboard-stats";
 
 interface BackendBrandItem {
   id?: number;
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     // Fetch product counts from stats
     let brandCountMap: Record<string, number> = {};
     try {
-      const stats = await getAdminStats();
+      const stats = await getDashboardStats();
       if (stats.brandBreakdown) {
         brandCountMap = stats.brandBreakdown;
       }

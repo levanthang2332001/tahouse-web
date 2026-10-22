@@ -19,6 +19,7 @@ import Header from "@/components/Header";
 import { PolicyContent } from "@/components/PolicyContent";
 import SocialFloating from "@/components/SocialFloating";
 import { COMPANY_LEGAL } from "@/data/company-legal";
+import { useStoreInfo } from "@/context/StoreInfoContext";
 import { POLICY_NAV_LINKS } from "@/data/policies";
 import type { PolicyDocument } from "@/lib/policy-types";
 
@@ -27,6 +28,8 @@ type PolicyPageLayoutProps = {
 };
 
 export default function PolicyPageLayout({ policy }: PolicyPageLayoutProps) {
+  // Contact links follow the settings API; legal entity details stay on COMPANY_LEGAL
+  const store = useStoreInfo();
   return (
     <div className="flex min-h-screen flex-col bg-[#F5F1EA] text-navy antialiased">
       <Header />
@@ -159,14 +162,14 @@ export default function PolicyPageLayout({ policy }: PolicyPageLayoutProps) {
 
                   <div className="mt-4 pt-3 border-t border-gray-light/60 flex items-center gap-2">
                     <a
-                      href={`tel:${COMPANY_LEGAL.phoneTel}`}
+                      href={`tel:${store.phoneTel}`}
                       className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white hover:bg-rose-700 transition-colors shadow-2xs"
                     >
                       <Phone size={13} />
-                      <span>{COMPANY_LEGAL.phone}</span>
+                      <span>{store.phone}</span>
                     </a>
                     <a
-                      href={COMPANY_LEGAL.zaloUrl}
+                      href={store.zaloUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-[#0068FF] py-2.5 text-xs font-bold text-white hover:bg-[#0056d6] transition-colors shadow-2xs"

@@ -4,9 +4,10 @@ import AIChatbot from "@/components/AIChatbot";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import SocialFloating from "@/components/SocialFloating";
-import { COMPANY_LEGAL } from "@/data/company-legal";
+import { getStoreInfo } from "@/lib/server/store-info";
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const store = await getStoreInfo();
   return (
     <div className="flex min-h-screen flex-col bg-neutral text-navy">
       <Header />
@@ -24,7 +25,7 @@ export default function ContactPage() {
           </h1>
           <p className="max-w-xl text-xs font-bold text-navy/70 sm:text-sm">
             Đặt lịch khảo sát công trình miễn phí tận nơi hoặc nhận tư vấn chi tiết từ chuyên gia{" "}
-            {COMPANY_LEGAL.tradeName}.
+            {store.tradeName}.
           </p>
         </div>
       </section>
@@ -36,7 +37,7 @@ export default function ContactPage() {
               <h2 className="text-sm font-semibold uppercase tracking-wider text-navy">Địa chỉ</h2>
             </div>
             <p className="text-sm font-bold leading-relaxed text-navy/70">
-              {COMPANY_LEGAL.address}
+              {store.address}
             </p>
           </div>
           <div className="rounded-2xl border border-gray-light bg-cream p-6">
@@ -46,20 +47,20 @@ export default function ContactPage() {
             </div>
             <div className="space-y-1">
               <a
-                href={`tel:${COMPANY_LEGAL.phoneTel}`}
+                href={`tel:${store.phoneTel}`}
                 className="block text-lg font-black text-navy transition-colors hover:text-brand-green"
               >
-                {COMPANY_LEGAL.phone}
+                {store.phone}
               </a>
               <a
-                href={`tel:${COMPANY_LEGAL.phoneSecondaryTel}`}
+                href={`tel:${store.phoneSecondaryTel}`}
                 className="block text-lg font-black text-navy transition-colors hover:text-brand-green"
               >
-                {COMPANY_LEGAL.phoneSecondary}
+                {store.phoneSecondary}
               </a>
             </div>
             <p className="mt-2 text-xs font-semibold text-navy/55">
-              Giờ làm việc: {COMPANY_LEGAL.workingHours}
+              Giờ làm việc: {store.workingHours}
             </p>
           </div>
           <div className="rounded-2xl border border-gray-light bg-cream p-6">
@@ -68,10 +69,10 @@ export default function ContactPage() {
               <h2 className="text-sm font-semibold uppercase tracking-wider text-navy">Email</h2>
             </div>
             <a
-              href={`mailto:${COMPANY_LEGAL.email}`}
+              href={`mailto:${store.email}`}
               className="text-sm font-bold text-navy transition-colors hover:text-brand-green"
             >
-              {COMPANY_LEGAL.email}
+              {store.email}
             </a>
           </div>
         </div>

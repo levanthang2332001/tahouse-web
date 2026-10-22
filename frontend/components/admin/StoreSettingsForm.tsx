@@ -6,18 +6,14 @@ import { SiFacebook, SiZalo } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
-import { COMPANY_LEGAL } from "@/data/company-legal";
+import { pickSitePhoneIndexes } from "@/lib/store-info";
 import type { StoreSettings, StoreSettingsInput, StoreSocialLinks } from "@/lib/types/store-settings";
 
 type Errors = Record<string, string>;
 
-// Numbers the website currently displays; backend entries outside this set (e.g. a seeded 1900 line) stay hidden
-const SITE_PHONE_DIGITS = new Set<string>([COMPANY_LEGAL.phoneTel, COMPANY_LEGAL.phoneSecondaryTel]);
-const digits = (value: string) => value.replace(/\D/g, "");
-
-/** Indexes of phone entries the website uses, judged on the loaded data so a field never vanishes mid-edit */
+/** The numbers the storefront renders (same rule as the site), judged on loaded data so a field never vanishes mid-edit */
 function sitePhoneIndexes(settings: StoreSettings): number[] {
-  return (settings.phoneNumbers ?? []).flatMap((p, i) => (SITE_PHONE_DIGITS.has(digits(p.number)) ? [i] : []));
+  return pickSitePhoneIndexes(settings.phoneNumbers ?? []);
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -69,6 +65,7 @@ function validate(form: StoreSettingsInput, phoneIndexes: number[]): Errors {
   if (e >= 0 && !EMAIL_RE.test(form.emails[e].email.trim())) errors[`email.${e}`] = "Email không hợp lệ";
   const a = primaryIndex(form.addresses, (x) => x.isMain);
   if (a >= 0) {
+    if (!form.addresses[a].branchName.trim()) errors[`branch.${a}`] = "Không được để trống";
     if (!form.addresses[a].address.trim()) errors[`addr.${a}`] = "Không được để trống";
     const map = form.addresses[a].mapUrl?.trim();
     if (map && !URL_RE.test(map)) errors[`map.${a}`] = "Link phải bắt đầu bằng https://";
@@ -318,11 +315,18 @@ export default function StoreSettingsForm() {
           </div>
         </Card>
 
-        <Card icon={MapPin} tone="red" title="Cửa hàng" description="Địa chỉ, nút chỉ đường và giờ mở cửa">
+        <Card icon={MapPin} tone="red" title="Cửa hàng" description="Tên showroom, địa chỉ, nút chỉ đường và giờ mở cửa">
           <div className="space-y-4">
             {addressIndex >= 0 && (
               <>
-                <Field label={form.addresses[addressIndex].branchName} icon={MapPin} iconClassName={TONES.red.icon} error={errors[`addr.${addressIndex}`]}>
+                <Field label="Tên showroom" badge={form.addresses[addressIndex].isMain ? "Trụ sở chính" : undefined} icon={Store} iconClassName={TONES.red.icon} error={errors[`branch.${addressIndex}`]}>
+                  <Input
+                    value={form.addresses[addressIndex].branchName}
+                    onChange={(e) => setListItem("addresses", addressIndex, { branchName: e.target.value })}
+                    {...inputProps(`branch.${addressIndex}`)}
+                  />
+                </Field>
+                <Field label="Địa chỉ" icon={MapPin} iconClassName={TONES.red.icon} error={errors[`addr.${addressIndex}`]}>
                   <Input
                     value={form.addresses[addressIndex].address}
                     onChange={(e) => setListItem("addresses", addressIndex, { address: e.target.value })}

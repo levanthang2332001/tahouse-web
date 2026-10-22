@@ -36,7 +36,8 @@ import SocialFloating from "@/components/SocialFloating";
 import { FormattedText } from "@/components/ui/FormattedText";
 import { SiZalo } from "react-icons/si";
 import { useApp } from "@/context/AppContext";
-import { COMPANY_LEGAL } from "@/data/company-legal";
+import { useStoreInfo } from "@/context/StoreInfoContext";
+import type { StoreInfo } from "@/lib/store-info";
 import content from "@/data/content.json";
 import { calculateProductDiscount } from "@/lib/format-price";
 import { fetchProduct } from "@/lib/api/products";
@@ -106,7 +107,7 @@ function removeHtmlSection(html: string, headingPattern: RegExp): string {
 }
 
 // Answers only restate what the page already promises or what the product's own specs say
-function buildFaq(product: Product, warrantyVal: string): { question: string; answer: string }[] {
+function buildFaq(product: Product, warrantyVal: string, store: StoreInfo): { question: string; answer: string }[] {
   if (product.faq && product.faq.length > 0) return product.faq;
 
   const specs = product.specs ?? {};
@@ -121,7 +122,7 @@ function buildFaq(product: Product, warrantyVal: string): { question: string; an
   if (doorThickness) {
     items.push({
       question: "Cửa nhà tôi có lắp được sản phẩm này không?",
-      answer: `Sản phẩm phù hợp với cửa có độ dày ${doorThickness}${findSpec("Đố cửa") ? `, đố cửa ${findSpec("Đố cửa")}` : ""}. Kỹ thuật viên ${COMPANY_LEGAL.tradeName} khảo sát miễn phí tại công trình để xác nhận trước khi lắp đặt.`,
+      answer: `Sản phẩm phù hợp với cửa có độ dày ${doorThickness}${findSpec("Đố cửa") ? `, đố cửa ${findSpec("Đố cửa")}` : ""}. Kỹ thuật viên ${store.tradeName} khảo sát miễn phí tại công trình để xác nhận trước khi lắp đặt.`,
     });
   }
   if (emergencyPower) {
@@ -133,7 +134,7 @@ function buildFaq(product: Product, warrantyVal: string): { question: string; an
   items.push(
     {
       question: "Có khảo sát và lắp đặt tận nơi không?",
-      answer: `Có. ${COMPANY_LEGAL.tradeName} khảo sát miễn phí tại công trình, kỹ thuật viên trực tiếp lắp đặt, căn chỉnh và hướng dẫn sử dụng khi bàn giao.`,
+      answer: `Có. ${store.tradeName} khảo sát miễn phí tại công trình, kỹ thuật viên trực tiếp lắp đặt, căn chỉnh và hướng dẫn sử dụng khi bàn giao.`,
     },
     {
       question: "Sản phẩm được bảo hành bao lâu?",
@@ -141,7 +142,7 @@ function buildFaq(product: Product, warrantyVal: string): { question: string; an
     },
     {
       question: "Tôi có thể xem sản phẩm trực tiếp ở đâu?",
-      answer: `Showroom tại ${COMPANY_LEGAL.address}, mở cửa ${COMPANY_LEGAL.workingHours}. Hotline: ${COMPANY_LEGAL.phone}.`,
+      answer: `Showroom tại ${store.address}, mở cửa ${store.workingHours}. Hotline: ${store.phone}.`,
     },
   );
   return items;
@@ -347,6 +348,7 @@ export default function ProductDetailView({
   );
 
   const { addToRecentlyViewed, setIsChatbotOpen } = useApp();
+  const store = useStoreInfo();
 
   useEffect(() => {
     if (initialProduct) {
@@ -557,7 +559,7 @@ export default function ProductDetailView({
       .join("\n");
     // Start the copy while this tab still has focus, then open Zalo in the same user gesture
     navigator.clipboard?.writeText(message).catch(() => {});
-    window.open(COMPANY_LEGAL.zaloUrl, "_blank", "noopener,noreferrer");
+    window.open(store.zaloUrl, "_blank", "noopener,noreferrer");
     setQuestionSent(true);
     setTimeout(() => {
       setQuestionText("");
@@ -613,7 +615,7 @@ export default function ProductDetailView({
   }
   const warrantyVal = product.warrantyText ?? (product.warranty ? `${product.warranty} tháng` : (specs["Bảo hành"] || specs["bao_hanh"] || "Chính hãng 24-36 tháng"));
   quickSpecsList.push({ label: "Bảo hành", value: warrantyVal });
-  const faqItems = buildFaq(product, warrantyVal);
+  const faqItems = buildFaq(product, warrantyVal, store);
 
   // Full specs table
   const fullSpecsEntries = Object.entries(specs);
@@ -887,7 +889,7 @@ export default function ProductDetailView({
                 {/* Action Buttons (Zalo, SĐT Hotline & Bot tư vấn AI) */}
                 <div className="mt-5 space-y-2.5">
                   <a
-                    href={COMPANY_LEGAL.zaloUrl}
+                    href={store.zaloUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center justify-center gap-3 rounded-xl bg-[#0068ff] py-3 px-4 text-center text-white shadow-md shadow-[#0068ff]/25 transition-transform active:scale-[0.99] hover:bg-[#0056d6] cursor-pointer"
@@ -903,11 +905,11 @@ export default function ProductDetailView({
 
                   <div className="grid grid-cols-2 gap-2.5">
                     <a
-                      href={`tel:${COMPANY_LEGAL.phoneTel}`}
+                      href={`tel:${store.phoneTel}`}
                       className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#c0283a]/40 bg-white px-2 text-sm font-semibold text-[#c0283a] hover:bg-[#c0283a]/5 transition-colors cursor-pointer"
                     >
                       <Phone size={15} />
-                      <span>Gọi {COMPANY_LEGAL.phone}</span>
+                      <span>Gọi {store.phone}</span>
                     </a>
                     <button
                       type="button"
@@ -1017,7 +1019,7 @@ export default function ProductDetailView({
                     </div>
                   ) : (
                     <p className="max-w-[70ch] text-base leading-relaxed text-navy/90">
-                      <strong className="font-semibold">{displayName}</strong> là dòng sản phẩm cao cấp phân phối chính hãng bởi {COMPANY_LEGAL.tradeName}. 
+                      <strong className="font-semibold">{displayName}</strong> là dòng sản phẩm cao cấp phân phối chính hãng bởi {store.tradeName}. 
                       Sản phẩm được thiết kế tỉ mỉ, kết hợp công nghệ hiện đại mang lại sự tiện nghi, an toàn và nâng tầm không gian sống của gia đình bạn.
                     </p>
                   )}
@@ -1040,7 +1042,7 @@ export default function ProductDetailView({
               <section className="rounded-3xl border border-gray-light/60 bg-white p-5 sm:p-8 shadow-sm">
                 <div className="mb-5">
                   <SectionTitle icon={<Wrench size={20} />}>
-                    Quy trình khảo sát & lắp đặt của {COMPANY_LEGAL.tradeName}
+                    Quy trình khảo sát & lắp đặt của {store.tradeName}
                   </SectionTitle>
                 </div>
                 <ol className="space-y-3.5 text-sm leading-relaxed text-navy/85 sm:text-[15px]">
@@ -1106,7 +1108,7 @@ export default function ProductDetailView({
                         required
                         pattern="[0-9 +().-]{9,15}"
                         title="Vui lòng nhập số điện thoại hợp lệ"
-                        placeholder="Ví dụ: 0904 992 267"
+                        placeholder="Ví dụ: 0912 345 678"
                         value={customerPhone}
                         onChange={(e) => setCustomerPhone(e.target.value)}
                         className="h-11 w-full rounded-xl border border-gray-light bg-white px-3.5 text-base text-navy placeholder:text-navy/45 focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/20 sm:text-sm"
@@ -1236,29 +1238,29 @@ export default function ProductDetailView({
                     Xem tận tay tại showroom
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-navy/80">
-                    Trải nghiệm sản phẩm thực tế, hoặc để kỹ thuật viên {COMPANY_LEGAL.tradeName} khảo sát kích thước tại nhà hoàn toàn miễn phí.
+                    Trải nghiệm sản phẩm thực tế, hoặc để kỹ thuật viên {store.tradeName} khảo sát kích thước tại nhà hoàn toàn miễn phí.
                   </p>
                   <dl className="mt-3 space-y-2 border-t border-brand-green/20 pt-3 text-sm text-navy/80">
                     <div className="flex items-start gap-2">
                       <dt className="sr-only">Địa chỉ</dt>
                       <MapPin size={15} className="mt-0.5 shrink-0 text-brand-green" aria-hidden="true" />
-                      <dd>{COMPANY_LEGAL.address}</dd>
+                      <dd>{store.address}</dd>
                     </div>
                     <div className="flex items-start gap-2">
                       <dt className="sr-only">Giờ mở cửa</dt>
                       <Clock size={15} className="mt-0.5 shrink-0 text-brand-green" aria-hidden="true" />
-                      <dd>{COMPANY_LEGAL.workingHours}</dd>
+                      <dd>{store.workingHours}</dd>
                     </div>
                   </dl>
                   <div className="mt-4 grid grid-cols-2 gap-2">
                     <a
-                      href={`tel:${COMPANY_LEGAL.phoneTel}`}
+                      href={`tel:${store.phoneTel}`}
                       className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-navy px-3 text-sm font-semibold text-white hover:bg-[#0b3c54] transition-colors"
                     >
-                      <Phone size={15} /> {COMPANY_LEGAL.phone}
+                      <Phone size={15} /> {store.phone}
                     </a>
                     <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(COMPANY_LEGAL.address)}`}
+                      href={store.mapUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-navy/20 bg-white px-3 text-sm font-semibold text-navy hover:border-brand-green hover:text-[#3f741b] transition-colors"
@@ -1448,14 +1450,14 @@ export default function ProductDetailView({
             <p className="truncate text-lg font-extrabold leading-tight text-[#c0283a]">{discountInfo.formattedCurrentPrice}</p>
           </div>
           <a
-            href={`tel:${COMPANY_LEGAL.phoneTel}`}
+            href={`tel:${store.phoneTel}`}
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#c0283a]/40 text-[#c0283a]"
-            aria-label={`Gọi hotline ${COMPANY_LEGAL.phone}`}
+            aria-label={`Gọi hotline ${store.phone}`}
           >
             <Phone size={20} />
           </a>
           <a
-            href={COMPANY_LEGAL.zaloUrl}
+            href={store.zaloUrl}
             target="_blank"
             rel="noreferrer"
             className="flex h-12 shrink-0 items-center gap-2 rounded-xl bg-[#0068ff] px-4 text-sm font-semibold text-white"

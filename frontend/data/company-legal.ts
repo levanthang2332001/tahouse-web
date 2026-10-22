@@ -29,6 +29,9 @@ export const COMPANY_LEGAL = {
   website: "https://www.tahouse.net",
   websiteDisplay: "www.tahouse.net",
   workingHours: "Thứ Hai – Chủ Nhật: 08:00 – 17:30",
+  /** Fallback until the settings API answers (see lib/store-info.ts) */
+  showroomName: "Showroom Linh Xuân",
+  mapsUrl: "https://maps.app.goo.gl/igZiLjUh7upisCRM8",
   /** Phạm vi giao hàng thực tế */
   deliveryScope:
     "Giao hàng trên phạm vi toàn quốc. Đối với khảo sát, lắp đặt và bảo hành tận nơi, phạm vi phục vụ phụ thuộc khu vực và điều kiện thực tế.",

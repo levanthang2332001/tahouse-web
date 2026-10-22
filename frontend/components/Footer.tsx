@@ -5,38 +5,42 @@ import Link from "next/link";
 import { ArrowUp, Facebook, Mail, MapPin, Phone } from "lucide-react";
 import { ZaloIcon } from "@/components/ui/icons";
 import { COMPANY_LEGAL } from "@/data/company-legal";
+import { useStoreInfo } from "@/context/StoreInfoContext";
+import type { StoreInfo } from "@/lib/store-info";
 import { POLICY_CORE_LINKS } from "@/data/policies";
 
-const SOCIAL_LINKS = [
-  {
-    href: COMPANY_LEGAL.facebookUrl,
-    icon: Facebook,
-    label: "Facebook Fanpage",
-    bgColor: "bg-[#1877F2] hover:bg-[#166fe5]",
-    iconClass: "h-4.5 w-4.5 text-white",
-  },
-  {
-    href: COMPANY_LEGAL.zaloUrl,
-    icon: ZaloIcon,
-    label: "Zalo OA",
-    bgColor: "bg-[#0068FF] hover:bg-[#0056d6]",
-    iconClass: "h-4.5 w-4.5 text-white",
-  },
-  {
-    href: `tel:${COMPANY_LEGAL.phoneTel}`,
-    icon: Phone,
-    label: `Hotline ${COMPANY_LEGAL.phone}`,
-    bgColor: "bg-rose-600 hover:bg-rose-700",
-    iconClass: "h-4.5 w-4.5 text-white",
-  },
-  {
-    href: `mailto:${COMPANY_LEGAL.email}`,
-    icon: Mail,
-    label: `Email ${COMPANY_LEGAL.email}`,
-    bgColor: "bg-teal-600 hover:bg-teal-700",
-    iconClass: "h-4.5 w-4.5 text-white",
-  },
-] as const;
+function getSocialLinks(store: StoreInfo) {
+  return [
+    {
+      href: store.facebookUrl,
+      icon: Facebook,
+      label: "Facebook Fanpage",
+      bgColor: "bg-[#1877F2] hover:bg-[#166fe5]",
+      iconClass: "h-4.5 w-4.5 text-white",
+    },
+    {
+      href: store.zaloUrl,
+      icon: ZaloIcon,
+      label: "Zalo OA",
+      bgColor: "bg-[#0068FF] hover:bg-[#0056d6]",
+      iconClass: "h-4.5 w-4.5 text-white",
+    },
+    {
+      href: `tel:${store.phoneTel}`,
+      icon: Phone,
+      label: `Hotline ${store.phone}`,
+      bgColor: "bg-rose-600 hover:bg-rose-700",
+      iconClass: "h-4.5 w-4.5 text-white",
+    },
+    {
+      href: `mailto:${store.email}`,
+      icon: Mail,
+      label: `Email ${store.email}`,
+      bgColor: "bg-teal-600 hover:bg-teal-700",
+      iconClass: "h-4.5 w-4.5 text-white",
+    },
+  ] as const;
+}
 
 const SERVICE_LINKS = [
   { href: "/products?cat=lock-parent", label: "Khóa điện tử – khóa vân tay" },
@@ -57,6 +61,9 @@ const ABOUT_LINKS = [
 ];
 
 export default function Footer() {
+  // Contact details come from the settings API; legal entity details below stay on COMPANY_LEGAL
+  const store = useStoreInfo();
+  const socialLinks = getSocialLinks(store);
   return (
     <footer
       id="contact"
@@ -82,7 +89,7 @@ export default function Footer() {
               hợp từng gia đình.
             </p>
             <div className="flex flex-wrap items-center gap-2.5">
-              {SOCIAL_LINKS.map(({ href, icon: Icon, label, bgColor, iconClass }) => (
+              {socialLinks.map(({ href, icon: Icon, label, bgColor, iconClass }) => (
                 <a
                   key={label}
                   href={href}
@@ -157,34 +164,34 @@ export default function Footer() {
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-green" />
                 <span className="text-[13px] font-semibold leading-relaxed text-navy/75">
-                  {COMPANY_LEGAL.address}
+                  {store.address}
                 </span>
               </li>
               <li className="flex items-start gap-3">
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-brand-green" />
                 <span className="text-[13px] font-semibold leading-relaxed text-navy/75">
                   <a
-                    href={`tel:${COMPANY_LEGAL.phoneTel}`}
+                    href={`tel:${store.phoneTel}`}
                     className="transition-colors hover:text-brand-green"
                   >
-                    {COMPANY_LEGAL.phone}
+                    {store.phone}
                   </a>
                   <br />
                   <a
-                    href={`tel:${COMPANY_LEGAL.phoneSecondaryTel}`}
+                    href={`tel:${store.phoneSecondaryTel}`}
                     className="transition-colors hover:text-brand-green"
                   >
-                    {COMPANY_LEGAL.phoneSecondary}
+                    {store.phoneSecondary}
                   </a>
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 shrink-0 text-brand-green" />
                 <a
-                  href={`mailto:${COMPANY_LEGAL.email}`}
+                  href={`mailto:${store.email}`}
                   className="text-[13px] font-semibold text-navy/75 transition-colors hover:text-brand-green"
                 >
-                  {COMPANY_LEGAL.email}
+                  {store.email}
                 </a>
               </li>
             </ul>

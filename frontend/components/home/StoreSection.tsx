@@ -7,11 +7,10 @@ import { motion } from "framer-motion";
 import { ArrowRight, Clock, MapPin, Phone } from "lucide-react";
 import { staggerContainer, fadeUp, fadeUpSlow } from "@/lib/motion-variants";
 import { STORE_COPY, STORE_IMAGES } from "@/data/home-data";
-import { COMPANY_LEGAL } from "@/data/company-legal";
-
-const MAPS_URL = "https://maps.app.goo.gl/igZiLjUh7upisCRM8";
+import { useStoreInfo } from "@/context/StoreInfoContext";
 
 export default function StoreSection() {
+  const store = useStoreInfo();
   const [active, setActive] = useState(0);
   const featured = STORE_IMAGES[active] ?? STORE_IMAGES[0];
 
@@ -84,44 +83,44 @@ export default function StoreSection() {
           >
             <div>
               <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-brand-green">
-                {COMPANY_LEGAL.tradeName}
+                {store.tradeName}
               </p>
               <h3 className="font-serif text-2xl text-navy sm:text-3xl">
-                {STORE_COPY.showroomName}
+                {store.showroomName}
               </h3>
             </div>
 
             <ul className="space-y-5 text-sm leading-relaxed text-navy/80 sm:text-base">
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-green" />
-                <span>{COMPANY_LEGAL.address}</span>
+                <span>{store.address}</span>
               </li>
               <li className="flex gap-3">
                 <Phone className="mt-0.5 h-5 w-5 shrink-0 text-brand-green" />
                 <span className="flex flex-col gap-1">
                   <a
-                    href={`tel:${COMPANY_LEGAL.phoneTel}`}
+                    href={`tel:${store.phoneTel}`}
                     className="transition-colors hover:text-brand-green"
                   >
-                    {COMPANY_LEGAL.phone}
+                    {store.phone}
                   </a>
                   <a
-                    href={`tel:${COMPANY_LEGAL.phoneSecondaryTel}`}
+                    href={`tel:${store.phoneSecondaryTel}`}
                     className="transition-colors hover:text-brand-green"
                   >
-                    {COMPANY_LEGAL.phoneSecondary}
+                    {store.phoneSecondary}
                   </a>
                 </span>
               </li>
               <li className="flex gap-3">
                 <Clock className="mt-0.5 h-5 w-5 shrink-0 text-brand-green" />
-                <span>{COMPANY_LEGAL.workingHours}</span>
+                <span>{store.workingHours}</span>
               </li>
             </ul>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a
-                href={MAPS_URL}
+                href={store.mapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-3 bg-brand-green px-7 py-3.5 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
@@ -130,13 +129,13 @@ export default function StoreSection() {
                 <ArrowRight className="h-4 w-4" />
               </a>
               <a
-                href={`tel:${COMPANY_LEGAL.phoneTel}`}
+                href={`tel:${store.phoneTel}`}
                 className="inline-flex items-center justify-center gap-3 border border-navy px-7 py-3.5 text-xs font-semibold uppercase tracking-wider text-navy transition-all hover:bg-navy hover:text-cream"
               >
                 {STORE_COPY.ctaCall}
               </a>
               <Link
-                href={COMPANY_LEGAL.zaloUrl}
+                href={store.zaloUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-3 border border-navy/25 px-7 py-3.5 text-xs font-semibold uppercase tracking-wider text-navy/80 transition-colors hover:border-brand-green hover:text-brand-green"
