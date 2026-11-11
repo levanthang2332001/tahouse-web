@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { fadeUp, fadeUpSlow, staggerContainer } from "@/lib/motion-variants";
@@ -38,7 +38,7 @@ function PartnerLogo({
       alt={brandName}
       className={
         isKassler
-          ? "max-h-14 w-auto max-w-[180px] object-contain sm:max-h-16 sm:max-w-[200px] transition-transform duration-300 group-hover/brand:scale-105"
+          ? "max-h-20 w-auto max-w-[180px] object-contain sm:max-h-24 sm:max-w-[200px] transition-transform duration-300 group-hover/brand:scale-105"
           : "max-h-10 w-auto max-w-[150px] object-contain sm:max-h-12 transition-transform duration-300 group-hover/brand:scale-105"
       }
       onError={() => setFailed(true)}
@@ -47,48 +47,22 @@ function PartnerLogo({
 }
 
 const HOME_BRANDS: DisplayBrand[] = [
-  // Dãy 1: Bosch, Kassler, Philips, Hyundai
+  // Dãy 1: Bosch, Kassler, GrandX, Eurosun
   { name: "Bosch", slug: "bosch", logo: "/brands/bosch.svg" },
-  { name: "Kassler", slug: "kassler", logo: "/brands/kassler.png" },
-  { name: "Philips", slug: "philips", logo: "/brands/philips.svg" },
-  { name: "Hyundai", slug: "hyundai", logo: "/brands/hyundai.png" },
-  // Dãy 2: Malloca, GrandX, Eurosun, Eurogold
-  { name: "Malloca", slug: "malloca", logo: "/brands/malloca.svg" },
-  { name: "GrandX", slug: "grandx", logo: "/brands/grandx.svg" },
-  { name: "Eurosun", slug: "eurosun", logo: "/brands/eurosun.png" },
-  { name: "Eurogold", slug: "eurogold", logo: "/brands/eurogold.svg" },
+  { name: "Kassler", slug: "kassler", logo: "/brands/kassler-2026.png" },
+  { name: "GrandX", slug: "grandx", logo: "/brands/grandx-2026.png" },
+  { name: "Eurosun", slug: "eurosun", logo: "/brands/eurosun-2026.png" },
+  // Dãy 2: Eurogold, Konox, Kocher, Malloca
+  { name: "Eurogold", slug: "eurogold", logo: "/brands/eurogold-2026.jpg" },
+  { name: "Konox", slug: "konox", logo: "/brands/konox-2026.png" },
+  { name: "Kocher", slug: "kocher", logo: "/brands/kocher-2026.png" },
+  { name: "Malloca", slug: "malloca", logo: "/brands/malloca-2026.svg" },
 ];
 
 export default function BrandsSection() {
-  const [brands, setBrands] = useState<DisplayBrand[]>(HOME_BRANDS);
-
-  useEffect(() => {
-    fetch("/api/brands")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          const brandMap = new Map<string, string>();
-          data.forEach((b: { name?: string; slug?: string; logo?: string }) => {
-            if (b.logo) {
-              if (b.name) brandMap.set(b.name.toLowerCase().trim(), b.logo);
-              if (b.slug) brandMap.set(b.slug.toLowerCase().trim(), b.logo);
-            }
-          });
-
-          setBrands(
-            HOME_BRANDS.map((item) => {
-              const customLogo = brandMap.get(item.name.toLowerCase());
-              return {
-                name: item.name,
-                slug: item.slug,
-                logo: customLogo || item.logo,
-              };
-            })
-          );
-        }
-      })
-      .catch(() => {});
-  }, []);
+  // Logo trang chủ được chọn riêng cho section này, không lấy từ /api/brands
+  // (API trả logo mặc định toàn site và sẽ ghi đè logo mới).
+  const brands = HOME_BRANDS;
 
   return (
     <section className="w-full bg-cream py-14 lg:py-20">
