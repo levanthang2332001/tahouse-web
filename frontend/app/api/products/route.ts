@@ -8,6 +8,7 @@ import {
 import { backendFetch } from "@/lib/backend/client";
 import { mapProductListItem } from "@/lib/backend/map-product";
 import { resolveKitchenCategorySlugs } from "@/lib/product-filters";
+import { normalizeSearchText } from "@/lib/utils";
 import type { Brand, Product, ProductsListResponse } from "@/lib/types/product";
 
 const GROUP_PAGE_FETCH_LIMIT = 1000;
@@ -42,12 +43,15 @@ function applyClientFilters(
   },
 ): Product[] {
   const brand = params.brand?.trim().toLowerCase();
-  const search = params.search?.trim().toLowerCase();
+  // Mỗi từ khóa phải có mặt (không cần đúng thứ tự), so khớp không dấu
+  const searchTokens = normalizeSearchText(params.search ?? "")
+    .split(" ")
+    .filter(Boolean);
   const category = params.category?.trim().toLowerCase();
   const minPrice = params.minPrice ? Number(params.minPrice) : null;
   const maxPrice = params.maxPrice ? Number(params.maxPrice) : null;
 
-  return items.filter((item) => {
+  const filtered = items.filter((item) => {
     if (
       category &&
       category !== "all" &&
@@ -64,9 +68,11 @@ function applyClientFilters(
     ) {
       return false;
     }
-    if (search) {
-      const haystack = `${item.name} ${item.code} ${item.brand}`.toLowerCase();
-      if (!haystack.includes(search)) return false;
+    if (searchTokens.length > 0) {
+      const haystack = normalizeSearchText(
+        `${item.name ?? ""} ${item.code ?? ""} ${item.brand ?? ""}`,
+      );
+      if (!searchTokens.every((token) => haystack.includes(token))) return false;
     }
     if (
       minPrice !== null &&
@@ -84,6 +90,15 @@ function applyClientFilters(
     }
     return true;
   });
+
+  // Ưu tiên sản phẩm chứa nguyên cụm từ (vd. "bếp từ" trước "bếp điện từ"); sort ổn định nên giữ thứ tự gốc
+  if (searchTokens.length > 1) {
+    const phrase = searchTokens.join(" ");
+    const hasPhrase = (item: Product) =>
+      normalizeSearchText(`${item.name ?? ""} ${item.code ?? ""}`).includes(phrase);
+    return [...filtered].sort((a, b) => Number(hasPhrase(b)) - Number(hasPhrase(a)));
+  }
+  return filtered;
 }
 
 async function fetchMergedCategoryGroup(
