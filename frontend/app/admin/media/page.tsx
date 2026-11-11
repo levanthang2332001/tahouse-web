@@ -14,6 +14,8 @@ import {
   X,
   Loader2,
   FolderOpen,
+  CircleCheck,
+  CircleAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +41,74 @@ interface MediaItem {
   category?: string;
   productCode?: string;
   createdAt: string;
+}
+
+const MB = 1024 * 1024;
+const MAX_IMAGE_BYTES = 15 * MB;
+const MAX_VIDEO_BYTES = 50 * MB;
+const ACCEPTED_TYPES =
+  "image/jpeg,image/png,image/webp,image/gif,image/avif,video/mp4,video/webm,video/quicktime,.jpg,.jpeg,.png,.webp,.gif,.avif,.mp4,.webm,.mov";
+
+/** Thư mục gốc được backend cho phép (backend/src/modules/upload/upload.constants.ts) */
+const FOLDER_OPTIONS = [
+  { value: "products", label: "products (Sản phẩm)" },
+  { value: "jobs", label: "jobs (Công trình lắp đặt)" },
+  { value: "brands", label: "brands (Logo hãng)" },
+  { value: "banners", label: "banners (Banner hero)" },
+  { value: "promo", label: "promo (Banner khuyến mãi)" },
+  { value: "store", label: "store (Ảnh cửa hàng)" },
+  { value: "avatars", label: "avatars (Ảnh đại diện)" },
+  { value: "videos", label: "videos (Video)" },
+];
+const FILTER_FOLDER_OPTIONS = [
+  ...FOLDER_OPTIONS,
+  { value: "categories", label: "categories" },
+  { value: "documents", label: "documents" },
+];
+
+type UploadStatus = "pending" | "uploading" | "success" | "error";
+
+interface UploadResultItem {
+  name: string;
+  size: number;
+  status: UploadStatus;
+  message?: string;
+}
+
+interface DeleteConflict {
+  summary: string;
+}
+
+/** Đọc JSON an toàn: phản hồi lỗi có thể là trang HTML (vd. 413 từ proxy) */
+async function readJson(res: Response): Promise<Record<string, unknown>> {
+  try {
+    const raw = await res.text();
+    const parsed: unknown = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : {};
+  } catch {
+    return {};
+  }
+}
+
+function errorMessage(res: Response, data: Record<string, unknown>, fallback: string): string {
+  if (typeof data.message === "string" && data.message) return data.message;
+  if (res.status === 413) return "Tệp quá lớn. Ảnh tối đa 15MB, video tối đa 50MB.";
+  if (res.status === 401) return "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại";
+  return `${fallback} (lỗi ${res.status})`;
+}
+
+/** Kiểm tra nhanh phía trình duyệt; backend vẫn kiểm tra lại bằng magic bytes */
+function precheckFile(file: File): string | null {
+  if (file.size === 0) return "Tệp rỗng (0 byte)";
+  const isVideo = file.type.startsWith("video/") || /\.(mp4|webm|mov)$/i.test(file.name);
+  if (file.type === "image/svg+xml" || /\.svg$/i.test(file.name)) {
+    return "Không hỗ trợ SVG. Chỉ chấp nhận ảnh JPG, PNG, WebP, GIF, AVIF và video MP4, WebM, MOV";
+  }
+  const max = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
+  if (file.size > max) {
+    return `Tệp quá lớn (${formatFileSize(file.size)}). ${isVideo ? "Video" : "Ảnh"} tối đa ${max / MB}MB`;
+  }
+  return null;
 }
 
 function formatFileSize(bytes?: number): string {
@@ -68,11 +138,13 @@ export default function AdminMediaPage() {
   const [uploadBrand, setUploadBrand] = useState("");
   const [uploadProductCode, setUploadProductCode] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadResults, setUploadResults] = useState<UploadResultItem[]>([]);
 
   // Delete modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingItem, setDeletingItem] = useState<MediaItem | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [deleteConflict, setDeleteConflict] = useState<DeleteConflict | null>(null);
 
   const fetchMedia = useCallback(() => {
     setLoading(true);
@@ -91,15 +163,27 @@ export default function AdminMediaPage() {
         if (typeFilter !== "all") sp.set("fileType", typeFilter);
 
         const res = await fetch(`/api/admin/upload?${sp.toString()}`);
-        const data = await res.json();
+        const data = await readJson(res);
         if (ignore) return;
 
         if (!res.ok) {
-          throw new Error(data.message || "Không thể tải danh sách media");
+          throw new Error(errorMessage(res, data, "Không thể tải danh sách media"));
         }
 
-        const items = data.data?.items || data.items || [];
-        const totalCount = data.data?.total ?? data.total ?? items.length;
+        // Backend: { success, data: { items, pagination: { total, page, limit, totalPages } } }
+        const payload = (data.data ?? data) as {
+          items?: MediaItem[];
+          pagination?: { total?: number; totalPages?: number };
+          total?: number;
+        };
+        const items = Array.isArray(payload.items) ? payload.items : [];
+        const totalCount = Number(payload.pagination?.total ?? payload.total ?? items.length) || 0;
+        const pages = Math.max(1, Math.ceil(totalCount / limit));
+        // Trang hiện tại không còn dữ liệu (vd. vừa xóa tệp cuối) → lùi về trang cuối cùng có dữ liệu
+        if (page > pages) {
+          setPage(pages);
+          return;
+        }
         setMediaList(items);
         setTotal(totalCount);
       } catch (err) {
@@ -132,6 +216,18 @@ export default function AdminMediaPage() {
     }
   };
 
+  const resetUploadModal = () => {
+    setUploadModalOpen(false);
+    setUploadFiles([]);
+    setUploadResults([]);
+  };
+
+  const handleSelectFiles = (files: File[]) => {
+    setUploadFiles(files);
+    setUploadResults([]);
+  };
+
+  /** Tải từng tệp một (mỗi request 1 tệp) để có kết quả riêng cho từng tệp và tránh vượt giới hạn dung lượng */
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (uploadFiles.length === 0) {
@@ -139,73 +235,111 @@ export default function AdminMediaPage() {
       return;
     }
 
+    const files = [...uploadFiles];
+    const results: UploadResultItem[] = files.map((f) => ({ name: f.name, size: f.size, status: "pending" }));
+    const update = (i: number, patch: Partial<UploadResultItem>) => {
+      results[i] = { ...results[i], ...patch };
+      setUploadResults([...results]);
+    };
+    setUploadResults([...results]);
     setUploading(true);
-    try {
-      const fd = new FormData();
-      if (uploadFiles.length === 1) {
-        fd.append("file", uploadFiles[0]);
-      } else {
-        uploadFiles.forEach((f) => fd.append("files", f));
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const precheck = precheckFile(file);
+      if (precheck) {
+        update(i, { status: "error", message: precheck });
+        continue;
       }
 
-      if (uploadFolder) fd.append("folder", uploadFolder);
-      if (uploadBrand.trim()) fd.append("brand", uploadBrand.trim());
-      if (uploadProductCode.trim()) fd.append("productCode", uploadProductCode.trim());
+      update(i, { status: "uploading" });
+      try {
+        const fd = new FormData();
+        fd.append("file", file);
+        if (uploadFolder) fd.append("folder", uploadFolder);
+        if (uploadBrand.trim()) fd.append("brand", uploadBrand.trim());
+        if (uploadProductCode.trim()) fd.append("productCode", uploadProductCode.trim());
 
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: fd,
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.message || "Tải lên tệp thất bại");
+        const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+        const data = await readJson(res);
+        const url = (data.data as { url?: string } | undefined)?.url ?? (data.url as string | undefined);
+        if (!res.ok) {
+          update(i, { status: "error", message: errorMessage(res, data, "Tải lên thất bại") });
+        } else if (!url) {
+          update(i, { status: "error", message: "Máy chủ không trả về đường dẫn tệp" });
+        } else {
+          update(i, { status: "success" });
+        }
+      } catch {
+        update(i, { status: "error", message: "Không kết nối được máy chủ" });
       }
-
-      toast.success(
-        uploadFiles.length === 1
-          ? "Tải lên tệp tin Cloudflare R2 thành công!"
-          : `Đã tải lên ${uploadFiles.length} tệp tin thành công!`,
-      );
-      setUploadModalOpen(false);
-      setUploadFiles([]);
-      setUploadProductCode("");
-      fetchMedia();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Lỗi khi tải tệp lên");
-    } finally {
-      setUploading(false);
     }
+
+    setUploading(false);
+    fetchMedia();
+
+    const succeeded = results.filter((r) => r.status === "success").length;
+    const failed = results.length - succeeded;
+    if (failed === 0) {
+      toast.success(succeeded === 1 ? "Đã tải lên 1 tệp thành công!" : `Đã tải lên ${succeeded} tệp thành công!`);
+      setUploadProductCode("");
+      resetUploadModal();
+      return;
+    }
+
+    // Giữ lại các tệp lỗi để thử lại, không tải lại tệp đã thành công (tránh trùng lặp)
+    setUploadFiles(files.filter((_, i) => results[i].status !== "success"));
+    if (succeeded === 0) {
+      toast.error(
+        failed === 1 ? results.find((r) => r.status === "error")?.message ?? "Tải lên thất bại" : `Không tải lên được tệp nào (${failed} tệp lỗi)`,
+      );
+    } else {
+      toast.warning(`Đã tải lên ${succeeded}/${results.length} tệp. ${failed} tệp lỗi, xem chi tiết bên dưới.`);
+    }
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteModalOpen(false);
+    setDeletingItem(null);
+    setDeleteConflict(null);
   };
 
   const handleDeleteMedia = async () => {
     if (!deletingItem) return;
+    const targetId = deletingItem.id || deletingItem._id;
+    if (!targetId) {
+      toast.error("Không xác định được tệp cần xóa");
+      return;
+    }
+
+    // Đã được cảnh báo tệp đang được dùng và admin chọn "Vẫn xóa"
+    const force = deleteConflict !== null;
     setDeleting(true);
     try {
-      const targetId = deletingItem.id || deletingItem._id;
-      const res = await fetch(`/api/admin/upload/${encodeURIComponent(targetId || "")}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `/api/admin/upload/${encodeURIComponent(targetId)}${force ? "?force=true" : ""}`,
+        { method: "DELETE" },
+      );
+      const data = await readJson(res);
 
-      const data = await res.json();
-      if (!res.ok) {
-        // Fallback delete by body if id route returns 404/405
-        const bodyRes = await fetch("/api/admin/upload", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: targetId, url: deletingItem.url }),
-        });
-        if (!bodyRes.ok) {
-          throw new Error(data.message || "Không thể xóa tệp tin");
-        }
+      if (res.status === 409 && !force) {
+        // Tệp đang được sử dụng: hiển thị nơi đang dùng và cho phép "Vẫn xóa"
+        setDeleteConflict({ summary: errorMessage(res, data, "Tệp đang được sử dụng") });
+        return;
       }
 
-      toast.success("Đã xóa tệp tin khỏi hệ thống!");
-      setDeleteModalOpen(false);
-      setDeletingItem(null);
+      if (!res.ok) {
+        toast.error(errorMessage(res, data, "Không thể xóa tệp"));
+        closeDeleteDialog();
+        fetchMedia();
+        return;
+      }
+
+      toast.success(`Đã xóa tệp "${deletingItem.filename}"`);
+      closeDeleteDialog();
       fetchMedia();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Lỗi khi xóa tệp tin");
+    } catch {
+      toast.error("Không kết nối được máy chủ, tệp chưa bị xóa. Vui lòng thử lại.");
     } finally {
       setDeleting(false);
     }
@@ -285,12 +419,7 @@ export default function AdminMediaPage() {
             className="text-xs h-9 w-36"
             options={[
               { value: "all", label: "Tất cả thư mục" },
-              { value: "products", label: "📁 products" },
-              { value: "brands", label: "📁 brands" },
-              { value: "avatars", label: "📁 avatars" },
-              { value: "banners", label: "📁 banners" },
-              { value: "documents", label: "📁 documents" },
-              { value: "videos", label: "📁 videos" },
+              ...FILTER_FOLDER_OPTIONS.map((o) => ({ value: o.value, label: `📁 ${o.value}` })),
             ]}
           />
 
@@ -494,7 +623,8 @@ export default function AdminMediaPage() {
               </div>
               <button
                 type="button"
-                onClick={() => setUploadModalOpen(false)}
+                onClick={resetUploadModal}
+                disabled={uploading}
                 className="rounded-full p-1 text-navy/40 hover:text-navy hover:bg-gray-100 transition-colors"
               >
                 <X size={18} />
@@ -507,12 +637,15 @@ export default function AdminMediaPage() {
                 <input
                   type="file"
                   multiple
+                  accept={ACCEPTED_TYPES}
                   id="media-file-input"
                   className="hidden"
+                  disabled={uploading}
                   onChange={(e) => {
                     if (e.target.files) {
-                      setUploadFiles(Array.from(e.target.files));
+                      handleSelectFiles(Array.from(e.target.files));
                     }
+                    e.target.value = "";
                   }}
                 />
                 <label
@@ -526,13 +659,46 @@ export default function AdminMediaPage() {
                     Nhấp để chọn tệp hoặc kéo thả vào đây
                   </div>
                   <span className="text-[11px] text-navy/50">
-                    Hỗ trợ Hình ảnh (PNG, JPG, WEBP), Video (MP4, MOV), Tài liệu (PDF)... Tối đa 100MB/tệp
+                    Ảnh JPG, PNG, WebP, GIF, AVIF (tối đa 15MB) · Video MP4, WebM, MOV (tối đa 50MB). Không hỗ trợ SVG
                   </span>
                 </label>
               </div>
 
+              {/* Per-file upload results */}
+              {uploadResults.length > 0 && (
+                <div className="rounded-xl border border-gray-light bg-white p-3 space-y-1.5 max-h-48 overflow-y-auto">
+                  <div className="text-[11px] font-bold text-navy/70 uppercase">
+                    Kết quả: {uploadResults.filter((r) => r.status === "success").length}/{uploadResults.length} tệp thành công
+                  </div>
+                  {uploadResults.map((r, idx) => (
+                    <div key={`${r.name}-${idx}`} className="flex items-start gap-2 text-xs py-1 px-2 rounded-lg bg-slate-50">
+                      <span className="mt-0.5 shrink-0">
+                        {r.status === "success" ? (
+                          <CircleCheck size={13} className="text-brand-green" />
+                        ) : r.status === "error" ? (
+                          <CircleAlert size={13} className="text-rose-600" />
+                        ) : r.status === "uploading" ? (
+                          <Loader2 size={13} className="animate-spin text-navy/50" />
+                        ) : (
+                          <span className="block h-3 w-3 rounded-full border border-navy/30" />
+                        )}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate font-medium text-navy" title={r.name}>
+                          {r.name}
+                        </div>
+                        {r.status === "error" && r.message && (
+                          <div className="text-[11px] text-rose-600 break-words">{r.message}</div>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-navy/50 shrink-0">{formatFileSize(r.size)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {/* Selected Files List */}
-              {uploadFiles.length > 0 && (
+              {uploadFiles.length > 0 && uploadResults.length === 0 && (
                 <div className="rounded-xl border border-gray-light bg-white p-3 space-y-1.5 max-h-36 overflow-y-auto">
                   <div className="text-[11px] font-bold text-navy/70 uppercase">
                     Đã chọn {uploadFiles.length} tệp tin:
@@ -561,14 +727,7 @@ export default function AdminMediaPage() {
                     value={uploadFolder}
                     onChange={(e) => setUploadFolder(e.target.value)}
                     className="text-xs h-9"
-                    options={[
-                      { value: "products", label: "products (Sản phẩm)" },
-                      { value: "brands", label: "brands (Logo hãng)" },
-                      { value: "avatars", label: "avatars (Ảnh đại diện)" },
-                      { value: "banners", label: "banners (Quảng cáo)" },
-                      { value: "documents", label: "documents (Tài liệu)" },
-                      { value: "videos", label: "videos (Video)" },
-                    ]}
+                    options={FOLDER_OPTIONS}
                   />
                 </div>
 
@@ -600,11 +759,11 @@ export default function AdminMediaPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setUploadModalOpen(false)}
+                  onClick={resetUploadModal}
                   disabled={uploading}
                   className="text-xs font-semibold h-9"
                 >
-                  Hủy bỏ
+                  {uploadResults.length > 0 ? "Đóng" : "Hủy bỏ"}
                 </Button>
                 <Button
                   type="submit"
@@ -618,6 +777,8 @@ export default function AdminMediaPage() {
                       <Loader2 size={13} className="animate-spin" />
                       <span>Đang tải lên...</span>
                     </>
+                  ) : uploadResults.some((r) => r.status === "error") ? (
+                    <span>Thử lại {uploadFiles.length} tệp lỗi</span>
                   ) : (
                     <span>Bắt đầu tải lên R2</span>
                   )}
@@ -634,12 +795,17 @@ export default function AdminMediaPage() {
       <ConfirmDialog
         open={deleteModalOpen}
         onOpenChange={(isOpen) => {
-          setDeleteModalOpen(isOpen);
-          if (!isOpen) setDeletingItem(null);
+          if (deleting) return;
+          if (isOpen) setDeleteModalOpen(true);
+          else closeDeleteDialog();
         }}
-        title="Xác nhận xóa tệp tin"
-        description={`Bạn có chắc chắn muốn xóa vĩnh viễn tệp "${deletingItem?.filename}" khỏi Cloudflare R2 không?`}
-        confirmText="Xác nhận xóa"
+        title={deleteConflict ? "Tệp đang được sử dụng" : "Xác nhận xóa tệp tin"}
+        description={
+          deleteConflict
+            ? `${deleteConflict.summary}. Nếu vẫn xóa, các vị trí này sẽ hiển thị ảnh lỗi cho đến khi được thay ảnh khác.`
+            : `Bạn có chắc chắn muốn xóa vĩnh viễn tệp "${deletingItem?.filename}" khỏi Cloudflare R2 không?`
+        }
+        confirmText={deleteConflict ? "Vẫn xóa" : "Xác nhận xóa"}
         cancelText="Hủy bỏ"
         loading={deleting}
         onConfirm={handleDeleteMedia}

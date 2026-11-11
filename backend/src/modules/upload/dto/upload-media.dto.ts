@@ -2,12 +2,13 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 import { DefaultErrorCode } from '@/common/decorators';
 import { ErrorCode } from '@/common/constants';
+import { ALLOWED_UPLOAD_FOLDERS } from '../upload.constants';
 
 @DefaultErrorCode(ErrorCode.MEDIA_VALIDATION_ERROR)
 export class UploadMediaDto {
   @ApiPropertyOptional({
-    description:
-      'Thư mục gốc lưu trữ trên Cloudflare R2 (mặc định: products, hoặc brands, categories, avatars, banners, documents, videos)',
+    description: `Thư mục gốc lưu trữ trên Cloudflare R2 (mặc định: products). Chỉ chấp nhận: ${ALLOWED_UPLOAD_FOLDERS.join(', ')}`,
+    enum: ALLOWED_UPLOAD_FOLDERS,
     example: 'products',
   })
   @IsOptional()

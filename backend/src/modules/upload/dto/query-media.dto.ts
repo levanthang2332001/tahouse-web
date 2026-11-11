@@ -1,9 +1,18 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 import { MediaType } from '../schemas/media.schema';
 import { DefaultErrorCode } from '@/common/decorators';
 import { ErrorCode } from '@/common/constants';
+import { ALLOWED_UPLOAD_FOLDERS } from '../upload.constants';
 
 @DefaultErrorCode(ErrorCode.MEDIA_VALIDATION_ERROR)
 export class QueryMediaDto {
@@ -25,7 +34,19 @@ export class QueryMediaDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(100)
   limit?: number = 20;
+
+  @ApiPropertyOptional({
+    description: 'Lọc theo thư mục gốc (bao gồm cả thư mục con)',
+    enum: ALLOWED_UPLOAD_FOLDERS,
+    example: 'products',
+  })
+  @IsOptional()
+  @IsIn(ALLOWED_UPLOAD_FOLDERS, {
+    message: `Thư mục không hợp lệ. Chỉ chấp nhận: ${ALLOWED_UPLOAD_FOLDERS.join(', ')}`,
+  })
+  folder?: string;
 
   @ApiPropertyOptional({
     description: 'Lọc theo định dạng loại tệp',

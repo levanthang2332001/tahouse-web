@@ -1,96 +1,66 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { fetch as undiciFetch } from "undici";
-import { checkAdminRequestAuth } from "@/lib/admin/auth";
-import { getValidAdminAccessToken } from "@/lib/admin/api-client";
 import { getBackendUrl } from "@/lib/backend/config";
 import { backendAgent } from "@/lib/backend/client";
+import {
+  ADMIN_HEADERS_UA,
+  DELETE_SERVER_ERRORS,
+  mediaProxyResponse,
+  networkErrorResponse,
+  readBackendJson,
+  requireAdminToken,
+} from "../_lib/media-proxy";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
 
-export async function GET(_request: NextRequest, context: RouteContext) {
-  const user = checkAdminRequestAuth(_request);
-  if (!user) {
-    return NextResponse.json(
-      { message: "Chưa xác thực quyền quản trị" },
-      { status: 401 },
-    );
-  }
-
-  const token = await getValidAdminAccessToken();
-  if (!token) {
-    return NextResponse.json(
-      { message: "Phiên làm việc hết hạn" },
-      { status: 401 },
-    );
-  }
+export async function GET(request: NextRequest, context: RouteContext) {
+  const auth = await requireAdminToken(request);
+  if (auth.response) return auth.response;
 
   try {
     const { id } = await context.params;
-    const backendUrl = getBackendUrl();
-    const beRes = await undiciFetch(
-      `${backendUrl}/admin/upload/${encodeURIComponent(id)}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "User-Agent": "TA House Admin FE/1.0",
-        },
-        dispatcher: backendAgent,
+    const beRes = await undiciFetch(`${getBackendUrl()}/admin/upload/${encodeURIComponent(id)}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${auth.token}`,
+        "User-Agent": ADMIN_HEADERS_UA,
       },
-    );
-
-    const beData = (await beRes.json()) as Record<string, unknown>;
-    return NextResponse.json(beData, { status: beRes.status });
+      dispatcher: backendAgent,
+    });
+    const body = await readBackendJson(beRes);
+    return mediaProxyResponse(beRes.status, body, { fallback: "Không thể lấy thông tin tệp" });
   } catch (error) {
-    console.error("[GET /api/admin/upload/[id]]", error);
-    return NextResponse.json(
-      { message: "Không thể lấy thông tin tệp tin" },
-      { status: 500 },
-    );
+    return networkErrorResponse("[GET /api/admin/upload/[id]]", error, "Không thể lấy thông tin tệp");
   }
 }
 
-export async function DELETE(_request: NextRequest, context: RouteContext) {
-  const user = checkAdminRequestAuth(_request);
-  if (!user) {
-    return NextResponse.json(
-      { message: "Chưa xác thực quyền quản trị" },
-      { status: 401 },
-    );
-  }
-
-  const token = await getValidAdminAccessToken();
-  if (!token) {
-    return NextResponse.json(
-      { message: "Phiên làm việc hết hạn" },
-      { status: 401 },
-    );
-  }
+/** DELETE /api/admin/upload/:id[?force=true] — 404 nếu không có tệp, 409 kèm tóm tắt nếu tệp đang được dùng */
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  const auth = await requireAdminToken(request);
+  if (auth.response) return auth.response;
 
   try {
     const { id } = await context.params;
-    const backendUrl = getBackendUrl();
+    const force = request.nextUrl.searchParams.get("force");
     const beRes = await undiciFetch(
-      `${backendUrl}/admin/upload/${encodeURIComponent(id)}`,
+      `${getBackendUrl()}/admin/upload/${encodeURIComponent(id)}${force ? `?force=${encodeURIComponent(force)}` : ""}`,
       {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`,
-          "User-Agent": "TA House Admin FE/1.0",
+          Authorization: `Bearer ${auth.token}`,
+          "User-Agent": ADMIN_HEADERS_UA,
         },
         dispatcher: backendAgent,
       },
     );
-
-    const beData = (await beRes.json()) as Record<string, unknown>;
-    return NextResponse.json(beData, { status: beRes.status });
+    const body = await readBackendJson(beRes);
+    return mediaProxyResponse(beRes.status, body, {
+      fallback: "Không thể xóa tệp",
+      serverErrors: DELETE_SERVER_ERRORS,
+    });
   } catch (error) {
-    console.error("[DELETE /api/admin/upload/[id]]", error);
-    return NextResponse.json(
-      { message: "Không thể xóa tệp tin media" },
-      { status: 500 },
-    );
+    return networkErrorResponse("[DELETE /api/admin/upload/[id]]", error, "Không thể xóa tệp");
   }
 }

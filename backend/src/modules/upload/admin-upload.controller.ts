@@ -9,10 +9,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   UseGuards,
-  BadRequestException,
 } from '@nestjs/common';
-import { AnyFilesInterceptor } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
 import {
   ApiTags,
   ApiOperation,
@@ -21,12 +18,27 @@ import {
   ApiConsumes,
   ApiBody,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
-import { ApiRoute, SwaggerTag } from '@/common/constants';
+import { ApiRoute, ErrorCode, SwaggerTag } from '@/common/constants';
+import { BusinessException } from '@/common/exceptions';
 import { JwtAuthGuard } from '@/common/guards';
 import { UploadService } from './upload.service';
 import { UploadMediaDto } from './dto/upload-media.dto';
 import { QueryMediaDto } from './dto/query-media.dto';
+import { MediaUploadInterceptor } from './interceptors/media-upload.interceptor';
+import {
+  ALLOWED_UPLOAD_FOLDERS,
+  formatMb,
+  MAX_FILES_PER_REQUEST,
+  MAX_IMAGE_BYTES,
+  MAX_TOTAL_UPLOAD_BYTES,
+  MAX_VIDEO_BYTES,
+} from './upload.constants';
+
+/** force=true|1 cho phép xóa tệp đang được sử dụng */
+const parseForce = (value: unknown): boolean =>
+  value === true || value === 'true' || value === '1';
 
 const unifiedUploadSchema = {
   type: 'object',
@@ -43,13 +55,12 @@ const unifiedUploadSchema = {
         type: 'string',
         format: 'binary',
       },
-      description:
-        'Danh sách nhiều tệp tin tải lên đồng thời (Hình ảnh, Video, PDF, ZIP...)',
+      description: `Danh sách nhiều tệp tải lên đồng thời (tối đa ${MAX_FILES_PER_REQUEST} tệp, tổng ${formatMb(MAX_TOTAL_UPLOAD_BYTES)})`,
     },
     folder: {
       type: 'string',
-      description:
-        'Thư mục gốc lưu trữ trên Cloudflare R2 (mặc định: products, hoặc brands, categories, avatars, banners, documents, videos)',
+      description: `Thư mục gốc lưu trữ trên Cloudflare R2 (mặc định: products). Chỉ chấp nhận: ${ALLOWED_UPLOAD_FOLDERS.join(', ')}`,
+      enum: [...ALLOWED_UPLOAD_FOLDERS],
       example: 'products',
     },
     brand: {
@@ -84,15 +95,12 @@ export class AdminUploadController {
 
   @Post(ApiRoute.ADMIN_UPLOAD)
   @ApiOperation({
-    summary:
-      'API Upload hình ảnh và video lên Cloudflare R2',
+    summary: 'API Upload hình ảnh và video lên Cloudflare R2',
     description: `Tải lên 1 hoặc nhiều tệp tin Hình ảnh hoặc Video trực tiếp lên Cloudflare R2.
-Hệ thống tự động:
-1. Ràng buộc bảo mật: Chỉ cho phép tệp Hình ảnh (JPG, PNG, WebP, GIF, SVG, AVIF) và Video (MP4, WebM, MOV, AVI). Chặn toàn bộ định dạng khác.
-2. Tự động sinh đường dẫn phân cấp theo: [folder]/[brand]/[category]/[subcategory]/[productCode]/[filename].
-3. Tự động trích xuất dung lượng size, kích thước width, height, aspectRatio, và duration video.
-4. Upload trực tiếp buffer lên Cloudflare R2 (100% không dùng lưu trữ local).
-5. Tạo bản ghi lưu toàn bộ thông số metadata vào D1 SQLite để quản lý.`,
+1. Định dạng được xác định bằng magic bytes (không tin Content-Type): ảnh JPG, PNG, WebP, GIF, AVIF (tối đa ${formatMb(MAX_IMAGE_BYTES)}) và video MP4, WebM, MOV (tối đa ${formatMb(MAX_VIDEO_BYTES)}). SVG và mọi định dạng khác bị từ chối (400).
+2. Tối đa ${MAX_FILES_PER_REQUEST} tệp / request, tổng ${formatMb(MAX_TOTAL_UPLOAD_BYTES)} (413 nếu vượt).
+3. Đường dẫn: [folder]/[brand]/[category]/[subcategory]/[productCode]/[tên-tệp]-[uuid].[ext]; folder phải thuộc danh sách cho phép.
+4. 1 tệp: data là bản ghi Media (data.url). Nhiều tệp: data = { uploaded, failed, total, successCount, failureCount }; nếu không tệp nào thành công thì trả lỗi.`,
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ schema: unifiedUploadSchema })
@@ -100,22 +108,16 @@ Hệ thống tự động:
     status: 201,
     description: 'Tải lên Cloudflare R2 và lưu document Media thành công',
   })
-  @UseInterceptors(
-    AnyFilesInterceptor({
-      storage: memoryStorage(),
-      limits: {
-        fileSize: 100 * 1024 * 1024, // 100MB tối đa mỗi file
-        files: 20, // Tối đa 20 file trong 1 request
-      },
-    }),
-  )
+  @UseInterceptors(MediaUploadInterceptor)
   async uploadMedia(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() dto: UploadMediaDto,
   ) {
     if (!files || files.length === 0) {
-      throw new BadRequestException(
-        'Please provide at least one file (file or files) in form-data',
+      throw new BusinessException(
+        ErrorCode.MEDIA_VALIDATION_ERROR,
+        'Vui lòng chọn ít nhất một tệp để tải lên (trường file hoặc files).',
+        'file',
       );
     }
 
@@ -136,29 +138,47 @@ Hệ thống tự động:
   @ApiOperation({
     summary: 'Xem chi tiết thông số của 1 tài nguyên Media theo ID',
   })
-  @ApiParam({ name: 'id', description: 'ID của document Media trong MongoDB' })
+  @ApiParam({ name: 'id', description: 'ID của bản ghi Media trong D1' })
   async getMediaDetail(@Param('id') id: string) {
     return this.uploadService.findById(id);
   }
 
   @Delete(ApiRoute.ADMIN_UPLOAD_DETAIL)
   @ApiOperation({
-    summary: 'Xóa tài nguyên Media khỏi Cloudflare R2 và MongoDB theo ID',
+    summary: 'Xóa tài nguyên Media khỏi Cloudflare R2 và D1 theo ID',
+    description:
+      'Chỉ xóa được tệp có bản ghi trong D1 (404 nếu không có). Nếu tệp đang được dùng ở sản phẩm, thương hiệu hoặc cài đặt cửa hàng thì trả 409 kèm tóm tắt, trừ khi gửi force=true.',
   })
-  @ApiParam({ name: 'id', description: 'ID của document Media trong MongoDB' })
-  async deleteMediaById(@Param('id') id: string) {
-    return this.uploadService.deleteMedia(id);
+  @ApiParam({ name: 'id', description: 'ID của bản ghi Media trong D1' })
+  @ApiQuery({ name: 'force', required: false, type: Boolean })
+  async deleteMediaById(
+    @Param('id') id: string,
+    @Query('force') force?: string,
+  ) {
+    return this.uploadService.deleteMedia(id, { force: parseForce(force) });
   }
 
   @Delete(ApiRoute.ADMIN_UPLOAD)
   @ApiOperation({
-    summary: 'Xóa tài nguyên Media theo URL hoặc Key hoặc ID qua Body',
+    summary: 'Xóa tài nguyên Media theo ID hoặc URL/Key đã lưu qua Body',
+    description:
+      'URL/Key phải khớp 1 bản ghi Media trong D1 (404 nếu không có). force=true (body hoặc query) để xóa tệp đang được sử dụng.',
   })
-  async deleteMediaByBody(@Body('url') url: string, @Body('id') id: string) {
+  async deleteMediaByBody(
+    @Body('url') url: string,
+    @Body('id') id: string,
+    @Body('force') bodyForce?: unknown,
+    @Query('force') queryForce?: string,
+  ) {
     const target = id || url;
     if (!target) {
-      throw new BadRequestException('Resource ID, Key, or URL is required');
+      throw new BusinessException(
+        ErrorCode.MEDIA_VALIDATION_ERROR,
+        'Thiếu ID hoặc URL của tệp cần xóa.',
+      );
     }
-    return this.uploadService.deleteMedia(target);
+    return this.uploadService.deleteMedia(target, {
+      force: parseForce(bodyForce) || parseForce(queryForce),
+    });
   }
 }
