@@ -4,7 +4,9 @@ import React, { FormEvent, Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, Search, X, Loader2 } from "lucide-react";
+import type { Product } from "@/lib/types/product";
+import { formatProductPrice } from "@/lib/format-price";
 
 function HeaderSearchForm({
   autoFocus = false,
@@ -15,7 +17,12 @@ function HeaderSearchForm({
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<Product[]>([]);
+  const [totalSuggestions, setTotalSuggestions] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     if (autoFocus) {
@@ -23,8 +30,67 @@ function HeaderSearchForm({
     }
   }, [autoFocus]);
 
+  // Click outside listener for dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleQueryChange = (val: string) => {
+    setQuery(val);
+    if (!val.trim()) {
+      setSuggestions([]);
+      setTotalSuggestions(0);
+      setIsLoading(false);
+      setShowDropdown(false);
+    }
+  };
+
+  // Live search debounce
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      setIsLoading(true);
+      setShowDropdown(true);
+
+      try {
+        const res = await fetch(
+          `/api/products?search=${encodeURIComponent(trimmed)}&limit=6`,
+        );
+        if (res.ok && !cancelled) {
+          const data = await res.json();
+          setSuggestions(data.items || []);
+          setTotalSuggestions(data.total || 0);
+        }
+      } catch {
+        // ignore
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [query]);
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setShowDropdown(false);
     const trimmed = query.trim();
     const href = trimmed
       ? `/products?q=${encodeURIComponent(trimmed)}`
@@ -33,19 +99,162 @@ function HeaderSearchForm({
     onSubmitted?.();
   };
 
+  const handleSelectProduct = (productId: string) => {
+    setShowDropdown(false);
+    onSubmitted?.();
+    router.push(`/product/${productId}`);
+  };
+
+  const handleViewAll = () => {
+    setShowDropdown(false);
+    onSubmitted?.();
+    const trimmed = query.trim();
+    router.push(
+      trimmed ? `/products?q=${encodeURIComponent(trimmed)}` : "/products",
+    );
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="relative w-full">
-      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-navy/40" />
-      <input
-        ref={inputRef}
-        type="search"
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        placeholder="Tìm sản phẩm, model..."
-        className="w-full rounded-xl border border-gray-light bg-neutral py-2.5 pl-10 pr-3 text-sm text-navy outline-none transition-colors placeholder:text-navy/40 focus:border-brand-green"
-        aria-label="Tìm kiếm sản phẩm"
-      />
-    </form>
+    <div
+      ref={containerRef}
+      data-lenis-prevent
+      className="relative w-full overflow-hidden rounded-2xl border-2 border-navy/20 bg-white shadow-2xl"
+    >
+      <form onSubmit={handleSubmit} className="flex items-center pl-4 pr-2 py-2 bg-white">
+        <input
+          ref={inputRef}
+          type="search"
+          value={query}
+          onChange={(event) => handleQueryChange(event.target.value)}
+          onFocus={() => {
+            if (query.trim().length > 0) setShowDropdown(true);
+          }}
+          placeholder="Tìm sản phẩm, model..."
+          className="w-full bg-transparent text-sm font-semibold text-navy placeholder:text-navy/45 outline-none border-none py-1 focus:outline-none"
+          aria-label="Tìm kiếm sản phẩm"
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={() => {
+              setQuery("");
+              setSuggestions([]);
+              setShowDropdown(false);
+              inputRef.current?.focus();
+            }}
+            className="p-1.5 text-navy/40 hover:text-navy cursor-pointer mr-1.5 shrink-0"
+            title="Xóa tìm kiếm"
+          >
+            <X size={16} />
+          </button>
+        )}
+        <button
+          type="submit"
+          aria-label="Tìm kiếm"
+          className="shrink-0 flex items-center justify-center rounded-xl bg-brand-green p-2 text-white shadow-xs hover:bg-[#68a83a] transition-all cursor-pointer"
+        >
+          <Search className="h-4 w-4" />
+        </button>
+      </form>
+
+      {/* Gợi ý sản phẩm gắn liền trực tiếp với ô search (không tách rời, có data-lenis-prevent để scroll mượt) */}
+      <AnimatePresence>
+        {showDropdown && query.trim().length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.18 }}
+            data-lenis-prevent
+            className="border-t border-gray-light/60 bg-white flex flex-col"
+          >
+            {isLoading ? (
+              <div className="flex items-center justify-center gap-2.5 py-6 text-xs font-semibold text-navy/65">
+                <Loader2 className="h-4 w-4 animate-spin text-brand-green" />
+                <span>Đang tìm sản phẩm...</span>
+              </div>
+            ) : suggestions.length > 0 ? (
+              <div data-lenis-prevent className="flex flex-col">
+                <div className="flex items-center justify-between border-b border-gray-light/50 bg-cream/70 px-4 py-2 text-[11px] font-extrabold uppercase tracking-wider text-navy/60">
+                  <span>Gợi ý sản phẩm</span>
+                  <span className="rounded-md bg-brand-green/10 px-2 py-0.5 text-brand-green font-bold text-[10px]">
+                    {totalSuggestions} kết quả
+                  </span>
+                </div>
+                <div
+                  data-lenis-prevent
+                  onWheel={(e) => e.stopPropagation()}
+                  className="max-h-[340px] overflow-y-auto overscroll-contain divide-y divide-gray-light/35 [touch-action:pan-y]"
+                >
+                  {suggestions.map((item) => {
+                    const priceText = formatProductPrice(
+                      item.price,
+                      item.priceRange,
+                    );
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleSelectProduct(item.id)}
+                        className="group flex w-full items-center gap-3 p-3 text-left transition-colors hover:bg-neutral/60 cursor-pointer"
+                      >
+                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-gray-light/70 bg-white">
+                          {item.imageUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={item.imageUrl}
+                              alt={item.name}
+                              className="h-full w-full object-contain p-1 transition-transform duration-200 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-neutral/40 text-[9px] text-navy/40">
+                              N/A
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="line-clamp-1 text-xs font-bold text-navy transition-colors group-hover:text-brand-green">
+                            {item.name}
+                          </p>
+                          <div className="mt-0.5 flex items-center gap-2 text-[10px] text-navy/55">
+                            {item.brand && (
+                              <span className="font-semibold text-brand-green">
+                                {item.brand}
+                              </span>
+                            )}
+                            {item.code && (
+                              <span className="font-mono text-navy/40">
+                                #{item.code}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <span className="text-xs font-extrabold text-[#c0283a]">
+                            {priceText}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleViewAll}
+                  className="border-t border-gray-light/60 bg-neutral/30 px-4 py-2.5 text-center text-xs font-bold text-brand-green transition-colors hover:bg-brand-green/10 cursor-pointer"
+                >
+                  Xem tất cả kết quả cho &ldquo;{query.trim()}&rdquo; &rarr;
+                </button>
+              </div>
+            ) : (
+              <div className="py-6 text-center text-xs font-medium text-navy/50">
+                Không tìm thấy sản phẩm phù hợp cho &ldquo;{query.trim()}&rdquo;
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -158,10 +367,12 @@ function HeaderContent() {
             <AnimatePresence>
               {searchOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 top-10 z-50 w-80 rounded-2xl border border-gray-light bg-cream p-3 shadow-xl"
+                  exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                  transition={{ duration: 0.16 }}
+                  data-lenis-prevent
+                  className="absolute right-0 top-11 z-50 w-[380px] sm:w-[460px]"
                 >
                   <HeaderSearchForm
                     autoFocus
@@ -198,6 +409,7 @@ function HeaderContent() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
+            data-lenis-prevent
             className="absolute left-0 top-24 flex max-h-[calc(100vh-5rem)] w-full flex-col gap-6 overflow-y-auto border-b border-gray-light bg-cream px-6 py-6 shadow-xl lg:hidden"
           >
             <HeaderSearchForm
