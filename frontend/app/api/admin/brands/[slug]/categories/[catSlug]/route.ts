@@ -1,86 +1,66 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAdminRequestAuth } from "@/lib/admin/auth";
 import { adminBackendFetch } from "@/lib/admin/api-client";
+import {
+  adminBrandPath,
+  badRequest,
+  readJsonObject,
+  requireAdmin,
+  runBrandWrite,
+} from "../../../_lib/route-helpers";
 
-type RouteContext = {
+type CategoryContext = {
   params: Promise<{
     slug: string;
     catSlug: string;
   }>;
 };
 
-export async function PATCH(request: NextRequest, context: RouteContext) {
-  const user = checkAdminRequestAuth(request);
-  if (!user) {
-    return NextResponse.json(
-      { message: "Chưa xác thực quyền quản trị" },
-      { status: 401 },
-    );
+export async function PATCH(request: NextRequest, context: CategoryContext) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
+  const { slug, catSlug } = await context.params;
+  const body = await readJsonObject(request);
+  if (!body) return badRequest("Dữ liệu cập nhật danh mục không đúng định dạng JSON");
+  if (body.name !== undefined && (typeof body.name !== "string" || !body.name.trim())) {
+    return badRequest("Tên danh mục không được để trống");
   }
 
-  try {
-    const { slug, catSlug } = await context.params;
-    const body = await request.json();
-
-    const result = await adminBackendFetch(
-      `/admin/brands/${encodeURIComponent(slug)}/categories/${encodeURIComponent(catSlug)}`,
-      {
+  return runBrandWrite(
+    "[PATCH /api/admin/brands/[slug]/categories/[catSlug]]",
+    () =>
+      adminBackendFetch(adminBrandPath(slug, "categories", catSlug), {
         method: "PATCH",
         body: JSON.stringify(body),
-      },
-    );
-
-    return NextResponse.json({
-      success: true,
-      message: "Cập nhật danh mục thành công",
-      data: result,
-    });
-  } catch (error) {
-    console.error("[PATCH /api/admin/brands/[slug]/categories/[catSlug]]", error);
-    return NextResponse.json(
-      {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Lỗi khi cập nhật danh mục",
-      },
-      { status: 500 },
-    );
-  }
+      }),
+    (result) =>
+      NextResponse.json({
+        success: true,
+        message: "Cập nhật danh mục thành công",
+        data: result,
+      }),
+    "Lỗi khi cập nhật danh mục",
+  );
 }
 
-export async function DELETE(request: NextRequest, context: RouteContext) {
-  const user = checkAdminRequestAuth(request);
-  if (!user) {
-    return NextResponse.json(
-      { message: "Chưa xác thực quyền quản trị" },
-      { status: 401 },
-    );
-  }
+export async function DELETE(request: NextRequest, context: CategoryContext) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
 
-  try {
-    const { slug, catSlug } = await context.params;
+  const { slug, catSlug } = await context.params;
 
-    const result = await adminBackendFetch(
-      `/admin/brands/${encodeURIComponent(slug)}/categories/${encodeURIComponent(catSlug)}`,
-      {
+  return runBrandWrite(
+    "[DELETE /api/admin/brands/[slug]/categories/[catSlug]]",
+    () =>
+      adminBackendFetch<{ message?: string }>(adminBrandPath(slug, "categories", catSlug), {
         method: "DELETE",
-      },
-    );
-
-    return NextResponse.json({
-      success: true,
-      message: "Xóa danh mục thành công",
-      data: result,
-    });
-  } catch (error) {
-    console.error("[DELETE /api/admin/brands/[slug]/categories/[catSlug]]", error);
-    return NextResponse.json(
-      {
-        message:
-          error instanceof Error ? error.message : "Lỗi khi xóa danh mục",
-      },
-      { status: 500 },
-    );
-  }
+      }),
+    (result) =>
+      NextResponse.json({
+        success: true,
+        message: result?.message || "Xóa danh mục thành công",
+        data: result,
+      }),
+    "Lỗi khi xóa danh mục",
+  );
 }

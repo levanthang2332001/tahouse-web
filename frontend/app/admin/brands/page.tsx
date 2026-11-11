@@ -24,6 +24,8 @@ import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { toast } from "@/components/ui/toast";
 import { getBrandLogoCandidates } from "@/lib/brand-logos";
+import { resolveBrandLogo } from "@/lib/admin/brand-logo";
+import { slugify } from "@/lib/utils";
 import type { CustomBrand } from "@/lib/admin/brand-store";
 
 export interface BrandSubcategory {
@@ -42,8 +44,29 @@ export type BrandItem = CustomBrand & {
   categories?: BrandCategory[];
 };
 
+/** Vietnamese-aware slug for auto-fill ("Bếp Điện Từ" → "bep-dien-tu"); the backend re-validates it. */
+function toSlug(value: string): string {
+  return slugify(value).replace(/^-+|-+$/g, "");
+}
+
+/** Reads `message` from a JSON error body; falls back when the body is missing or not JSON. */
+async function readResponseMessage(res: Response, fallback: string): Promise<string> {
+  try {
+    const data = (await res.json()) as { message?: unknown };
+    if (typeof data?.message === "string" && data.message.trim()) return data.message;
+  } catch {
+    // non-JSON body (e.g. proxy error page)
+  }
+  return `${fallback} (mã lỗi ${res.status})`;
+}
+
 function BrandCardLogo({ brand }: { brand: BrandItem }) {
-  const candidates = getBrandLogoCandidates(brand.logo, brand.slug, brand.name);
+  // Same rule as the public site: uploaded/external logo first, bundled asset for empty or seeded logos
+  const candidates = getBrandLogoCandidates(
+    resolveBrandLogo(brand.logo, brand.slug, brand.name),
+    brand.slug,
+    brand.name,
+  );
   // Step to the next source whenever one fails to load
   const [attempt, setAttempt] = useState(0);
   const logoSrc = candidates[attempt];
@@ -82,9 +105,6 @@ export default function AdminBrandsPage() {
   const [formName, setFormName] = useState("");
   const [formSlug, setFormSlug] = useState("");
   const [formLogo, setFormLogo] = useState("");
-  const [formCountry, setFormCountry] = useState("");
-  const [formDescription, setFormDescription] = useState("");
-  const [formWebsite, setFormWebsite] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
@@ -172,9 +192,6 @@ export default function AdminBrandsPage() {
     setFormName("");
     setFormSlug("");
     setFormLogo("");
-    setFormCountry("Chính hãng");
-    setFormDescription("");
-    setFormWebsite("");
     setModalOpen(true);
   };
 
@@ -183,9 +200,6 @@ export default function AdminBrandsPage() {
     setFormName(brand.name);
     setFormSlug(brand.slug);
     setFormLogo(brand.logo || "");
-    setFormCountry(brand.country || "Chính hãng");
-    setFormDescription(brand.description || "");
-    setFormWebsite(brand.website || "");
     setModalOpen(true);
   };
 
@@ -222,19 +236,23 @@ export default function AdminBrandsPage() {
       return;
     }
 
+    const slugInput = formSlug.trim();
+    if (!editingBrand && !toSlug(slugInput || formName)) {
+      toast.error("Không tạo được slug hợp lệ: hãy nhập slug gồm chữ không dấu, số và dấu gạch ngang");
+      return;
+    }
+
     setSaving(true);
     try {
+      // Only fields the backend stores; anything else would be silently dropped
       const payload: Partial<CustomBrand> = {
         name: formName.trim(),
-        slug: formSlug.trim() || undefined,
+        slug: slugInput || undefined,
         logo: formLogo.trim(),
-        country: formCountry.trim(),
-        description: formDescription.trim(),
-        website: formWebsite.trim(),
       };
 
       const url = editingBrand
-        ? `/api/admin/brands/${editingBrand.slug}`
+        ? `/api/admin/brands/${encodeURIComponent(editingBrand.slug)}`
         : "/api/admin/brands";
       const method = editingBrand ? "PUT" : "POST";
 
@@ -245,8 +263,7 @@ export default function AdminBrandsPage() {
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Lỗi khi lưu");
+        throw new Error(await readResponseMessage(res, "Không thể lưu thương hiệu"));
       }
 
       toast.success(
@@ -267,19 +284,22 @@ export default function AdminBrandsPage() {
     if (!deletingBrand) return;
     setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/brands/${deletingBrand.slug}`, {
+      const res = await fetch(`/api/admin/brands/${encodeURIComponent(deletingBrand.slug)}`, {
         method: "DELETE",
       });
-      if (!res.ok) throw new Error("Lỗi khi xóa");
+      if (!res.ok) {
+        throw new Error(await readResponseMessage(res, "Không thể xóa thương hiệu"));
+      }
 
       toast.success(`Đã xóa thương hiệu "${deletingBrand.name}"`);
       setDeleteModalOpen(false);
       setDeletingBrand(null);
-      fetchBrands();
-    } catch {
-      toast.error("Không thể xóa thương hiệu");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Không thể xóa thương hiệu");
     } finally {
       setDeleting(false);
+      // Reload from the server so the list shows what is really stored
+      void fetchBrands();
     }
   };
 
@@ -294,18 +314,39 @@ export default function AdminBrandsPage() {
     setActiveCatForSub(null);
 
     try {
-      const res = await fetch(`/api/admin/brands/${encodeURIComponent(brand.slug)}`);
-      if (res.ok) {
-        const fullBrand = await res.json();
-        setBrandCategories(fullBrand.categories || []);
-      } else {
-        setBrandCategories(brand.categories || []);
-      }
-    } catch {
+      await reloadCategories(brand.slug);
+    } catch (err) {
       setBrandCategories(brand.categories || []);
+      toast.error(
+        err instanceof Error
+          ? `${err.message}. Đang hiển thị dữ liệu đã tải trước đó.`
+          : "Không thể tải cây danh mục mới nhất",
+      );
     } finally {
       setLoadingCategories(false);
     }
+  };
+
+  /** Fetches the brand's category tree from the server; throws with the server message on failure. */
+  const reloadCategories = async (brandSlug: string) => {
+    const res = await fetch(`/api/admin/brands/${encodeURIComponent(brandSlug)}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      throw new Error(await readResponseMessage(res, "Không thể tải cây danh mục"));
+    }
+    const fullBrand = (await res.json()) as { categories?: BrandCategory[] };
+    setBrandCategories(fullBrand.categories || []);
+  };
+
+  /** After a category write: reload the tree and the brand list; a reload failure is reported, not hidden. */
+  const refreshAfterCategoryWrite = async (brandSlug: string) => {
+    try {
+      await reloadCategories(brandSlug);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Không thể tải lại cây danh mục");
+    }
+    setRefreshIndex((prev) => prev + 1);
   };
 
   const handleAddCategory = async (e: React.FormEvent) => {
@@ -329,19 +370,14 @@ export default function AdminBrandsPage() {
           }),
         },
       );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Không thể thêm danh mục");
+      if (!res.ok) {
+        throw new Error(await readResponseMessage(res, "Không thể thêm danh mục"));
+      }
 
       toast.success(`Đã thêm danh mục "${newCatName}"`);
       setNewCatName("");
       setNewCatSlug("");
-      // Refresh category list
-      const updatedRes = await fetch(`/api/admin/brands/${encodeURIComponent(categoryBrand.slug)}`);
-      if (updatedRes.ok) {
-        const updatedBrand = await updatedRes.json();
-        setBrandCategories(updatedBrand.categories || []);
-      }
-      setRefreshIndex((prev) => prev + 1);
+      await refreshAfterCategoryWrite(categoryBrand.slug);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Lỗi khi thêm danh mục");
     } finally {
@@ -351,23 +387,33 @@ export default function AdminBrandsPage() {
 
   const handleDeleteCategory = async (catSlug: string, catName: string) => {
     if (!categoryBrand) return;
-    if (!confirm(`Bạn có chắc chắn muốn xóa danh mục "${catName}" không?`)) return;
+    if (
+      !confirm(
+        `Xóa danh mục "${catName}" và toàn bộ danh mục con của nó?\n\n` +
+          "Nếu vẫn còn sản phẩm thuộc danh mục này, hệ thống sẽ từ chối xóa và báo số sản phẩm. " +
+          "Hãy chuyển hoặc xóa các sản phẩm đó trước.",
+      )
+    ) {
+      return;
+    }
 
+    const brandSlug = categoryBrand.slug;
     try {
       const res = await fetch(
-        `/api/admin/brands/${encodeURIComponent(categoryBrand.slug)}/categories/${encodeURIComponent(catSlug)}`,
+        `/api/admin/brands/${encodeURIComponent(brandSlug)}/categories/${encodeURIComponent(catSlug)}`,
         {
           method: "DELETE",
         },
       );
-      if (!res.ok) throw new Error("Không thể xóa danh mục");
+      if (!res.ok) {
+        throw new Error(await readResponseMessage(res, "Không thể xóa danh mục"));
+      }
 
       toast.success(`Đã xóa danh mục "${catName}"`);
-      setBrandCategories((prev) => prev.filter((c) => c.slug !== catSlug));
-      setRefreshIndex((prev) => prev + 1);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Lỗi khi xóa danh mục");
     }
+    await refreshAfterCategoryWrite(brandSlug);
   };
 
   const handleAddSubcategory = async (catSlug: string) => {
@@ -389,21 +435,15 @@ export default function AdminBrandsPage() {
           }),
         },
       );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Không thể thêm danh mục con");
+      if (!res.ok) {
+        throw new Error(await readResponseMessage(res, "Không thể thêm danh mục con"));
+      }
 
       toast.success(`Đã thêm danh mục con "${newSubName}"`);
       setNewSubName("");
       setNewSubSlug("");
       setActiveCatForSub(null);
-
-      // Refresh category list
-      const updatedRes = await fetch(`/api/admin/brands/${encodeURIComponent(categoryBrand.slug)}`);
-      if (updatedRes.ok) {
-        const updatedBrand = await updatedRes.json();
-        setBrandCategories(updatedBrand.categories || []);
-      }
-      setRefreshIndex((prev) => prev + 1);
+      await refreshAfterCategoryWrite(categoryBrand.slug);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Lỗi khi thêm danh mục con");
     } finally {
@@ -417,42 +457,39 @@ export default function AdminBrandsPage() {
     subName: string,
   ) => {
     if (!categoryBrand) return;
-    if (!confirm(`Bạn có chắc chắn muốn xóa danh mục con "${subName}" không?`)) return;
+    if (
+      !confirm(
+        `Xóa danh mục con "${subName}"?\n\n` +
+          "Nếu vẫn còn sản phẩm thuộc danh mục con này, hệ thống sẽ từ chối xóa và báo số sản phẩm. " +
+          "Hãy chuyển hoặc xóa các sản phẩm đó trước.",
+      )
+    ) {
+      return;
+    }
 
+    const brandSlug = categoryBrand.slug;
     try {
       const res = await fetch(
-        `/api/admin/brands/${encodeURIComponent(categoryBrand.slug)}/categories/${encodeURIComponent(catSlug)}/subcategories/${encodeURIComponent(subSlug)}`,
+        `/api/admin/brands/${encodeURIComponent(brandSlug)}/categories/${encodeURIComponent(catSlug)}/subcategories/${encodeURIComponent(subSlug)}`,
         {
           method: "DELETE",
         },
       );
-      if (!res.ok) throw new Error("Không thể xóa danh mục con");
+      if (!res.ok) {
+        throw new Error(await readResponseMessage(res, "Không thể xóa danh mục con"));
+      }
 
       toast.success(`Đã xóa danh mục con "${subName}"`);
-      setBrandCategories((prev) =>
-        prev.map((c) =>
-          c.slug === catSlug
-            ? {
-                ...c,
-                subcategories: (c.subcategories || []).filter((s) => s.slug !== subSlug),
-              }
-            : c,
-        ),
-      );
-      setRefreshIndex((prev) => prev + 1);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Lỗi khi xóa danh mục con");
     }
+    await refreshAfterCategoryWrite(brandSlug);
   };
 
   const filteredBrands = brands.filter((b) => {
     const q = search.trim().toLowerCase();
     if (!q) return true;
-    return (
-      b.name.toLowerCase().includes(q) ||
-      b.slug.toLowerCase().includes(q) ||
-      (b.country && b.country.toLowerCase().includes(q))
-    );
+    return b.name.toLowerCase().includes(q) || b.slug.toLowerCase().includes(q);
   });
 
   const totalProducts = brands.reduce((acc, b) => acc + (b.productCount || 0), 0);
@@ -472,7 +509,7 @@ export default function AdminBrandsPage() {
             </Badge>
           </div>
           <p className="text-xs sm:text-sm text-navy/60 mt-1">
-            Quản lý thông tin hãng, xuất xứ, logo đối tác và cây phân cấp danh mục sản phẩm (Categories & Subcategories)
+            Quản lý thông tin hãng, logo đối tác và cây phân cấp danh mục sản phẩm (Categories & Subcategories)
           </p>
         </div>
 
@@ -541,7 +578,7 @@ export default function AdminBrandsPage() {
           <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-navy/40" />
           <Input
             type="text"
-            placeholder="Tìm kiếm thương hiệu theo tên, xuất xứ..."
+            placeholder="Tìm kiếm thương hiệu theo tên, slug..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9 text-xs h-9"
@@ -606,24 +643,12 @@ export default function AdminBrandsPage() {
 
                 {/* Brand Info */}
                 <div className="space-y-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <h4 className="font-extrabold text-navy text-sm truncate" title={brand.name}>
-                      {brand.name}
-                    </h4>
-                    {brand.country && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-navy/5 text-navy/70 border border-navy/10 shrink-0">
-                        {brand.country}
-                      </span>
-                    )}
-                  </div>
+                  <h4 className="font-extrabold text-navy text-sm truncate" title={brand.name}>
+                    {brand.name}
+                  </h4>
                   <div className="text-[11px] text-navy/50 font-mono truncate">
                     slug: {brand.slug}
                   </div>
-                  {brand.description && (
-                    <p className="text-xs text-navy/60 line-clamp-2 pt-1 font-normal">
-                      {brand.description}
-                    </p>
-                  )}
                 </div>
               </div>
 
@@ -709,7 +734,7 @@ export default function AdminBrandsPage() {
                   onChange={(e) => {
                     setFormName(e.target.value);
                     if (!editingBrand) {
-                      setFormSlug(e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-"));
+                      setFormSlug(toSlug(e.target.value));
                     }
                   }}
                   className="text-xs font-semibold"
@@ -779,7 +804,7 @@ export default function AdminBrandsPage() {
                   <div className="flex h-12 w-24 shrink-0 items-center justify-center rounded-lg bg-white border border-gray-200 p-1">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={formLogo}
+                      src={resolveBrandLogo(formLogo, formSlug, formName)}
                       alt="Logo preview"
                       className="h-full w-auto object-contain"
                       onError={(e) => {
@@ -793,47 +818,6 @@ export default function AdminBrandsPage() {
                   </div>
                 </div>
               )}
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-navy mb-1">
-                    Xuất xứ / Quốc gia
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="VD: Đức, Nhật Bản..."
-                    value={formCountry}
-                    onChange={(e) => setFormCountry(e.target.value)}
-                    className="text-xs font-medium"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-navy mb-1">
-                    Website (Tùy chọn)
-                  </label>
-                  <Input
-                    type="url"
-                    placeholder="https://brand.com"
-                    value={formWebsite}
-                    onChange={(e) => setFormWebsite(e.target.value)}
-                    className="text-xs"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-navy mb-1">
-                  Mô tả ngắn về hãng (Tùy chọn)
-                </label>
-                <textarea
-                  rows={2}
-                  placeholder="Thông tin giới thiệu ngắn về thương hiệu..."
-                  value={formDescription}
-                  onChange={(e) => setFormDescription(e.target.value)}
-                  className="w-full rounded-xl border border-gray-light p-2.5 text-xs text-navy focus:outline-none focus:ring-2 focus:ring-brand-green"
-                />
-              </div>
 
               <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-gray-light">
                 <Button
@@ -908,7 +892,7 @@ export default function AdminBrandsPage() {
                     value={newCatName}
                     onChange={(e) => {
                       setNewCatName(e.target.value);
-                      setNewCatSlug(e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-"));
+                      setNewCatSlug(toSlug(e.target.value));
                     }}
                     className="text-xs h-8"
                     required
@@ -993,7 +977,7 @@ export default function AdminBrandsPage() {
                             value={newSubName}
                             onChange={(e) => {
                               setNewSubName(e.target.value);
-                              setNewSubSlug(e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-"));
+                              setNewSubSlug(toSlug(e.target.value));
                             }}
                             className="text-xs h-7 bg-white"
                           />
@@ -1083,7 +1067,11 @@ export default function AdminBrandsPage() {
           if (!isOpen) setDeletingBrand(null);
         }}
         title="Xác nhận xóa thương hiệu"
-        description={`Bạn có chắc chắn muốn xóa thương hiệu "${deletingBrand?.name}" khỏi danh sách quản lý không?`}
+        description={
+          deletingBrand && deletingBrand.productCount > 0
+            ? `Thương hiệu "${deletingBrand.name}" đang có ${deletingBrand.productCount} sản phẩm. Hệ thống sẽ không cho xóa cho đến khi các sản phẩm này được chuyển sang thương hiệu khác hoặc bị xóa.`
+            : `Bạn có chắc chắn muốn xóa thương hiệu "${deletingBrand?.name}" cùng toàn bộ cây danh mục của nó không?`
+        }
         confirmText="Xác nhận xóa"
         cancelText="Hủy bỏ"
         loading={deleting}

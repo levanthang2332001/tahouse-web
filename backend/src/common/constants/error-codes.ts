@@ -70,6 +70,21 @@ export const ErrorCode = {
     errorName: 'SUBCATEGORY_ALREADY_EXISTS',
     httpStatus: HttpStatus.CONFLICT,
   },
+  BRAND_HAS_PRODUCTS: {
+    errorCode: 5007,
+    errorName: 'BRAND_HAS_PRODUCTS',
+    httpStatus: HttpStatus.CONFLICT,
+  },
+  CATEGORY_HAS_PRODUCTS: {
+    errorCode: 5008,
+    errorName: 'CATEGORY_HAS_PRODUCTS',
+    httpStatus: HttpStatus.CONFLICT,
+  },
+  SUBCATEGORY_HAS_PRODUCTS: {
+    errorCode: 5009,
+    errorName: 'SUBCATEGORY_HAS_PRODUCTS',
+    httpStatus: HttpStatus.CONFLICT,
+  },
 
   // --- PRODUCTS (6xxx) ---
   PRODUCT_VALIDATION_ERROR: {

@@ -54,8 +54,8 @@ describe('BrandsController', () => {
       expect(brandsService.findAll).toHaveBeenCalled();
       expect(result).toHaveLength(1);
       expect(result[0].slug).toBe('kassler');
-      expect(result[0].categories[0].slug).toBe('dai-sanh');
-      expect(result[0].categories[0].subcategories[0].slug).toBe('face-id');
+      expect(result[0].categories?.[0].slug).toBe('dai-sanh');
+      expect(result[0].categories?.[0].subcategories?.[0].slug).toBe('face-id');
     });
   });
 });

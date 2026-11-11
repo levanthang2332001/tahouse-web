@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAdminRequestAuth } from "@/lib/admin/auth";
 import { adminBackendFetch } from "@/lib/admin/api-client";
+import { adminBrandPath, requireAdmin, runBrandWrite } from "../../../../../_lib/route-helpers";
 
-type RouteContext = {
+type SubcategoryContext = {
   params: Promise<{
     slug: string;
     catSlug: string;
@@ -10,43 +10,25 @@ type RouteContext = {
   }>;
 };
 
-export async function DELETE(request: NextRequest, context: RouteContext) {
-  const user = checkAdminRequestAuth(request);
-  if (!user) {
-    return NextResponse.json(
-      { message: "Chưa xác thực quyền quản trị" },
-      { status: 401 },
-    );
-  }
+export async function DELETE(request: NextRequest, context: SubcategoryContext) {
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
 
-  try {
-    const { slug, catSlug, subSlug } = await context.params;
+  const { slug, catSlug, subSlug } = await context.params;
 
-    const result = await adminBackendFetch(
-      `/admin/brands/${encodeURIComponent(slug)}/categories/${encodeURIComponent(catSlug)}/subcategories/${encodeURIComponent(subSlug)}`,
-      {
-        method: "DELETE",
-      },
-    );
-
-    return NextResponse.json({
-      success: true,
-      message: "Đã xóa danh mục con thành công",
-      data: result,
-    });
-  } catch (error) {
-    console.error(
-      "[DELETE /api/admin/brands/[slug]/categories/[catSlug]/subcategories/[subSlug]]",
-      error,
-    );
-    return NextResponse.json(
-      {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Lỗi khi xóa danh mục con",
-      },
-      { status: 500 },
-    );
-  }
+  return runBrandWrite(
+    "[DELETE /api/admin/brands/[slug]/categories/[catSlug]/subcategories/[subSlug]]",
+    () =>
+      adminBackendFetch<{ message?: string }>(
+        adminBrandPath(slug, "categories", catSlug, "subcategories", subSlug),
+        { method: "DELETE" },
+      ),
+    (result) =>
+      NextResponse.json({
+        success: true,
+        message: result?.message || "Đã xóa danh mục con thành công",
+        data: result,
+      }),
+    "Lỗi khi xóa danh mục con",
+  );
 }

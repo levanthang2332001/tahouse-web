@@ -10,10 +10,11 @@ export async function GET() {
       },
     });
   } catch (error) {
+    // Backend unreachable or failing: report it instead of pretending there are no brands
     console.error("[GET /api/brands]", error);
     return NextResponse.json(
-      { message: "Không thể tải danh sách thương hiệu" },
-      { status: 500 },
+      { message: "Không thể tải danh sách thương hiệu từ máy chủ. Vui lòng thử lại sau." },
+      { status: 502, headers: { "Cache-Control": "no-store" } },
     );
   }
 }

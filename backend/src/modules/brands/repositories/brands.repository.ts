@@ -1,5 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { eq, or, and, sql } from 'drizzle-orm';
+import { eq, or, and, sql, inArray, is } from 'drizzle-orm';
+import type { BatchItem } from 'drizzle-orm/batch';
+import { DrizzleD1Database } from 'drizzle-orm/d1';
 import { D1_DATABASE } from '@/database/d1.constants';
 import type { D1Database } from '@/database/d1.client';
 import {
@@ -10,7 +12,15 @@ import {
   NewCategory,
   NewSubcategory,
 } from '../schemas/brand.schema';
+import { products } from '../../products/schemas/product.schema';
 import { BrandResponseDto } from '../dto/brand-response.dto';
+
+/** Số sản phẩm của một thương hiệu, gom theo cặp (category_slug, subcategory_slug) */
+export interface ProductTaxonomyCount {
+  categorySlug: string;
+  subcategorySlug: string | null;
+  count: number;
+}
 
 @Injectable()
 export class BrandsRepository {
@@ -173,5 +183,167 @@ export class BrandsRepository {
     });
     if (!row) return null;
     return { id: row.id, slug: row.slug, name: row.name };
+  }
+
+  /**
+   * Đếm sản phẩm của thương hiệu theo (category_slug, subcategory_slug).
+   * Chỉ đọc bảng products; dùng để chặn xóa/đổi slug khi còn sản phẩm tham chiếu.
+   */
+  async countProductsByTaxonomy(
+    brandId: string,
+  ): Promise<ProductTaxonomyCount[]> {
+    const rows = await this.db
+      .select({
+        categorySlug: products.categorySlug,
+        subcategorySlug: products.subcategorySlug,
+        count: sql<number>`count(*)`,
+      })
+      .from(products)
+      .where(eq(products.brandId, brandId))
+      .groupBy(products.categorySlug, products.subcategorySlug);
+
+    return rows.map((r) => ({
+      categorySlug: String(r.categorySlug ?? ''),
+      subcategorySlug: r.subcategorySlug ?? null,
+      count: Number(r.count) || 0,
+    }));
+  }
+
+  /** Tạo thương hiệu cùng cây danh mục trong một batch (nguyên tử trên D1) */
+  async createBrandWithTree(
+    brand: NewBrand,
+    categoryRows: NewCategory[],
+    subcategoryRows: NewSubcategory[],
+  ): Promise<void> {
+    const queries: BatchItem<'sqlite'>[] = [
+      this.db.insert(brands).values(brand),
+    ];
+    if (categoryRows.length > 0) {
+      queries.push(this.db.insert(categories).values(categoryRows));
+    }
+    if (subcategoryRows.length > 0) {
+      queries.push(this.db.insert(subcategories).values(subcategoryRows));
+    }
+    await this.runBatch(queries);
+  }
+
+  /**
+   * Cập nhật thương hiệu; nếu truyền `tree` thì thay toàn bộ cây danh mục trong cùng batch.
+   */
+  async updateBrandWithTree(
+    brandId: string,
+    data: Partial<NewBrand>,
+    tree?: { categories: NewCategory[]; subcategories: NewSubcategory[] },
+  ): Promise<void> {
+    const queries: BatchItem<'sqlite'>[] = [
+      this.db
+        .update(brands)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(brands.id, brandId)),
+    ];
+    if (tree) {
+      queries.push(...this.deleteTreeQueries(brandId));
+      if (tree.categories.length > 0) {
+        queries.push(this.db.insert(categories).values(tree.categories));
+      }
+      if (tree.subcategories.length > 0) {
+        queries.push(this.db.insert(subcategories).values(tree.subcategories));
+      }
+    }
+    await this.runBatch(queries);
+  }
+
+  /** Xóa thương hiệu cùng toàn bộ danh mục/danh mục con trong một batch */
+  async deleteBrandWithTree(brandId: string): Promise<void> {
+    await this.runBatch([
+      ...this.deleteTreeQueries(brandId),
+      this.db.delete(brands).where(eq(brands.id, brandId)),
+    ]);
+  }
+
+  /** Thêm danh mục cha cùng danh mục con trong một batch */
+  async insertCategoryWithSubcategories(
+    category: NewCategory,
+    subcategoryRows: NewSubcategory[],
+  ): Promise<void> {
+    const queries: BatchItem<'sqlite'>[] = [
+      this.db.insert(categories).values(category),
+    ];
+    if (subcategoryRows.length > 0) {
+      queries.push(this.db.insert(subcategories).values(subcategoryRows));
+    }
+    await this.runBatch(queries);
+  }
+
+  /**
+   * Cập nhật danh mục cha; nếu truyền `subcategoryRows` thì thay toàn bộ danh mục con trong cùng batch.
+   */
+  async updateCategoryWithSubcategories(
+    categoryId: string,
+    data: Partial<NewCategory>,
+    subcategoryRows?: NewSubcategory[],
+  ): Promise<void> {
+    const queries: BatchItem<'sqlite'>[] = [
+      this.db
+        .update(categories)
+        .set({ ...data, updatedAt: new Date() })
+        .where(eq(categories.id, categoryId)),
+    ];
+    if (subcategoryRows) {
+      queries.push(
+        this.db
+          .delete(subcategories)
+          .where(eq(subcategories.categoryId, categoryId)),
+      );
+      if (subcategoryRows.length > 0) {
+        queries.push(this.db.insert(subcategories).values(subcategoryRows));
+      }
+    }
+    await this.runBatch(queries);
+  }
+
+  /** Xóa danh mục cha cùng danh mục con trong một batch */
+  async deleteCategoryWithSubcategories(categoryId: string): Promise<void> {
+    await this.runBatch([
+      this.db
+        .delete(subcategories)
+        .where(eq(subcategories.categoryId, categoryId)),
+      this.db.delete(categories).where(eq(categories.id, categoryId)),
+    ]);
+  }
+
+  private deleteTreeQueries(brandId: string): BatchItem<'sqlite'>[] {
+    return [
+      this.db
+        .delete(subcategories)
+        .where(
+          inArray(
+            subcategories.categoryId,
+            this.db
+              .select({ id: categories.id })
+              .from(categories)
+              .where(eq(categories.brandId, brandId)),
+          ),
+        ),
+      this.db.delete(categories).where(eq(categories.brandId, brandId)),
+    ];
+  }
+
+  /**
+   * Chạy nhiều câu lệnh nguyên tử: D1 binding (Worker production) dùng db.batch — một transaction.
+   * Client HTTP sqlite-proxy (chạy local) không có batch nên chạy tuần tự.
+   */
+  private async runBatch(queries: BatchItem<'sqlite'>[]): Promise<void> {
+    if (queries.length === 0) return;
+    if (is(this.db, DrizzleD1Database)) {
+      await this.db.batch(
+        queries as unknown as [BatchItem<'sqlite'>, ...BatchItem<'sqlite'>[]],
+      );
+      return;
+    }
+    for (const query of queries) {
+      // Query builder của drizzle là thenable: await để thực thi từng câu lệnh
+      await (query as unknown as Promise<unknown>);
+    }
   }
 }

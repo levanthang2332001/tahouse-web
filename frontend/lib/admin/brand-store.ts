@@ -1,7 +1,6 @@
 import { backendFetch } from "@/lib/backend/client";
-import { resolveMediaUrl } from "@/lib/media";
 import { slugify } from "@/lib/utils";
-import { getLocalBrandLogo } from "@/lib/brand-logos";
+import { resolveBrandLogo } from "@/lib/admin/brand-logo";
 import { fetchRemoteProducts } from "@/lib/admin/product-store";
 import type { Brand } from "@/lib/types/product";
 
@@ -10,22 +9,24 @@ export interface CustomBrand {
   name: string;
   slug: string;
   logo?: string;
-  description?: string;
-  website?: string;
-  country?: string;
   updatedAt?: string;
 }
 
 /**
  * Get unified list of all brands directly from the backend database with product counts.
+ * Throws when the backend brand list cannot be loaded, so callers never mistake an outage for "no brands".
+ * Product counts are best-effort: if products fail to load, counts are 0.
  */
 export async function getAllBrandsWithStats(): Promise<
   Array<CustomBrand & { productCount: number; categories?: Brand["categories"] }>
 > {
   const [remoteBrands, products] = await Promise.all([
-    backendFetch<Brand[]>("/brands").catch(() => [] as Brand[]),
+    backendFetch<Brand[]>("/brands"),
     fetchRemoteProducts().catch(() => []),
   ]);
+  if (!Array.isArray(remoteBrands)) {
+    throw new Error("Backend trả về danh sách thương hiệu không hợp lệ");
+  }
 
   // Count products by brand slug and brand name
   const productCountMap: Record<string, number> = {};
@@ -44,17 +45,12 @@ export async function getAllBrandsWithStats(): Promise<
       productCountMap[slug] ||
       productCountMap[rb.name.toLowerCase()] ||
       0;
-    const localAsset = getLocalBrandLogo(slug, rb.name);
-    const logo = localAsset || resolveMediaUrl(rb.logo) || "";
 
     return {
       id: String(rb.id || slug),
       name: rb.name,
       slug,
-      logo,
-      description: rb.description || "",
-      website: rb.website || "",
-      country: rb.country || "Chính hãng",
+      logo: resolveBrandLogo(rb.logo, slug, rb.name),
       productCount: count,
       categories: rb.categories || [],
     };

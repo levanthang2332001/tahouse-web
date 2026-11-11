@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAdminRequestAuth } from "@/lib/admin/auth";
-import { adminBackendFetch } from "@/lib/admin/api-client";
+import { adminBackendFetch, adminErrorResponse } from "@/lib/admin/api-client";
 import { getDashboardStats } from "@/lib/admin/dashboard-stats";
+import { badRequest, readJsonObject, requireAdmin, runBrandWrite } from "./_lib/route-helpers";
 
 interface BackendBrandItem {
-  id?: number;
+  id?: string;
   name: string;
   slug: string;
   logo?: string;
   logoHtml?: string;
-  country?: string;
-  description?: string;
-  website?: string;
   categories?: Array<{
     name: string;
     slug: string;
@@ -20,13 +17,8 @@ interface BackendBrandItem {
 }
 
 export async function GET(request: NextRequest) {
-  const user = checkAdminRequestAuth(request);
-  if (!user) {
-    return NextResponse.json(
-      { message: "Chưa xác thực quyền quản trị" },
-      { status: 401 },
-    );
-  }
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
 
   try {
     const brands = await adminBackendFetch<BackendBrandItem[]>("/admin/brands");
@@ -39,15 +31,12 @@ export async function GET(request: NextRequest) {
         brandCountMap = stats.brandBreakdown;
       }
     } catch {
-      // ignore
+      // ignore: counts are informational, the backend still blocks deleting brands with products
     }
 
-    const items = brands.map((b) => ({
+    const items = (Array.isArray(brands) ? brands : []).map((b) => ({
       ...b,
-      productCount:
-        brandCountMap[b.name] ??
-        brandCountMap[b.slug] ??
-        0,
+      productCount: brandCountMap[b.name] ?? brandCountMap[b.slug] ?? 0,
     }));
 
     return NextResponse.json({
@@ -57,67 +46,33 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("[GET /api/admin/brands]", error);
-    return NextResponse.json(
-      {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Lỗi khi lấy danh sách thương hiệu",
-      },
-      { status: 500 },
-    );
+    return adminErrorResponse(error, "Lỗi khi lấy danh sách thương hiệu");
   }
 }
 
 export async function POST(request: NextRequest) {
-  const user = checkAdminRequestAuth(request);
-  if (!user) {
-    return NextResponse.json(
-      { message: "Chưa xác thực quyền quản trị" },
-      { status: 401 },
-    );
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
+  const body = await readJsonObject(request);
+  if (!body) return badRequest("Dữ liệu thương hiệu không đúng định dạng JSON");
+
+  if (typeof body.name !== "string" || !body.name.trim()) {
+    return badRequest("Tên thương hiệu không được để trống");
   }
 
-  try {
-    const body = (await request.json()) as Partial<BackendBrandItem>;
-
-    if (!body || typeof body !== "object") {
-      return NextResponse.json(
-        { message: "Dữ liệu thương hiệu không đúng định dạng" },
-        { status: 400 },
-      );
-    }
-
-    if (!body.name || typeof body.name !== "string" || !body.name.trim()) {
-      return NextResponse.json(
-        { message: "Tên thương hiệu không được để trống" },
-        { status: 400 },
-      );
-    }
-
-    const saved = await adminBackendFetch<BackendBrandItem>("/admin/brands", {
-      method: "POST",
-      body: JSON.stringify(body),
-    });
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Lưu thương hiệu thành công",
-        brand: saved,
-      },
-      { status: 201 },
-    );
-  } catch (error) {
-    console.error("[POST /api/admin/brands]", error);
-    return NextResponse.json(
-      {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Lỗi hệ thống khi lưu thương hiệu",
-      },
-      { status: 500 },
-    );
-  }
+  return runBrandWrite(
+    "[POST /api/admin/brands]",
+    () =>
+      adminBackendFetch<BackendBrandItem>("/admin/brands", {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+    (saved) =>
+      NextResponse.json(
+        { success: true, message: "Lưu thương hiệu thành công", brand: saved },
+        { status: 201 },
+      ),
+    "Lỗi hệ thống khi lưu thương hiệu",
+  );
 }
