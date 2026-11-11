@@ -5,7 +5,11 @@ jest.mock('@nestjs/passport', () => ({
 import { Test, TestingModule } from '@nestjs/testing';
 import { AdminProductsController } from './admin-products.controller';
 import { ProductsService } from './products.service';
-import type { IProduct, IProductsListResponse } from './types/product.types';
+import type {
+  IProduct,
+  IProductListItem,
+  IProductsListResponse,
+} from './types/product.types';
 
 describe('AdminProductsController', () => {
   let controller: AdminProductsController;
@@ -45,7 +49,7 @@ describe('AdminProductsController', () => {
   };
 
   const mockListResponse: IProductsListResponse = {
-    items: [mockProduct],
+    items: [mockProduct as IProductListItem],
     total: 1,
     page: 1,
     limit: 20,
@@ -54,7 +58,7 @@ describe('AdminProductsController', () => {
   beforeEach(async () => {
     productsService = {
       findAll: jest.fn().mockResolvedValue(mockListResponse),
-      findOne: jest.fn().mockResolvedValue(mockProduct),
+      findOneForAdmin: jest.fn().mockResolvedValue(mockProduct),
       create: jest.fn().mockResolvedValue(mockProduct),
       update: jest.fn().mockResolvedValue(mockProduct),
       remove: jest
@@ -82,8 +86,8 @@ describe('AdminProductsController', () => {
   });
 
   it('should get detailed product by id', async () => {
-    const result = await controller.findOne('prod-1');
-    expect(productsService.findOne).toHaveBeenCalledWith('prod-1');
+    const result = await controller.findOne('kl-989f');
+    expect(productsService.findOneForAdmin).toHaveBeenCalledWith('kl-989f');
     expect(result.code).toBe('KL-989F');
   });
 
@@ -91,6 +95,8 @@ describe('AdminProductsController', () => {
     const dto = {
       name: 'Khóa cửa Kassler KL-989F',
       code: 'KL-989F',
+      brandId: '7afccd8e-940e-4e9f-81bb-8754925f6e48',
+      category: 'dai-sanh',
       price: 32450000,
       imageUrl: '/img.jpg',
     };

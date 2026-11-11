@@ -52,6 +52,19 @@ export interface IProduct {
   options?: IProductOption[];
   variants?: IProductVariant[];
   installation_preview?: string[];
+  /** Full installation media (images + videos); only on admin/internal reads */
+  installation?: IInstallation;
+  /** Display priority (smaller first); only on admin/internal reads */
+  priority?: number;
+}
+
+/**
+ * Product plus its real database primary key. Public/admin responses expose
+ * `id = slug || id`, so every write and exclusion check must use `dbId` instead.
+ */
+export interface IProductRecord {
+  dbId: string;
+  product: IProduct;
 }
 
 export interface IProductListItem {

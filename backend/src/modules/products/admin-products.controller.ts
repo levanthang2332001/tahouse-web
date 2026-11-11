@@ -47,7 +47,7 @@ export class AdminProductsController {
   @ApiParam({ name: 'id', description: 'ID (slug) hoặc mã code sản phẩm' })
   @ApiResponse({ status: 200, description: 'Chi tiết sản phẩm.' })
   async findOne(@Param('id') id: string) {
-    return this.productsService.findOne(id);
+    return this.productsService.findOneForAdmin(id);
   }
 
   @Post(ApiRoute.ADMIN_PRODUCTS)

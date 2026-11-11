@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
-import type { IProduct, IProductsListResponse } from './types/product.types';
+import type {
+  IProduct,
+  IProductListItem,
+  IProductsListResponse,
+} from './types/product.types';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -41,7 +45,7 @@ describe('ProductsController', () => {
   };
 
   const mockListResponse: IProductsListResponse = {
-    items: [mockProduct],
+    items: [mockProduct as IProductListItem],
     total: 1,
     page: 1,
     limit: 20,

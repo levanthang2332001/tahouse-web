@@ -4,7 +4,8 @@ export interface Product {
   name: string;
   slug?: string;
   brand: string;
-  brandId?: number;
+  /** Brand UUID (backend `brands.id`) */
+  brandId?: string | null;
   brandSlug: string;
   category: string;
   categoryName: string;
@@ -19,6 +20,7 @@ export interface Product {
   description?: string;
   shortDescription?: string;
   content?: string;
+  /** Display priority (smaller first); only returned by the admin detail endpoint */
   priority?: number;
   images?: string[];
   specs?: Record<string, string>;
@@ -37,7 +39,9 @@ export interface Product {
     priceRange: string;
     is_default: boolean;
   }[];
+  /** First installation images (public detail) */
   installation_preview?: string[];
+  /** Full installation media; only returned by the admin detail endpoint */
   installation?: {
     images?: string[];
     videos?: string[];

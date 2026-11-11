@@ -16,7 +16,7 @@ import {
 import { randomUUID } from 'crypto';
 import { D1_DATABASE } from '@/database/d1.constants';
 import type { D1Database } from '@/database/d1.client';
-import { products } from '../schemas/product.schema';
+import { products, type NewProduct } from '../schemas/product.schema';
 import {
   brands,
   categories,
@@ -33,10 +33,13 @@ import { resolveMediaUrl, resolveMediaUrls } from '@/common/utils/url.util';
 import { PRODUCT_DEFAULTS } from '../constants/product.constants';
 import type {
   IProduct,
+  IProductRecord,
   IProductsListResponse,
   IProductListItem,
   IProductVariant,
 } from '../types/product.types';
+
+const DEFAULT_PRIORITY = 9999;
 
 @Injectable()
 export class ProductsRepository {
@@ -92,7 +95,7 @@ export class ProductsRepository {
         COALESCE(
           NULLIF(${products.priceRange}, ''),
           CASE
-            WHEN ${products.price} IS NOT NULL THEN (${products.price} || ' VNĐ')
+            WHEN ${products.price} IS NOT NULL AND ${products.price} > 0 THEN (${products.price} || ' VNĐ')
             ELSE ''
           END
         )
@@ -276,14 +279,9 @@ export class ProductsRepository {
     };
   }
 
-  /**
-   * Truy vấn chi tiết sản phẩm qua Aggregation SQL Pipeline
-   */
-  async findByIdOrCode(idOrCode: string): Promise<IProduct | undefined> {
-    const clean = idOrCode.trim();
-    const lower = clean.toLowerCase();
-
-    const rows = await this.db
+  /** Detail query (products + brand/category/subcategory names), shared by every single-product read. */
+  private detailQuery() {
+    return this.db
       .select(this.getProductAggregationSelect())
       .from(products)
       .leftJoin(brands, eq(products.brandId, brands.id))
@@ -306,34 +304,62 @@ export class ProductsRepository {
             eq(products.subcategorySlug, subcategories.name),
           ),
         ),
-      )
+      );
+  }
+
+  /**
+   * Tìm 1 sản phẩm theo DB id, slug hoặc mã (so khớp chính xác, không phân biệt hoa thường;
+   * không dùng LIKE nên "%" và "_" không còn là ký tự đại diện).
+   * Ưu tiên: DB id > slug > mã sản phẩm.
+   */
+  async findRecordByIdOrCode(
+    idOrCode: string,
+    options: { includeAdminFields?: boolean } = {},
+  ): Promise<IProductRecord | undefined> {
+    const clean = idOrCode.trim();
+    if (!clean) return undefined;
+    const lower = clean.toLowerCase();
+
+    const rows = await this.detailQuery()
       .where(
         or(
           eq(products.id, clean),
-          eq(products.code, clean),
-          eq(products.slug, lower),
-          like(products.code, clean),
-          like(products.slug, lower),
+          sql`LOWER(${products.slug}) = ${lower}`,
+          sql`LOWER(${products.code}) = ${lower}`,
         ),
+      )
+      .orderBy(
+        sql`CASE WHEN ${products.id} = ${clean} THEN 0 WHEN LOWER(${products.slug}) = ${lower} THEN 1 ELSE 2 END`,
       )
       .limit(1);
 
     const r = rows[0];
     if (!r) return undefined;
-
-    const installationObj = r.installation || {
-      images: [],
-      videos: [],
+    return {
+      dbId: r.id,
+      product: this.mapDetailRow(r, options.includeAdminFields === true),
     };
-    const installationPreview = installationObj?.images
-      ? resolveMediaUrls(
-          installationObj.images.slice(
-            0,
-            PRODUCT_DEFAULTS.INSTALLATION_PREVIEW_LIMIT,
-          ),
-          this.imageBaseUrl,
-        )
-      : [];
+  }
+
+  /**
+   * Truy vấn chi tiết sản phẩm qua Aggregation SQL Pipeline
+   */
+  async findByIdOrCode(
+    idOrCode: string,
+    options: { includeAdminFields?: boolean } = {},
+  ): Promise<IProduct | undefined> {
+    return (await this.findRecordByIdOrCode(idOrCode, options))?.product;
+  }
+
+  private mapDetailRow(r: any, includeAdminFields: boolean): IProduct {
+    const installationObj = this.normalizeInstallation(r.installation);
+    const installationPreview = resolveMediaUrls(
+      installationObj.images.slice(
+        0,
+        PRODUCT_DEFAULTS.INSTALLATION_PREVIEW_LIMIT,
+      ),
+      this.imageBaseUrl,
+    );
 
     const rawVariants = r.variants || [];
     const variants: IProductVariant[] = Array.isArray(rawVariants)
@@ -351,7 +377,7 @@ export class ProductsRepository {
         }))
       : [];
 
-    return {
+    const product: IProduct = {
       id: r.slug || r.id,
       code: r.code,
       slug: r.slug || r.id,
@@ -385,44 +411,95 @@ export class ProductsRepository {
       variants,
       installation_preview: installationPreview,
     };
+
+    if (includeAdminFields) {
+      // Full media (same URL form as `images`), so the edit form can send it back without losing anything
+      product.installation = {
+        images: resolveMediaUrls(installationObj.images, this.imageBaseUrl),
+        videos: resolveMediaUrls(installationObj.videos, this.imageBaseUrl),
+      };
+      product.priority =
+        typeof r.priority === 'number' ? r.priority : DEFAULT_PRIORITY;
+    }
+
+    return product;
   }
 
-  async findByCode(code: string): Promise<IProduct | null> {
-    const row = await this.db.query.products.findFirst({
-      where: eq(products.code, code.trim()),
-    });
-    if (!row) return null;
-    return (await this.findByIdOrCode(row.id)) || null;
+  private normalizeInstallation(value: unknown): {
+    images: string[];
+    videos: string[];
+  } {
+    const obj =
+      value && typeof value === 'object' && !Array.isArray(value)
+        ? (value as { images?: unknown; videos?: unknown })
+        : {};
+    const strings = (list: unknown) =>
+      Array.isArray(list)
+        ? list.filter((item): item is string => typeof item === 'string')
+        : [];
+    return { images: strings(obj.images), videos: strings(obj.videos) };
   }
 
-  async findBySlug(slug: string): Promise<IProduct | null> {
-    const row = await this.db.query.products.findFirst({
-      where: eq(products.slug, slug.trim()),
-    });
-    if (!row) return null;
-    return (await this.findByIdOrCode(row.id)) || null;
+  /**
+   * Reads return media as absolute URLs (IMAGE_BASE_URL + path); store them back as the original
+   * path so a read-then-save round trip does not rewrite the stored values.
+   */
+  private toStoredMediaPath(url: string): string {
+    const base = this.imageBaseUrl.replace(/\/$/, '');
+    if (base && url.startsWith(`${base}/`)) return url.slice(base.length);
+    return url;
   }
 
-  async findOtherByCode(
+  private toStoredMediaPaths(urls: string[] | null | undefined): string[] {
+    return (urls || []).map((url) => this.toStoredMediaPath(url));
+  }
+
+  private toStoredInstallation(value: unknown) {
+    const installation = this.normalizeInstallation(value);
+    return {
+      images: this.toStoredMediaPaths(installation.images),
+      videos: this.toStoredMediaPaths(installation.videos),
+    };
+  }
+
+  /** Lightweight lookup (case-insensitive) used for the duplicate-code check. */
+  async findByCode(
     code: string,
-    excludeId: string,
-  ): Promise<IProduct | null> {
+    excludeDbId?: string,
+  ): Promise<{ id: string; code: string; slug: string } | null> {
+    const lower = code.trim().toLowerCase();
+    const condition = sql`LOWER(${products.code}) = ${lower}`;
     const row = await this.db.query.products.findFirst({
-      where: and(ne(products.id, excludeId), eq(products.code, code.trim())),
+      where: excludeDbId
+        ? and(ne(products.id, excludeDbId), condition)
+        : condition,
+      columns: { id: true, code: true, slug: true },
     });
-    if (!row) return null;
-    return (await this.findByIdOrCode(row.id)) || null;
+    return row ?? null;
   }
 
-  async findOtherBySlug(
+  /** Lightweight lookup (case-insensitive) used for the duplicate-slug check. */
+  async findBySlug(
     slug: string,
-    excludeId: string,
-  ): Promise<IProduct | null> {
+    excludeDbId?: string,
+  ): Promise<{ id: string; code: string; slug: string } | null> {
+    const lower = slug.trim().toLowerCase();
+    const condition = sql`LOWER(${products.slug}) = ${lower}`;
     const row = await this.db.query.products.findFirst({
-      where: and(ne(products.id, excludeId), eq(products.slug, slug.trim())),
+      where: excludeDbId
+        ? and(ne(products.id, excludeDbId), condition)
+        : condition,
+      columns: { id: true, code: true, slug: true },
     });
-    if (!row) return null;
-    return (await this.findByIdOrCode(row.id)) || null;
+    return row ?? null;
+  }
+
+  async findOtherByCode(code: string, excludeDbId: string) {
+    return this.findByCode(code, excludeDbId);
+  }
+
+  async findOtherBySlug(slug: string, excludeDbId: string) {
+    return this.findBySlug(slug, excludeDbId);
   }
 
   async findByCodeOrSlug(code: string, slug?: string) {
@@ -436,10 +513,8 @@ export class ProductsRepository {
   findInstallationMedia(product: IProduct, query: GetInstallationMediaDto) {
     const { page = 1, limit = 12, type = MediaType.ALL } = query;
 
-    const installation = (product as any).installation ?? {
-      images: [],
-      videos: [],
-    };
+    // Needs a product read with `includeAdminFields` (the public detail only carries a 3-image preview)
+    const installation = this.normalizeInstallation(product.installation);
     const mediaItems: Array<{ url: string; type: 'image' | 'video' }> = [];
 
     if (type === MediaType.IMAGES || type === MediaType.ALL) {
@@ -486,117 +561,132 @@ export class ProductsRepository {
     });
   }
 
-  async createProduct(dto: CreateProductDto): Promise<IProduct> {
-    const data: any = { ...dto };
+  /**
+   * Inserts a product. The service has already resolved `slug`, validated the brand tree
+   * and checked for duplicates. "Liên hệ" (no price) is stored as price 0.
+   */
+  async createProduct(
+    dto: CreateProductDto & { slug: string },
+  ): Promise<IProduct | undefined> {
     const newId = randomUUID();
 
     await this.db.insert(products).values({
       id: newId,
-      code: data.code,
-      slug:
-        data.slug ||
-        data.code
-          .toLowerCase()
-          .trim()
-          .replace(/[^a-z0-9]+/g, '-'),
-      name: data.name,
-      description: data.description || '',
-      shortDescription: data.shortDescription || '',
-      content: data.content || '',
-      brandId: String(data.brandId),
-      categorySlug: data.categorySlug || data.category,
-      subcategorySlug: data.subcategorySlug || data.subcategory || null,
-      price: data.price ?? null,
-      originalPrice: data.originalPrice ?? null,
-      discountPercent: data.discountPercent ?? null,
-      priceRange: data.priceRange ?? null,
-      imageUrl: data.imageUrl || '',
-      images: data.images || [],
-      features: data.features || [],
-      specs: data.specs || {},
-      technologies: data.technologies || [],
-      warranty: data.warranty || 36,
-      warrantyText: data.warrantyText || '',
-      colors: data.colors || [],
-      installation: data.installation || { images: [], videos: [] },
-      installationManual: data.installationManual || [],
-      faq: data.faq || [],
-      hasVariants: data.has_variants || data.hasVariants || false,
-      options: data.options || [],
-      variants: data.variants || [],
-      installationPreview: data.installation_preview || [],
-      priority: data.priority ?? 9999,
-      status: data.status || 'ACTIVE',
+      code: dto.code,
+      slug: dto.slug,
+      name: dto.name,
+      description: dto.description ?? '',
+      shortDescription: dto.shortDescription ?? '',
+      content: dto.content ?? '',
+      brandId: dto.brandId,
+      categorySlug: dto.category,
+      subcategorySlug: dto.subcategory || null,
+      price: dto.price ?? 0,
+      originalPrice: dto.originalPrice ?? null,
+      discountPercent: dto.discountPercent ?? null,
+      priceRange: dto.priceRange ?? null,
+      imageUrl: this.toStoredMediaPath(dto.imageUrl ?? ''),
+      images: this.toStoredMediaPaths(dto.images),
+      features: dto.features ?? [],
+      specs: (dto.specs ?? {}) as Record<string, string>,
+      technologies: dto.technologies ?? [],
+      warranty: dto.warranty ?? 36,
+      warrantyText: dto.warrantyText ?? '',
+      colors: dto.colors ?? [],
+      installation: this.toStoredInstallation(dto.installation),
+      installationManual: dto.installationManual ?? [],
+      faq: dto.faq ?? [],
+      hasVariants: dto.has_variants ?? false,
+      options: dto.options ?? [],
+      variants: (dto.variants ?? []) as IProductVariant[],
+      installationPreview: this.toStoredMediaPaths(dto.installation_preview),
+      priority: dto.priority ?? DEFAULT_PRIORITY,
+      status: 'ACTIVE',
       views: 0,
     });
 
-    const created = await this.findByIdOrCode(newId);
-    return created!;
+    return this.findByIdOrCode(newId, { includeAdminFields: true });
   }
 
+  /**
+   * Updates the row whose real primary key is `dbId` (never the public slug id).
+   * Returns `undefined` when no row was updated, so callers never report a phantom success.
+   * `null` clears nullable columns (originalPrice, discountPercent, priceRange, subcategory);
+   * for NOT NULL columns it falls back to the column's empty value instead of failing.
+   */
   async updateProduct(
-    productId: string,
+    dbId: string,
     dto: UpdateProductDto,
-  ): Promise<IProduct> {
-    const data: any = { ...dto };
-    const updateData: any = { updatedAt: new Date() };
+  ): Promise<IProduct | undefined> {
+    const updateData: Partial<NewProduct> = { updatedAt: new Date() };
 
-    if (data.name !== undefined) updateData.name = data.name;
-    if (data.code !== undefined) updateData.code = data.code;
-    if (data.slug !== undefined) updateData.slug = data.slug;
-    if (data.description !== undefined)
-      updateData.description = data.description;
-    if (data.shortDescription !== undefined)
-      updateData.shortDescription = data.shortDescription;
-    if (data.content !== undefined) updateData.content = data.content;
-    if (data.brandId !== undefined) updateData.brandId = String(data.brandId);
-    if (data.categorySlug !== undefined || data.category !== undefined) {
-      updateData.categorySlug = data.categorySlug || data.category;
-    }
-    if (data.subcategorySlug !== undefined || data.subcategory !== undefined) {
-      updateData.subcategorySlug = data.subcategorySlug || data.subcategory;
-    }
-    if (data.price !== undefined) updateData.price = data.price;
-    if (data.originalPrice !== undefined)
-      updateData.originalPrice = data.originalPrice;
-    if (data.discountPercent !== undefined)
-      updateData.discountPercent = data.discountPercent;
-    if (data.priceRange !== undefined) updateData.priceRange = data.priceRange;
-    if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl;
-    if (data.images !== undefined) updateData.images = data.images;
-    if (data.features !== undefined) updateData.features = data.features;
-    if (data.specs !== undefined) updateData.specs = data.specs;
-    if (data.technologies !== undefined)
-      updateData.technologies = data.technologies;
-    if (data.warranty !== undefined) updateData.warranty = data.warranty;
-    if (data.warrantyText !== undefined)
-      updateData.warrantyText = data.warrantyText;
-    if (data.colors !== undefined) updateData.colors = data.colors;
-    if (data.installation !== undefined)
-      updateData.installation = data.installation;
-    if (data.installationManual !== undefined)
-      updateData.installationManual = data.installationManual;
-    if (data.faq !== undefined) updateData.faq = data.faq;
-    if (data.has_variants !== undefined || data.hasVariants !== undefined) {
-      updateData.hasVariants = data.has_variants ?? data.hasVariants;
-    }
-    if (data.options !== undefined) updateData.options = data.options;
-    if (data.variants !== undefined) updateData.variants = data.variants;
-    if (data.priority !== undefined) updateData.priority = data.priority;
-    if (data.status !== undefined) updateData.status = data.status;
+    if (dto.name != null) updateData.name = dto.name;
+    if (dto.code != null) updateData.code = dto.code;
+    if (dto.slug) updateData.slug = dto.slug;
+    if (dto.description !== undefined)
+      updateData.description = dto.description ?? '';
+    if (dto.shortDescription !== undefined)
+      updateData.shortDescription = dto.shortDescription ?? '';
+    if (dto.content !== undefined) updateData.content = dto.content ?? '';
+    if (dto.brandId != null) updateData.brandId = dto.brandId;
+    if (dto.category) updateData.categorySlug = dto.category;
+    if (dto.subcategory !== undefined)
+      updateData.subcategorySlug = dto.subcategory || null;
+    if (dto.price !== undefined) updateData.price = dto.price ?? 0;
+    if (dto.originalPrice !== undefined)
+      updateData.originalPrice = dto.originalPrice;
+    if (dto.discountPercent !== undefined)
+      updateData.discountPercent = dto.discountPercent;
+    if (dto.priceRange !== undefined) updateData.priceRange = dto.priceRange;
+    if (dto.imageUrl !== undefined)
+      updateData.imageUrl = this.toStoredMediaPath(dto.imageUrl ?? '');
+    if (dto.images !== undefined)
+      updateData.images = this.toStoredMediaPaths(dto.images);
+    if (dto.features !== undefined) updateData.features = dto.features ?? [];
+    if (dto.specs !== undefined)
+      updateData.specs = (dto.specs ?? {}) as Record<string, string>;
+    if (dto.technologies !== undefined)
+      updateData.technologies = dto.technologies ?? [];
+    if (dto.warranty != null) updateData.warranty = dto.warranty;
+    if (dto.warrantyText !== undefined)
+      updateData.warrantyText = dto.warrantyText ?? '';
+    if (dto.colors !== undefined) updateData.colors = dto.colors ?? [];
+    if (dto.installation !== undefined)
+      updateData.installation = this.toStoredInstallation(dto.installation);
+    if (dto.installation_preview !== undefined)
+      updateData.installationPreview = this.toStoredMediaPaths(
+        dto.installation_preview,
+      );
+    if (dto.installationManual !== undefined)
+      updateData.installationManual = dto.installationManual ?? [];
+    if (dto.faq !== undefined) updateData.faq = dto.faq ?? [];
+    if (dto.has_variants != null) updateData.hasVariants = dto.has_variants;
+    if (dto.options !== undefined) updateData.options = dto.options ?? [];
+    if (dto.variants !== undefined)
+      updateData.variants = (dto.variants ?? []) as IProductVariant[];
+    if (dto.priority !== undefined)
+      updateData.priority = dto.priority ?? DEFAULT_PRIORITY;
 
-    await this.db
+    const updatedRows = await this.db
       .update(products)
       .set(updateData)
-      .where(eq(products.id, productId));
+      .where(eq(products.id, dbId))
+      .returning({ id: products.id });
 
-    const updated = await this.findByIdOrCode(productId);
-    return updated!;
+    if (!Array.isArray(updatedRows) || updatedRows.length === 0) {
+      return undefined;
+    }
+
+    return this.findByIdOrCode(dbId, { includeAdminFields: true });
   }
 
-  async deleteProduct(productId: string): Promise<boolean> {
-    await this.db.delete(products).where(eq(products.id, productId));
-    return true;
+  /** Deletes by real primary key; `false` when nothing was deleted. */
+  async deleteProduct(dbId: string): Promise<boolean> {
+    const deletedRows = await this.db
+      .delete(products)
+      .where(eq(products.id, dbId))
+      .returning({ id: products.id });
+    return Array.isArray(deletedRows) && deletedRows.length > 0;
   }
 
   async findAllRaw(): Promise<any[]> {

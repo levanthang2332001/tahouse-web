@@ -30,9 +30,10 @@ export default function EditProductPage({ params }: EditProductPageProps) {
       setStatusCode(null);
 
       try {
-        const res = await fetch(`/api/admin/products/${encodeURIComponent(id)}`);
+        // Always read the current server state (the form must not be seeded from a stale copy)
+        const res = await fetch(`/api/admin/products/${encodeURIComponent(id)}`, { cache: "no-store" });
         const status = res.status;
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
         if (ignore) return;
         setStatusCode(status);
         if (!res.ok) {

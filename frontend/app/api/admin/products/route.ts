@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAdminRequestAuth } from "@/lib/admin/auth";
 import { adminBackendFetch, adminErrorResponse } from "@/lib/admin/api-client";
-import { prepareBrandTaxonomy, resolveBrandId, validateTaxonomyFields } from "@/lib/admin/brand-taxonomy";
 import { invalidateRemoteProductsCache, PRODUCT_SECTORS } from "@/lib/admin/product-store";
 import { getDashboardStats } from "@/lib/admin/dashboard-stats";
 import type { Product } from "@/lib/types/product";
+import {
+  badRequest,
+  prepareProductPayload,
+  readJsonObject,
+  requireAdmin,
+  validateProductBody,
+} from "./_lib/product-payload";
 
 interface BackendProductListResponse {
   items: Product[];
@@ -14,13 +19,8 @@ interface BackendProductListResponse {
 }
 
 export async function GET(request: NextRequest) {
-  const user = checkAdminRequestAuth(request);
-  if (!user) {
-    return NextResponse.json(
-      { message: "Chưa xác thực quyền quản trị" },
-      { status: 401 },
-    );
-  }
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
 
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -111,90 +111,45 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("[GET /api/admin/products]", error);
-    return NextResponse.json(
-      {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Không thể lấy danh sách sản phẩm từ backend",
-      },
-      { status: 500 },
-    );
+    return adminErrorResponse(error, "Không thể lấy danh sách sản phẩm từ hệ thống");
   }
 }
 
 export async function POST(request: NextRequest) {
-  const user = checkAdminRequestAuth(request);
-  if (!user) {
-    return NextResponse.json(
-      { message: "Chưa xác thực quyền quản trị" },
-      { status: 401 },
-    );
-  }
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
+  const body = await readJsonObject(request);
+  if (!body) return badRequest("Dữ liệu gửi lên không đúng định dạng JSON");
+
+  const invalid = validateProductBody(body, "create");
+  if (invalid) return badRequest(invalid);
 
   try {
-    const body = (await request.json().catch(() => null)) as Partial<Product> | null;
+    // Brand → UUID, and the category/subcategory are added to the brand tree *before* the product is
+    // created (the backend rejects categories it does not know). If that fails nothing is created.
+    const prepared = await prepareProductPayload(body, "create");
+    if (prepared instanceof NextResponse) return prepared;
 
-    if (!body || typeof body !== "object" || Array.isArray(body)) {
-      return NextResponse.json(
-        { message: "Dữ liệu gửi lên không đúng định dạng JSON" },
-        { status: 400 },
-      );
-    }
-
-    const taxonomyError = validateTaxonomyFields(body as Record<string, unknown>);
-    if (taxonomyError) {
-      return NextResponse.json({ message: taxonomyError }, { status: 400 });
-    }
-
-    if (!body.name || typeof body.name !== "string" || !body.name.trim()) {
-      return NextResponse.json(
-        { message: "Tên sản phẩm không được để trống" },
-        { status: 400 },
-      );
-    }
-
-    if (!body.code || typeof body.code !== "string" || !body.code.trim()) {
-      return NextResponse.json(
-        { message: "Mã sản phẩm không được để trống" },
-        { status: 400 },
-      );
-    }
-
-    // Resolve brandId if missing
-    let brandId = body.brandId;
-    if (!brandId && body.brand) {
-      brandId = await resolveBrandId(body.brand);
-    }
-
-    const payload = {
-      ...body,
-      brandId,
-      code: body.code.trim(),
-      name: body.name.trim(),
-    };
-
-    // Keep the brand's category tree in step with its products, only once the save has succeeded
-    const taxonomy = await prepareBrandTaxonomy(payload);
     const created = await adminBackendFetch<Product>("/admin/products", {
       method: "POST",
-      body: JSON.stringify(taxonomy.payload),
+      body: JSON.stringify(prepared.payload),
     });
-    const taxonomySync = await taxonomy.sync();
-
-    invalidateRemoteProductsCache();
 
     return NextResponse.json(
       {
         success: true,
-        message: "Tạo sản phẩm thành công trên hệ thống",
+        message: "Đã tạo sản phẩm",
         product: created,
-        taxonomy: taxonomySync,
+        taxonomy: { added: prepared.added },
       },
       { status: 201 },
     );
   } catch (error) {
     console.error("[POST /api/admin/products]", error);
-    return adminErrorResponse(error, "Lỗi hệ thống khi tạo sản phẩm");
+    return adminErrorResponse(error, "Không tạo được sản phẩm do lỗi hệ thống");
+  } finally {
+    // Also after failures: a timed-out write may still have been applied
+    invalidateRemoteProductsCache();
   }
 }

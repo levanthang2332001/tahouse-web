@@ -41,13 +41,10 @@ export function formatProductPrice(
   if (numeric !== null && numeric > 0) {
     return `${numeric.toLocaleString("vi-VN")} đ`;
   }
-  if (
-    priceRange?.trim() &&
-    priceRange.trim() !== "0" &&
-    priceRange.trim() !== "0 VNĐ" &&
-    priceRange.trim() !== "0đ"
-  ) {
-    return priceRange.trim();
+  // Price 0 (or none) means "Liên hệ"; a zero price label such as "0 đ" / "0.0 VNĐ" means the same
+  const label = priceRange?.trim();
+  if (label && parseProductPrice(label) !== 0) {
+    return label;
   }
   return "Liên hệ";
 }

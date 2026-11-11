@@ -58,6 +58,42 @@ const SECTIONS = [
   { id: "sec-faq", label: "Thi công & FAQ", icon: HelpCircle },
 ];
 
+const DEFAULT_NEW_PRIORITY = 10;
+
+/** Price 0 / null is "Liên hệ": show an empty price field. */
+function priceToInput(value: number | null | undefined): string {
+  return typeof value === "number" && value > 0 ? String(value) : "";
+}
+
+function initialInstallationImages(product?: Product): string[] {
+  return product?.installation?.images ?? product?.installation_preview ?? [];
+}
+
+/** Reads a JSON error/success body without throwing on HTML or empty responses. */
+async function readResponseBody(res: Response): Promise<{ message?: string; [key: string]: unknown }> {
+  try {
+    const data: unknown = await res.json();
+    return data && typeof data === "object" ? (data as { message?: string }) : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Status-aware Vietnamese message for a failed save; the backend's own message is kept when present. */
+function describeSaveError(status: number, message: string | undefined, isEditing: boolean): string {
+  const action = isEditing ? "cập nhật" : "tạo";
+  if (status === 401) return "Phiên đăng nhập quản trị đã hết hạn. Vui lòng đăng nhập lại rồi lưu lại.";
+  if (message) {
+    if (status === 409) return `Không ${action} được sản phẩm: ${message}`;
+    if (status === 404) return `Không ${action} được sản phẩm: ${message}`;
+    return message;
+  }
+  if (status === 400) return `Dữ liệu sản phẩm chưa hợp lệ, vui lòng kiểm tra lại (${status})`;
+  if (status === 404) return "Không tìm thấy sản phẩm hoặc dữ liệu liên quan (có thể đã bị xóa)";
+  if (status === 409) return "Mã sản phẩm hoặc ID/slug đã được dùng cho sản phẩm khác";
+  return `Không ${action} được sản phẩm: máy chủ đang gặp sự cố (${status}). Vui lòng thử lại.`;
+}
+
 export function ProductForm({ initialData, isEditing = false }: ProductFormProps) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -102,10 +138,8 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
   const [subcategoryName, setSubcategoryName] = useState(initialData?.subcategoryName || "");
   const [isNewSubcategory, setIsNewSubcategory] = useState(false);
 
-  // Pricing State
-  const [price, setPrice] = useState<string>(
-    initialData?.price !== undefined && initialData?.price !== null ? String(initialData.price) : "",
-  );
+  // Pricing State ("Liên hệ" products are stored with price 0 and shown as an empty price)
+  const [price, setPrice] = useState<string>(priceToInput(initialData?.price));
   const [originalPrice, setOriginalPrice] = useState<string>(
     initialData?.originalPrice !== undefined && initialData?.originalPrice !== null
       ? String(initialData.originalPrice)
@@ -123,15 +157,15 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
   // Media (Images) - No raw URLs required, handled through uploaders
   const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || "");
   const [images, setImages] = useState<string[]>(initialData?.images || []);
-  const [installationPreview, setInstallationPreview] = useState<string[]>(
-    initialData?.installation_preview || [],
-  );
+  // Full installation media from the admin endpoint; videos have no editor here but are sent back unchanged
+  const [installationImages, setInstallationImages] = useState<string[]>(initialInstallationImages(initialData));
+  const [installationVideos, setInstallationVideos] = useState<string[]>(initialData?.installation?.videos || []);
 
   // Content & Features
   const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || "");
   const [description, setDescription] = useState(initialData?.content || initialData?.description || "");
   const [features, setFeatures] = useState<string[]>(initialData?.features || []);
-  const [priority, setPriority] = useState<number>(initialData?.priority ?? 10);
+  const [priority, setPriority] = useState<number>(initialData?.priority ?? DEFAULT_NEW_PRIORITY);
 
   // Variants State
   const [hasVariants, setHasVariants] = useState<boolean>(Boolean(initialData?.has_variants));
@@ -176,11 +210,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
     );
     setSubcategory(initialData.subcategory || "");
     setSubcategoryName(initialData.subcategoryName || "");
-    setPrice(
-      initialData.price !== undefined && initialData.price !== null
-        ? String(initialData.price)
-        : "",
-    );
+    setPrice(priceToInput(initialData.price));
     setOriginalPrice(
       initialData.originalPrice !== undefined &&
         initialData.originalPrice !== null
@@ -195,7 +225,8 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
     setPriceRange(initialData.priceRange || "");
     setImageUrl(initialData.imageUrl || "");
     setImages(initialData.images || []);
-    setInstallationPreview(initialData.installation_preview || []);
+    setInstallationImages(initialInstallationImages(initialData));
+    setInstallationVideos(initialData.installation?.videos || []);
     setShortDescription(initialData.shortDescription || "");
     setDescription(initialData.content || initialData.description || "");
     setFeatures(initialData.features || []);
@@ -206,7 +237,7 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
     setWarrantyText(initialData.warrantyText || "Chính hãng 24 tháng");
     setInstallationManual(initialData.installationManual || []);
     setFaq(initialData.faq || []);
-    setPriority(initialData.priority ?? 10);
+    setPriority(initialData.priority ?? DEFAULT_NEW_PRIORITY);
     setHasVariants(Boolean(initialData.has_variants));
     setVariants(initialData.variants || []);
   }
@@ -414,7 +445,8 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
       parsedPrice = p;
     }
 
-    let parsedOrigPrice: number | undefined = undefined;
+    // null (not undefined, which JSON drops) so clearing the original price really clears it
+    let parsedOrigPrice: number | null = null;
     if (originalPrice.trim()) {
       const op = Number(originalPrice.replace(/\D/g, ""));
       if (isNaN(op) || op < 0) {
@@ -425,8 +457,22 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
       parsedOrigPrice = op;
     }
 
-    if (parsedOrigPrice && parsedPrice && parsedOrigPrice < parsedPrice) {
-      toast.warning("Lưu ý: Giá gốc đang nhỏ hơn giá bán ưu đãi");
+    if (parsedOrigPrice !== null && parsedPrice !== null && parsedOrigPrice < parsedPrice) {
+      toast.error("Giá bán không được lớn hơn giá gốc. Hãy sửa giá gốc hoặc xóa giá gốc.");
+      document.getElementById("sec-pricing")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+
+    const warrantyMonths = Number(warranty);
+    if (!Number.isInteger(warrantyMonths) || warrantyMonths < 0) {
+      toast.error("Thời hạn bảo hành phải là số tháng nguyên, không âm");
+      return;
+    }
+
+    const priorityValue = Number(priority);
+    if (!Number.isInteger(priorityValue) || priorityValue < 0) {
+      toast.error("Thứ tự ưu tiên phải là số nguyên không âm");
+      return;
     }
 
     setSubmitting(true);
@@ -469,11 +515,12 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
       subcategory: subcategory.trim(),
       subcategoryName: subcategory.trim() ? subcategoryName.trim() : "",
       imageUrl: imageUrl.trim() || "/images/placeholder-product.png",
-      price: parsedPrice,
+      // No price = "Liên hệ", stored as 0
+      price: parsedPrice ?? 0,
       originalPrice: parsedOrigPrice,
       priceRange:
         priceRange.trim() ||
-        (parsedPrice !== null ? `${new Intl.NumberFormat("vi-VN").format(parsedPrice)} đ` : "Liên hệ"),
+        (parsedPrice ? `${new Intl.NumberFormat("vi-VN").format(parsedPrice)} đ` : "Liên hệ"),
       features: features.map((f) => f.trim()).filter(Boolean),
       has_variants: hasVariants && cleanVariants.length > 0,
       variants: cleanVariants,
@@ -491,19 +538,18 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
       description: description.trim(),
       shortDescription: shortDescription.trim(),
       content: description.trim(),
-      priority: Number(priority) || 10,
+      priority: priorityValue,
       images: images.map((img) => img.trim()).filter(Boolean),
       specs: cleanSpecs,
       technologies: technologies.map((t) => t.trim()).filter(Boolean),
-      warranty: Number(warranty) >= 0 ? Number(warranty) : 24,
+      warranty: warrantyMonths,
       warrantyText: warrantyText.trim() || "Chính hãng 24 tháng",
       colors: colors.map((c) => c.trim()).filter(Boolean),
       installationManual: installationManual.map((m) => m.trim()).filter(Boolean),
       faq: cleanFaq,
-      installation_preview: installationPreview.map((p) => p.trim()).filter(Boolean),
       installation: {
-        images: installationPreview.map((p) => p.trim()).filter(Boolean),
-        videos: [],
+        images: installationImages.map((p) => p.trim()).filter(Boolean),
+        videos: installationVideos,
       },
     };
 
@@ -519,10 +565,10 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const data = await readResponseBody(res);
 
       if (!res.ok) {
-        toast.error(data.message || "Lỗi khi lưu sản phẩm");
+        toast.error(describeSaveError(res.status, typeof data.message === "string" ? data.message : undefined, isEditing));
         return;
       }
 
@@ -532,17 +578,19 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
           : `Đã tạo mới sản phẩm: ${payload.name}`,
       );
 
-      // The API route syncs the brand's category tree alongside the save and reports back
-      const taxonomy = data.taxonomy as { added?: string[]; warning?: string } | undefined;
+      // New categories are added to the brand tree before the product is saved; the route reports them
+      const taxonomy = data.taxonomy as { added?: string[] } | undefined;
       if (taxonomy?.added?.length) {
         toast.info(`Đã thêm ${taxonomy.added.map((label) => `"${label}"`).join(", ")} vào danh mục của ${brand.trim()}`);
       }
-      if (taxonomy?.warning) toast.warning(`Đã lưu sản phẩm. ${taxonomy.warning}`);
 
+      // The list page reloads from the server on mount; refresh drops any cached RSC payload
       router.push("/admin/products");
       router.refresh();
     } catch {
-      toast.error("Lỗi khi kết nối đến máy chủ");
+      toast.error(
+        "Không kết nối được tới máy chủ nên chưa xác nhận được việc lưu. Hãy kiểm tra danh sách sản phẩm trước khi lưu lại.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -1142,8 +1190,8 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                 <MultiImageUploader
                   label="Ảnh chụp công trình thực tế (Installation Photos)"
                   description="Album ảnh thực tế kỹ thuật viên TA HOUSE thi công lắp đặt tại nhà khách hàng."
-                  items={installationPreview}
-                  onChange={setInstallationPreview}
+                  items={installationImages}
+                  onChange={setInstallationImages}
                   brand={brand}
                   category={category}
                   productCode={code}
@@ -1497,11 +1545,11 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                 </div>
                 <Input
                   type="number"
-                  min="1"
-                  max="9999"
+                  min="0"
+                  max="1000000"
                   placeholder="10"
                   value={priority}
-                  onChange={(e) => setPriority(Number(e.target.value) || 10)}
+                  onChange={(e) => setPriority(Math.max(0, Math.trunc(Number(e.target.value) || 0)))}
                   className="font-bold text-xs h-9"
                 />
               </div>
@@ -1513,6 +1561,8 @@ export function ProductForm({ initialData, isEditing = false }: ProductFormProps
                   type="number"
                   placeholder="VD: 24"
                   value={warranty}
+                  min="0"
+                  step="1"
                   onChange={(e) => setWarranty(Number(e.target.value))}
                   className="font-bold text-xs h-9"
                 />

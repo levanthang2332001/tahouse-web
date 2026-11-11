@@ -1,171 +1,105 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkAdminRequestAuth } from "@/lib/admin/auth";
 import { adminBackendFetch, adminErrorResponse } from "@/lib/admin/api-client";
-import { prepareBrandTaxonomy, resolveBrandId, validateTaxonomyFields } from "@/lib/admin/brand-taxonomy";
 import { invalidateRemoteProductsCache } from "@/lib/admin/product-store";
 import type { Product } from "@/lib/types/product";
+import {
+  badRequest,
+  prepareProductPayload,
+  readJsonObject,
+  requireAdmin,
+  validateProductBody,
+} from "../_lib/product-payload";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
 
+async function readProductId(context: RouteContext): Promise<string | null> {
+  const { id } = await context.params;
+  return id?.trim() || null;
+}
+
+const productPath = (id: string) => `/admin/products/${encodeURIComponent(id)}`;
+
 export async function GET(request: NextRequest, context: RouteContext) {
-  const user = checkAdminRequestAuth(request);
-  if (!user) {
-    return NextResponse.json(
-      { message: "Chưa xác thực quyền quản trị" },
-      { status: 401 },
-    );
-  }
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
+  const id = await readProductId(context);
+  if (!id) return badRequest("Mã sản phẩm không hợp lệ");
 
   try {
-    const { id } = await context.params;
-    const cleanId = id?.trim();
-
-    if (!cleanId) {
-      return NextResponse.json(
-        { message: "Mã sản phẩm không hợp lệ" },
-        { status: 400 },
-      );
-    }
-
-    const product = await adminBackendFetch<Product>(
-      `/admin/products/${encodeURIComponent(cleanId)}`,
-    );
-
-    return NextResponse.json(product);
+    const product = await adminBackendFetch<Product>(productPath(id));
+    return NextResponse.json(product, {
+      headers: { "Cache-Control": "private, no-store, max-age=0" },
+    });
   } catch (error) {
     console.error("[GET /api/admin/products/[id]]", error);
-    return NextResponse.json(
-      {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Lỗi khi lấy thông tin sản phẩm",
-      },
-      { status: 404 },
-    );
+    return adminErrorResponse(error, "Không tải được thông tin sản phẩm");
   }
 }
 
 export async function PUT(request: NextRequest, context: RouteContext) {
-  const user = checkAdminRequestAuth(request);
-  if (!user) {
-    return NextResponse.json(
-      { message: "Chưa xác thực quyền quản trị" },
-      { status: 401 },
-    );
-  }
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
+  const id = await readProductId(context);
+  if (!id) return badRequest("Mã sản phẩm không hợp lệ");
+
+  const body = await readJsonObject(request);
+  if (!body) return badRequest("Dữ liệu cập nhật không đúng định dạng JSON");
+
+  const invalid = validateProductBody(body, "update");
+  if (invalid) return badRequest(invalid);
 
   try {
-    const { id } = await context.params;
-    const cleanId = id?.trim();
+    // A new category/subcategory is added to the brand tree first; if that fails the product is not touched
+    const prepared = await prepareProductPayload(body, "update");
+    if (prepared instanceof NextResponse) return prepared;
 
-    if (!cleanId) {
-      return NextResponse.json(
-        { message: "Mã sản phẩm không hợp lệ" },
-        { status: 400 },
-      );
-    }
-
-    const body = (await request.json().catch(() => null)) as Partial<Product> | null;
-    if (!body || typeof body !== "object" || Array.isArray(body)) {
-      return NextResponse.json(
-        { message: "Dữ liệu cập nhật không hợp lệ" },
-        { status: 400 },
-      );
-    }
-
-    const taxonomyError = validateTaxonomyFields(body as Record<string, unknown>);
-    if (taxonomyError) {
-      return NextResponse.json({ message: taxonomyError }, { status: 400 });
-    }
-
-    if (body.name !== undefined && (typeof body.name !== "string" || !body.name.trim())) {
-      return NextResponse.json(
-        { message: "Tên sản phẩm không được để trống" },
-        { status: 400 },
-      );
-    }
-
-    // Resolve brandId if missing
-    let brandId = body.brandId;
-    if (!brandId && body.brand) {
-      brandId = await resolveBrandId(body.brand);
-    }
-
-    const payload = {
-      ...body,
-      ...(brandId ? { brandId } : {}),
-    };
-
-    // Keep the brand's category tree in step with its products, only once the save has succeeded
-    const taxonomy = await prepareBrandTaxonomy(payload);
-    const updated = await adminBackendFetch<Product>(`/admin/products/${encodeURIComponent(cleanId)}`, {
+    const updated = await adminBackendFetch<Product>(productPath(id), {
       method: "PATCH",
-      body: JSON.stringify(taxonomy.payload),
+      body: JSON.stringify(prepared.payload),
     });
-    const taxonomySync = await taxonomy.sync();
-
-    invalidateRemoteProductsCache();
 
     return NextResponse.json({
       success: true,
-      message: "Cập nhật sản phẩm thành công",
+      message: "Đã cập nhật sản phẩm",
       product: updated,
-      taxonomy: taxonomySync,
+      taxonomy: { added: prepared.added },
     });
   } catch (error) {
     console.error("[PUT /api/admin/products/[id]]", error);
-    return adminErrorResponse(error, "Lỗi hệ thống khi cập nhật sản phẩm");
+    return adminErrorResponse(error, "Không cập nhật được sản phẩm do lỗi hệ thống");
+  } finally {
+    // Also after failures: a timed-out write may still have been applied
+    invalidateRemoteProductsCache();
   }
 }
 
 export const PATCH = PUT;
 
 export async function DELETE(request: NextRequest, context: RouteContext) {
-  const user = checkAdminRequestAuth(request);
-  if (!user) {
-    return NextResponse.json(
-      { message: "Chưa xác thực quyền quản trị" },
-      { status: 401 },
-    );
-  }
+  const unauthorized = requireAdmin(request);
+  if (unauthorized) return unauthorized;
+
+  const id = await readProductId(context);
+  if (!id) return badRequest("Mã sản phẩm không hợp lệ");
 
   try {
-    const { id } = await context.params;
-    const cleanId = id?.trim();
-
-    if (!cleanId) {
-      return NextResponse.json(
-        { message: "Mã sản phẩm không hợp lệ" },
-        { status: 400 },
-      );
-    }
-
-    await adminBackendFetch(
-      `/admin/products/${encodeURIComponent(cleanId)}`,
-      {
-        method: "DELETE",
-      },
-    );
-
-    invalidateRemoteProductsCache();
+    const result = await adminBackendFetch<{ message?: string }>(productPath(id), {
+      method: "DELETE",
+    });
 
     return NextResponse.json({
       success: true,
-      message: "Đã xóa sản phẩm thành công",
+      message: result?.message || "Đã xóa sản phẩm",
     });
   } catch (error) {
     console.error("[DELETE /api/admin/products/[id]]", error);
-    return NextResponse.json(
-      {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Lỗi hệ thống khi xóa sản phẩm",
-      },
-      { status: 500 },
-    );
+    return adminErrorResponse(error, "Không xóa được sản phẩm do lỗi hệ thống");
+  } finally {
+    // Also after failures: a timed-out write may still have been applied
+    invalidateRemoteProductsCache();
   }
 }

@@ -77,7 +77,7 @@ export function ProductTable() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [refreshIndex, setRefreshIndex] = useState(0);
 
-  const fetchProducts = useCallback(async (isRefresh = false) => {
+  const fetchProducts = useCallback(async (isRefresh = false, announce = isRefresh) => {
     setLoading(true);
     setFetchError(null);
     try {
@@ -93,7 +93,7 @@ export function ProductTable() {
         params.set("refresh", "true");
       }
 
-      const res = await fetch(`/api/admin/products?${params.toString()}`);
+      const res = await fetch(`/api/admin/products?${params.toString()}`, { cache: "no-store" });
       const data = await res.json();
 
       if (!res.ok) {
@@ -109,7 +109,7 @@ export function ProductTable() {
       if (data.stats) {
         setStats(data.stats);
       }
-      if (isRefresh) {
+      if (announce) {
         toast.success(`Đã làm mới dữ liệu (${data.total} sản phẩm)`);
       }
     } catch (err: unknown) {
@@ -136,7 +136,7 @@ export function ProductTable() {
           sortBy,
         });
 
-        const res = await fetch(`/api/admin/products?${params.toString()}`);
+        const res = await fetch(`/api/admin/products?${params.toString()}`, { cache: "no-store" });
         const data = await res.json();
 
         if (ignore) return;
@@ -188,22 +188,45 @@ export function ProductTable() {
 
   const handleConfirmDelete = async () => {
     if (!deletingProduct) return;
+    const target = deletingProduct;
     setDeleteLoading(true);
     try {
-      const res = await fetch(`/api/admin/products/${encodeURIComponent(deletingProduct.id)}`, {
+      const res = await fetch(`/api/admin/products/${encodeURIComponent(target.id)}`, {
         method: "DELETE",
       });
-      const data = await res.json();
+      let data: { message?: string } = {};
+      try {
+        data = (await res.json()) as { message?: string };
+      } catch {
+        // non-JSON error page: fall back to the status-based message below
+      }
       if (!res.ok) {
-        toast.error(data.message || "Xóa sản phẩm thất bại");
+        if (res.status === 401) {
+          toast.error("Phiên đăng nhập quản trị đã hết hạn. Vui lòng đăng nhập lại rồi thử xóa lại.");
+        } else if (res.status === 404) {
+          toast.error(data.message || `Không tìm thấy sản phẩm "${target.name}" (có thể đã bị xóa trước đó)`);
+          // Show the server's current state instead of a row that no longer exists
+          setDeleteModalOpen(false);
+          setDeletingProduct(null);
+          void fetchProducts(true, false);
+        } else {
+          toast.error(data.message || `Xóa sản phẩm thất bại (${res.status}). Sản phẩm chưa bị xóa.`);
+        }
         return;
       }
-      toast.success(`Đã xóa sản phẩm: ${deletingProduct.name}`);
+      toast.success(data.message || `Đã xóa sản phẩm: ${target.name}`);
       setDeleteModalOpen(false);
       setDeletingProduct(null);
-      fetchProducts();
+      // Drop the row right away, then reload the page (and stats) from the server
+      setProducts((prev) => prev.filter((p) => p.id !== target.id));
+      if (products.length <= 1 && page > 1) {
+        setPage((prev) => Math.max(1, prev - 1));
+      } else {
+        void fetchProducts(true, false);
+      }
     } catch {
-      toast.error("Lỗi khi kết nối máy chủ");
+      toast.error("Không kết nối được tới máy chủ nên chưa xác nhận được việc xóa. Danh sách sẽ được tải lại để kiểm tra.");
+      void fetchProducts(true, false);
     } finally {
       setDeleteLoading(false);
     }
