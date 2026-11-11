@@ -931,7 +931,7 @@ export default function ProductDetailView({
                 { icon: ShieldCheck, title: "100% Chính hãng", text: "Đầy đủ CO/CQ, bảo hành điện tử" },
                 { icon: Wrench, title: "Khảo sát & lắp đặt", text: "Kỹ thuật viên tận nơi, miễn phí khảo sát" },
                 { icon: Truck, title: "Giao hàng an toàn", text: "Đóng gói chuẩn hãng, ship toàn quốc" },
-                { icon: CheckCircle2, title: "Hỗ trợ trọn đời", text: "Linh kiện thay thế chính hãng" },
+                { icon: CheckCircle2, title: "Hỗ trợ theo chính sách của hãng", text: "Linh kiện thay thế chính hãng" },
               ].map(({ icon: Icon, title, text }) => (
                 <li key={title} className="flex items-start gap-3">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-green/10 text-[#3f741b]">

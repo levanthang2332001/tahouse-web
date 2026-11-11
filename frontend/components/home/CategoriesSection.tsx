@@ -33,13 +33,15 @@ async function fetchCategoryTotal(catId: string): Promise<number> {
   return data.total;
 }
 
+const DISPLAYED_SERVICES = SERVICES.slice(0, 3);
+
 export default function CategoriesSection() {
   const [totals, setTotals] = useState<Record<string, number | null>>({});
 
   useEffect(() => {
     let cancelled = false;
 
-    for (const service of SERVICES) {
+    for (const service of DISPLAYED_SERVICES) {
       void (async () => {
         try {
           const total = await fetchCategoryTotal(service.catId);
@@ -91,7 +93,7 @@ export default function CategoriesSection() {
 
         {/* Service category cards */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {SERVICES.map((service) => {
+          {DISPLAYED_SERVICES.map((service) => {
             const total = totals[service.catId];
             const countLabel =
               typeof total === "number"
