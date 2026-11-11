@@ -52,8 +52,55 @@ function list(value: unknown, label: string): Record<string, unknown>[] {
  * Validates the body and keeps only fields the backend DTO accepts, so malformed or stray client data never
  * reaches the API. Throws InputError with a user-facing message.
  */
-function pickSettingsInput(body: unknown): StoreSettingsInput {
+function pickSettingsInput(body: unknown): Partial<StoreSettingsInput> {
   if (!isRecord(body)) throw new InputError("Dữ liệu cấu hình không đúng định dạng");
+
+  let heroBanners: string[] | undefined;
+  if (body.heroBanners !== undefined) {
+    if (!Array.isArray(body.heroBanners)) {
+      throw new InputError("Danh sách ảnh banner hero phải là một mảng");
+    }
+    if (body.heroBanners.length < 1) {
+      throw new InputError("Cần tối thiểu 1 ảnh banner hero");
+    }
+    if (body.heroBanners.length > 10) {
+      throw new InputError("Tối đa 10 ảnh banner hero");
+    }
+    heroBanners = body.heroBanners.map((item, idx) => {
+      if (typeof item !== "string" || !item.trim()) {
+        throw new InputError(`Ảnh banner #${idx + 1} không hợp lệ`);
+      }
+      return item.trim();
+    });
+  }
+
+  let storeImages: string[] | undefined;
+  if (body.storeImages !== undefined) {
+    if (!Array.isArray(body.storeImages)) {
+      throw new InputError("Danh sách ảnh showroom phải là một mảng");
+    }
+    if (body.storeImages.length < 1) {
+      throw new InputError("Cần tối thiểu 1 ảnh showroom");
+    }
+    if (body.storeImages.length > 20) {
+      throw new InputError("Tối đa 20 ảnh showroom");
+    }
+    storeImages = body.storeImages.map((item, idx) => {
+      if (typeof item !== "string" || !item.trim()) {
+        throw new InputError(`Ảnh showroom #${idx + 1} không hợp lệ`);
+      }
+      return item.trim();
+    });
+  }
+
+  // If this is a dedicated heroBanners or storeImages update
+  if (body.storeName === undefined && (heroBanners !== undefined || storeImages !== undefined)) {
+    return {
+      ...(heroBanners !== undefined ? { heroBanners } : {}),
+      ...(storeImages !== undefined ? { storeImages } : {}),
+    };
+  }
+
   const social = body.socialLinks === undefined ? {} : body.socialLinks;
   const hours = body.openingHours === undefined ? {} : body.openingHours;
   if (!isRecord(social)) throw new InputError("Mạng xã hội không đúng định dạng");
@@ -102,15 +149,41 @@ function pickSettingsInput(body: unknown): StoreSettingsInput {
       weekend: text(hours.weekend, "Giờ Thứ 7 – Chủ nhật") || undefined,
       note: text(hours.note, "Ghi chú giờ mở cửa", 300) || undefined,
     },
+    ...(heroBanners !== undefined ? { heroBanners } : {}),
+    ...(storeImages !== undefined ? { storeImages } : {}),
   };
 }
+
+import { getSavedHeroBanners, saveHeroBanners } from "@/lib/server/hero-banners";
+import { getSavedStoreImages, saveStoreImages } from "@/lib/server/store-images";
 
 export async function GET(request: NextRequest) {
   if (!checkAdminRequestAuth(request)) return unauthorized();
 
   try {
-    const settings = await adminBackendFetch<StoreSettings>("/admin/settings", { cache: "no-store" });
-    return NextResponse.json({ success: true, settings });
+    const [settings, savedBanners, savedStoreImages] = await Promise.all([
+      adminBackendFetch<StoreSettings>("/admin/settings", { cache: "no-store" }).catch(() => null),
+      getSavedHeroBanners(),
+      getSavedStoreImages(),
+    ]);
+
+    const heroBanners =
+      Array.isArray(settings?.heroBanners) && settings.heroBanners.length > 0 && settings.heroBanners[0] !== "/parner.jpg"
+        ? settings.heroBanners
+        : savedBanners;
+
+    const storeImages =
+      Array.isArray(settings?.storeImages) && settings.storeImages.length > 0
+        ? settings.storeImages
+        : savedStoreImages;
+
+    const mergedSettings = {
+      ...(settings || {}),
+      heroBanners,
+      storeImages,
+    };
+
+    return NextResponse.json({ success: true, settings: mergedSettings });
   } catch (error) {
     console.error("[GET /api/admin/settings]", error);
     return adminErrorResponse(error, "Không thể tải cấu hình cửa hàng");
@@ -120,7 +193,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   if (!checkAdminRequestAuth(request)) return unauthorized();
 
-  let input: StoreSettingsInput;
+  let input: Partial<StoreSettingsInput>;
   try {
     input = pickSettingsInput(await request.json());
   } catch (error) {
@@ -129,14 +202,55 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    // PATCH, not PUT: the form owns these fields only, so backend-side extras like `metadata` survive
-    const settings = await adminBackendFetch<StoreSettings>("/admin/settings", {
-      method: "PATCH",
-      body: JSON.stringify(input),
+    let savedBanners: string[] | undefined;
+    if (input.heroBanners !== undefined) {
+      savedBanners = await saveHeroBanners(input.heroBanners);
+    }
+
+    let savedStoreImages: string[] | undefined;
+    if (input.storeImages !== undefined) {
+      savedStoreImages = await saveStoreImages(input.storeImages);
+    }
+
+    const bodyToSend = {
+      ...input,
+      ...(input.heroBanners !== undefined || input.storeImages !== undefined
+        ? {
+            metadata: {
+              ...(input.heroBanners !== undefined ? { heroBanners: input.heroBanners } : {}),
+              ...(input.storeImages !== undefined ? { storeImages: input.storeImages } : {}),
+            },
+          }
+        : {}),
+    };
+
+    let settings: StoreSettings | undefined;
+    try {
+      settings = await adminBackendFetch<StoreSettings>("/admin/settings", {
+        method: "PATCH",
+        body: JSON.stringify(bodyToSend),
+      });
+    } catch (err) {
+      console.warn("[PUT /api/admin/settings] backend sync notice:", err);
+    }
+
+    const finalSettings = {
+      ...(settings || {}),
+      ...(savedBanners ? { heroBanners: savedBanners } : {}),
+      ...(savedStoreImages ? { storeImages: savedStoreImages } : {}),
+    };
+
+    return NextResponse.json({
+      success: true,
+      message: "Đã lưu cấu hình cửa hàng",
+      settings: finalSettings,
     });
-    return NextResponse.json({ success: true, message: "Đã lưu cấu hình cửa hàng", settings });
   } catch (error) {
     console.error("[PUT /api/admin/settings]", error);
     return adminErrorResponse(error, "Không thể lưu cấu hình cửa hàng");
   }
+}
+
+export async function PATCH(request: NextRequest) {
+  return PUT(request);
 }

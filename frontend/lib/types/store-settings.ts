@@ -46,6 +46,8 @@ export interface StoreSettingsInput {
   emails: StoreEmail[];
   addresses: StoreAddress[];
   openingHours: StoreOpeningHours;
+  heroBanners?: string[];
+  storeImages?: string[];
 }
 
 export interface StoreSettings extends StoreSettingsInput {
@@ -53,5 +55,7 @@ export interface StoreSettings extends StoreSettingsInput {
   primaryPhone: string;
   primaryEmail: string;
   mainAddress: string;
+  heroBanners?: string[];
+  storeImages?: string[];
   updatedAt: string;
 }

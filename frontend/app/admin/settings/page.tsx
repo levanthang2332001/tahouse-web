@@ -18,6 +18,8 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StoreSettingsForm from "@/components/admin/StoreSettingsForm";
+import HeroBannersSettings from "@/components/admin/HeroBannersSettings";
+import StoreImagesSettings from "@/components/admin/StoreImagesSettings";
 
 export default function AdminSettingsPage() {
   const { user, login, logout } = useAdminAuth();
@@ -172,11 +174,21 @@ export default function AdminSettingsPage() {
       <Tabs defaultValue="store">
         <TabsList>
           <TabsTrigger value="store">Thông tin cửa hàng</TabsTrigger>
+          <TabsTrigger value="banners">Banner Hero (Trang chủ)</TabsTrigger>
+          <TabsTrigger value="store-images">Ảnh Showroom & Album</TabsTrigger>
           <TabsTrigger value="account">Tài khoản & bảo mật</TabsTrigger>
         </TabsList>
 
         <TabsContent value="store">
           <StoreSettingsForm />
+        </TabsContent>
+
+        <TabsContent value="banners">
+          <HeroBannersSettings />
+        </TabsContent>
+
+        <TabsContent value="store-images">
+          <StoreImagesSettings />
         </TabsContent>
 
         <TabsContent value="account" className="space-y-6">

@@ -1,4 +1,5 @@
 import { COMPANY_LEGAL } from "@/data/company-legal";
+import { STORE_IMAGES } from "@/data/home-data";
 import type { StorePhoneNumber, StoreSettings } from "@/lib/types/store-settings";
 
 /** Public contact details rendered across the storefront (header, footer, product pages, floating buttons). */
@@ -16,6 +17,7 @@ export interface StoreInfo {
   showroomName: string;
   mapUrl: string;
   workingHours: string;
+  storeImages: string[];
 }
 
 /** Hardcoded values used until the settings API answers, and for any field it leaves empty. */
@@ -33,6 +35,7 @@ export const FALLBACK_STORE_INFO: StoreInfo = {
   showroomName: COMPANY_LEGAL.showroomName,
   mapUrl: COMPANY_LEGAL.mapsUrl,
   workingHours: COMPANY_LEGAL.workingHours,
+  storeImages: STORE_IMAGES,
 };
 
 /** Dialable form for `tel:` links: digits, keeping a leading "+" */
@@ -82,5 +85,9 @@ export function toStoreInfo(settings: StoreSettings | null | undefined): StoreIn
     showroomName: pick(main?.branchName, f.showroomName),
     mapUrl: pick(main?.mapUrl, f.mapUrl),
     workingHours: pick(settings.openingHours?.text, f.workingHours),
+    storeImages:
+      Array.isArray(settings.storeImages) && settings.storeImages.length > 0
+        ? settings.storeImages
+        : f.storeImages,
   };
 }

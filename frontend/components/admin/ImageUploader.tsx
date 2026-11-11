@@ -12,7 +12,6 @@ import {
   ExternalLink,
   RefreshCw,
   X,
-  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
