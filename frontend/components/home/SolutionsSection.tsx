@@ -28,10 +28,10 @@ export default function SolutionsSection() {
       >
         {/* Left text panel */}
         <motion.div variants={slideInLeft} className="text-left lg:w-1/3">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-green">
+          <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-brand-green">
             {content.home.solutions.prefix}
           </h3>
-          <h2 className="mb-6 whitespace-pre-line font-serif text-4xl leading-tight text-navy lg:text-5xl">
+          <h2 className="mb-6 whitespace-pre-line font-sans text-3xl font-bold leading-tight text-navy md:text-4xl">
             {content.home.solutions.title}
           </h2>
           <p className="mb-10 text-base leading-relaxed text-navy/70">
@@ -39,7 +39,7 @@ export default function SolutionsSection() {
           </p>
           <Link
             href="#contact"
-            className="inline-flex items-center gap-4 border border-navy px-8 py-3.5 text-xs font-semibold uppercase tracking-wider text-navy transition-all hover:bg-navy hover:text-cream"
+            className="inline-flex items-center gap-4 border border-navy px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-navy transition-all hover:bg-navy hover:text-cream"
           >
             {content.home.solutions.cta}
             <ArrowRight className="h-4 w-4" />
@@ -76,7 +76,7 @@ export default function SolutionsSection() {
             </div>
             <Link
               href="/products"
-              className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/75 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white/75 hover:text-white transition-colors"
             >
               Xem chi tiết
               <ArrowRight className="h-3 w-3" />

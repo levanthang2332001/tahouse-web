@@ -44,10 +44,10 @@ export default function StoreSection() {
         className="mx-auto max-w-[1440px] px-6 lg:px-12"
       >
         <motion.div variants={fadeUpSlow} className="mb-12 text-left">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-green">
+          <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-brand-green">
             {STORE_COPY.prefix}
           </h3>
-          <h2 className="mb-4 whitespace-normal font-serif text-3xl leading-tight text-navy sm:whitespace-nowrap sm:text-4xl lg:text-[2.75rem]">
+          <h2 className="mb-4 whitespace-normal font-sans text-3xl font-bold leading-tight text-navy sm:whitespace-nowrap md:text-4xl">
             {STORE_COPY.title}
           </h2>
           <p className="max-w-2xl text-base leading-relaxed text-navy/70">
@@ -99,10 +99,10 @@ export default function StoreSection() {
             className="flex flex-col justify-center gap-8 lg:col-span-5"
           >
             <div>
-              <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-brand-green">
+              <p className="mb-1 text-xs font-bold uppercase tracking-widest text-brand-green">
                 {store.tradeName}
               </p>
-              <h3 className="font-serif text-2xl text-navy sm:text-3xl">
+              <h3 className="font-sans text-2xl font-bold leading-tight text-navy sm:text-3xl">
                 {store.showroomName}
               </h3>
             </div>
@@ -140,14 +140,14 @@ export default function StoreSection() {
                 href={store.mapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-3 bg-brand-green px-7 py-3.5 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
+                className="inline-flex items-center justify-center gap-3 bg-brand-green px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
               >
                 {STORE_COPY.ctaDirections}
                 <ArrowRight className="h-4 w-4" />
               </a>
               <a
                 href={`tel:${store.phoneTel}`}
-                className="inline-flex items-center justify-center gap-3 border border-navy px-7 py-3.5 text-xs font-semibold uppercase tracking-wider text-navy transition-all hover:bg-navy hover:text-cream"
+                className="inline-flex items-center justify-center gap-3 border border-navy px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-navy transition-all hover:bg-navy hover:text-cream"
               >
                 {STORE_COPY.ctaCall}
               </a>
@@ -155,7 +155,7 @@ export default function StoreSection() {
                 href={store.zaloUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-3 border border-navy/25 px-7 py-3.5 text-xs font-semibold uppercase tracking-wider text-navy/80 transition-colors hover:border-brand-green hover:text-brand-green"
+                className="inline-flex items-center justify-center gap-3 border border-navy/25 px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-navy/80 transition-colors hover:border-brand-green hover:text-brand-green"
               >
                 {STORE_COPY.ctaZalo}
               </Link>
