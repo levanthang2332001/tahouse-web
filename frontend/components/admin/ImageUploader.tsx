@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
+import { summarizeUploadErrors, uploadAdminFile } from "@/lib/admin/upload-client";
 
 interface SingleImageUploaderProps {
   label: string;
@@ -60,30 +61,9 @@ export function SingleImageUploader({
 
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("folder", "products");
-      if (brand) fd.append("brand", brand);
-      if (category) fd.append("category", category);
-      if (productCode) fd.append("productCode", productCode);
-
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: fd,
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.message || "Tải lên ảnh thất bại");
-      }
-
-      const uploadedUrl = data.data?.url || data.url;
-      if (uploadedUrl) {
-        onChange(uploadedUrl);
-        toast.success("Tải ảnh đại diện lên máy chủ thành công!");
-      } else {
-        throw new Error("Không nhận được URL ảnh từ máy chủ");
-      }
+      const uploadedUrl = await uploadAdminFile(file, { folder: "products", brand, category, productCode });
+      onChange(uploadedUrl);
+      toast.success("Đã tải ảnh đại diện lên. Nhớ bấm Lưu sản phẩm để áp dụng.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Lỗi khi tải ảnh");
     } finally {
@@ -329,49 +309,30 @@ export function MultiImageUploader({
     setUploading(true);
     setUploadProgress({ current: 0, total: fileArray.length });
     const uploadedUrls: string[] = [];
-    let failureCount = 0;
+    const errors: string[] = [];
 
     for (let i = 0; i < fileArray.length; i++) {
       const file = fileArray[i];
       setUploadProgress({ current: i + 1, total: fileArray.length });
 
       try {
-        const fd = new FormData();
-        fd.append("file", file);
-        fd.append("folder", folder);
-        if (brand) fd.append("brand", brand);
-        if (category) fd.append("category", category);
-        if (productCode) fd.append("productCode", productCode);
-
-        const res = await fetch("/api/admin/upload", {
-          method: "POST",
-          body: fd,
-        });
-
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.message || "Tải lên thất bại");
-        }
-
-        const url = data.data?.url || data.url;
-        if (url) {
-          uploadedUrls.push(url);
-        }
+        uploadedUrls.push(await uploadAdminFile(file, { folder, brand, category, productCode }));
       } catch (err) {
-        failureCount++;
-        console.error("Upload error for file", file.name, err);
+        errors.push(err instanceof Error ? err.message : `${file.name}: tải lên thất bại`);
       }
     }
 
     if (uploadedUrls.length > 0) {
       onChange([...items, ...uploadedUrls]);
-      if (failureCount === 0) {
-        toast.success(`Đã tải lên thành công ${uploadedUrls.length} ảnh!`);
+      if (errors.length === 0) {
+        toast.success(`Đã tải lên ${uploadedUrls.length} ảnh. Nhớ bấm Lưu sản phẩm để áp dụng.`);
       } else {
-        toast.warning(`Đã tải lên ${uploadedUrls.length} ảnh, ${failureCount} ảnh lỗi`);
+        toast.warning(
+          `Đã tải lên ${uploadedUrls.length} ảnh, ${errors.length} ảnh lỗi: ${summarizeUploadErrors(errors)}`,
+        );
       }
-    } else if (failureCount > 0) {
-      toast.error("Lỗi khi tải ảnh lên máy chủ");
+    } else if (errors.length > 0) {
+      toast.error(`Không tải được ảnh: ${summarizeUploadErrors(errors)}`);
     }
 
     setUploading(false);

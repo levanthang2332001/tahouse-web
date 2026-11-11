@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/toast";
+import { summarizeUploadErrors, uploadAdminFile } from "@/lib/admin/upload-client";
 import type { StoreSettings } from "@/lib/types/store-settings";
 
 const MIN_IMAGES = 1;
@@ -130,32 +131,16 @@ export default function StoreImagesSettings() {
     setUploadProgress({ current: 0, total: toUpload.length });
 
     const uploadedUrls: string[] = [];
-    let failureCount = 0;
+    const errors: string[] = [];
 
     for (let i = 0; i < toUpload.length; i++) {
       const file = toUpload[i];
       setUploadProgress({ current: i + 1, total: toUpload.length });
 
       try {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("folder", "store");
-
-        const res = await fetch("/api/admin/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await res.json();
-        const uploadedUrl: string | undefined = data.data?.url || data.url;
-        if (!res.ok || !uploadedUrl) {
-          throw new Error(data.message || `Lỗi tải tệp ${file.name}`);
-        }
-
-        uploadedUrls.push(uploadedUrl);
+        uploadedUrls.push(await uploadAdminFile(file, { folder: "store" }));
       } catch (err) {
-        console.error("Upload error for file:", file.name, err);
-        failureCount++;
+        errors.push(err instanceof Error ? err.message : `${file.name}: tải lên thất bại`);
       }
     }
 
@@ -165,12 +150,13 @@ export default function StoreImagesSettings() {
     if (uploadedUrls.length > 0) {
       const newList = [...images, ...uploadedUrls];
       setImages(newList);
+      // Kết quả cuối cùng (đã lưu / lỗi) do saveImagesDirectly thông báo
+      toast.info(`Đã tải lên ${uploadedUrls.length} ảnh, đang lưu danh sách...`);
       void saveImagesDirectly(newList);
-      toast.success(`Đã tải lên thành công ${uploadedUrls.length} ảnh showroom!`);
     }
 
-    if (failureCount > 0) {
-      toast.error(`Có ${failureCount} tệp không thể tải lên. Vui lòng thử lại.`);
+    if (errors.length > 0) {
+      toast.error(`Có ${errors.length} ảnh không tải lên được: ${summarizeUploadErrors(errors)}`);
     }
 
     if (fileInputRef.current) {

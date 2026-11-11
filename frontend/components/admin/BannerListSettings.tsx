@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/toast";
+import { summarizeUploadErrors, uploadAdminFile } from "@/lib/admin/upload-client";
 import type { StoreSettings } from "@/lib/types/store-settings";
 
 type BannerField = "heroBanners" | "promoBanners";
@@ -155,45 +156,29 @@ export default function BannerListSettings({
     setUploading(true);
     setUploadProgress({ current: 0, total: filesToUpload.length });
     const newUrls: string[] = [];
-    let failedCount = 0;
+    const errors: string[] = [];
 
     for (let i = 0; i < filesToUpload.length; i++) {
       const file = filesToUpload[i];
       setUploadProgress({ current: i + 1, total: filesToUpload.length });
 
       try {
-        const fd = new FormData();
-        fd.append("file", file);
-        fd.append("folder", uploadFolder);
-
-        const res = await fetch("/api/admin/upload", {
-          method: "POST",
-          body: fd,
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Tải ảnh thất bại");
-
-        const uploadedUrl = data.data?.url || data.url;
-        if (uploadedUrl) {
-          newUrls.push(uploadedUrl);
-        } else {
-          failedCount++;
-        }
-      } catch {
-        failedCount++;
+        newUrls.push(await uploadAdminFile(file, { folder: uploadFolder }));
+      } catch (err) {
+        errors.push(err instanceof Error ? err.message : `${file.name}: tải lên thất bại`);
       }
+    }
+
+    if (errors.length > 0) {
+      toast.error(`Có ${errors.length} ảnh không tải lên được: ${summarizeUploadErrors(errors)}`);
     }
 
     if (newUrls.length > 0) {
       const updated = [...banners, ...newUrls].slice(0, max);
       setBanners(updated);
-      toast.success(`Đã tải lên ${newUrls.length} ảnh thành công!`);
+      // Kết quả cuối cùng (đã lưu / lỗi) do saveBannersDirectly thông báo
+      toast.info(`Đã tải lên ${newUrls.length} ảnh, đang lưu danh sách...`);
       void saveBannersDirectly(updated);
-    }
-
-    if (failedCount > 0) {
-      toast.error(`Có ${failedCount} ảnh tải lên thất bại`);
     }
 
     setUploading(false);
