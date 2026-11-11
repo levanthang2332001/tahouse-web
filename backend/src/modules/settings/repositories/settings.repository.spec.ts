@@ -110,4 +110,38 @@ describe('SettingsRepository', () => {
     expect(mockDb.update).toHaveBeenCalled();
     expect(result.storeName).toBe('TA HOUSE VIP');
   });
+
+  it('should update heroBanners in metadata', async () => {
+    const updateDto = {
+      heroBanners: ['/banner1.jpg', '/banner2.jpg'],
+    };
+
+    mockDb.query.storeSettings.findFirst
+      .mockResolvedValueOnce(mockSettingsRow)
+      .mockResolvedValueOnce({
+        ...mockSettingsRow,
+        metadata: { heroBanners: updateDto.heroBanners },
+      });
+
+    const result = await repository.updateSettings(updateDto);
+    expect(mockDb.update).toHaveBeenCalled();
+    expect(result.heroBanners).toEqual(['/banner1.jpg', '/banner2.jpg']);
+  });
+
+  it('should update storeImages in metadata', async () => {
+    const updateDto = {
+      storeImages: ['/store/1.jpg', '/store/2.jpg'],
+    };
+
+    mockDb.query.storeSettings.findFirst
+      .mockResolvedValueOnce(mockSettingsRow)
+      .mockResolvedValueOnce({
+        ...mockSettingsRow,
+        metadata: { storeImages: updateDto.storeImages },
+      });
+
+    const result = await repository.updateSettings(updateDto);
+    expect(mockDb.update).toHaveBeenCalled();
+    expect(result.storeImages).toEqual(['/store/1.jpg', '/store/2.jpg']);
+  });
 });

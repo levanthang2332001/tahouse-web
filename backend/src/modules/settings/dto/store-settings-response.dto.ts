@@ -62,6 +62,8 @@ export const DEFAULT_STORE_SETTINGS = {
     weekend: '08:00 - 21:30',
     note: 'Phục vụ tư vấn và khảo sát trực tiếp tất cả các ngày trong tuần',
   },
+  heroBanners: ['/parner.jpg'],
+  storeImages: ['/store/2.jpg', '/store/1.jpg', '/store/3.jpg', '/store/4.jpg'],
   metadata: {},
 };
 
@@ -130,6 +132,20 @@ export class StoreSettingsResponseDto {
   @ApiProperty({ example: '961A Kha Vạn Cân, P. Linh Xuân, TP. Thủ Đức, TP. HCM' })
   mainAddress: string;
 
+  @ApiProperty({
+    type: [String],
+    example: ['/parner.jpg'],
+    description: 'Danh sách 1 - 10 ảnh banner hero trang chủ',
+  })
+  heroBanners: string[];
+
+  @ApiProperty({
+    type: [String],
+    example: ['/store/2.jpg', '/store/1.jpg'],
+    description: 'Danh sách 1 - 20 ảnh showroom TA HOUSE (album cửa hàng)',
+  })
+  storeImages: string[];
+
   @ApiProperty()
   updatedAt: Date;
 
@@ -175,6 +191,18 @@ export class StoreSettingsResponseDto {
       addresses[0]?.address ||
       fallback.addresses[0].address;
 
+    const rawHeroBanners = (entity?.metadata as Record<string, any> | undefined)?.heroBanners;
+    const heroBanners =
+      Array.isArray(rawHeroBanners) && rawHeroBanners.length > 0
+        ? rawHeroBanners
+        : fallback.heroBanners;
+
+    const rawStoreImages = (entity?.metadata as Record<string, any> | undefined)?.storeImages;
+    const storeImages =
+      Array.isArray(rawStoreImages) && rawStoreImages.length > 0
+        ? rawStoreImages
+        : fallback.storeImages;
+
     const dto = new StoreSettingsResponseDto();
     dto.id = entity?.id || fallback.id;
     dto.storeName = entity?.storeName || fallback.storeName;
@@ -187,6 +215,8 @@ export class StoreSettingsResponseDto {
     dto.primaryPhone = primaryPhone;
     dto.primaryEmail = primaryEmail;
     dto.mainAddress = mainAddress;
+    dto.heroBanners = heroBanners;
+    dto.storeImages = storeImages;
     dto.updatedAt = entity?.updatedAt ? new Date(entity.updatedAt) : new Date();
 
     return dto;

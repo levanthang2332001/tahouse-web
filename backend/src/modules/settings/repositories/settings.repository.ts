@@ -41,7 +41,11 @@ export class SettingsRepository {
         emails: DEFAULT_STORE_SETTINGS.emails,
         addresses: DEFAULT_STORE_SETTINGS.addresses,
         openingHours: DEFAULT_STORE_SETTINGS.openingHours,
-        metadata: DEFAULT_STORE_SETTINGS.metadata,
+        metadata: {
+          ...DEFAULT_STORE_SETTINGS.metadata,
+          heroBanners: DEFAULT_STORE_SETTINGS.heroBanners,
+          storeImages: DEFAULT_STORE_SETTINGS.storeImages,
+        },
         createdAt: now,
         updatedAt: now,
       };
@@ -81,7 +85,19 @@ export class SettingsRepository {
       if (dto.emails !== undefined) updateData.emails = dto.emails;
       if (dto.addresses !== undefined) updateData.addresses = dto.addresses;
       if (dto.openingHours !== undefined) updateData.openingHours = dto.openingHours;
-      if (dto.metadata !== undefined) updateData.metadata = dto.metadata;
+      if (
+        dto.metadata !== undefined ||
+        dto.heroBanners !== undefined ||
+        dto.storeImages !== undefined
+      ) {
+        const currentMeta = (existing.metadata as Record<string, any>) || {};
+        updateData.metadata = {
+          ...currentMeta,
+          ...(dto.metadata !== undefined ? dto.metadata : {}),
+          ...(dto.heroBanners !== undefined ? { heroBanners: dto.heroBanners } : {}),
+          ...(dto.storeImages !== undefined ? { storeImages: dto.storeImages } : {}),
+        };
+      }
 
       await this.db
         .update(storeSettings)
@@ -97,7 +113,11 @@ export class SettingsRepository {
         emails: dto.emails || DEFAULT_STORE_SETTINGS.emails,
         addresses: dto.addresses || DEFAULT_STORE_SETTINGS.addresses,
         openingHours: dto.openingHours || DEFAULT_STORE_SETTINGS.openingHours,
-        metadata: dto.metadata || DEFAULT_STORE_SETTINGS.metadata,
+        metadata: {
+          ...(dto.metadata || DEFAULT_STORE_SETTINGS.metadata),
+          heroBanners: dto.heroBanners || DEFAULT_STORE_SETTINGS.heroBanners,
+          storeImages: dto.storeImages || DEFAULT_STORE_SETTINGS.storeImages,
+        },
         createdAt: now,
         updatedAt: now,
       };

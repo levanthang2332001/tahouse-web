@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsEmail,
@@ -269,6 +271,30 @@ export class UpdateStoreSettingsDto {
   @ValidateNested()
   @Type(() => OpeningHoursDto)
   openingHours?: OpeningHoursDto;
+
+  @ApiPropertyOptional({
+    description: 'Danh sách 1 đến 10 ảnh banner hero trang chủ (tự động chuyển sau mỗi 5s)',
+    type: [String],
+    example: ['/parner.jpg'],
+  })
+  @IsOptional()
+  @IsArray({ message: 'Danh sách ảnh banner hero phải là một mảng' })
+  @ArrayMinSize(1, { message: 'Cần tối thiểu 1 ảnh banner hero' })
+  @ArrayMaxSize(10, { message: 'Tối đa 10 ảnh banner hero' })
+  @IsString({ each: true, message: 'Mỗi đường dẫn ảnh banner hero phải là chuỗi ký tự' })
+  heroBanners?: string[];
+
+  @ApiPropertyOptional({
+    description: 'Danh sách 1 đến 20 ảnh showroom TA HOUSE (album cửa hàng)',
+    type: [String],
+    example: ['/store/2.jpg'],
+  })
+  @IsOptional()
+  @IsArray({ message: 'Danh sách ảnh showroom phải là một mảng' })
+  @ArrayMinSize(1, { message: 'Cần tối thiểu 1 ảnh showroom' })
+  @ArrayMaxSize(20, { message: 'Tối đa 20 ảnh showroom' })
+  @IsString({ each: true, message: 'Mỗi đường dẫn ảnh showroom phải là chuỗi ký tự' })
+  storeImages?: string[];
 
   @ApiPropertyOptional({
     description: 'Thông tin mở rộng khác',
