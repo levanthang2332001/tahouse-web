@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { fadeUp, fadeUpSlow, staggerContainer } from "@/lib/motion-variants";
 import content from "@/data/content.json";
 
 interface DisplayBrand {
   name: string;
+  slug: string;
   logo?: string;
 }
 
@@ -14,16 +16,17 @@ function PartnerLogo({
   name,
   logo,
 }: {
-  name: string;
+  name?: string;
   logo?: string;
 }) {
   const [failed, setFailed] = useState(false);
-  const isKassler = name.toLowerCase() === "kassler";
+  const brandName = name || "";
+  const isKassler = brandName.toLowerCase() === "kassler";
 
   if (!logo || failed) {
     return (
       <span className="text-center text-lg sm:text-xl lg:text-2xl font-sans font-bold tracking-tight text-navy">
-        {name}
+        {brandName}
       </span>
     );
   }
@@ -32,34 +35,60 @@ function PartnerLogo({
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={logo}
-      alt={name}
+      alt={brandName}
       className={
         isKassler
-          ? "max-h-14 w-auto max-w-[180px] object-contain sm:max-h-16 sm:max-w-[200px]"
-          : "max-h-10 w-auto max-w-[150px] object-contain sm:max-h-12"
+          ? "max-h-14 w-auto max-w-[180px] object-contain sm:max-h-16 sm:max-w-[200px] transition-transform duration-300 group-hover/brand:scale-105"
+          : "max-h-10 w-auto max-w-[150px] object-contain sm:max-h-12 transition-transform duration-300 group-hover/brand:scale-105"
       }
       onError={() => setFailed(true)}
     />
   );
 }
 
+const HOME_BRANDS: DisplayBrand[] = [
+  // Dãy 1: Bosch, Kassler, Philips, Hyundai
+  { name: "Bosch", slug: "bosch", logo: "/brands/bosch.svg" },
+  { name: "Kassler", slug: "kassler", logo: "/brands/kassler.png" },
+  { name: "Philips", slug: "philips", logo: "/brands/philips.svg" },
+  { name: "Hyundai", slug: "hyundai", logo: "/brands/hyundai.png" },
+  // Dãy 2: Malloca, GrandX, Eurosun, Eurogold
+  { name: "Malloca", slug: "malloca", logo: "/brands/malloca.svg" },
+  { name: "GrandX", slug: "grandx", logo: "/brands/grandx.svg" },
+  { name: "Eurosun", slug: "eurosun", logo: "/brands/eurosun.png" },
+  { name: "Eurogold", slug: "eurogold", logo: "/brands/eurogold.svg" },
+];
+
 export default function BrandsSection() {
-  const [brands, setBrands] = useState<DisplayBrand[]>([]);
+  const [brands, setBrands] = useState<DisplayBrand[]>(HOME_BRANDS);
 
   useEffect(() => {
     fetch("/api/brands")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
-          setBrands(data.map((b: { name: string; logo?: string }) => ({ name: b.name, logo: b.logo })));
+          const brandMap = new Map<string, string>();
+          data.forEach((b: { name?: string; slug?: string; logo?: string }) => {
+            if (b.logo) {
+              if (b.name) brandMap.set(b.name.toLowerCase().trim(), b.logo);
+              if (b.slug) brandMap.set(b.slug.toLowerCase().trim(), b.logo);
+            }
+          });
+
+          setBrands(
+            HOME_BRANDS.map((item) => {
+              const customLogo = brandMap.get(item.name.toLowerCase());
+              return {
+                name: item.name,
+                slug: item.slug,
+                logo: customLogo || item.logo,
+              };
+            })
+          );
         }
       })
       .catch(() => {});
   }, []);
-
-  if (brands.length === 0) {
-    return null;
-  }
 
   return (
     <section className="w-full bg-cream py-14 lg:py-20">
@@ -98,12 +127,13 @@ export default function BrandsSection() {
           className="grid grid-cols-2 gap-y-10 sm:grid-cols-4 sm:gap-y-14"
         >
           {brands.map((brand, index) => {
+            const brandSlug = (brand.slug || brand.name || "").toLowerCase().trim();
             const mobileDivider = index % 2 === 0;
             const desktopDivider = (index + 1) % 4 !== 0;
 
             return (
               <div
-                key={brand.name}
+                key={brandSlug || brand.name}
                 className={`flex min-h-16 items-center justify-center px-3 sm:min-h-20 sm:px-6 ${
                   mobileDivider ? "border-r border-gray-light/60" : ""
                 } ${
@@ -112,10 +142,16 @@ export default function BrandsSection() {
                     : "sm:border-r-0"
                 }`}
               >
-                <PartnerLogo
-                  name={brand.name}
-                  logo={brand.logo}
-                />
+                <Link
+                  href={`/products?brand=${encodeURIComponent(brandSlug)}`}
+                  className="group/brand flex items-center justify-center p-2 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95"
+                  title={`Xem sản phẩm ${brand.name}`}
+                >
+                  <PartnerLogo
+                    name={brand.name}
+                    logo={brand.logo}
+                  />
+                </Link>
               </div>
             );
           })}

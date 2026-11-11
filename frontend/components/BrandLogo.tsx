@@ -24,19 +24,21 @@ export default function BrandLogo({
   brand: Brand;
   className?: string;
 }) {
-  const candidates = getBrandLogoCandidates(brand.logo, brand.slug, brand.name);
-  const localLabel = getLocalBrandLabel(brand.slug, brand.name);
+  const brandSlug = (brand?.slug || brand?.name || "").toLowerCase().trim();
+  const brandName = brand?.name || brandSlug;
+  const candidates = getBrandLogoCandidates(brand?.logo, brandSlug, brandName);
+  const localLabel = getLocalBrandLabel(brandSlug, brandName);
   // Step to the next source whenever one fails to load
   const [attempt, setAttempt] = useState(0);
   const logoSrc = candidates[attempt];
 
   if (logoSrc) {
-    const isKassler = brand.slug === "kassler" || brand.name.toLowerCase() === "kassler";
+    const isKassler = brandSlug === "kassler" || brandName.toLowerCase() === "kassler";
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={logoSrc}
-        alt={brand.name}
+        alt={brandName}
         className={
           isKassler
             ? "h-9 w-auto max-w-[140px] object-contain sm:h-10 sm:max-w-[160px]"
@@ -47,10 +49,10 @@ export default function BrandLogo({
     );
   }
 
-  const label = localLabel || brand.name.toUpperCase();
+  const label = localLabel || (brandName ? brandName.toUpperCase() : "");
   const colorClass =
-    BRAND_TEXT_CLASS[brand.slug] ||
-    BRAND_TEXT_CLASS[brand.name.trim().toLowerCase()] ||
+    BRAND_TEXT_CLASS[brandSlug] ||
+    BRAND_TEXT_CLASS[brandName.trim().toLowerCase()] ||
     "text-navy/70";
 
   return (

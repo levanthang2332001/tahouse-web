@@ -77,11 +77,18 @@ function ProductListContent() {
   const searchParams = useSearchParams();
   const catParam = searchParams.get("cat") || "all";
   const qParam = searchParams.get("q") || "";
+  const rawBrandParam = (searchParams.get("brand") || "all").trim().toLowerCase();
+  const brandParam =
+    !rawBrandParam || rawBrandParam === "undefined" || rawBrandParam === "null"
+      ? "all"
+      : rawBrandParam;
 
   const [prevCatParam, setPrevCatParam] = useState(catParam);
   const [prevQParam, setPrevQParam] = useState(qParam);
+  const [prevBrandParam, setPrevBrandParam] = useState(brandParam);
   const [filter, setFilter] = useState(catParam);
   const [search, setSearch] = useState(qParam);
+  const [selectedBrand, setSelectedBrand] = useState(brandParam);
   const [page, setPage] = useState(1);
 
   if (catParam !== prevCatParam) {
@@ -94,8 +101,12 @@ function ProductListContent() {
     setSearch(qParam);
     setPage(1);
   }
+  if (brandParam !== prevBrandParam) {
+    setPrevBrandParam(brandParam);
+    setSelectedBrand(brandParam);
+    setPage(1);
+  }
 
-  const [selectedBrand, setSelectedBrand] = useState("all");
   const [sortBy, setSortBy] = useState<"newest" | "price-asc" | "price-desc">("newest");
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -176,7 +187,29 @@ function ProductListContent() {
     setFilter(subcatId);
     setSelectedBrand("all");
     setPage(1);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("brand");
+      window.history.replaceState(null, "", url.toString());
+    } catch {}
     scrollToProductGrid(false);
+  };
+
+  const handleSelectBrand = (brandSlug: string) => {
+    const slug = (brandSlug || "").trim().toLowerCase();
+    const finalSlug =
+      !slug || slug === "undefined" || slug === "null" ? "all" : slug;
+    setSelectedBrand(finalSlug);
+    setPage(1);
+    try {
+      const url = new URL(window.location.href);
+      if (finalSlug === "all") {
+        url.searchParams.delete("brand");
+      } else {
+        url.searchParams.set("brand", finalSlug);
+      }
+      window.history.replaceState(null, "", url.toString());
+    } catch {}
   };
 
   // Sau khi danh mục đổi và sản phẩm render xong → căn lại vị trí lưới (tránh rơi xuống footer)
@@ -207,9 +240,31 @@ function ProductListContent() {
 
   const visibleBrands = filterBrandsForCategory(brands, filter);
   const activeBrandSlug =
-    selectedBrand === "all" || visibleBrands.some((brand) => brand.slug === selectedBrand)
+    selectedBrand === "all" ||
+    brands.length === 0 ||
+    visibleBrands.some(
+      (brand) =>
+        (brand.slug || brand.name || "").toLowerCase().trim() ===
+        selectedBrand.toLowerCase().trim(),
+    )
       ? selectedBrand
       : "all";
+
+  // Tự động cuộn tới thương hiệu đang chọn trên thanh thương hiệu
+  useEffect(() => {
+    if (selectedBrand && selectedBrand !== "all") {
+      const el = document.getElementById(
+        `brand-pill-${selectedBrand.toLowerCase()}`,
+      );
+      if (el) {
+        el.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
+      }
+    }
+  }, [selectedBrand, visibleBrands]);
 
   useEffect(() => {
     let cancelled = false;
@@ -326,6 +381,11 @@ function ProductListContent() {
     setFilter(nextFilter);
     setSelectedBrand("all");
     setPage(1);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("brand");
+      window.history.replaceState(null, "", url.toString());
+    } catch {}
     scrollToProductGrid(false);
   };
 
@@ -467,51 +527,73 @@ function ProductListContent() {
           </h1>
           <div className="flex flex-col items-stretch justify-between gap-6 pt-4 xl:flex-row xl:items-center">
             <div className="relative w-full shrink-0 lg:w-80">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-              <input
-                placeholder="Tìm sản phẩm, model..."
-                className="w-full rounded-xl border border-gray-light bg-cream py-3.5 pl-12 pr-4 text-xs text-navy transition-all focus:border-brand-green focus:outline-none"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
+              <div className="relative flex items-center">
+                <Search
+                  className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-navy/70"
+                  size={18}
+                />
+                <input
+                  placeholder="Tìm sản phẩm, model..."
+                  className="h-12 w-full rounded-xl border-2 border-navy/20 bg-white pl-10 pr-20 text-xs font-bold text-navy placeholder:text-navy/45 shadow-xs transition-all focus:border-brand-green focus:ring-2 focus:ring-brand-green/20 focus:outline-none"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch("")}
+                    className="absolute right-12 top-1/2 -translate-y-1/2 p-1 text-navy/40 hover:text-navy cursor-pointer"
+                    title="Xóa tìm kiếm"
+                  >
+                    <X size={15} />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  aria-label="Tìm kiếm"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-lg bg-brand-green p-2 text-white shadow-xs hover:bg-[#68a83a] transition-all cursor-pointer"
+                >
+                  <Search size={15} />
+                </button>
+              </div>
             </div>
 
             {/* Brands filter — theo danh mục đang chọn (khóa / bếp / quạt / nước / cửa) */}
             <div className="flex min-w-0 flex-1 items-center gap-3 xl:justify-end">
-              <span className="hidden shrink-0 text-[10px] font-bold uppercase tracking-widest text-navy/40 sm:block">
+              <span className="hidden shrink-0 text-xs font-extrabold uppercase tracking-widest text-navy/70 sm:block">
                 Thương hiệu:
               </span>
               <div className="flex min-w-0 items-center gap-2 overflow-x-auto py-1 invisible-scrollbar">
                 <button
                   type="button"
+                  id="brand-pill-all"
                   onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => {
-                    setSelectedBrand("all");
-                    setPage(1);
-                  }}
-                  className={`flex h-12 shrink-0 cursor-pointer items-center justify-center rounded-xl px-5 text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
-                    selectedBrand === "all"
-                      ? "bg-brand-green text-white shadow-md shadow-brand-green/20"
-                      : "bg-cream border border-gray-light/60 text-navy/60 hover:text-brand-green hover:border-brand-green/30 shadow-xs"
+                  onClick={() => handleSelectBrand("all")}
+                  className={`flex h-12 shrink-0 cursor-pointer items-center justify-center rounded-xl px-5 text-xs font-extrabold uppercase tracking-wider transition-all duration-300 ${
+                    selectedBrand.toLowerCase() === "all"
+                      ? "border-2 border-brand-green bg-brand-green text-white shadow-md shadow-brand-green/25"
+                      : "border-2 border-navy/20 bg-white text-navy font-bold hover:border-brand-green hover:text-brand-green shadow-xs"
                   }`}
                 >
                   Tất cả
                 </button>
                 {visibleBrands.map((brand) => {
-                  const isActive = selectedBrand === brand.slug;
+                  const brandSlug = (brand.slug || brand.name || "")
+                    .toLowerCase()
+                    .trim();
+                  const isActive =
+                    selectedBrand.toLowerCase() === brandSlug;
                   return (
                     <button
-                      key={brand.id ?? brand.slug}
+                      key={brand.id || brandSlug}
+                      id={`brand-pill-${brandSlug}`}
                       type="button"
                       onMouseDown={(event) => event.preventDefault()}
-                      onClick={() => {
-                        setSelectedBrand(brand.slug);
-                        setPage(1);
-                      }}
-                      className={`flex h-12 w-[120px] shrink-0 cursor-pointer items-center justify-center rounded-xl border bg-white px-3 shadow-xs transition-all duration-300 hover:shadow-sm ${
+                      onClick={() => handleSelectBrand(brandSlug)}
+                      className={`flex h-12 w-[120px] shrink-0 cursor-pointer items-center justify-center rounded-xl border-2 bg-white px-3 shadow-xs transition-all duration-300 hover:shadow-sm ${
                         isActive
-                          ? "border-brand-green ring-2 ring-brand-green/10 shadow-sm"
-                          : "border-gray-light/60 hover:border-brand-green/30"
+                          ? "border-brand-green ring-2 ring-brand-green/20 shadow-md"
+                          : "border-navy/15 hover:border-brand-green/50"
                       }`}
                     >
                       <BrandLogo
