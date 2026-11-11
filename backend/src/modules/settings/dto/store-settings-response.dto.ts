@@ -64,6 +64,7 @@ export const DEFAULT_STORE_SETTINGS = {
   },
   heroBanners: ['/parner.jpg'],
   storeImages: ['/store/2.jpg', '/store/1.jpg', '/store/3.jpg', '/store/4.jpg'],
+  promoBanners: ['/promo/uudai.jpg'],
   metadata: {},
 };
 
@@ -146,6 +147,14 @@ export class StoreSettingsResponseDto {
   })
   storeImages: string[];
 
+  @ApiProperty({
+    type: [String],
+    example: ['/promo/uudai.jpg'],
+    description:
+      'Danh sách 0 - 10 ảnh banner ưu đãi trên trang sản phẩm (rỗng = ẩn banner)',
+  })
+  promoBanners: string[];
+
   @ApiProperty()
   updatedAt: Date;
 
@@ -203,6 +212,14 @@ export class StoreSettingsResponseDto {
         ? rawStoreImages
         : fallback.storeImages;
 
+    // Mảng rỗng là hợp lệ (admin đã xóa hết banner) nên chỉ dùng mặc định khi chưa từng lưu
+    const rawPromoBanners = (
+      entity?.metadata as Record<string, any> | undefined
+    )?.promoBanners;
+    const promoBanners = Array.isArray(rawPromoBanners)
+      ? rawPromoBanners
+      : fallback.promoBanners;
+
     const dto = new StoreSettingsResponseDto();
     dto.id = entity?.id || fallback.id;
     dto.storeName = entity?.storeName || fallback.storeName;
@@ -217,6 +234,7 @@ export class StoreSettingsResponseDto {
     dto.mainAddress = mainAddress;
     dto.heroBanners = heroBanners;
     dto.storeImages = storeImages;
+    dto.promoBanners = promoBanners;
     dto.updatedAt = entity?.updatedAt ? new Date(entity.updatedAt) : new Date();
 
     return dto;

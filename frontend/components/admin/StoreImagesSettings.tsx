@@ -35,6 +35,7 @@ export default function StoreImagesSettings() {
   const [images, setImages] = useState<string[]>([]);
   const [initialImages, setInitialImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
@@ -63,9 +64,9 @@ export default function StoreImagesSettings() {
         setInitialImages(list);
       } catch (err) {
         if (!cancelled) {
+          // Không cho chỉnh sửa khi chưa tải được: lưu lúc này sẽ ghi đè ảnh thật bằng danh sách mặc định
+          setLoadFailed(true);
           toast.error(err instanceof Error ? err.message : "Lỗi khi tải danh sách ảnh showroom");
-          setImages(DEFAULT_STORE_IMAGES);
-          setInitialImages(DEFAULT_STORE_IMAGES);
         }
       } finally {
         if (!cancelled) {
@@ -91,10 +92,17 @@ export default function StoreImagesSettings() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Không thể lưu danh sách ảnh showroom");
+      // Backend cũ bỏ qua field lạ nhưng vẫn trả 200 → so lại dữ liệu trả về để không báo "đã lưu" giả
+      const saved = (data.settings as StoreSettings | undefined)?.storeImages;
+      if (!Array.isArray(saved) || JSON.stringify(saved) !== JSON.stringify(list)) {
+        throw new Error("Máy chủ chưa lưu được danh sách ảnh (backend có thể chưa được cập nhật)");
+      }
       setInitialImages(list);
       toast.success("Đã đồng bộ ảnh showroom & album!");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Lỗi khi lưu ảnh showroom");
+      toast.error(
+        `${err instanceof Error ? err.message : "Lỗi khi lưu ảnh showroom"}. Thay đổi chưa được lưu — bấm "Lưu" để thử lại.`,
+      );
     } finally {
       setSaving(false);
     }
@@ -131,18 +139,20 @@ export default function StoreImagesSettings() {
       try {
         const formData = new FormData();
         formData.append("file", file);
+        formData.append("folder", "store");
 
-        const res = await fetch("/api/upload", {
+        const res = await fetch("/api/admin/upload", {
           method: "POST",
           body: formData,
         });
 
         const data = await res.json();
-        if (!res.ok || !data.url) {
+        const uploadedUrl: string | undefined = data.data?.url || data.url;
+        if (!res.ok || !uploadedUrl) {
           throw new Error(data.message || `Lỗi tải tệp ${file.name}`);
         }
 
-        uploadedUrls.push(data.url);
+        uploadedUrls.push(uploadedUrl);
       } catch (err) {
         console.error("Upload error for file:", file.name, err);
         failureCount++;
@@ -171,6 +181,10 @@ export default function StoreImagesSettings() {
   const handleAddManualUrl = () => {
     const trimmed = manualUrl.trim();
     if (!trimmed) return;
+    if (!/^(\/(?!\/)|https:\/\/)\S+$/i.test(trimmed)) {
+      toast.error("Đường dẫn ảnh phải bắt đầu bằng / (ảnh trong site) hoặc https://");
+      return;
+    }
 
     if (images.length >= MAX_IMAGES) {
       toast.error(`Tối đa ${MAX_IMAGES} ảnh showroom`);
@@ -222,6 +236,8 @@ export default function StoreImagesSettings() {
   };
 
   const hasUnsavedChanges = JSON.stringify(images) !== JSON.stringify(initialImages);
+  // Khóa thao tác khi đang lưu/tải lên: các lần lưu chạy song song có thể tới backend sai thứ tự và ghi đè nhau
+  const busy = saving || uploading;
 
   if (loading) {
     return (
@@ -230,6 +246,19 @@ export default function StoreImagesSettings() {
           <Loader2 className="h-8 w-8 animate-spin text-brand-green" />
           <span className="text-sm font-semibold">Đang tải danh sách ảnh showroom...</span>
         </div>
+      </div>
+    );
+  }
+
+  if (loadFailed) {
+    return (
+      <div className="rounded-3xl border border-rose-200 bg-white p-12 text-center space-y-3">
+        <p className="text-sm font-bold text-rose-700">Không tải được danh sách ảnh showroom từ máy chủ.</p>
+        <p className="text-xs text-navy/60">Tải lại trang để thử lại. Chỉnh sửa bị khóa để tránh ghi đè dữ liệu hiện có.</p>
+        <Button type="button" variant="outline" size="sm" onClick={() => window.location.reload()} className="text-xs font-bold">
+          <RefreshCw size={13} className="mr-1.5" />
+          Tải lại
+        </Button>
       </div>
     );
   }
@@ -265,6 +294,7 @@ export default function StoreImagesSettings() {
             variant="outline"
             size="sm"
             onClick={handleResetDefaults}
+            disabled={busy}
             className="text-xs font-bold text-navy/70 hover:text-navy cursor-pointer"
           >
             <RefreshCw size={14} className="mr-1.5" />
@@ -274,7 +304,7 @@ export default function StoreImagesSettings() {
           <Button
             type="button"
             size="sm"
-            disabled={saving || !hasUnsavedChanges}
+            disabled={busy || !hasUnsavedChanges}
             onClick={() => void saveImagesDirectly(images)}
             className="bg-brand-green text-xs font-bold text-white hover:bg-brand-green/90 cursor-pointer"
           >
@@ -304,11 +334,13 @@ export default function StoreImagesSettings() {
         <div className="space-y-6 lg:col-span-7">
           {/* Dropzone */}
           <div
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => {
+              if (!busy) fileInputRef.current?.click();
+            }}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               e.preventDefault();
-              if (e.dataTransfer.files) {
+              if (!busy && e.dataTransfer.files) {
                 void handleUploadFiles(e.dataTransfer.files);
               }
             }}
@@ -389,6 +421,7 @@ export default function StoreImagesSettings() {
                 type="button"
                 size="sm"
                 onClick={handleAddManualUrl}
+                disabled={busy}
                 className="bg-brand-green text-xs font-bold text-white shrink-0 cursor-pointer"
               >
                 <Plus size={14} className="mr-1" />
@@ -472,7 +505,7 @@ export default function StoreImagesSettings() {
                   >
                     <button
                       type="button"
-                      disabled={idx === 0}
+                      disabled={busy || idx === 0}
                       onClick={() => handleMove(idx, "left")}
                       title="Chuyển lên trước"
                       className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-light/80 text-navy/60 transition-colors hover:border-navy hover:text-navy disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
@@ -482,7 +515,7 @@ export default function StoreImagesSettings() {
 
                     <button
                       type="button"
-                      disabled={idx === images.length - 1}
+                      disabled={busy || idx === images.length - 1}
                       onClick={() => handleMove(idx, "right")}
                       title="Chuyển về sau"
                       className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-light/80 text-navy/60 transition-colors hover:border-navy hover:text-navy disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"
@@ -492,7 +525,7 @@ export default function StoreImagesSettings() {
 
                     <button
                       type="button"
-                      disabled={images.length <= MIN_IMAGES}
+                      disabled={busy || images.length <= MIN_IMAGES}
                       onClick={() => handleRemove(idx)}
                       title="Xóa ảnh này"
                       className="flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 text-red-500 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-30 cursor-pointer"

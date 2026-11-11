@@ -48,6 +48,8 @@ export interface StoreSettingsInput {
   openingHours: StoreOpeningHours;
   heroBanners?: string[];
   storeImages?: string[];
+  /** Banner ưu đãi trên trang /products; mảng rỗng = ẩn banner */
+  promoBanners?: string[];
 }
 
 export interface StoreSettings extends StoreSettingsInput {
@@ -57,5 +59,6 @@ export interface StoreSettings extends StoreSettingsInput {
   mainAddress: string;
   heroBanners?: string[];
   storeImages?: string[];
+  promoBanners?: string[];
   updatedAt: string;
 }

@@ -20,6 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StoreSettingsForm from "@/components/admin/StoreSettingsForm";
 import HeroBannersSettings from "@/components/admin/HeroBannersSettings";
 import StoreImagesSettings from "@/components/admin/StoreImagesSettings";
+import PromoBannersSettings from "@/components/admin/PromoBannersSettings";
 
 export default function AdminSettingsPage() {
   const { user, login, logout } = useAdminAuth();
@@ -176,6 +177,7 @@ export default function AdminSettingsPage() {
           <TabsTrigger value="store">Thông tin cửa hàng</TabsTrigger>
           <TabsTrigger value="banners">Banner Hero (Trang chủ)</TabsTrigger>
           <TabsTrigger value="store-images">Ảnh Showroom & Album</TabsTrigger>
+          <TabsTrigger value="promo-banners">Banner Ưu đãi (Sản phẩm)</TabsTrigger>
           <TabsTrigger value="account">Tài khoản & bảo mật</TabsTrigger>
         </TabsList>
 
@@ -189,6 +191,10 @@ export default function AdminSettingsPage() {
 
         <TabsContent value="store-images">
           <StoreImagesSettings />
+        </TabsContent>
+
+        <TabsContent value="promo-banners">
+          <PromoBannersSettings />
         </TabsContent>
 
         <TabsContent value="account" className="space-y-6">

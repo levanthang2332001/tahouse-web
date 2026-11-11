@@ -144,4 +144,41 @@ describe('SettingsRepository', () => {
     expect(mockDb.update).toHaveBeenCalled();
     expect(result.storeImages).toEqual(['/store/1.jpg', '/store/2.jpg']);
   });
+
+  it('should update promoBanners in metadata', async () => {
+    const updateDto = { promoBanners: ['/promo/a.jpg', '/promo/b.jpg'] };
+
+    mockDb.query.storeSettings.findFirst
+      .mockResolvedValueOnce(mockSettingsRow)
+      .mockResolvedValueOnce({
+        ...mockSettingsRow,
+        metadata: { promoBanners: updateDto.promoBanners },
+      });
+
+    const result = await repository.updateSettings(updateDto);
+    expect(mockDb.update).toHaveBeenCalled();
+    expect(result.promoBanners).toEqual(['/promo/a.jpg', '/promo/b.jpg']);
+  });
+
+  it('should keep an empty promoBanners list instead of falling back to the default', async () => {
+    mockDb.query.storeSettings.findFirst
+      .mockResolvedValueOnce(mockSettingsRow)
+      .mockResolvedValueOnce({
+        ...mockSettingsRow,
+        metadata: { promoBanners: [] },
+      });
+
+    const result = await repository.updateSettings({ promoBanners: [] });
+    expect(result.promoBanners).toEqual([]);
+  });
+
+  it('should return the default promo banner when none was ever saved', async () => {
+    mockDb.query.storeSettings.findFirst.mockResolvedValueOnce({
+      ...mockSettingsRow,
+      metadata: {},
+    });
+
+    const result = await repository.getSettings();
+    expect(result.promoBanners).toEqual(['/promo/uudai.jpg']);
+  });
 });

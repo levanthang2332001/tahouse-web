@@ -6,13 +6,20 @@ import {
   IsBoolean,
   IsEmail,
   IsNotEmpty,
+  IsObject,
   IsOptional,
   IsString,
+  Matches,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { DefaultErrorCode } from '@/common/decorators';
 import { ErrorCode } from '@/common/constants';
+
+/** Ảnh hợp lệ: đường dẫn tĩnh trong site ("/promo/a.jpg") hoặc URL https */
+const IMAGE_SRC_REGEX = /^(\/(?!\/)|https:\/\/)\S+$/i;
+const IMAGE_SRC_MESSAGE =
+  'Đường dẫn ảnh phải bắt đầu bằng / (ảnh trong site) hoặc https://';
 
 export class SocialLinksDto {
   @ApiPropertyOptional({
@@ -282,6 +289,7 @@ export class UpdateStoreSettingsDto {
   @ArrayMinSize(1, { message: 'Cần tối thiểu 1 ảnh banner hero' })
   @ArrayMaxSize(10, { message: 'Tối đa 10 ảnh banner hero' })
   @IsString({ each: true, message: 'Mỗi đường dẫn ảnh banner hero phải là chuỗi ký tự' })
+  @Matches(IMAGE_SRC_REGEX, { each: true, message: IMAGE_SRC_MESSAGE })
   heroBanners?: string[];
 
   @ApiPropertyOptional({
@@ -294,11 +302,29 @@ export class UpdateStoreSettingsDto {
   @ArrayMinSize(1, { message: 'Cần tối thiểu 1 ảnh showroom' })
   @ArrayMaxSize(20, { message: 'Tối đa 20 ảnh showroom' })
   @IsString({ each: true, message: 'Mỗi đường dẫn ảnh showroom phải là chuỗi ký tự' })
+  @Matches(IMAGE_SRC_REGEX, { each: true, message: IMAGE_SRC_MESSAGE })
   storeImages?: string[];
+
+  @ApiPropertyOptional({
+    description:
+      'Danh sách 0 đến 10 ảnh banner ưu đãi trên trang sản phẩm (mảng rỗng để ẩn banner)',
+    type: [String],
+    example: ['/promo/uudai.jpg'],
+  })
+  @IsOptional()
+  @IsArray({ message: 'Danh sách banner ưu đãi phải là một mảng' })
+  @ArrayMaxSize(10, { message: 'Tối đa 10 banner ưu đãi' })
+  @IsString({
+    each: true,
+    message: 'Mỗi đường dẫn banner ưu đãi phải là chuỗi ký tự',
+  })
+  @Matches(IMAGE_SRC_REGEX, { each: true, message: IMAGE_SRC_MESSAGE })
+  promoBanners?: string[];
 
   @ApiPropertyOptional({
     description: 'Thông tin mở rộng khác',
   })
   @IsOptional()
+  @IsObject({ message: 'metadata phải là một object' })
   metadata?: Record<string, any>;
 }

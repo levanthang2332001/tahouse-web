@@ -17,6 +17,9 @@ describe('SettingsController', () => {
     primaryPhone: '1900 8899',
     primaryEmail: 'info@takit.vn',
     mainAddress: '961A Kha Vạn Cân',
+    heroBanners: ['/parner.jpg'],
+    storeImages: ['/store/1.jpg'],
+    promoBanners: ['/promo/uudai.jpg'],
     updatedAt: new Date(),
   };
 

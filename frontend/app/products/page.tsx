@@ -17,6 +17,7 @@ import { filterBrandsForCategory, mapFilterToApiParams } from "@/lib/product-fil
 import type { Brand, Product } from "@/lib/types/product";
 import { MAX_PRODUCT_PRICE } from "@/lib/types/product";
 import type { CatalogSection } from "@/data/catalog-taxonomy";
+import PromoBanner from "@/components/PromoBanner";
 
 const GRID_COLUMNS = 3;
 const PAGE_SIZE = GRID_COLUMNS * 7; // 21 sản phẩm = 7 hàng × 3 cột
@@ -699,6 +700,12 @@ function ProductListContent() {
 
           {/* Right Product Grid */}
           <div className="min-w-0 flex-1 [overflow-anchor:none]" ref={gridRef}>
+            {/* Banner ưu đãi: chỉ khi xem toàn bộ catalog ở trang 1; ẩn khi khách đã lọc/tìm/sang trang để không đẩy sản phẩm xuống */}
+            {page === 1 &&
+              isUnfilteredCatalogView(filter, selectedBrand, debouncedSearch, minPrice, maxPrice) && (
+                <PromoBanner className="mb-6 w-full" />
+              )}
+
             {/* Grid Header with Counts and Dropdowns */}
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="text-[13px] font-semibold text-navy/75 leading-none">

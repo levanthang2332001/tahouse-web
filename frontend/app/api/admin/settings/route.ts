@@ -48,6 +48,26 @@ function list(value: unknown, label: string): Record<string, unknown>[] {
   });
 }
 
+/** Đường dẫn ảnh hợp lệ: đường dẫn tĩnh trong site ("/promo/a.jpg") hoặc URL https */
+const IMAGE_SRC_RE = /^(\/(?!\/)|https:\/\/)\S+$/i;
+
+/** Danh sách ảnh tùy chọn (undefined = không cập nhật); kiểm tra số lượng và định dạng từng đường dẫn */
+function imageList(value: unknown, label: string, min: number, max: number): string[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) throw new InputError(`Danh sách ${label} phải là một mảng`);
+  if (value.length < min) throw new InputError(`Cần tối thiểu ${min} ${label}`);
+  if (value.length > max) throw new InputError(`Tối đa ${max} ${label}`);
+  return value.map((item, idx) => {
+    const src = typeof item === "string" ? item.trim() : "";
+    if (!src || src.length > 1000 || !IMAGE_SRC_RE.test(src)) {
+      throw new InputError(
+        `${label[0].toUpperCase()}${label.slice(1)} #${idx + 1} không hợp lệ (cần đường dẫn bắt đầu bằng / hoặc https://)`,
+      );
+    }
+    return src;
+  });
+}
+
 /**
  * Validates the body and keeps only fields the backend DTO accepts, so malformed or stray client data never
  * reaches the API. Throws InputError with a user-facing message.
@@ -55,50 +75,19 @@ function list(value: unknown, label: string): Record<string, unknown>[] {
 function pickSettingsInput(body: unknown): Partial<StoreSettingsInput> {
   if (!isRecord(body)) throw new InputError("Dữ liệu cấu hình không đúng định dạng");
 
-  let heroBanners: string[] | undefined;
-  if (body.heroBanners !== undefined) {
-    if (!Array.isArray(body.heroBanners)) {
-      throw new InputError("Danh sách ảnh banner hero phải là một mảng");
-    }
-    if (body.heroBanners.length < 1) {
-      throw new InputError("Cần tối thiểu 1 ảnh banner hero");
-    }
-    if (body.heroBanners.length > 10) {
-      throw new InputError("Tối đa 10 ảnh banner hero");
-    }
-    heroBanners = body.heroBanners.map((item, idx) => {
-      if (typeof item !== "string" || !item.trim()) {
-        throw new InputError(`Ảnh banner #${idx + 1} không hợp lệ`);
-      }
-      return item.trim();
-    });
-  }
+  const heroBanners = imageList(body.heroBanners, "ảnh banner hero", 1, 10);
+  const storeImages = imageList(body.storeImages, "ảnh showroom", 1, 20);
+  const promoBanners = imageList(body.promoBanners, "banner ưu đãi", 0, 10);
 
-  let storeImages: string[] | undefined;
-  if (body.storeImages !== undefined) {
-    if (!Array.isArray(body.storeImages)) {
-      throw new InputError("Danh sách ảnh showroom phải là một mảng");
-    }
-    if (body.storeImages.length < 1) {
-      throw new InputError("Cần tối thiểu 1 ảnh showroom");
-    }
-    if (body.storeImages.length > 20) {
-      throw new InputError("Tối đa 20 ảnh showroom");
-    }
-    storeImages = body.storeImages.map((item, idx) => {
-      if (typeof item !== "string" || !item.trim()) {
-        throw new InputError(`Ảnh showroom #${idx + 1} không hợp lệ`);
-      }
-      return item.trim();
-    });
-  }
+  const imageLists = {
+    ...(heroBanners !== undefined ? { heroBanners } : {}),
+    ...(storeImages !== undefined ? { storeImages } : {}),
+    ...(promoBanners !== undefined ? { promoBanners } : {}),
+  };
 
-  // If this is a dedicated heroBanners or storeImages update
-  if (body.storeName === undefined && (heroBanners !== undefined || storeImages !== undefined)) {
-    return {
-      ...(heroBanners !== undefined ? { heroBanners } : {}),
-      ...(storeImages !== undefined ? { storeImages } : {}),
-    };
+  // Các tab ảnh (banner hero / showroom / ưu đãi) chỉ gửi danh sách ảnh, không gửi cả form thông tin cửa hàng
+  if (body.storeName === undefined && Object.keys(imageLists).length > 0) {
+    return imageLists;
   }
 
   const social = body.socialLinks === undefined ? {} : body.socialLinks;
@@ -149,41 +138,17 @@ function pickSettingsInput(body: unknown): Partial<StoreSettingsInput> {
       weekend: text(hours.weekend, "Giờ Thứ 7 – Chủ nhật") || undefined,
       note: text(hours.note, "Ghi chú giờ mở cửa", 300) || undefined,
     },
-    ...(heroBanners !== undefined ? { heroBanners } : {}),
-    ...(storeImages !== undefined ? { storeImages } : {}),
+    ...imageLists,
   };
 }
-
-import { getSavedHeroBanners, saveHeroBanners } from "@/lib/server/hero-banners";
-import { getSavedStoreImages, saveStoreImages } from "@/lib/server/store-images";
 
 export async function GET(request: NextRequest) {
   if (!checkAdminRequestAuth(request)) return unauthorized();
 
   try {
-    const [settings, savedBanners, savedStoreImages] = await Promise.all([
-      adminBackendFetch<StoreSettings>("/admin/settings", { cache: "no-store" }).catch(() => null),
-      getSavedHeroBanners(),
-      getSavedStoreImages(),
-    ]);
-
-    const heroBanners =
-      Array.isArray(settings?.heroBanners) && settings.heroBanners.length > 0 && settings.heroBanners[0] !== "/parner.jpg"
-        ? settings.heroBanners
-        : savedBanners;
-
-    const storeImages =
-      Array.isArray(settings?.storeImages) && settings.storeImages.length > 0
-        ? settings.storeImages
-        : savedStoreImages;
-
-    const mergedSettings = {
-      ...(settings || {}),
-      heroBanners,
-      storeImages,
-    };
-
-    return NextResponse.json({ success: true, settings: mergedSettings });
+    // Backend là nguồn dữ liệu duy nhất (kể cả heroBanners / storeImages trong metadata)
+    const settings = await adminBackendFetch<StoreSettings>("/admin/settings", { cache: "no-store" });
+    return NextResponse.json({ success: true, settings });
   } catch (error) {
     console.error("[GET /api/admin/settings]", error);
     return adminErrorResponse(error, "Không thể tải cấu hình cửa hàng");
@@ -202,49 +167,12 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    let savedBanners: string[] | undefined;
-    if (input.heroBanners !== undefined) {
-      savedBanners = await saveHeroBanners(input.heroBanners);
-    }
-
-    let savedStoreImages: string[] | undefined;
-    if (input.storeImages !== undefined) {
-      savedStoreImages = await saveStoreImages(input.storeImages);
-    }
-
-    const bodyToSend = {
-      ...input,
-      ...(input.heroBanners !== undefined || input.storeImages !== undefined
-        ? {
-            metadata: {
-              ...(input.heroBanners !== undefined ? { heroBanners: input.heroBanners } : {}),
-              ...(input.storeImages !== undefined ? { storeImages: input.storeImages } : {}),
-            },
-          }
-        : {}),
-    };
-
-    let settings: StoreSettings | undefined;
-    try {
-      settings = await adminBackendFetch<StoreSettings>("/admin/settings", {
-        method: "PATCH",
-        body: JSON.stringify(bodyToSend),
-      });
-    } catch (err) {
-      console.warn("[PUT /api/admin/settings] backend sync notice:", err);
-    }
-
-    const finalSettings = {
-      ...(settings || {}),
-      ...(savedBanners ? { heroBanners: savedBanners } : {}),
-      ...(savedStoreImages ? { storeImages: savedStoreImages } : {}),
-    };
-
-    return NextResponse.json({
-      success: true,
-      message: "Đã lưu cấu hình cửa hàng",
-      settings: finalSettings,
+    // PATCH, not PUT: chỉ gửi các field form sở hữu; backend tự merge heroBanners/storeImages vào metadata
+    const settings = await adminBackendFetch<StoreSettings>("/admin/settings", {
+      method: "PATCH",
+      body: JSON.stringify(input),
     });
+    return NextResponse.json({ success: true, message: "Đã lưu cấu hình cửa hàng", settings });
   } catch (error) {
     console.error("[PUT /api/admin/settings]", error);
     return adminErrorResponse(error, "Không thể lưu cấu hình cửa hàng");

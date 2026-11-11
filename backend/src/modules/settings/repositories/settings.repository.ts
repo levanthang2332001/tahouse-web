@@ -45,6 +45,7 @@ export class SettingsRepository {
           ...DEFAULT_STORE_SETTINGS.metadata,
           heroBanners: DEFAULT_STORE_SETTINGS.heroBanners,
           storeImages: DEFAULT_STORE_SETTINGS.storeImages,
+          promoBanners: DEFAULT_STORE_SETTINGS.promoBanners,
         },
         createdAt: now,
         updatedAt: now,
@@ -88,7 +89,8 @@ export class SettingsRepository {
       if (
         dto.metadata !== undefined ||
         dto.heroBanners !== undefined ||
-        dto.storeImages !== undefined
+        dto.storeImages !== undefined ||
+        dto.promoBanners !== undefined
       ) {
         const currentMeta = (existing.metadata as Record<string, any>) || {};
         updateData.metadata = {
@@ -96,6 +98,9 @@ export class SettingsRepository {
           ...(dto.metadata !== undefined ? dto.metadata : {}),
           ...(dto.heroBanners !== undefined ? { heroBanners: dto.heroBanners } : {}),
           ...(dto.storeImages !== undefined ? { storeImages: dto.storeImages } : {}),
+          ...(dto.promoBanners !== undefined
+            ? { promoBanners: dto.promoBanners }
+            : {}),
         };
       }
 
@@ -117,6 +122,7 @@ export class SettingsRepository {
           ...(dto.metadata || DEFAULT_STORE_SETTINGS.metadata),
           heroBanners: dto.heroBanners || DEFAULT_STORE_SETTINGS.heroBanners,
           storeImages: dto.storeImages || DEFAULT_STORE_SETTINGS.storeImages,
+          promoBanners: dto.promoBanners ?? DEFAULT_STORE_SETTINGS.promoBanners,
         },
         createdAt: now,
         updatedAt: now,
