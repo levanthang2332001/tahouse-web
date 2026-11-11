@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight, LayoutGrid } from "lucide-react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { ArrowRight, ChevronLeft, ChevronRight, LayoutGrid } from "lucide-react";
 import { GoGoal } from "react-icons/go";
 import { GiAutoRepair } from "react-icons/gi";
 import { MdOutlineSecurity } from "react-icons/md";
@@ -15,29 +15,157 @@ const CHECK_ITEMS = [
   { icon: MdOutlineSecurity, label: "Sử dụng lâu dài" },
 ] as const;
 
+const slideVariants: Variants = {
+  enter: (d: number) => ({
+    x: d > 0 ? "100%" : "-100%",
+  }),
+  center: {
+    x: 0,
+    transition: {
+      x: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const },
+    },
+  },
+  exit: (d: number) => ({
+    x: d > 0 ? "-100%" : "100%",
+    transition: {
+      x: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const },
+    },
+  }),
+};
+
 export default function HeroSection() {
+  const [banners, setBanners] = useState<string[]>(["/parner.jpg"]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+
+  const paginate = useCallback(
+    (newDirection: number) => {
+      setDirection(newDirection);
+      setCurrentIndex((prev) => {
+        if (newDirection > 0) {
+          return (prev + 1) % banners.length;
+        }
+        return (prev - 1 + banners.length) % banners.length;
+      });
+    },
+    [banners.length],
+  );
+
+  useEffect(() => {
+    fetch("/api/settings", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data?.heroBanners) && data.heroBanners.length > 0) {
+          setBanners(data.heroBanners);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Auto scroll to the left every 8s
+  useEffect(() => {
+    if (banners.length <= 1) return;
+    const interval = setInterval(() => {
+      paginate(1);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [banners.length, paginate]);
+
+  const activeBanner = banners[currentIndex] || "/parner.jpg";
+
   return (
     <section className="relative w-full bg-white overflow-hidden py-12 lg:py-20 flex items-center min-h-[550px] lg:min-h-[650px] border-b border-gray-light/35">
-      {/* Right-aligned background image with elegant split fade */}
-      <div className="absolute top-0 right-0 h-full w-full lg:w-1/2 z-0">
+      {/* Right-aligned background image carousel with auto scroll & swipe */}
+      <div className="absolute top-0 right-0 h-full w-full lg:w-1/2 z-0 group overflow-hidden">
         <div className="relative h-full w-full">
-          <Image
-            src="/parner.jpg"
-            alt="TA HOUSE Smart Kitchen Solutions"
-            fill
-            priority
-            unoptimized
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover"
-          />
-          {/* Smooth fade overlay to merge with left cream background */}
-          <div className="hidden lg:block absolute inset-0 bg-gradient-to-r from-white from-0% to-transparent to-25% z-10" />
+          <AnimatePresence initial={false} custom={direction}>
+            <motion.div
+              key={currentIndex}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              drag={banners.length > 1 ? "x" : false}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.25}
+              onDragEnd={(_, info) => {
+                const swipeThreshold = 40;
+                if (info.offset.x < -swipeThreshold || info.velocity.x < -300) {
+                  // Vuốt sang trái (swiped left) -> chuyển sang slide kế tiếp
+                  paginate(1);
+                } else if (info.offset.x > swipeThreshold || info.velocity.x > 300) {
+                  // Vuốt sang phải (swiped right) -> chuyển về slide trước
+                  paginate(-1);
+                }
+              }}
+              className="absolute inset-0 h-full w-full cursor-grab active:cursor-grabbing touch-pan-y"
+            >
+              <Image
+                src={activeBanner}
+                alt={`TA HOUSE Smart Kitchen Solutions - Banner ${currentIndex + 1}`}
+                fill
+                priority={currentIndex === 0}
+                unoptimized
+                draggable={false}
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover select-none pointer-events-none"
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Pagination indicators and controls when more than 1 image */}
+          {banners.length > 1 && (
+            <>
+              {/* Dots navigation (centered) */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-white/80 backdrop-blur-xs px-3 py-1.5 rounded-full shadow-xs">
+                {banners.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      if (idx !== currentIndex) {
+                        setDirection(idx > currentIndex ? 1 : -1);
+                        setCurrentIndex(idx);
+                      }
+                    }}
+                    aria-label={`Chuyển tới slide ${idx + 1}`}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      idx === currentIndex
+                        ? "w-6 bg-brand-green"
+                        : "w-2 bg-navy/25 hover:bg-navy/50"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {/* Previous button on left edge */}
+              <button
+                type="button"
+                onClick={() => paginate(-1)}
+                aria-label="Slide trước"
+                className="absolute top-1/2 -translate-y-1/2 left-3 sm:left-4 z-20 w-10 sm:w-12 h-20 sm:h-24 rounded-2xl bg-white/25 hover:bg-white/55 backdrop-blur-md text-navy/60 hover:text-navy border border-white/30 shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-105"
+              >
+                <ChevronLeft className="h-7 w-7 sm:h-8 sm:w-8 stroke-[2.2]" />
+              </button>
+
+              {/* Next button on right edge */}
+              <button
+                type="button"
+                onClick={() => paginate(1)}
+                aria-label="Slide sau"
+                className="absolute top-1/2 -translate-y-1/2 right-3 sm:right-4 z-20 w-10 sm:w-12 h-20 sm:h-24 rounded-2xl bg-white/25 hover:bg-white/55 backdrop-blur-md text-navy/60 hover:text-navy border border-white/30 shadow-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-105"
+              >
+                <ChevronRight className="h-7 w-7 sm:h-8 sm:w-8 stroke-[2.2]" />
+              </button>
+            </>
+          )}
         </div>
       </div>
 
       {/* Content container (left-aligned on desktop) */}
       <div className="relative z-20 mx-auto flex w-full max-w-[1440px] px-6 lg:px-12">
-        <div className="max-w-2xl text-left bg-white/85 p-6 rounded-2xl backdrop-blur-xs lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+        <div className="hidden lg:block max-w-2xl text-left">
           {/* Subtitle accent */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}

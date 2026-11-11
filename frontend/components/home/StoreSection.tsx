@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -11,8 +11,25 @@ import { useStoreInfo } from "@/context/StoreInfoContext";
 
 export default function StoreSection() {
   const store = useStoreInfo();
+  const [images, setImages] = useState<string[]>(
+    Array.isArray(store.storeImages) && store.storeImages.length > 0
+      ? store.storeImages
+      : STORE_IMAGES,
+  );
   const [active, setActive] = useState(0);
-  const featured = STORE_IMAGES[active] ?? STORE_IMAGES[0];
+
+  useEffect(() => {
+    fetch("/api/settings", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data?.storeImages) && data.storeImages.length > 0) {
+          setImages(data.storeImages);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const featured = images[active] ?? images[0] ?? "/store/2.jpg";
 
   return (
     <section
@@ -52,14 +69,14 @@ export default function StoreSection() {
               />
             </div>
 
-            <div className="mt-3 flex gap-2 sm:gap-2.5">
-              {STORE_IMAGES.map((src, idx) => (
+            <div className="mt-3 flex gap-2 sm:gap-2.5 overflow-x-auto py-1 invisible-scrollbar">
+              {images.map((src, idx) => (
                 <button
-                  key={src}
+                  key={`${src}-${idx}`}
                   type="button"
                   onClick={() => setActive(idx)}
                   aria-label={`Xem ảnh showroom ${idx + 1}`}
-                  className={`relative h-16 w-12 shrink-0 overflow-hidden rounded-sm bg-gray-200 transition-[box-shadow,opacity] sm:h-20 sm:w-14 ${
+                  className={`relative h-16 w-12 shrink-0 overflow-hidden rounded-sm bg-gray-200 transition-[box-shadow,opacity] sm:h-20 sm:w-14 cursor-pointer ${
                     active === idx
                       ? "ring-2 ring-brand-green ring-offset-2 ring-offset-cream"
                       : "opacity-90 hover:opacity-100"
