@@ -235,7 +235,13 @@ function ProductListContent() {
 
   useEffect(() => {
     fetchBrands()
-      .then(setBrands)
+      .then((data) => {
+        // Chỉ lưu và hiển thị những thương hiệu đã có sản phẩm trong hệ thống
+        const withProducts = (data || []).filter(
+          (b) => typeof b.productCount !== "number" || b.productCount > 0,
+        );
+        setBrands(withProducts);
+      })
       .catch(() => setBrands([]));
   }, []);
 

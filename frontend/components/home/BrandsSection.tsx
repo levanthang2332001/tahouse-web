@@ -47,22 +47,49 @@ function PartnerLogo({
 }
 
 const HOME_BRANDS: DisplayBrand[] = [
-  // Dãy 1: Bosch, Kassler, GrandX, Eurosun
-  { name: "Bosch", slug: "bosch", logo: "/brands/bosch.svg" },
+  // Dãy 1: Bosch, Kassler, GrandX, Nobinox
+  { name: "Bosch", slug: "bosch", logo: "/brands/bosch.png" },
   { name: "Kassler", slug: "kassler", logo: "/brands/kassler-2026.png" },
   { name: "GrandX", slug: "grandx", logo: "/brands/grandx-2026.png" },
-  { name: "Eurosun", slug: "eurosun", logo: "/brands/eurosun-2026.png" },
-  // Dãy 2: Eurogold, Konox, Kocher, Malloca
+  { name: "Nobinox", slug: "nobinox", logo: "/brands/nobinox.png" },
+  // Dãy 2: Eurogold, Malloca, Hubert, Philips
   { name: "Eurogold", slug: "eurogold", logo: "/brands/eurogold-2026.jpg" },
-  { name: "Konox", slug: "konox", logo: "/brands/konox-2026.png" },
-  { name: "Kocher", slug: "kocher", logo: "/brands/kocher-2026.png" },
-  { name: "Malloca", slug: "malloca", logo: "/brands/malloca-2026.svg" },
+  { name: "Malloca", slug: "malloca", logo: "/brands/malloca-2026.png" },
+  { name: "Hubert", slug: "hubert", logo: "/brands/hubert.png" },
+  { name: "Philips", slug: "philips", logo: "/brands/philips.png" },
 ];
 
 export default function BrandsSection() {
-  // Logo trang chủ được chọn riêng cho section này, không lấy từ /api/brands
-  // (API trả logo mặc định toàn site và sẽ ghi đè logo mới).
-  const brands = HOME_BRANDS;
+  const [brands, setBrands] = useState<DisplayBrand[]>(HOME_BRANDS);
+
+  React.useEffect(() => {
+    fetch("/api/brands")
+      .then((res) => res.json())
+      .then((data: unknown) => {
+        if (!Array.isArray(data)) return;
+        const brandMap = new Map<string, string>();
+        for (const b of data) {
+          const count = typeof b?.productCount === "number" ? b.productCount : 1;
+          if (count > 0 && b?.logo) {
+            if (b.name) brandMap.set(String(b.name).toLowerCase().trim(), String(b.logo));
+            if (b.slug) brandMap.set(String(b.slug).toLowerCase().trim(), String(b.logo));
+          }
+        }
+
+        setBrands(
+          HOME_BRANDS.map((item) => {
+            const liveLogo =
+              brandMap.get(item.slug.toLowerCase().trim()) ||
+              brandMap.get(item.name.toLowerCase().trim());
+            return {
+              ...item,
+              logo: liveLogo || item.logo,
+            };
+          }),
+        );
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <section className="w-full bg-cream py-14 lg:py-20">

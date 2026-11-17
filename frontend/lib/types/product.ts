@@ -56,7 +56,7 @@ export interface ProductsListResponse {
 }
 
 export interface Brand {
-  id: number;
+  id: number | string;
   name: string;
   slug: string;
   logo: string;
@@ -64,6 +64,7 @@ export interface Brand {
   description?: string;
   website?: string;
   country?: string;
+  productCount?: number;
   categories: { slug: string; name: string }[];
 }
 

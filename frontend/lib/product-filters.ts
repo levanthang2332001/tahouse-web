@@ -187,13 +187,21 @@ export function filterBrandsForCategory(
   brands: Brand[],
   filter: string,
 ): Brand[] {
-  const slugs = getBrandMatchCategorySlugs(filter, brands);
-  if (!slugs) return brands;
+  // Chỉ hiển thị những thương hiệu đã có sản phẩm trong hệ thống
+  const brandsWithProducts = brands.filter((brand) => {
+    if (typeof brand.productCount === "number") {
+      return brand.productCount > 0;
+    }
+    return true;
+  });
+
+  const slugs = getBrandMatchCategorySlugs(filter, brandsWithProducts);
+  if (!slugs) return brandsWithProducts;
 
   const slugSet = new Set(slugs);
   const groupBrand = GROUP_BRAND_FILTERS[filter];
 
-  return brands.filter((brand) => {
+  return brandsWithProducts.filter((brand) => {
     if (groupBrand && brand.slug === groupBrand) return true;
     return (brand.categories ?? []).some((category) =>
       slugSet.has(category.slug),

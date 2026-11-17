@@ -31,7 +31,7 @@ export const SERVICES: Service[] = [
     title: "Thiết bị bếp",
     catId: "kitchen-group",
     icon: CookingPot,
-    img: "/pic/bep2.webp",
+    img: "/pic/bep.webp",
     imgClass: "object-cover",
   },
   {
@@ -67,7 +67,7 @@ export type SolutionMeta = {
 
 export const SOLUTION_META: SolutionMeta[] = [
   { img: "/pic/khoa2.jpg", icon: Shield },
-  { img: "/pic/bep2.webp", icon: CookingPot },
+  { img: "/pic/bep.webp", icon: CookingPot },
 ];
 
 // ---------------------------------------------------------------------------
